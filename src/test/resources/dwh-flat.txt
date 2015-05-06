@@ -1,0 +1,29 @@
+@meta(sourceid)=test
+@meta(etl)=replacesource	
+# etl strategie: replacesource|replacevisit|insert
+# fallid darf leer sein (nicht erlaubt bei replacevisit)
+# dann wird pro patient ein neuer fall angelegt
+# da die echte fallid nicht übertragen werden darf, kann der importer einen hash über die echte id bilden
+# etwa fallid -> crc16(fallid+lokales geheimnis)
+# metainformation über besondere felder
+@concept(patient.birthdate)=geb
+@concept(patient.deathdate)=gest
+@concept(patient.sex)=sex
+@concept(visit.start)=vstart
+@concept(visit.end)=vend
+# eav einträge folgen
+# patid	fallid	konzept	wert	typ	start	ende	einheit
+1	2	geb	1950
+1	2	gest	2012
+1	2	sex	F
+
+
+# wie gruppierte werte?
+# z.B. so: erste zeile enthält konzeptcode, weitere Zeilen modifier codes
+# dabei muss patid,fallid,zeitstempel gleich sein.
+@modifier(start)
+1	2	gruppe1	123	N	2012
+1	2	modif1	halo	T	2012
+1	2	modif2	888	N	2012
+@modifier(end)
+
