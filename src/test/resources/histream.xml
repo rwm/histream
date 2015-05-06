@@ -1,14 +1,16 @@
 <histream>
 	<plugins>
 		<!-- plugins are loaded in order of occurance -->
-		<plugin class="de.sekmi.histream.i2b2.I2b2PatientStore">
+		<plugin class="de.sekmi.histream.i2b2.PostgresPatientStore">
 			<property name="user">i2b2demodata</property>
 		</plugin>
-		<plugin class="de.sekmi.histream.i2b2.I2b2VisitStore">
+		<plugin class="de.sekmi.histream.i2b2.PostgresVisitStore">
 			<property name="user">i2b2demodata</property>
 		</plugin>
 		<plugin class="de.sekmi.histream.i2b2.services.HiveServer">
 			<property name="user">i2b2demodata</property>
+		</plugin>
+		<plugin class="de.sekmi.histream.impl.SAXObservationProvider">
 		</plugin>
 		<plugin class="de.sekmi.histream.i2b2.I2b2Inserter">
 			<property name="user">i2b2demodata</property>
@@ -20,10 +22,10 @@
 	<!-- Wie kann die Konfiguration benutzt werden, wenn z.B. Dateien von der Kommandozeile
 	gelesen werden sollen und dann das Programm beendet werden soll?
 	 -->
-	<source plugin-ref="de.sekmi.histream.hl7.MLLPListener" />
-	<source plugin-ref="de.sekmi.histream.impl.SAXObservationProvider" />
+	<source plugin="de.sekmi.histream.hl7.MLLPListener" />
+	<source plugin="de.sekmi.histream.impl.SAXObservationProvider" />
 	
-	<destination plugin-ref="de.sekmi.histream.i2b2.I2b2Inserter" />
+	<destination plugin="de.sekmi.histream.i2b2.I2b2Inserter" />
 	
 	<!-- kann dateien von Kommandozeile lesen -->
 	<filehandler  type="text/xml" plugin-ref="de.sekmi.histream.hl7.MLLPListener">

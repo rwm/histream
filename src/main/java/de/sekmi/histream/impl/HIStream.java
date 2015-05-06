@@ -10,10 +10,13 @@ import java.util.Properties;
 
 
 
+
+
 import javax.xml.bind.JAXB;
 
 import de.sekmi.histream.Plugin;
 import de.sekmi.histream.conf.Configuration;
+import de.sekmi.histream.conf.PluginConfig;
 
 public class HIStream {
 
@@ -42,7 +45,14 @@ public class HIStream {
 		// load configuration
 		Configuration config = JAXB.unmarshal(new File("src/test/resources/histream.xml"), Configuration.class);
 		System.out.println("Configuration with "+config.getPlugins().length+" plugins");
-
+		for( PluginConfig p : config.getPlugins() ){
+			try {
+				Class<?> c = p.resolveClass();
+				System.out.println("Plugin class loaded: "+c);
+			} catch (ClassNotFoundException e) {
+				System.err.println("Plugin class not found: "+p.getClazz());
+			}
+		}
 		// load plugins
 		
 		hs.shutdown();

@@ -1,7 +1,5 @@
 package de.sekmi.histream.conf;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -23,9 +21,9 @@ public class Configuration {
     @XmlElementWrapper(name="plugins", required=true)
     protected PluginConfig[] plugins;
     @XmlElement(required = true)
-    protected List<PluginRef> source;
+    protected PluginRef[] source;
     @XmlElement(required = true)
-    protected List<PluginRef> destination;
+    protected PluginRef[] destination;
 
     
     public PluginConfig[] getPlugins(){return plugins;}
