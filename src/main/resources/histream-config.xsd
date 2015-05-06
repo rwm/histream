@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema version="1.0" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    jxb:version="1.0"
+>
 
   <xs:element name="histream" type="histream"/>
 
@@ -26,7 +30,15 @@
 
   <xs:complexType name="pluginref">
     <xs:sequence/>
-    <xs:attribute name="plugin" type="xs:IDREF" use="required"/>
+    <xs:attribute name="plugin" type="xs:IDREF" use="required">
+		<xs:annotation>
+			<xs:appinfo>
+				<jxb:property>
+					<jxb:baseType name="Plugin"/>
+				</jxb:property>
+			</xs:appinfo>
+		</xs:annotation>    
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="plugin-property">
