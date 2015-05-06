@@ -1,0 +1,55 @@
+<dwh-eav etl-strategy="replace-visit">
+	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes gr��er als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem Encounter-Start liegen -->
+	<meta>
+		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
+		<source timestamp="2015-04-21T08:58:00" system="test"/>
+		<enum concept="L:46098-0">
+			<value id="0">Male</value>
+			<value id="1">Female</value>
+		</enum>
+		<provider id="..">...</provider>
+		
+		<!-- weitere metadaten n�tig? wertebereich, datentypen, ontologie, ...? -->
+	</meta>
+	<visit>
+		<patid>XX12345</patid>
+		<surname>Dampf</surname>
+		<name>A</name>
+		<name>B</name>
+		<birthdate>2001-01-01</birthdate>
+		<deathdate>2020</deathdate>
+		<sex>F</sex>
+		<encounter start="2014-01-01T10:30:00" end="2014-01-05T10:30:00">XXE12345</encounter>
+		<location>Zuhause</location>
+		<!-- TODO inpatient/outpatient -->
+		<provider>xxxa</provider>
+		<facts>
+			<!--  test parsing of partial time stamps -->
+			<eav-item concept="T:date:secs" start="2014-09-07T10:40:03"/>
+			<eav-item concept="T:date:mins" start="2014-09-07T10:40"/>
+			<eav-item concept="T:date:hours" start="2014-09-07T10"/>
+			<eav-item concept="T:date:day" start="2014-09-07"/>
+			<eav-item concept="T:date:month" start="2014-09"/>
+			<eav-item concept="T:date:year" start="2014"/>
+			
+			<!-- test parsing of data types -->
+			<eav-item concept="T:type:str" type="xsi:string">abc123</eav-item>
+			<eav-item concept="T:type:int" type="xsi:integer">123</eav-item>
+			<!-- value attributes can be used in elements eav-item and value -->
+			<eav-item concept="T:type:dec" type="xsi:decimal" unit="mm" flag="A">123.456</eav-item>
+			<!-- 
+			<eav-item concept="T:type:enum" type="xsi:integer">1</eav-item>
+				-->
+			<!--  test group items -->
+			
+			<eav-group concept="T:group:1">
+				<value modifier="T:mod:1"/>
+				<value modifier="T:mod:2" type="xsi:string">def456</value>
+				<value modifier="T:mod:3" type="xsi:decimal" unit="mm" flag="A">78.9</value>
+			</eav-group>
+		
+		</facts>
+	</visit>
+	<!-- weitere zeitstempel -->
+	
+</dwh-eav>
