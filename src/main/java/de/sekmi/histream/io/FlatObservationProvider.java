@@ -1,13 +1,15 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.io;
 
 import java.util.Hashtable;
 import java.util.Map;
 
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.AbstractObservationProvider;
 
 /**
  * Reads a flat file with content type text/tab-separated-values.
+ * TODO rewrite to pull parser (e.g. implementing Spliterator)
  * @author Raphael
  *
  */

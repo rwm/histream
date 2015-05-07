@@ -1,4 +1,4 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.io;
 
 import java.util.function.Consumer;
 import java.util.regex.Pattern;

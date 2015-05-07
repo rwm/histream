@@ -1,4 +1,4 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.io;
 
 public interface FlatObservationWriter {
 

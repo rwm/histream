@@ -18,6 +18,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Modifier;
+import de.sekmi.histream.io.SAXObservationProvider;
 
 
 public class TestXmlReader {

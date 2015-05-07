@@ -1,4 +1,4 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,10 @@ import de.sekmi.histream.Value.Type;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.AbstractObservationProvider;
+import de.sekmi.histream.impl.AbstractValue;
+import de.sekmi.histream.impl.NumericValue;
+import de.sekmi.histream.impl.StringValue;
 
 /**
  * Sax2 content handler which reads an xml eav representation 

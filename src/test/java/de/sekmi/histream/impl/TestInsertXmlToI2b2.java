@@ -4,8 +4,10 @@ import java.io.FileInputStream;
 import java.sql.SQLException;
 
 
+
 import de.sekmi.histream.i2b2.I2b2Inserter;
 import de.sekmi.histream.i2b2.I2b2Visit;
+import de.sekmi.histream.io.SAXObservationProvider;
 
 public class TestInsertXmlToI2b2 {
 	TestPostgresVisitStore visitStore;
