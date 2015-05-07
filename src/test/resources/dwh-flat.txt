@@ -9,21 +9,37 @@
 @concept(patient.birthdate)=geb
 @concept(patient.deathdate)=gest
 @concept(patient.sex)=sex
-@concept(visit.start)=vstart
-@concept(visit.end)=vend
+@concept(patient.surname)=psurname
+@concept(patient.names)=pnames
+
+@concept(visit)=visit
+# visit start, end, location, provider
 # eav einträge folgen
-# patid	fallid	konzept	wert	typ	start	ende	einheit
-1	2	geb	1950
-1	2	gest	2012
-1	2	sex	F
+# patid	fallid	konzept	typ	wert	start	ende	einheit	provider	location
+XX12345	XXE12345	geb	2001-01-01
+XX12345	XXE12345	gest	2020
+XX12345	XXE12345	sex	F
+XX12345	XXE12345	psurname	Dampf
+XX12345	XXE12345	pnames	A B
+XX12345	XXE12345	visit	@	@	2014-01-01T10:30:00	2014-01-05T10:30:00	@	xxxa	Zuhause
 
 
-# wie gruppierte werte?
-# z.B. so: erste zeile enthält konzeptcode, weitere Zeilen modifier codes
-# dabei muss patid,fallid,zeitstempel gleich sein.
-@modifier(start)
-1	2	gruppe1	123	N	2012
-1	2	modif1	halo	T	2012
-1	2	modif2	888	N	2012
-@modifier(end)
+# normale werte
+XX12345	XXE12345	T:date:secs		@	@	2014-09-07T10:40:03
+XX12345	XXE12345	T:date:mins		@	@	2014-09-07T10:40
+XX12345	XXE12345	T:date:hours		@	@	2014-09-07T10
+XX12345	XXE12345	T:date:day		@	@	2014-09-07
+XX12345	XXE12345	T:date:month		@	@	2014-09
+XX12345	XXE12345	T:date:year		@	@	2014
+XX12345	XXE12345	T:type:str	str	abc123
+XX12345	XXE12345	T:type:int	int	123
+# value attributes can be used in elements eav-item and value -->
+XX12345	XXE12345	T:type:dec	dec	123.456	mm	
+#  test group items
+@group(start)
+XX12345	XXE12345	T:group:1	nil
+XX12345	XXE12345	T:mod:1	nil
+XX12345	XXE12345	T:mod:2	str	def456
+XX12345	XXE12345	T:mod:3	dec	78.9			mm	A
+@group(end)
 

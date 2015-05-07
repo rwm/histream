@@ -4,7 +4,12 @@ import java.util.Enumeration;
 
 import de.sekmi.histream.ext.ExternalSourceType;
 
-
+/**
+ * Observation of a single event or a single fact assigned to a single patient.
+ * TODO include java.util.stream API
+ * @author Raphael
+ *
+ */
 public interface Observation extends ConceptValuePair, ExternalSourceType{
 	String getPatientId();
 	String getEncounterId();
