@@ -1,11 +1,8 @@
 package de.sekmi.histream.impl;
 
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.sql.SQLException;
 
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.sekmi.histream.i2b2.I2b2Inserter;
 import de.sekmi.histream.i2b2.I2b2Visit;
@@ -29,7 +26,6 @@ public class TestInsertXmlToI2b2 {
 		ObservationFactoryImpl factory = new ObservationFactoryImpl();
 		factory.registerExtension(patientStore.getStore());
 		factory.registerExtension(visitStore.getStore());
-		XMLReader reader = XMLReaderFactory.createXMLReader();
 		SAXObservationProvider provider = new SAXObservationProvider(factory);
 		I2b2Inserter inserter = new I2b2Inserter();
 		inserter.open();
@@ -49,8 +45,7 @@ public class TestInsertXmlToI2b2 {
 		visitStore.getStore().loadMaxInstanceNums();
 
 		provider.setHandler(inserter);
-		reader.setContentHandler(provider);
-		reader.parse(new InputSource(new FileReader("src/test/resources/dwh-eav.xml")));
+		provider.parse(new FileInputStream("src/test/resources/dwh-eav.xml"));
 		inserter.close();
 		visitStore.close();
 		patientStore.close();

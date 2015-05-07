@@ -1,5 +1,7 @@
 package de.sekmi.histream.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.BufferOverflowException;
 import java.nio.CharBuffer;
@@ -11,14 +13,18 @@ import java.util.logging.Logger;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationParser;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Value.Type;
 import de.sekmi.histream.ext.Patient;
@@ -35,7 +41,7 @@ import de.sekmi.histream.ext.Visit;
  * @author Raphael
  *
  */
-public class SAXObservationProvider extends AbstractObservationProvider implements ContentHandler{
+public class SAXObservationProvider extends AbstractObservationProvider implements ContentHandler, ObservationParser{
 	private static final Logger log = Logger.getLogger(SAXObservationProvider.class.getName());
 
 	static private Class<?>[] supportedExtensions = new Class<?>[]{Patient.class,Visit.class};
@@ -365,5 +371,16 @@ public class SAXObservationProvider extends AbstractObservationProvider implemen
 	 */
 	public void beforeFacts(Consumer<Visit> handler){
 		this.beforeFacts = handler;
+	}
+
+	@Override
+	public void parse(InputStream input) throws IOException{
+		try {
+			XMLReader reader = XMLReaderFactory.createXMLReader();
+			reader.setContentHandler(this);
+			reader.parse(new InputSource(input));
+		} catch (SAXException e) {
+			throw new IOException(e);
+		}
 	}
 }

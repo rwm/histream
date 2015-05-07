@@ -6,7 +6,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
 
 /**
  * Observation of a single event or a single fact assigned to a single patient.
- * TODO include java.util.stream API
+ * 
  * @author Raphael
  *
  */
