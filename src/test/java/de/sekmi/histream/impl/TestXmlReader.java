@@ -102,7 +102,7 @@ public class TestXmlReader {
 		});
 		XMLReader reader = XMLReaderFactory.createXMLReader();
 		SAXObservationProvider provider = new SAXObservationProvider(factory);
-		provider.addHandler(handler);
+		provider.setHandler(handler);
 		reader.setContentHandler(provider);
 		reader.parse(new InputSource(new FileReader("src/test/resources/dwh-eav.xml")));
 		handler.finish();

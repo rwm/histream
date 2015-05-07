@@ -48,7 +48,7 @@ public class TestInsertXmlToI2b2 {
 		// load instance_num presets
 		visitStore.getStore().loadMaxInstanceNums();
 
-		provider.addHandler(inserter);
+		provider.setHandler(inserter);
 		reader.setContentHandler(provider);
 		reader.parse(new InputSource(new FileReader("src/test/resources/dwh-eav.xml")));
 		inserter.close();

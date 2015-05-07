@@ -1,35 +1,28 @@
 package de.sekmi.histream.impl;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationHandler;
 import de.sekmi.histream.ObservationProvider;
 
 public abstract class AbstractObservationProvider implements ObservationProvider {
-	private LinkedList<ObservationHandler> handlers;
+	private Consumer<Observation> consumer;
 	
 	public AbstractObservationProvider() {
-		handlers = new LinkedList<>();
 	}
 	
 	@Override
-	public void addHandler(ObservationHandler handler) {
-		handlers.add(handler);
-	}
-
-	@Override
-	public void removeHandler(ObservationHandler handler) {
-		handlers.remove(handler);
+	public void setHandler(Consumer<Observation> consumer) {
+		this.consumer = consumer;
 	}
 	
 	
 	public void provideObservation(Observation observation){
-		Iterator<ObservationHandler> iter = handlers.iterator();
+		/*Iterator<ObservationHandler> iter = handlers.iterator();
 		while( iter.hasNext() ){
 			iter.next().accept(observation);
-		}
+		}*/
+		consumer.accept(observation);
 	}
 
 }
