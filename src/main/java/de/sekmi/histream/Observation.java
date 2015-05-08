@@ -26,6 +26,7 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	DateTimeAccuracy getStartTime();
 	DateTimeAccuracy getEndTime();
 	void setEndTime(DateTimeAccuracy date);
+	void setStartTime(DateTimeAccuracy date);
 	
 	ObservationFactory getFactory();
 	<T> T getExtension(Class<T> extensionType) throws IllegalArgumentException;

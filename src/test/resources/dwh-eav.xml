@@ -1,4 +1,4 @@
-<dwh-eav etl-strategy="replace-visit">
+<dwh-eav xmlns="http://sekmi.de/histream/dwh-eav" etl-strategy="replace-visit">
 	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes gr��er als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem Encounter-Start liegen -->
 	<meta>
 		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
@@ -7,15 +7,13 @@
 			<value id="0">Male</value>
 			<value id="1">Female</value>
 		</enum>
-		<provider id="..">...</provider>
 		
 		<!-- weitere metadaten n�tig? wertebereich, datentypen, ontologie, ...? -->
 	</meta>
 	<visit>
 		<patid>XX12345</patid>
 		<surname>Dampf</surname>
-		<name>A</name>
-		<name>B</name>
+		<names>A</names>
 		<birthdate>2001-01-01</birthdate>
 		<deathdate>2020</deathdate>
 		<sex>F</sex>

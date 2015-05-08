@@ -72,7 +72,8 @@ public class ObservationImpl implements Observation{
 
 	@Override
 	public DateTimeAccuracy getStartTime() {return startTime;}
-	void setStartTime(DateTimeAccuracy startTime){this.startTime = startTime;}
+	@Override
+	public void setStartTime(DateTimeAccuracy startTime){this.startTime = startTime;}
 
 	@Override
 	public DateTimeAccuracy getEndTime() {return endTime;}
