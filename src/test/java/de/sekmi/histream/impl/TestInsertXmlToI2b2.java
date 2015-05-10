@@ -31,7 +31,8 @@ public class TestInsertXmlToI2b2 {
 		ObservationFactoryImpl factory = new ObservationFactoryImpl();
 		factory.registerExtension(patientStore.getStore());
 		factory.registerExtension(visitStore.getStore());
-		SAXObservationProvider provider = new SAXObservationProvider(factory);
+		SAXObservationProvider provider = new SAXObservationProvider();
+		provider.setObservationFactory(factory);
 		
 		Map<String,String> props = new HashMap<>();
 		props.put("user", "i2b2demodata");

@@ -116,7 +116,8 @@ public class FileObservationProviderTest {
 	@Test
 	public void testSAXReader() throws Exception{
 		XMLReader reader = XMLReaderFactory.createXMLReader();
-		SAXObservationProvider provider = new SAXObservationProvider(factory);
+		SAXObservationProvider provider = new SAXObservationProvider();
+		provider.setObservationFactory(factory);
 		provider.setHandler(handler);
 		reader.setContentHandler(provider);
 		reader.parse(new InputSource(new FileReader("src/test/resources/dwh-eav.xml")));

@@ -3,7 +3,6 @@ package de.sekmi.histream.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.util.function.Supplier;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -27,7 +26,7 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 	private AttributeAccessor atts;
 	
 	public XMLObservationProvider(ObservationFactory factory, XMLStreamReader reader) {
-		super(factory);
+		setObservationFactory(factory);
 		this.reader = reader;
 		atts = new AttributeAccessor() {
 			@Override

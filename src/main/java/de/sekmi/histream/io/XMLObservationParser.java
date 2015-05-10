@@ -9,7 +9,6 @@ import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Value.Type;
 import de.sekmi.histream.ext.Patient;
@@ -61,8 +60,7 @@ class XMLObservationParser extends AbstractObservationParser{
 	protected Patient patient;
 
 	
-	protected XMLObservationParser(ObservationFactory factory){
-		super(factory);
+	protected XMLObservationParser(){
 		visitData = new HashMap<>();
 		//factory.getExtensionAccessor(Patient.class);
 		// TODO: assert that the supportedExtensions are available from the factory

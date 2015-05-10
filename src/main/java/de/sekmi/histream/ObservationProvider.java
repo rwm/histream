@@ -5,5 +5,7 @@ import java.util.function.Consumer;
 public interface ObservationProvider{
 	void setHandler(Consumer<Observation> consumer);
 	
+	void setObservationFactory(ObservationFactory factory);
+	
 	Class<?>[] getSupportedExtensions();
 }

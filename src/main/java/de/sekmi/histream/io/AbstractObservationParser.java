@@ -15,7 +15,10 @@ public class AbstractObservationParser {
 	protected String sourceId;
 	protected String etlStrategy;
 
-	public AbstractObservationParser(ObservationFactory factory){
+	public AbstractObservationParser(){
+	}
+	
+	public void setObservationFactory(ObservationFactory factory){
 		this.factory = factory;
 	}
 	

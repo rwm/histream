@@ -49,8 +49,7 @@ public class SAXObservationProvider extends XMLObservationParser implements Cont
 	private ExtensionAccessor<Patient> patient;
 	*/
 	
-	public SAXObservationProvider(ObservationFactory factory) {
-		super(factory);
+	public SAXObservationProvider() {
 		buffer = CharBuffer.allocate(1024);
 	}
 	
@@ -205,5 +204,10 @@ public class SAXObservationProvider extends XMLObservationParser implements Cont
 	
 	private void provideObservation(Observation observation){
 		handler.accept(observation);
+	}
+
+	@Override
+	public void setObservationFactory(ObservationFactory factory) {
+		this.factory = factory;
 	}
 }

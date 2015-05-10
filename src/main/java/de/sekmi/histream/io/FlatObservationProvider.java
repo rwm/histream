@@ -90,7 +90,7 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 	}
 	
 	public FlatObservationProvider(ObservationFactory factory, BufferedReader reader){
-		super(factory);
+		setObservationFactory(factory);
 		this.reader = reader;
 		this.fieldSeparator = Pattern.compile("\\t");
 		this.metaAssignment = Pattern.compile("^#@meta\\(([a-z\\.]+)\\)=(.*)$");
