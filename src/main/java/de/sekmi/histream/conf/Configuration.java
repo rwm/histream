@@ -1,5 +1,8 @@
 package de.sekmi.histream.conf;
 
+import java.io.File;
+
+import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -8,6 +11,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
+/**
+ * Configuration for HIStream processing. Uses javax.xml.bind for loading XML files
+ * via 
+ * @author Raphael
+ *
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(namespace = "http://some/namespace",
@@ -27,4 +36,11 @@ public class Configuration {
 
     
     public PluginConfig[] getPlugins(){return plugins;}
+    public PluginRef[] getDestinations(){return destination;}
+    public PluginRef[] getSources(){return source;}
+    
+    
+    public static final Configuration fromFile(File file){
+    	return JAXB.unmarshal(file, Configuration.class);
+    }
 }

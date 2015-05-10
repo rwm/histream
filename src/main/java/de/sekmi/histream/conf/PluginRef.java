@@ -14,5 +14,11 @@ public class PluginRef {
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
     protected PluginConfig plugin;
+    
+    /**
+     * Returns a reference to a plugin configuration.
+     * @return plugin configuration
+     */
+    public PluginConfig getPlugin(){return plugin;}
 
 }

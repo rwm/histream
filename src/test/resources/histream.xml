@@ -7,12 +7,12 @@
 		<plugin class="de.sekmi.histream.i2b2.PostgresVisitStore">
 			<property name="user">i2b2demodata</property>
 		</plugin>
-		<plugin class="de.sekmi.histream.i2b2.services.HiveServer">
+		<plugin class="de.sekmi.histream.i2b2.I2b2Inserter">
 			<property name="user">i2b2demodata</property>
 		</plugin>
 		<plugin class="de.sekmi.histream.impl.SAXObservationProvider">
 		</plugin>
-		<plugin class="de.sekmi.histream.i2b2.I2b2Inserter">
+		<plugin class="de.sekmi.histream.i2b2.services.HiveServer">
 			<property name="user">i2b2demodata</property>
 		</plugin>
 		<plugin class="de.sekmi.histream.hl7.MLLPListener">
