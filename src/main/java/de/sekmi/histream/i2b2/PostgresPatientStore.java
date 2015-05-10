@@ -11,9 +11,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 
 
@@ -92,9 +93,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	 * 	fetchSize (int, 10000)
 	 * @param configuration
 	 */
-	public PostgresPatientStore(Properties configuration) {
+	public PostgresPatientStore(Map<String,String> configuration) {
 		super(configuration);
-		this.projectId = config.getProperty("project");
+		this.projectId = config.get("project");
 		if( projectId == null ){
 			log.warning("property project is null, some things might fail");
 		}
@@ -131,6 +132,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 
 	@Override
 	protected void prepareStatements()throws SQLException{
+
 		db.setAutoCommit(true);
 		// TODO: use prefix from configuration to specify tablespace
 		insert = db.prepareStatement("INSERT INTO patient_dimension(patient_num, import_date, sourcesystem_cd) VALUES(?,current_timestamp,?)");
@@ -144,10 +146,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		//selectAll = db.prepareStatement("SELECT p.patient_num, p.vital_status_cd, p.birth_date, p.death_date, p.sex_cd, p.download_date, p.sourcesystem_cd, m.patient_ide, m.patient_ide_source, m.patient_ide_status FROM patient_mapping m, patient_dimension p WHERE m.patient_num=p.patient_num AND m.project_id='"+projectId+"'");
 		// TODO select only patients relevant to the current project: eg. join patient_dimension with patient_mapping to get only relevant rows.
 		selectAll = db.prepareStatement("SELECT patient_num, vital_status_cd, birth_date, death_date, sex_cd, download_date, sourcesystem_cd FROM patient_dimension", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAll.setFetchSize(Integer.parseInt(config.getProperty("fetchSize", "10000")));
+		selectAll.setFetchSize(getFetchSize());
 		
 		selectAllIde = db.prepareStatement("SELECT patient_num, patient_ide, patient_ide_source, patient_ide_status, project_id FROM patient_mapping WHERE project_id='"+projectId+"' ORDER BY patient_num", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAllIde.setFetchSize(Integer.parseInt(config.getProperty("fetchSize", "10000")));
+		selectAllIde.setFetchSize(getFetchSize());
 		
 		deletePatientSource = db.prepareStatement("DELETE FROM patient_dimension WHERE sourcesystem_cd=?");
 		deleteMapSource = db.prepareStatement("DELETE FROM patient_mapping WHERE sourcesystem_cd=?");

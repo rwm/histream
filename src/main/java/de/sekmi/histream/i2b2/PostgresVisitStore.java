@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,11 +55,11 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
 	
-	public PostgresVisitStore(Properties configuration) {
+	public PostgresVisitStore(Map<String,String> configuration) {
 		super(configuration);
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
-		projectId = config.getProperty("project");
+		projectId = config.get("project");
 		idSourceDefault = "HIVE";
 		idSourceSeparator = ':';
 	}
@@ -75,9 +75,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		update = db.prepareStatement("UPDATE visit_dimension SET active_status_cd=?, start_date=?, end_date=?, inout_cd=?, location_cd=?, update_date=current_timestamp, download_date=?, sourcesystem_cd=? WHERE encounter_num=?");
 		//select = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, update_date, sourcesystem_cd FROM visit_dimension WHERE patient_num=?");
 		selectAll = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, download_date, sourcesystem_cd FROM visit_dimension", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAll.setFetchSize(Integer.parseInt(config.getProperty("fetchSize", "10000")));
+		selectAll.setFetchSize(getFetchSize());
 		selectMappingsAll = db.prepareStatement("SELECT encounter_num, encounter_ide, encounter_ide_source, patient_ide, patient_ide_source, encounter_ide_status, project_id FROM encounter_mapping ORDER BY encounter_num", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectMappingsAll.setFetchSize(Integer.parseInt(config.getProperty("fetchSize", "10000")));
+		selectMappingsAll.setFetchSize(getFetchSize());
 
 		deleteSource = db.prepareStatement("DELETE FROM visit_dimension WHERE sourcesystem_cd=?");
 		deleteMapSource = db.prepareStatement("DELETE FROM encounter_mapping WHERE sourcesystem_cd=?");

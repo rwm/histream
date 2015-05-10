@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.Properties;
 
 import de.sekmi.histream.DateTimeAccuracy;
@@ -21,16 +22,25 @@ import de.sekmi.histream.Plugin;
  * @param <T>
  */
 public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
-	static final String driver = "org.postgresql.Driver";
-	protected Properties config;
+	private static final int defaultFetchSize = 10000;
+	private static final String driver = "org.postgresql.Driver";
+	protected Map<String,String> config;
 	protected Connection db;
 
-	public PostgresExtension(Properties configuration){
+	public PostgresExtension(Map<String,String> configuration){
 		this.config = configuration;
 	}
-	public void open() throws ClassNotFoundException, SQLException{
+	
+	public static Connection getConnection(Map<String,String> props) throws SQLException, ClassNotFoundException{
 		Class.forName(driver);
-		db = DriverManager.getConnection("jdbc:postgresql://"+config.getProperty("host")+":"+config.getProperty("port")+"/"+config.getProperty("database"), config);
+		Properties jdbcProps = new Properties();
+		// TODO put only properties relevant to jdbc
+		jdbcProps.putAll(props);
+		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), jdbcProps);
+
+	}
+	public void open() throws ClassNotFoundException, SQLException{
+		db = getConnection(config);
 		prepareStatements();
 	}
 
@@ -50,6 +60,19 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 	public static Timestamp inaccurateSqlTimestamp(DateTimeAccuracy dateTime){
 		if( dateTime == null )return null;
 		else return Timestamp.valueOf(dateTime.getLocal());
+	}
+	
+	/**
+	 * Get the configuration setting for fetchSize if configured. Otherwise
+	 * the default 10000 is returned.
+	 * @return configured fetch size, or 10000 otherwise.
+	 */
+	public int getFetchSize(){
+		if( config.containsKey("fetchSize") ){
+			return Integer.parseInt(config.get("fetchSize"));
+		}else{
+			return defaultFetchSize;
+		}
 	}
 
 	/**

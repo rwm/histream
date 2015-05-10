@@ -3,14 +3,14 @@ package de.sekmi.histream.impl;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.HashMap;
 
 import de.sekmi.histream.i2b2.PostgresPatientStore;
 public class TestPostgresPatientStore implements Closeable {
 	PostgresPatientStore store;
 	
 	public void open(String  host, int port) throws ClassNotFoundException, SQLException{
-		Properties props = new Properties();
+		HashMap<String, String> props = new HashMap<>();
 		props.put("project", "demo");
 		props.put("user", "i2b2demodata");
 		props.put("host", host);

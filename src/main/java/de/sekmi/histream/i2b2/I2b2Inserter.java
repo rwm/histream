@@ -3,18 +3,18 @@ package de.sekmi.histream.i2b2;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Enumeration;
-import java.util.Properties;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationHandler;
+import de.sekmi.histream.Plugin;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.impl.AbstractObservationHandler;
 
@@ -44,7 +44,7 @@ import de.sekmi.histream.impl.AbstractObservationHandler;
  * @author marap1
  *
  */
-public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable{
+public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable, Plugin{
 	private static final Logger log = Logger.getLogger(I2b2Inserter.class.getName());
 	private Connection db;
 	private PreparedStatement insertFact;
@@ -56,12 +56,13 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private String nullModifierCd;
 	private String nullValueFlagCd;
 	
-	public I2b2Inserter(){
+	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
 		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
 		this.nullLocationCd = "@"; // technically, null is allowed, but the demodata only uses '@'
 		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
 		// TODO nullBlob (technically null allowed, but '' is used in demodata)
 		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
+		open(config);
 	}
 	
 	/**
@@ -86,7 +87,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		db.commit();
 		log.info("Deleted "+rows+" observations for encounter_num="+encounter_num);
 	}
-	private void prepareStatements()throws SQLException{
+	private void prepareStatements(Map<String,String> props)throws SQLException{
 		// no value
 		insertFact = db.prepareStatement(""
 				+ "INSERT INTO observation_fact ("
@@ -108,25 +109,13 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	/**
 	 * Opens a database connection and prepares statements
 	 * @throws SQLException
+	 * @throws ClassNotFoundException 
 	 */
-	public void open()throws SQLException{
-		Properties props = new Properties();
-		props.put("user", "i2b2demodata");
-		props.put("host", "localhost");
-		props.put("database", "i2b2");
-		props.put("port", "15432");
-		props.put("password", "");
-		props.put("nullProvider", "LCS-I2B2:PROVIDERS");
-		try {
-			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e) {
-			throw new SQLException(e);
-		}
-		db = DriverManager.getConnection("jdbc:postgresql://"+props.getProperty("host")+":"+props.getProperty("port")+"/"+props.getProperty("database"), props);
+	private void open(Map<String,String> props)throws SQLException, ClassNotFoundException{
+		db = PostgresExtension.getConnection(props);
 		db.setAutoCommit(false);
-		this.nullProviderId = props.getProperty("nullProvider");
-		prepareStatements();
-		
+		this.nullProviderId = props.get("nullProvider");
+		prepareStatements(props);
 	}
 
 	
