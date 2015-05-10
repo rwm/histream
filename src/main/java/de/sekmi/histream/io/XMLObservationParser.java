@@ -216,7 +216,7 @@ class XMLObservationParser extends AbstractObservationParser{
 			val = new StringValue(valueText);
 			break;
 		case Numeric:
-			val = new NumericValue(new BigDecimal(valueText), valueOp);
+			val = new NumericValue(new BigDecimal(valueText), valueUnit, valueOp);
 			break;
 		default:
 			throw new IllegalArgumentException("Unsupported fact type "+factType);

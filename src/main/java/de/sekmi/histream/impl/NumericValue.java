@@ -11,15 +11,15 @@ public class NumericValue extends AbstractValue {
 	
 
 	public NumericValue(BigDecimal value){
-		this(value, Operator.Equal);
+		this(value, null);
 	}
 	public NumericValue(BigDecimal value, String units){
-		this(value, Operator.Equal);
-		this.units = units;
+		this(value, units, Operator.Equal);
 	}
 	
-	public NumericValue(BigDecimal value, Operator operator){
+	public NumericValue(BigDecimal value, String units, Operator operator){
 		this.value = value;
+		this.units = units;
 		this.operator = operator;		
 	}
 	

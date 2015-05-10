@@ -72,17 +72,18 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:str", o.getConceptId());
 				Assert.assertEquals(Value.Type.Text, o.getValue().getType());
-				Assert.assertEquals("abc123", o.getValue().getValue());					
+				Assert.assertEquals("abc123", o.getValue().getValue());
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:int", o.getConceptId());
 				Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
-				Assert.assertEquals(123, o.getValue().getNumericValue().intValueExact());				
+				Assert.assertEquals(123, o.getValue().getNumericValue().intValueExact());
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:dec", o.getConceptId());
 				Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
-				Assert.assertEquals(new BigDecimal("123.456"), o.getValue().getNumericValue());				
+				Assert.assertEquals(new BigDecimal("123.456"), o.getValue().getNumericValue());
+				Assert.assertEquals("mm", o.getValue().getUnits());
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:group:1", o.getConceptId());
