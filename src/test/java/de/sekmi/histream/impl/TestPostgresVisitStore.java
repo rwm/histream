@@ -19,7 +19,6 @@ public class TestPostgresVisitStore implements Closeable {
 		props.put("port", Integer.toString(port));
 		props.put("password", "");
 		store = new PostgresVisitStore(props);
-		store.open();		
 	}
 	
 	private void open()throws Exception{

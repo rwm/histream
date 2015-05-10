@@ -21,13 +21,13 @@ import de.sekmi.histream.Plugin;
  *
  * @param <T>
  */
-public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
+abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 	private static final int defaultFetchSize = 10000;
 	private static final String driver = "org.postgresql.Driver";
 	protected Map<String,String> config;
 	protected Connection db;
 
-	public PostgresExtension(Map<String,String> configuration){
+	protected PostgresExtension(Map<String,String> configuration){
 		this.config = configuration;
 	}
 	
@@ -39,7 +39,7 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), jdbcProps);
 
 	}
-	public void open() throws ClassNotFoundException, SQLException{
+	protected void open() throws ClassNotFoundException, SQLException{
 		db = getConnection(config);
 		prepareStatements();
 	}

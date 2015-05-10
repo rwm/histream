@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 
 
+
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -92,8 +93,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	 * 	idSourceDefault ('HIVE'), idSourceSeparator (single char, ':')
 	 * 	fetchSize (int, 10000)
 	 * @param configuration
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
-	public PostgresPatientStore(Map<String,String> configuration) {
+	public PostgresPatientStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
 		super(configuration);
 		this.projectId = config.get("project");
 		if( projectId == null ){
@@ -104,6 +107,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
 		idCache = new Hashtable<>(1000);
+		open();
 	}
 	
 	private I2b2Patient getCached(int patient_num){

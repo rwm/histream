@@ -55,17 +55,18 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
 	
-	public PostgresVisitStore(Map<String,String> configuration) {
+	public PostgresVisitStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
 		super(configuration);
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
 		projectId = config.get("project");
 		idSourceDefault = "HIVE";
 		idSourceSeparator = ':';
+		open();
 	}
 	
 	@Override
-	public void open()throws SQLException, ClassNotFoundException{
+	protected void open()throws SQLException, ClassNotFoundException{
 		super.open();
 		// db is already opened by super.connect()
 		db.setAutoCommit(true);

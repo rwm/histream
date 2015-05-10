@@ -13,7 +13,7 @@ import de.sekmi.histream.Plugin;
 
 public class XMLProviderFactory implements FileObservationProviderFactory, Plugin{
 
-	public void XMLObservationFactory(Map<String,String> props) {
+	public XMLProviderFactory(Map<String,String> props) {
 		// no configuration needed
 	}
 	@Override

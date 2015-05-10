@@ -18,7 +18,6 @@ public class TestPostgresPatientStore implements Closeable {
 		props.put("port", Integer.toString(port));
 		props.put("password", "");
 		store = new PostgresPatientStore(props);
-		store.open();
 	}
 
 	public PostgresPatientStore getStore(){return store;}
