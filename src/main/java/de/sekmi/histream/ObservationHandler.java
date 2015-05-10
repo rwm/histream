@@ -21,4 +21,6 @@ public interface ObservationHandler extends Consumer<Observation>{
 	 */
 	@Override
 	void accept(Observation observation);
+	
+	void setErrorHandler(Consumer<ObservationException> handler);
 }

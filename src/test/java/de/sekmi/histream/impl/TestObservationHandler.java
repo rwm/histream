@@ -1,11 +1,12 @@
 package de.sekmi.histream.impl;
 
+import java.util.function.Consumer;
+
 import org.junit.Assert;
 
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationHandler;
 
-public class TestObservationHandler implements ObservationHandler{
+public class TestObservationHandler implements Consumer<Observation>{
 
 	public static interface Tester{
 		void test(Observation observation);

@@ -9,13 +9,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationHandler;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.impl.AbstractObservationHandler;
 
 /**
  * Inserts observtions in to the i2b2 observation_fact table.
@@ -43,7 +44,7 @@ import de.sekmi.histream.Value;
  * @author marap1
  *
  */
-public class I2b2Inserter implements ObservationHandler, Closeable{
+public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable{
 	private static final Logger log = Logger.getLogger(I2b2Inserter.class.getName());
 	private Connection db;
 	private PreparedStatement insertFact;
@@ -130,12 +131,11 @@ public class I2b2Inserter implements ObservationHandler, Closeable{
 
 	
 	@Override
-	public void accept(Observation o) {
-		// TODO Auto-generated method stub
+	public void acceptOrException(Observation o) throws ObservationException{
 		try {
 			insertFact(o, null, 1);
 		} catch (SQLException e) {
-			log.log(Level.SEVERE, "Unable to insert fact", e);
+			throw new ObservationException(o, e);
 		}
 		
 	}
