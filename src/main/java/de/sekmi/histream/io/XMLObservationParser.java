@@ -21,7 +21,7 @@ import de.sekmi.histream.impl.StringValue;
 
 /**
  * Parser for EAV XML documents. This class is used by both the {@link SAXObservationProvider}
- * and {@link XMLObservationSpliterator}.
+ * and {@link XMLObservationProvider}.
  * 
  * @author marap1
  *

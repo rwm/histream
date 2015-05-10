@@ -3,8 +3,7 @@ package de.sekmi.histream.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.util.Spliterator;
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -15,18 +14,19 @@ import javax.xml.stream.XMLStreamReader;
 
 
 
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.impl.AbstractValue;
 
-public class XMLObservationSpliterator extends XMLObservationParser implements Spliterator<Observation>{
+public class XMLObservationProvider extends XMLObservationParser implements FileObservationProvider{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";
 	private XMLStreamReader reader;
 	private boolean documentStart;
 	
 	private AttributeAccessor atts;
 	
-	public XMLObservationSpliterator(ObservationFactory factory, XMLStreamReader reader) {
+	public XMLObservationProvider(ObservationFactory factory, XMLStreamReader reader) {
 		super(factory);
 		this.reader = reader;
 		atts = new AttributeAccessor() {
@@ -38,7 +38,7 @@ public class XMLObservationSpliterator extends XMLObservationParser implements S
 		};
 		documentStart = true;
 	}
-	public XMLObservationSpliterator(ObservationFactory factory, InputStream input) throws XMLStreamException, FactoryConfigurationError {
+	public XMLObservationProvider(ObservationFactory factory, InputStream input) throws XMLStreamException, FactoryConfigurationError {
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
 	
@@ -168,32 +168,14 @@ public class XMLObservationSpliterator extends XMLObservationParser implements S
 	}
 	
 	@Override
-	public boolean tryAdvance(Consumer<? super Observation> action) {
+	public Observation get() {
 		Observation o;
 		try {
 			o = readObservation();
 		} catch (XMLStreamException e) {
 			throw new UncheckedIOException(new IOException(e));
 		}
-		
-		if( o != null ){
-			action.accept(o);
-			return true;
-		}else return false;
-	}
-	@Override
-	public Spliterator<Observation> trySplit() {
-		return null;
-	}
-	@Override
-	public long estimateSize() {
-		// TODO Auto-generated method stub
-		return Long.MAX_VALUE;
-	}
-	@Override
-	public int characteristics() {
-		// TODO Auto-generated method stub
-		return Spliterator.NONNULL | Spliterator.IMMUTABLE;
+		return o;
 	}
 
 }

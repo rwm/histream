@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +24,12 @@ import de.sekmi.histream.impl.AbstractValue;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
-public class FlatObservationSpliterator extends AbstractObservationParser implements Spliterator<Observation>{
+/**
+ * 
+ * @author Raphael
+ *
+ */
+public class FlatObservationProvider extends AbstractObservationParser implements FileObservationProvider{
 	private BufferedReader reader;
 	private Pattern fieldSeparator;
 	private Pattern metaAssignment;
@@ -86,7 +89,7 @@ public class FlatObservationSpliterator extends AbstractObservationParser implem
 		public String getFlags(){return fields[10];}
 	}
 	
-	public FlatObservationSpliterator(ObservationFactory factory, BufferedReader reader){
+	public FlatObservationProvider(ObservationFactory factory, BufferedReader reader){
 		super(factory);
 		this.reader = reader;
 		this.fieldSeparator = Pattern.compile("\\t");
@@ -97,7 +100,7 @@ public class FlatObservationSpliterator extends AbstractObservationParser implem
 		lineNo = 0;
 	}
 	
-	public FlatObservationSpliterator(ObservationFactory factory, InputStream input){
+	public FlatObservationProvider(ObservationFactory factory, InputStream input){
 		this(factory, new BufferedReader(new InputStreamReader(input)));
 	}
 
@@ -243,7 +246,7 @@ public class FlatObservationSpliterator extends AbstractObservationParser implem
 	}
 	
 	@Override
-	public boolean tryAdvance(Consumer<? super Observation> action) {
+	public Observation get() {
 		String line;
 		boolean inGroup = false;
 		do{
@@ -255,7 +258,7 @@ public class FlatObservationSpliterator extends AbstractObservationParser implem
 			}
 			if( line == null ){
 				// end of stream
-				return false; 
+				return null; 
 			}else if( line.length() == 0 ){
 				// empty line
 				// continue;
@@ -303,27 +306,9 @@ public class FlatObservationSpliterator extends AbstractObservationParser implem
 				}
 			}
 		}while( true );
-		
-		action.accept(fact);
-		fact = null;
-		return true;
-	}
-
-	@Override
-	public Spliterator<Observation> trySplit() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long estimateSize() {
-		// TODO estimate by file size
-		return Long.MAX_VALUE;
-	}
-
-	@Override
-	public int characteristics() {
-		return Spliterator.IMMUTABLE | Spliterator.NONNULL;
+		Observation ret = fact;
+		fact = null; // clear local copy
+		return ret;
 	}
 
 }

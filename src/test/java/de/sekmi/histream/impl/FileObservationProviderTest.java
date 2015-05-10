@@ -18,9 +18,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Modifier;
-import de.sekmi.histream.io.FlatObservationSpliterator;
+import de.sekmi.histream.io.AbstractObservationParser;
+import de.sekmi.histream.io.FlatObservationProvider;
 import de.sekmi.histream.io.SAXObservationProvider;
-import de.sekmi.histream.io.XMLObservationSpliterator;
+import de.sekmi.histream.io.XMLObservationProvider;
 
 
 public class FileObservationProviderTest {
@@ -124,15 +125,15 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testStAXReader() throws Exception {
-		XMLObservationSpliterator xos = new XMLObservationSpliterator(factory, new FileInputStream("src/test/resources/dwh-eav.xml"));
-		StreamSupport.stream(xos, false).forEach(handler);
+		XMLObservationProvider xos = new XMLObservationProvider(factory, new FileInputStream("src/test/resources/dwh-eav.xml"));
+		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(xos), false).forEach(handler);
 		handler.finish();
 	}
 	
 	@Test
 	public void testFlatReader() throws Exception {
-		FlatObservationSpliterator s = new FlatObservationSpliterator(factory, new FileInputStream("src/test/resources/dwh-flat.txt"));
-		StreamSupport.stream(s, false).forEach(handler);
+		FlatObservationProvider s = new FlatObservationProvider(factory, new FileInputStream("src/test/resources/dwh-flat.txt"));
+		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(handler);
 		handler.finish();
 	}
 	
