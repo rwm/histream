@@ -30,7 +30,7 @@ public class ObservationFactoryImpl implements ObservationFactory{
 	}	
 	
 	@Override
-	public <T> void registerExtension(Extension<T> extension) {
+	public void registerExtension(Extension<?> extension) {
 		// make sure hashtable is not modified between index calculation and assignment
 		synchronized( extensions ){
 			for( Class<?> type : extension.getInstanceTypes() ){

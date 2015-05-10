@@ -13,7 +13,7 @@ public interface ObservationFactory {
 	 * Register an extension. Registered extensions cannot be removed.
 	 * @param extension
 	 */
-	<T> void registerExtension(Extension<T> extension);
+	void registerExtension(Extension<?> extension);
 	
 	/**
 	 * Get a list of currently registered extensions
