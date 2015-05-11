@@ -112,6 +112,7 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 			// go to next element start or </facts>
 			reader.nextTag();
 		}
+		
 		reader.nextTag();
 		// should be an observation
 	}

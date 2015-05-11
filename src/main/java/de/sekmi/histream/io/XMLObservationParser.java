@@ -40,7 +40,7 @@ class XMLObservationParser extends AbstractObservationParser{
 	// visit
 	protected DateTimeAccuracy encounterStart;
 	protected DateTimeAccuracy encounterEnd;
-	protected String patientId;
+	//protected String patientId;
 	protected Map<String,String> visitData;
 	
 	/**
@@ -91,7 +91,7 @@ class XMLObservationParser extends AbstractObservationParser{
 			start = encounterStart;
 
 
-		fact = factory.createObservation(patientId, atts.getValue("concept"), start);
+		fact = factory.createObservation(visitData.get("patid"), atts.getValue("concept"), start);
 		// set encounter id to visitData.get("encounter")
 		fact.setEncounterId(visitData.get("encounter"));
 

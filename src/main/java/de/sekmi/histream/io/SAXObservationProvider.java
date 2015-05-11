@@ -155,7 +155,6 @@ public class SAXObservationProvider extends XMLObservationParser implements Cont
 				parseEncounter(atts);
 			}else if( qName.equals("facts") ){
 				// visit section is complete
-				patientId = visitData.get("patid");
 				
 				
 				// patient and visit objects are created, once the first fact is complete
