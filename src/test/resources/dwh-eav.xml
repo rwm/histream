@@ -3,7 +3,7 @@
 	<meta>
 		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
 		<etl strategy="replace-visit" />
-		<source timestamp="2015-04-21T08:58:00" system="test"/>
+		<source timestamp="2015-04-21T08:58:00" id="test"/>
 		<enum concept="L:46098-0">
 			<value id="0">Male</value>
 			<value id="1">Female</value>

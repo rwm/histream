@@ -178,7 +178,7 @@ class XMLObservationParser extends AbstractObservationParser{
 
 	protected void parseSource(AttributeAccessor atts){
 		setMeta("source.timestamp", atts.getValue("timestamp"));
-		setMeta("source.id", atts.getValue("source"));
+		setMeta("source.id", atts.getValue("id"));
 	}
 	protected void parseEncounter(AttributeAccessor atts){
 		encounterStart = DateTimeAccuracy.parsePartialIso8601(atts.getValue("start"));
