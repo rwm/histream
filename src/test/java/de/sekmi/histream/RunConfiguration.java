@@ -98,12 +98,14 @@ public class RunConfiguration implements Closeable{
 		// TODO set error handlers for destinations
 		
 		// if listeners specified, run as server (don't exit)
-
+		args = new String[]{"src/test/resources/dwh-eav.xml"};
+		
 		if( args.length > 0 ){
 			for( int i=0; i<args.length; i++ ){
 				File file = new File(args[i]);
 				FileObservationProvider p = rc.providerForFile(file);
 				if( p != null ){
+					System.out.println("ETL Strategy: "+p.getMeta("etl.strategy"));
 					rc.processFile(p);
 				}else{
 					System.err.println("Unable to find parser for file "+file);

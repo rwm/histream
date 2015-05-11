@@ -1,3 +1,4 @@
+patid	encounter	concept	type	value	units	start	end	provider	location	flag
 #@meta(source.id)=test
 #@meta(source.timestamp)=2015-04-21T08:58:00
 #@meta(etl.strategy)=replacesource
