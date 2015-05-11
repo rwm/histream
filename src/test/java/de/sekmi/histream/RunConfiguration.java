@@ -64,10 +64,12 @@ public class RunConfiguration implements Closeable{
 	@SuppressWarnings("unchecked")
 	private void buildDestinationChain(Configuration conf){
 		PluginRef[] ds = conf.getDestinations();
-		destinationChain = (Consumer<Observation>)plugins[getPluginIndex(conf, ds[0].getPlugin())];
+		destinationChain = null;
 		// chain subsequent destinations in order of configuration
-		for( int i=1; i<ds.length; i++ ){
-			destinationChain.andThen((Consumer<Observation>)plugins[getPluginIndex(conf, ds[0].getPlugin())]);
+		for( int i=0; i<ds.length; i++ ){
+			Consumer<Observation> dest = (Consumer<Observation>)plugins[getPluginIndex(conf, ds[i].getPlugin())];
+			if( destinationChain == null )destinationChain = dest;
+			else destinationChain = destinationChain.andThen(dest);
 		}
 	}
 	
