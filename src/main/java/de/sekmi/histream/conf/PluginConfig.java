@@ -44,8 +44,10 @@ public class PluginConfig {
 			throw new Exception("Unable to find constructor",e);
 		}
     	HashMap<String, String> props = new HashMap<>();
-    	for( PluginProperty prop : property ){
-    		props.put(prop.name, prop.value);
+    	if( property != null ){
+	    	for( PluginProperty prop : property ){
+	    		props.put(prop.name, prop.value);
+	    	}
     	}
     	return c.newInstance(props);
     }

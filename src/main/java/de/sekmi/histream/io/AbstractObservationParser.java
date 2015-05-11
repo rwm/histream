@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
@@ -36,6 +38,10 @@ public class AbstractObservationParser {
 	public static Spliterator<Observation> nonNullSpliterator(Supplier<Observation> supplier){
 		return new NonNullSpliterator(supplier);
 	}
+	public static Stream<Observation> nonNullStream(Supplier<Observation> supplier){
+		return StreamSupport.stream(new NonNullSpliterator(supplier), false);
+	}
+	
 	private static class NonNullSpliterator implements Spliterator<Observation>{
 		private Supplier<Observation> supplier;
 		
