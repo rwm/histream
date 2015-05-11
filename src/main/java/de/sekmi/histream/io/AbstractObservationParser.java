@@ -1,6 +1,8 @@
 package de.sekmi.histream.io;
 
 import java.time.Instant;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -16,23 +18,45 @@ public class AbstractObservationParser {
 	protected Instant sourceTimestamp;
 	protected String sourceId;
 	protected String etlStrategy;
+	private Map<String,String> meta;
 
 	public AbstractObservationParser(){
+		meta = new Hashtable<>();	
+	}
+	
+	/**
+	 * Set meta information for this parser
+	 * @param key
+	 * @param value
+	 */
+	protected void setMeta(String key, String value){
+		if( value == null ){
+			// clear value, remove key
+			meta.remove(key);
+		}else{
+			meta.put(key, value);
+		}
+		switch( key ){
+		case "source.timestamp":
+			if( value == null )this.sourceTimestamp = null;
+			else this.sourceTimestamp = javax.xml.bind.DatatypeConverter.parseDateTime(value).toInstant();
+			break;
+		case "source.id":
+			this.sourceId = value;
+			break;
+		case "etl.strategy":
+			this.etlStrategy = value;
+			break;
+		}
+
+	}
+	
+	public String getMeta(String key){
+		return meta.get(key);
 	}
 	
 	public void setObservationFactory(ObservationFactory factory){
 		this.factory = factory;
-	}
-	
-	protected void parseSourceTimestamp(String sourceTimestamp){
-		this.sourceTimestamp = javax.xml.bind.DatatypeConverter.parseDateTime(sourceTimestamp).toInstant();
-	}
-	protected void setSourceId(String sourceId){
-		this.sourceId = sourceId;
-	}
-	
-	protected void setEtlStrategy(String strategy){
-		this.etlStrategy = strategy;
 	}
 	
 	public static Spliterator<Observation> nonNullSpliterator(Supplier<Observation> supplier){

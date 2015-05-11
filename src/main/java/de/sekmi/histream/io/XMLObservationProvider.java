@@ -14,6 +14,9 @@ import javax.xml.stream.XMLStreamReader;
 
 
 
+
+
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.impl.AbstractValue;
@@ -21,11 +24,10 @@ import de.sekmi.histream.impl.AbstractValue;
 public class XMLObservationProvider extends XMLObservationParser implements FileObservationProvider{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";
 	private XMLStreamReader reader;
-	private boolean documentStart;
 	
 	private AttributeAccessor atts;
 	
-	public XMLObservationProvider(ObservationFactory factory, XMLStreamReader reader) {
+	public XMLObservationProvider(ObservationFactory factory, XMLStreamReader reader) throws XMLStreamException {
 		setObservationFactory(factory);
 		this.reader = reader;
 		atts = new AttributeAccessor() {
@@ -35,7 +37,10 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 				return reader.getAttributeValue(null, name);
 			}
 		};
-		documentStart = true;
+		// read start of document until start of visit
+		readToRoot();
+		readMeta();
+		readVisit();
 	}
 	public XMLObservationProvider(ObservationFactory factory, InputStream input) throws XMLStreamException, FactoryConfigurationError {
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
@@ -59,6 +64,14 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 		
 		// read meta
 		reader.nextTag();
+		if( reader.getLocalName().equals("etl") ){
+			String etlStrategy = reader.getAttributeValue(null, "strategy");
+			// TODO use constants for etl.strategy, etc.
+			if( etlStrategy != null )setMeta("etl.strategy", etlStrategy);
+			reader.nextTag();
+			// should be end element
+			reader.nextTag();
+		}
 		if( reader.getLocalName().equals("source") ){
 			parseSource(atts);
 			reader.nextTag();
@@ -104,12 +117,7 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 	}
 	
 	private Observation readObservation()throws XMLStreamException{
-		if( documentStart ){
-			readToRoot();
-			readMeta();
-			readVisit();
-			documentStart = false;
-		}
+		// </facts> might occur after previous call to readObservation()
 		while( reader.isEndElement() ){
 			switch( reader.getLocalName() ){
 			case "facts":

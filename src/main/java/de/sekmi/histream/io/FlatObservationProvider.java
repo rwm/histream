@@ -40,9 +40,15 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 	//static private Class<?>[] supportedExtensions = new Class<?>[]{Patient.class,Visit.class};
 
 	private Map<String, SpecialConcept> specialConcepts;
+	private Map<String, String> metaInfo;
 	
 	private Observation fact;
-	private DateTimeAccuracy sourceDateTime;
+	
+	/**
+	 * Unprocessed line if non null (used to look ahead)
+	 */
+	private String prefetchLine;
+	//private DateTimeAccuracy sourceDateTime;
 	
 	
 	private static enum SpecialConcept{
@@ -89,18 +95,38 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		public String getFlags(){return fields[10];}
 	}
 	
-	public FlatObservationProvider(ObservationFactory factory, BufferedReader reader){
+	public FlatObservationProvider(ObservationFactory factory, BufferedReader reader) throws IOException{
 		setObservationFactory(factory);
 		this.reader = reader;
 		this.fieldSeparator = Pattern.compile("\\t");
 		this.metaAssignment = Pattern.compile("^#@meta\\(([a-z\\.]+)\\)=(.*)$");
 		this.specialConceptAssignment = Pattern.compile("^#@concept\\(([a-z\\.]+)\\)=(.*)$");
 		specialConcepts = new Hashtable<>();
+		metaInfo = new Hashtable<>();
 		fact = null;
 		lineNo = 0;
+		
+		
+		// read meta info
+		readMeta();
 	}
 	
-	public FlatObservationProvider(ObservationFactory factory, InputStream input){
+	private void readMeta() throws IOException{
+		do{
+			prefetchLine = reader.readLine(); 
+			Matcher m = metaAssignment.matcher(prefetchLine);
+			if( m.matches() ){
+				// meta
+				setMeta(m.group(1), m.group(2));
+				prefetchLine = null;
+			}else{
+				break; // no more meta information
+			}
+		}while( true );
+
+	}
+	
+	public FlatObservationProvider(ObservationFactory factory, InputStream input) throws IOException{
 		this(factory, new BufferedReader(new InputStreamReader(input)));
 	}
 
@@ -108,20 +134,9 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		Matcher m = metaAssignment.matcher(line);
 		if( m.matches() ){
 			// meta
-			switch( m.group(1) ){
-			case "source.id":
-				setSourceId(m.group(2));
-				break;
-			case "source.timestamp":
-				parseSourceTimestamp(m.group(2));
-				this.sourceDateTime = new DateTimeAccuracy(LocalDateTime.ofInstant(sourceTimestamp, ZoneId.systemDefault()));
-				break;
-			case "etl.strategy":
-				setEtlStrategy(m.group(2));
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown meta command in line "+lineNo+": "+line);
-			}
+			setMeta(m.group(1), m.group(2));
+
+			//this.sourceDateTime = new DateTimeAccuracy(LocalDateTime.ofInstant(sourceTimestamp, ZoneId.systemDefault()));
 			return;
 		}
 		m = specialConceptAssignment.matcher(line);
@@ -135,12 +150,15 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		throw new IllegalArgumentException("Invalid command in line "+lineNo+": "+line);
 	}
 	
+	private DateTimeAccuracy getSourceDateTime(){
+		return new DateTimeAccuracy(LocalDateTime.ofInstant(sourceTimestamp, ZoneId.systemDefault()));
+	}
 	private void specialFields(SpecialConcept special, Record record){
 		// create temporary observation
 		// which is only used to fill the special concepts
 		DateTimeAccuracy ts;
 		if( record.getStartDate() == null ){
-			ts = sourceDateTime;
+			ts = getSourceDateTime();
 		}else{
 			ts = DateTimeAccuracy.parsePartialIso8601(record.getStartDate());
 		}
@@ -211,16 +229,17 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 	
 	private void newObservation(Record record){
 		DateTimeAccuracy ts;
+		DateTimeAccuracy sourceTs = getSourceDateTime();
 		if( record.getStartDate() == null ){
 			// first use source timestamp
-			ts = sourceDateTime;
+			ts = sourceTs;
 			// later update to visit timestamp
 		}else{
 			ts = DateTimeAccuracy.parsePartialIso8601(record.getStartDate());
 		}
 		fact = factory.createObservation(record.getPatID(), record.getConcept(), ts);
 		
-		if( ts == sourceDateTime ){
+		if( ts == sourceTs ){
 			// try to use visit timestamp
 			ts = fact.getExtension(Visit.class).getStartTime();
 			if( ts != null )fact.setStartTime(ts);
@@ -251,8 +270,13 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		boolean inGroup = false;
 		do{
 			try {
-				 line = reader.readLine();
-				 lineNo ++;
+				if( prefetchLine != null ){
+					line = prefetchLine;
+					prefetchLine = null;
+				}else{
+					line = reader.readLine();
+					lineNo ++;
+				}
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -309,6 +333,11 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		Observation ret = fact;
 		fact = null; // clear local copy
 		return ret;
+	}
+
+	@Override
+	public String getMeta(String key) {
+		return metaInfo.get(key);
 	}
 
 }

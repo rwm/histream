@@ -34,8 +34,8 @@ class XMLObservationParser extends AbstractObservationParser{
 	
 
 	// provider
-	protected String providerId;
-	protected String providerName;
+	//protected String providerId;
+	//protected String providerName;
 
 	// visit
 	protected DateTimeAccuracy encounterStart;
@@ -177,8 +177,8 @@ class XMLObservationParser extends AbstractObservationParser{
 	}
 
 	protected void parseSource(AttributeAccessor atts){
-		parseSourceTimestamp(atts.getValue("timestamp"));
-		sourceId = atts.getValue("source");
+		setMeta("source.timestamp", atts.getValue("timestamp"));
+		setMeta("source.id", atts.getValue("source"));
 	}
 	protected void parseEncounter(AttributeAccessor atts){
 		encounterStart = DateTimeAccuracy.parsePartialIso8601(atts.getValue("start"));
