@@ -1,7 +1,6 @@
 package de.sekmi.histream.impl;
 
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Enumeration;
@@ -11,16 +10,12 @@ import java.math.BigDecimal;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FlatObservationProvider;
-import de.sekmi.histream.io.SAXObservationProvider;
 import de.sekmi.histream.io.XMLObservationProvider;
 
 
@@ -110,18 +105,6 @@ public class FileObservationProviderTest {
 			},
 			
 		});
-	}
-	
-	
-	@Test
-	public void testSAXReader() throws Exception{
-		XMLReader reader = XMLReaderFactory.createXMLReader();
-		SAXObservationProvider provider = new SAXObservationProvider();
-		provider.setObservationFactory(factory);
-		provider.setHandler(handler);
-		reader.setContentHandler(provider);
-		reader.parse(new InputSource(new FileReader("src/test/resources/dwh-eav.xml")));
-		handler.finish();
 	}
 	
 	@Test
