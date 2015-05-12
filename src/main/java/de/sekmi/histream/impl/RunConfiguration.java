@@ -125,7 +125,7 @@ public class RunConfiguration implements Closeable{
 				File file = new File(args[i]);
 				FileObservationProvider p = rc.providerForFile(file);
 				if( p != null ){
-					System.out.println("ETL Strategy: "+p.getMeta("etl.strategy"));
+					System.out.println("ETL("+p.getMeta("etl.strategy")+"): "+file);
 					rc.processFile(p);
 				}else{
 					System.err.println("Unable to find parser for file "+file);
