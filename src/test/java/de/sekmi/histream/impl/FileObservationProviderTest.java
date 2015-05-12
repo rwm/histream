@@ -82,6 +82,21 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("mm", o.getValue().getUnits());
 			},
 			(Observation o) ->  {
+				Assert.assertEquals("T:full", o.getConceptId());
+				Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
+				Assert.assertEquals(new BigDecimal("123.456"), o.getValue().getNumericValue());
+				Assert.assertEquals("mm", o.getValue().getUnits());
+				
+				Assert.assertEquals(ChronoUnit.YEARS, o.getStartTime().getAccuracy());
+				Assert.assertEquals(2010, o.getStartTime().getLong(ChronoField.YEAR));
+
+				Assert.assertEquals(ChronoUnit.YEARS, o.getEndTime().getAccuracy());
+				Assert.assertEquals(2011, o.getEndTime().getLong(ChronoField.YEAR));
+
+				Assert.assertEquals("T:LOC", o.getLocationId());
+				// TODO test provider, flag
+			},
+			(Observation o) ->  {
 				Assert.assertEquals("T:group:1", o.getConceptId());
 				Assert.assertEquals(Value.Type.None, o.getValue().getType());
 				Assert.assertTrue(o.hasModifiers()); 

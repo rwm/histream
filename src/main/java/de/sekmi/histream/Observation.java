@@ -33,6 +33,7 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	<T> void setExtension(Class<T> extensionType, T extension) throws IllegalArgumentException;
 	
 	void setEncounterId(String encounterId);
+	void setLocationId(String locationId);
 	
 	boolean hasModifiers();
 	Modifier getModifier(String modifierId);

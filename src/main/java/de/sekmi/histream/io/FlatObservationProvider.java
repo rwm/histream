@@ -289,6 +289,10 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		fact.setSourceId(sourceId);
 		fact.setSourceTimestamp(sourceTimestamp);
 		fact.setValue( parseValue(record) );
+		if( record.getEndDate() != null ){
+			fact.setEndTime(DateTimeAccuracy.parsePartialIso8601(record.getEndDate()));
+		}
+		fact.setLocationId(record.getLocation());
 
 		if( ts == sourceTs ){
 			// try to use visit timestamp

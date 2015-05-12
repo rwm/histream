@@ -94,7 +94,7 @@ class XMLObservationParser extends AbstractObservationParser{
 		fact = factory.createObservation(visitData.get("patid"), atts.getValue("concept"), start);
 		// set encounter id to visitData.get("encounter")
 		fact.setEncounterId(visitData.get("encounter"));
-
+		fact.setLocationId(atts.getValue("location"));
 		// set source information
 		fact.setSourceId(sourceId);
 		fact.setSourceTimestamp(sourceTimestamp);
@@ -173,6 +173,7 @@ class XMLObservationParser extends AbstractObservationParser{
 		if( ts != null ){
 			fact.setEndTime(DateTimeAccuracy.parsePartialIso8601(ts));
 		}
+		
 		
 	}
 

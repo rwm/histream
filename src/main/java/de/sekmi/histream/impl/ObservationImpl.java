@@ -158,6 +158,11 @@ public class ObservationImpl implements Observation{
 		return m;
 	}
 
+	@Override
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+
 	
 	
 }

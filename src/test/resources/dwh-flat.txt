@@ -35,6 +35,7 @@ XX12345	XXE12345	T:type:str	str	abc123
 XX12345	XXE12345	T:type:int	int	123
 # value attributes can be used in elements eav-item and value -->
 XX12345	XXE12345	T:type:dec	dec	123.456	mm	
+XX12345	XXE12345	T:full	dec	123.456	mm	2010	2011	T:PROV	T:LOC	A
 #  test group items
 #@group(start)
 XX12345	XXE12345	T:group:1	@

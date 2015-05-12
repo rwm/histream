@@ -36,6 +36,7 @@
 			<eav-item concept="T:type:int" type="xsi:integer">123</eav-item>
 			<!-- value attributes can be used in elements eav-item and value -->
 			<eav-item concept="T:type:dec" type="xsi:decimal" unit="mm" flag="A">123.456</eav-item>
+			<eav-item concept="T:full" start="2010" end="2011" type="xsi:decimal" unit="mm" flag="A" location="T:LOC">123.456</eav-item>
 			<!-- 
 			<eav-item concept="T:type:enum" type="xsi:integer">1</eav-item>
 				-->
