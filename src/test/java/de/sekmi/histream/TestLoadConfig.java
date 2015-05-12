@@ -14,7 +14,7 @@ public class TestLoadConfig {
 	public void loadNewConfig(){
 		Configuration config = Configuration.fromFile(new File("src/test/resources/histream.xml"));
 		Assert.assertNotNull(config);
-		Assert.assertEquals(6, config.getPlugins().length);
+		Assert.assertEquals(5, config.getPlugins().length);
 		Assert.assertEquals(1, config.getDestinations().length);
 		
 		Assert.assertEquals(config.getPlugins()[2], config.getDestinations()[0].getPlugin());

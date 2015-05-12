@@ -283,17 +283,20 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		}
 		fact = factory.createObservation(record.getPatID(), record.getConcept(), ts);
 		
-		if( ts == sourceTs ){
-			// try to use visit timestamp
-			ts = fact.getExtension(Visit.class).getStartTime();
-			if( ts != null )fact.setStartTime(ts);
-		}
 		// set other fields
 		
 		fact.setEncounterId(record.getVisitID());
 		fact.setSourceId(sourceId);
 		fact.setSourceTimestamp(sourceTimestamp);
 		fact.setValue( parseValue(record) );
+
+		if( ts == sourceTs ){
+			// try to use visit timestamp
+			ts = fact.getExtension(Visit.class).getStartTime();
+			if( ts != null )fact.setStartTime(ts);
+		}
+
+		
 		// TODO set remaining fields
 		record.getEndDate();
 		record.getLocation();

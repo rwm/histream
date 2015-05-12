@@ -23,4 +23,11 @@ public interface ObservationHandler extends Consumer<Observation>{
 	void accept(Observation observation);
 	
 	void setErrorHandler(Consumer<ObservationException> handler);
+	
+	/**
+	 * Set meta information for this observation handler.
+	 * @param key
+	 * @param value
+	 */
+	void setMeta(String key, String value);
 }

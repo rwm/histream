@@ -1,4 +1,4 @@
-package de.sekmi.histream;
+package de.sekmi.histream.impl;
 
 import java.io.Closeable;
 import java.io.File;
@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import de.sekmi.histream.Extension;
+import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationHandler;
+import de.sekmi.histream.Plugin;
 import de.sekmi.histream.conf.Configuration;
 import de.sekmi.histream.conf.PluginConfig;
 import de.sekmi.histream.conf.PluginRef;
-import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FileObservationProvider;
 import de.sekmi.histream.io.FileObservationProviderFactory;
@@ -24,6 +28,7 @@ public class RunConfiguration implements Closeable{
 	private Plugin[] plugins;
 	private FileObservationProviderFactory[] fileFactories;
 	private Consumer<Observation> destinationChain;
+	private ObservationHandler[] destinationHandlers;
 	
 	public RunConfiguration(Configuration conf) throws Exception{
 		factory = new ObservationFactoryImpl();
@@ -64,16 +69,26 @@ public class RunConfiguration implements Closeable{
 	@SuppressWarnings("unchecked")
 	private void buildDestinationChain(Configuration conf){
 		PluginRef[] ds = conf.getDestinations();
+		ArrayList<ObservationHandler> a = new ArrayList<ObservationHandler>(ds.length);
 		destinationChain = null;
 		// chain subsequent destinations in order of configuration
 		for( int i=0; i<ds.length; i++ ){
 			Consumer<Observation> dest = (Consumer<Observation>)plugins[getPluginIndex(conf, ds[i].getPlugin())];
 			if( destinationChain == null )destinationChain = dest;
 			else destinationChain = destinationChain.andThen(dest);
+			
+			if( dest instanceof ObservationHandler ){
+				a.add((ObservationHandler)dest);
+			}
 		}
+		destinationHandlers = a.toArray(new ObservationHandler[a.size()]);
+
 	}
-	
+		
 	public void processFile(FileObservationProvider provider){
+		for( ObservationHandler h : destinationHandlers ){
+			h.setMeta("etl.strategy", provider.getMeta("etl.strategy"));
+		}
 		AbstractObservationParser.nonNullStream(provider).forEach(destinationChain);
 	}
 	
@@ -100,7 +115,10 @@ public class RunConfiguration implements Closeable{
 		// TODO set error handlers for destinations
 		
 		// if listeners specified, run as server (don't exit)
-		args = new String[]{"src/test/resources/dwh-eav.xml"};
+		args = new String[]{
+				"src/test/resources/dwh-eav.xml",
+				"src/test/resources/dwh-flat.txt"
+				};
 		
 		if( args.length > 0 ){
 			for( int i=0; i<args.length; i++ ){

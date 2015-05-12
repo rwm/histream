@@ -1,8 +1,8 @@
 patid	encounter	concept	type	value	units	start	end	provider	location	flag
 #@meta(source.id)=test
 #@meta(source.timestamp)=2015-04-21T08:58:00
-#@meta(etl.strategy)=replacesource
-# etl strategie: replacesource|replacevisit|insert
+#@meta(etl.strategy)=replace-source
+# etl strategie: replace-source|replace-visit|insert
 # fallid darf leer sein (nicht erlaubt bei replacevisit)
 # dann wird pro patient ein neuer fall angelegt
 # da die echte fallid nicht übertragen werden darf, kann der importer einen hash über die echte id bilden

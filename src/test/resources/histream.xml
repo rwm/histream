@@ -27,8 +27,10 @@
 			<property name="project">demo</property>					
 			<property name="nullProvider">LCS-I2B2:PROVIDERS</property>					
 		</plugin>
-		<plugin class="de.sekmi.histream.io.XMLProviderFactory">
-		</plugin><!-- 
+		<plugin class="de.sekmi.histream.io.XMLProviderFactory"/>
+		<plugin class="de.sekmi.histream.io.FlatProviderFactory"/>
+		
+		<!-- 
 		<plugin class="de.sekmi.histream.i2b2.services.HiveServer">
 			<property name="user">i2b2demodata</property>
 		</plugin>
@@ -39,9 +41,12 @@
 	<!-- Wie kann die Konfiguration benutzt werden, wenn z.B. Dateien von der Kommandozeile
 	gelesen werden sollen und dann das Programm beendet werden soll?
 	 -->
+	<!-- 
 	<source plugin="de.sekmi.histream.hl7.MLLPListener" />
 	<source plugin="de.sekmi.histream.impl.SAXObservationProvider" />
+	-->
 	<!-- TODO source umbenennen in listener (fuer netzwerkschnittstellen) -->
+	
 	<destination plugin="de.sekmi.histream.i2b2.I2b2Inserter" />
 	
 	<!-- kann dateien von Kommandozeile lesen -->

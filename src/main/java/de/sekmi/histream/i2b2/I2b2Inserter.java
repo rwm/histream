@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import de.sekmi.histream.Modifier;
@@ -55,6 +57,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private String nullLocationCd;
 	private String nullModifierCd;
 	private String nullValueFlagCd;
+	private Preprocessor etlPreprocessor;
+	private int insertCount;
 	
 	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
 		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
@@ -62,9 +66,40 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
 		// TODO nullBlob (technically null allowed, but '' is used in demodata)
 		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
+		insertCount = 0;
 		open(config);
 	}
 	
+	
+	private interface Preprocessor{
+		void preprocess(Observation fact)throws SQLException;
+	}
+	private class DistinctVisitPurge implements Preprocessor{
+		private I2b2Visit prev;
+
+		@Override
+		public void preprocess(Observation fact) throws SQLException{
+			I2b2Visit current = fact.getExtension(I2b2Visit.class);
+			if( current != prev ){
+				purgeVisit(current.getNum());
+				prev = current;
+			}
+		}
+	}
+	private class UniqueSourcePurge implements Preprocessor{
+		private Set<String> purgedSources;
+		public UniqueSourcePurge(){
+			purgedSources = new HashSet<>();
+		}
+		@Override
+		public void preprocess(Observation fact) throws SQLException {
+			if( !purgedSources.contains(fact.getSourceId()) ){
+				purgedSources.add(fact.getSourceId());
+				purgeSource(fact.getSourceId());
+			}
+			
+		}
+	}
 	/**
 	 * Deletes all observations with the given sourceId
 	 * @param sourceId
@@ -72,8 +107,9 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	 */
 	public synchronized void purgeSource(String sourceId)throws SQLException{
 		deleteSource.setString(1, sourceId);
-		deleteSource.executeUpdate();
+		int rows = deleteSource.executeUpdate();
 		db.commit();
+		log.info("Deleted "+rows+" rows for sourcesystem_cd="+sourceId);
 	}
 	
 	/**
@@ -85,7 +121,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		deleteVisit.setInt(1, encounter_num);
 		int rows = deleteVisit.executeUpdate();
 		db.commit();
-		log.info("Deleted "+rows+" observations for encounter_num="+encounter_num);
+		log.info("Deleted "+rows+" rows for encounter_num="+encounter_num);
 	}
 	private void prepareStatements(Map<String,String> props)throws SQLException{
 		// no value
@@ -121,8 +157,19 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	
 	@Override
 	public void acceptOrException(Observation o) throws ObservationException{
+		if( etlPreprocessor != null ){
+			try{
+				etlPreprocessor.preprocess(o);
+			}catch( SQLException e ){
+				reportError(new ObservationException(o, e));
+			}
+		}
+			
 		try {
+			
 			insertFact(o, null, 1);
+			
+			insertCount ++;
 		} catch (SQLException e) {
 			throw new ObservationException(o, e);
 		}
@@ -311,6 +358,28 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 			db.close();
 		} catch (SQLException e) {
 			throw new IOException(e);
+		}
+		log.info("Inserted "+insertCount+" facts");
+	}
+
+	@Override
+	public void setMeta(String key, String value) {
+		if( key.equals("etl.strategy") ){
+			switch( value ){
+			case "replace-visit":
+				etlPreprocessor = new DistinctVisitPurge();
+				break;
+			case "replace-source":
+				etlPreprocessor = new UniqueSourcePurge();
+				break;
+			case "insert":
+				etlPreprocessor = null;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown etl strategy "+value);
+			}
+		}else{
+			throw new IllegalArgumentException("Unknown meta key "+value);
 		}
 	}
 
