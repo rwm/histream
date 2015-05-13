@@ -1,0 +1,41 @@
+            ------
+        HIStream Roadmap
+            ------
+       Raphael W. Majeed
+            ------
+          2012-09-17
+          
+Version 0.9.x
+* Working i2b2oracle connector to insert content into i2b2.
+* Sample HL7 messages and GUI tool to send messages.
+* HL7 message filters. Configurable through xml file / configuration admin
+
+
+Version 1.0.x
+* Easy setup. Wizard to create database tables (eg. karaf-command line based and gui based: histream:setup)
+* Notification plugin (e-mail, file). Taking user-id from fact.provider_id, loading email adresses / user information from UserAdmin.
+* Inference engine (generating new facts from inference rules)
+* Query tool (can use inference engine)
+* Publicly accessible maven repository + Karaf feature descriptors
+
+
+Version 1.1.x
+* Ontology support (OWL+SKOS) via Apache Jena
+
+
+Version 1.2.x
+
+
+Version 2.0.x
+* full support for current i2b2 web client (without admin)
+* i2b2 ontology
+* i2b2 query tool
+
+Version 2.1.x 
+* LDAP user authentication + groups/roles
+
+Version 2.2.x 
+* Fine grained access control for queries on data. Users can be limited to specific providers and locations.
+
+Version 3.x.x
+* 
