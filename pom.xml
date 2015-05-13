@@ -32,14 +32,16 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- assembly plugin to specify main class for runnable jar -->
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.4</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>de.sekmi.histream.impl.HIStream</mainClass>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>de.sekmi.histream.impl.RunConfiguration</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -95,11 +97,9 @@
               </configuration>
                   </execution>
               </executions>
-	</plugin>-->
+	</plugin>
 			
 			<plugin>
-				<!-- collect dependencies -->
-				<!-- use mvn dependency:copy-dependencies  to execute -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -110,13 +110,21 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<!-- configure the plugin here -->
-							<!--<outputDirectory>
-								${project.build.directory}/dependencies
-							</outputDirectory>-->
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.4</version>
+				<configuration>
+					<!-- Configures the used assembly descriptor -->
+					<descriptors>
+						<descriptor>src/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

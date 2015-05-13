@@ -142,10 +142,26 @@ public class RunConfiguration implements Closeable{
 			return;
 		}
 		
+		// TODO check for file histream.xml
+		File xml = new File("histream.xml");
+		if( !xml.canRead() ){
+			System.err.println("Unable to find/read file histream.xml");
+			xml = new File("src/test/resources/histream.xml");
+			if( xml.canRead() )
+				System.err.println("Using src/test/resources/histream.xml");
+			else
+				xml = null;
+		}
+		
+		if( xml == null ){
+			System.err.println("Unable to run without configuration");
+			System.exit(1);
+		}
+		
 		System.out.println("HIStream "+readVersion()+" starting");
 		long millis = System.currentTimeMillis();
 		
-		Configuration conf = Configuration.fromFile(new File("src/test/resources/histream.xml"));
+		Configuration conf = Configuration.fromFile(xml);
 		RunConfiguration rc = new RunConfiguration(conf);
 
 		// TODO set error handlers for destinations
