@@ -26,10 +26,14 @@ import java.io.File;
 import java.io.IOException;
 
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 import de.sekmi.histream.Extension;
 import de.sekmi.histream.Observation;
@@ -126,8 +130,19 @@ public class RunConfiguration implements Closeable{
 		return p;
 	}
 	
+	private static final String readVersion() throws IOException{
+		InputStream inputStream = RunConfiguration.class.getClassLoader().getResourceAsStream("META-INF/maven/de.sekmi.histream/histream/pom.properties");
+		Properties props = new Properties();
+		props.load(inputStream);
+		return props.getProperty("version","[unknown]");
+	}
 	public static void main(String args[])throws Exception{
-		System.out.println("HIStream starting");
+		if( System.console() == null ){
+			JOptionPane.showMessageDialog(null, "This program should be run with a console", "HIStream "+readVersion(), JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		
+		System.out.println("HIStream "+readVersion()+" starting");
 		long millis = System.currentTimeMillis();
 		
 		Configuration conf = Configuration.fromFile(new File("src/test/resources/histream.xml"));
