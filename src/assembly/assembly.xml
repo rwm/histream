@@ -51,6 +51,9 @@
 		<includes>
 			<include>*.txt</include>
 		</includes>
+		<excludes>
+			<exclude>TODO.txt</exclude>
+		</excludes>
 	</fileSet>
     </fileSets>
 </assembly>
