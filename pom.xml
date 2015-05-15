@@ -1,10 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<name>HIStream</name>
+	<packaging>pom</packaging>
+	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
 	<version>0.2-alpha</version>
   
-	<packaging>pom</packaging>
 	
   	<inceptionYear>2013</inceptionYear>
   	<organization>
@@ -26,6 +28,8 @@
 	</licenses>
 	<modules>
 		<module>histream-core</module>
+		<module>HIStream-i2b2</module>
+		<module>HIStream-HL7</module>
 	</modules>
 	<build>
 		<pluginManagement>

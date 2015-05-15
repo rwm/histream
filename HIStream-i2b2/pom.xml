@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>HIStream : Core</name>
-
+	<name>HIStream : i2b2</name>
+	
 	<groupId>de.sekmi.histream</groupId>
-	<artifactId>histream-core</artifactId>
+	<artifactId>histream-i2b2</artifactId>
 	<version>0.2-alpha</version>
 
 	<parent>
@@ -14,29 +14,6 @@
   
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>de.sekmi.histream.impl.RunConfiguration</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<!-- Configures the used assembly descriptor -->
-					<descriptors>
-						<descriptor>src/assembly/assembly.xml</descriptor>
-					</descriptors>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -51,6 +28,11 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1201-jdbc41</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-core</artifactId>
+			<version>0.2-alpha</version>
 		</dependency>
 	</dependencies>
 </project>

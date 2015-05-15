@@ -1,4 +1,4 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.i2b2;
 
 /*
  * #%L
