@@ -1,2 +1,9 @@
+
+Move i2b2 classes to i2b2 submodule
+
+Add hl7 submodule
+
+Test eclipse project generation
+
 Deploy site to sourceforge via mvn site:deploy
 https://maven.apache.org/plugins/maven-site-plugin/examples/site-deploy-to-sourceforge.net.html
