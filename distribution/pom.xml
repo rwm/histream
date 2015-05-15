@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>Distribution</name>
+	
+	<packaging>pom</packaging>
+	
+	<groupId>de.sekmi.histream</groupId>
+	<artifactId>distribution</artifactId>
+	<version>0.2-alpha</version>
+
+	<parent>
+		<groupId>de.sekmi.histream</groupId>
+		<artifactId>histream</artifactId>
+		<version>0.2-alpha</version>
+	</parent>
+  
+	<dependencies>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-core</artifactId>
+			<version>0.2-alpha</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+		      <plugin>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<executions>
+			  <execution>
+			    <id>distro-assembly</id>
+			    <phase>package</phase>
+			    <goals>
+			      <goal>single</goal>
+			    </goals>
+			    <configuration>
+			      <descriptors>
+				<descriptor>src/assembly/assembly.xml</descriptor>
+			      </descriptors>
+			    </configuration>
+			  </execution>
+			</executions>
+		      </plugin>
+
+		</plugins>
+	</build>
+</project>

@@ -131,7 +131,7 @@ public class RunConfiguration implements Closeable{
 	}
 	
 	private static final String readVersion() throws IOException{
-		InputStream inputStream = RunConfiguration.class.getClassLoader().getResourceAsStream("META-INF/maven/de.sekmi.histream/histream/pom.properties");
+		InputStream inputStream = RunConfiguration.class.getClassLoader().getResourceAsStream("META-INF/maven/de.sekmi.histream/histream-core/pom.properties");
 		Properties props = new Properties();
 		props.load(inputStream);
 		return props.getProperty("version","[unknown]");

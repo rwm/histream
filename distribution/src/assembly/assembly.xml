@@ -1,0 +1,53 @@
+<assembly>
+    <id>bin</id>
+    <!-- Specifies that our binary distribution is a zip package -->
+    <formats>
+        <format>zip</format>
+    </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+    
+      <!-- Enable access to all projects in the current multimodule build! -->
+      <useAllReactorProjects>true</useAllReactorProjects>
+      
+      <!-- Now, select which projects to include in this module-set. -->
+      <includes>
+        <include>de.sekmi.histream:histream-i2b2</include>
+      </includes>
+      <binaries>
+        <outputDirectory>lib</outputDirectory>
+        <unpack>false</unpack>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+
+    <fileSets>
+        <!--
+            Adds startup scripts to the root directory of zip package. The startup
+            scripts are copied from the src/main/scripts directory.
+        -->
+        <fileSet>
+            <directory>${project.build.scriptSourceDirectory}/startup</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <filtered>true</filtered>
+        </fileSet>
+        <!--
+            Add license files. TODO copy/create files
+        -->
+	<fileSet>
+		<directory>${basedir}</directory>
+		<outputDirectory></outputDirectory>
+		<includes>
+			<include>*.txt</include>
+		</includes>
+		<excludes>
+			<exclude>TODO.txt</exclude>
+		</excludes>
+	</fileSet>
+    </fileSets>
+</assembly>
