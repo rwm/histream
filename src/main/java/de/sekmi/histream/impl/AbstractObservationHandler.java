@@ -47,8 +47,8 @@ public abstract class AbstractObservationHandler implements ObservationHandler{
 	/**
 	 * Accept method which allows exceptions. Exceptions are passed to the error handler
 	 * specified via {@link #setErrorHandler(Consumer)}.
-	 * @param observation
-	 * @throws ObservationException
+	 * @param observation observation
+	 * @throws ObservationException for errors during the accept operation
 	 */
 	protected abstract void acceptOrException(Observation observation)throws ObservationException;
 

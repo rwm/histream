@@ -28,6 +28,8 @@ import de.sekmi.histream.ext.ExternalSourceType;
 /**
  * Observation of a single event or a single fact assigned to a single patient.
  * 
+ * TODO more details
+ * 
  * @author Raphael
  *
  */
@@ -56,8 +58,25 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	void setEncounterId(String encounterId);
 	void setLocationId(String locationId);
 	
+	/**
+	 * Whether this observation contains sub-concepts (=modifiers).
+	 * 
+	 * @see #getModifier(String)
+	 * @return true if modifiers are present, false otherwise
+	 */
 	boolean hasModifiers();
 	Modifier getModifier(String modifierId);
 	Enumeration<Modifier> getModifiers();
+	
+	/**
+	 * Add a sub concept to this observation.
+	 * 
+	 * Use the returned {@link Modifier} to add additional information (e.g. value)
+	 * to the modifier.
+	 * 
+	 * @param modifierId concept id for the new modifier
+	 * @return new modifier
+	 * @throws IllegalArgumentException if the given modifierId is already used.
+	 */
 	Modifier addModifier(String modifierId)throws IllegalArgumentException;
 }

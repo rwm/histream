@@ -123,8 +123,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	}
 	/**
 	 * Deletes all observations with the given sourceId
-	 * @param sourceId
-	 * @throws SQLException
+	 * @param sourceId source id
+	 * @throws SQLException if the DELETE statement failed
 	 */
 	public synchronized void purgeSource(String sourceId)throws SQLException{
 		deleteSource.setString(1, sourceId);
@@ -135,8 +135,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	
 	/**
 	 * Deletes all observations for the given encounter_num
-	 * @param encounter_num
-	 * @throws SQLException
+	 * @param encounter_num encounter number (e.g. observation_fact.encounter_num)
+	 * @throws SQLException if the DELETE statement failed.
 	 */
 	public synchronized void purgeVisit(int encounter_num) throws SQLException{
 		deleteVisit.setInt(1, encounter_num);
@@ -165,8 +165,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	}
 	/**
 	 * Opens a database connection and prepares statements
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
+	 * @throws SQLException if preparation/initialisation failed
+	 * @throws ClassNotFoundException if database driver not found 
 	 */
 	private void open(Map<String,String> props)throws SQLException, ClassNotFoundException{
 		db = PostgresExtension.getConnection(props);

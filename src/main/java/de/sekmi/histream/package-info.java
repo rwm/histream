@@ -1,3 +1,9 @@
+/**
+ * Basic interfaces for HIStream
+ * 
+ * @author marap1
+ *
+ */
 package de.sekmi.histream;
 
 /*
@@ -19,23 +25,3 @@ package de.sekmi.histream;
  * limitations under the License.
  * #L%
  */
-
-
-import java.io.IOException;
-import java.io.InputStream;
-
-/**
- * Observation provider parsing input streams to provide observations.
- * 
- * @author marap1
- *
- */
-public interface ObservationParser extends ObservationProvider {
-
-	/**
-	 * Parse an input stream to produce observations
-	 * @param input input stream
-	 * @throws IOException for io errors occurred during parsing
-	 */
-	public void parse(InputStream input) throws IOException;
-}

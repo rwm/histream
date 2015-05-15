@@ -59,8 +59,8 @@ public class ObservationImpl implements Observation{
 	
 	/**
 	 * Constructor should not be called directly. Instead, use
-	 * {@link ObservationFactory#}
-	 * @param factory
+	 * {@link ObservationFactory#createObservation(String, String, DateTimeAccuracy)}.
+	 * @param factory observation factory
 	 */
 	protected ObservationImpl(ObservationFactoryImpl factory){
 		this.factory = factory;
@@ -119,7 +119,7 @@ public class ObservationImpl implements Observation{
 	 * Assign a modifier to the concept. This will overwrite any existing modifier
 	 * with the same modifierId.
 	 * 
-	 * @param modifier
+	 * @param modifier modifier
 	 */
 	public void setModifier(Modifier modifier){
 		// lazy create hashtable only, when a modifier is set

@@ -26,10 +26,11 @@ import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlEnum;
 
 /**
- * @author marap1
- *
  * Interface for observation value. 
+ * 
  * Also contains abnormal flag, value type and numeric operator.
+ *
+ * @author marap1
  */
 public interface Value {
 	/**
@@ -45,7 +46,7 @@ public interface Value {
 	AbnormalFlag getAbnormalFlag();
 	/**
 	 * Value units. E.g. s or ml/h
-	 * @return
+	 * @return units string
 	 */
 	String getUnits();
 	/**
@@ -60,6 +61,11 @@ public interface Value {
 	BigDecimal getReferenceHigh();
 	
 	
+	/**
+	 * Value types
+	 * @author marap1
+	 *
+	 */
 	@XmlEnum
 	public enum Type{
 		/**
@@ -80,7 +86,11 @@ public interface Value {
 		//NumericEnum
 	}
 
-	
+	/**
+	 * Value operators
+	 * @author marap1
+	 *
+	 */
 	@XmlEnum
 	public enum Operator{
 		Equal("EQ"), 

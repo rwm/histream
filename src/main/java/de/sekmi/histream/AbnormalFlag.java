@@ -105,8 +105,8 @@ public enum AbnormalFlag{
 	public String key(){return this.key;}
 	
 	/**
-	 * Get abnormal flag for the specified key.
-	 * @param key
+	 * Get abnormal flag for the specified key. For allowed values, see the enum values.
+	 * @param key key string.
 	 * @return null if key is null, matching flag otherwise
 	 * @throws IllegalArgumentException for non-null keys which do not match any enum constant.
 	 */

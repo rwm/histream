@@ -106,16 +106,16 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	
 	/**
 	 * Construct new postgres patient store. In addition to properties
-	 * needed by {@link PostgresExtension#PostgresExtension(Properties), the
-	 * following properties are needed: 
+	 * needed by {@link PostgresExtension#PostgresExtension(Map)},
+	 * the following properties are needed: 
 	 * <p>projectId, 
 	 * <p>Optional properties:
 	 * <p>
 	 * 	idSourceDefault ('HIVE'), idSourceSeparator (single char, ':')
 	 * 	fetchSize (int, 10000)
-	 * @param configuration
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
+	 * @param configuration configuration
+	 * @throws SQLException if the preparation or initialisation fails
+	 * @throws ClassNotFoundException if postgresql driver not found
 	 */
 	public PostgresPatientStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
 		super(configuration);
@@ -330,8 +330,8 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 
 	/**
 	 * Insert a new patient into the database. Only patient_num and sourcesystem_cd are filled.
-	 * @param patient
-	 * @throws SQLException
+	 * @param patient patient object
+	 * @throws SQLException if INSERT failed
 	 */
 	private void insertPatient(I2b2Patient patient) throws SQLException{
 		synchronized( insert ){
@@ -343,9 +343,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 	
 	/**
-	 * Get the i2b2 sex_cd for a patient
-	 * @param patient
-	 * @return
+	 * Get the i2b2 sex_cd for a patient. Currently, only M and F are supported.
+	 * @param patient patient object
+	 * @return i2b2 sex_cd
 	 */
 	private static String getSexCd(Patient patient){
 		if( patient.getSex() == null )return null;
@@ -360,8 +360,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		}
 	}
 	/**
-	 * Get the i2b2 vital_status_cd for a patient
-	 * @param patient
+	 * Get the i2b2 vital_status_cd for a patient.
+	 * Values Y,M,X,R,T,S can be returned.
+	 * @param patient patient object
 	 * @return vital status code, see CRC_Design doc
 	 */
 	private static String getVitalStatusCd(Patient patient){

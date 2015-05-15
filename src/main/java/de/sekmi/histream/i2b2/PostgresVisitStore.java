@@ -172,9 +172,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	/**
 	 * Set aliases for a visit, puts aliases into cache.
 	 * 
-	 * @param visit
-	 * @param aliases
-	 * @param primary
+	 * @param visit visit instance
+	 * @param aliases alias patient IDs (e.g. merged)
+	 * @param primary index of primary alias (in aliases)
 	 */
 	private void setAliases(I2b2Visit visit, String[] aliases, int primary){
 		visit.aliasIds = aliases;
@@ -287,7 +287,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	/**
 	 * Add the visit to storage. Patient information is not written
 	 * @param visit visit to add
-	 * @throws SQLException
+	 * @throws SQLException if the INSERT failed
 	 */
 	private void addToStorage(I2b2Visit visit) throws SQLException{
 		synchronized( insert ){
@@ -317,8 +317,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	}
 	
 	/**
-	 * Get the i2b2 vital_status_cd for a patient
-	 * @param visit
+	 * Get the i2b2 vital_status_cd for a patient.
+	 * TODO move method to generic i2b2 support class.
+	 * @param visit visit object
 	 * @return vital status code, see CRC_Design doc
 	 */
 	private static String getActiveStatusCd(Visit visit){

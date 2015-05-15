@@ -28,7 +28,7 @@ package de.sekmi.histream;
  * 
  * @author Raphael
  *
- * @param <T>
+ * @param <T> type class
  */
 public interface Extension<T>{
 	/**
@@ -36,8 +36,8 @@ public interface Extension<T>{
 	 * once for each observation, usually when the extension requested for
 	 * the observation. The instance is then cached automatically.
 	 * 
-	 * @param observation
-	 * @return extension
+	 * @param observation observation
+	 * @return extension extension
 	 */
 	T createInstance(Observation observation);
 	

@@ -32,7 +32,7 @@ package de.sekmi.histream;
 public interface ObservationFactory {
 	/**
 	 * Register an extension. Registered extensions cannot be removed.
-	 * @param extension
+	 * @param extension extension
 	 */
 	void registerExtension(Extension<?> extension);
 	
@@ -54,10 +54,10 @@ public interface ObservationFactory {
 	
 	/**
 	 * Create a new observation
-	 * @param patientId
-	 * @param conceptId
-	 * @param startTime TODO
-	 * @return
+	 * @param patientId patient id 
+	 * @param conceptId concept code
+	 * @param startTime start time for the fact TODO remove start time from constructor but throw exception later if startTime is needed.
+	 * @return new observation
 	 */
 	Observation createObservation(String patientId, String conceptId, DateTimeAccuracy startTime);
 }

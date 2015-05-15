@@ -31,9 +31,7 @@ import java.util.Date;
 
 /**
  * Local date and time with specified accuracy. Maximum resolution is seconds.
- * Supported accuracy values are {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS},
- * {@link ChronoUnit#DAYS}, {@link ChronoUnit#HOURS}, {@link ChronoUnit#MINUTES} and
- * {@link ChronoUnit#SECONDS}.    
+ * For supported accuracy, see {@link #setAccuracy(ChronoUnit)}.
  * @author Raphael
  *
  */
@@ -43,7 +41,7 @@ public class DateTimeAccuracy implements Temporal {
 	
 	/**
 	 * Create date time with accuracy to seconds.
-	 * @param dateTime
+	 * @param dateTime timestamp
 	 */
 	public DateTimeAccuracy(LocalDateTime dateTime){
 		this.dateTime = dateTime;
@@ -104,8 +102,13 @@ public class DateTimeAccuracy implements Temporal {
 	
 	/** 
 	 * Set the accuracy for the date time object.
+	 * <p>
+	 * Supported accuracy values are {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS},
+     * {@link ChronoUnit#DAYS}, {@link ChronoUnit#HOURS}, {@link ChronoUnit#MINUTES} and
+     * {@link ChronoUnit#SECONDS}
+     * <p>
 	 * TODO: what happens if the accuracy is increased (but the underlaying time was truncated)
-	 * @param accuracy
+	 * @param accuracy accuracy
 	 */
 	public void setAccuracy(ChronoUnit accuracy){
 		this.accuracy = accuracy;
@@ -114,7 +117,7 @@ public class DateTimeAccuracy implements Temporal {
 	
 	/**
 	 * Get the local time
-	 * @return
+	 * @return local time
 	 */
 	public LocalDateTime getLocal(){ return dateTime; }
 	
@@ -169,9 +172,9 @@ public class DateTimeAccuracy implements Temporal {
 	/**
 	 * Parses a partial ISO 8601 date time string.
 	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
-	 * @param str
+	 * @param str ISO 8601 string
 	 * @return date time with accuracy as derived from parse
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException for unparsable string
 	 */
 	public static DateTimeAccuracy parsePartialIso8601(String str)throws IllegalArgumentException{
 		if( str.length() < 4 )throw new IllegalArgumentException("Need at least 4 characters for year: "+str);

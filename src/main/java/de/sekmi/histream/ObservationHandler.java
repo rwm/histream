@@ -47,8 +47,8 @@ public interface ObservationHandler extends Consumer<Observation>{
 	
 	/**
 	 * Set meta information for this observation handler.
-	 * @param key
-	 * @param value
+	 * @param key meta key
+	 * @param value meta value
 	 */
 	void setMeta(String key, String value);
 }

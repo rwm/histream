@@ -39,7 +39,7 @@ public interface ExternalSourceType {
 	
 	/**
 	 * Set the point in time, when the contained information left it's source.
-	 * @param instant
+	 * @param sourceTimestamp source timestamp
 	 */
 	void setSourceTimestamp(Instant sourceTimestamp);
 	/**

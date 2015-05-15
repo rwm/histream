@@ -34,7 +34,7 @@ public interface IdExtensionType{
 	 * Sets the id for the extension type instance.
 	 * This method should be called only if the id was undefined before.
 	 * The id should not be changed thereafter.
-	 * @param id
+	 * @param id id string
 	 */
 	void setId(String id);
 	

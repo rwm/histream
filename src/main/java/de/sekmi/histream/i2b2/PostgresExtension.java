@@ -40,7 +40,7 @@ import de.sekmi.histream.Plugin;
  * 
  * @author Raphael
  *
- * @param <T>
+ * @param <T> extension instance type
  */
 abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 	private static final int defaultFetchSize = 10000;

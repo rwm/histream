@@ -40,8 +40,7 @@ import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
 /**
- * Parser for EAV XML documents. This class is used by both the {@link SAXObservationProvider}
- * and {@link XMLObservationProvider}.
+ * Parser for EAV XML documents. This class is used by {@link XMLObservationProvider}.
  * 
  * @author marap1
  *
@@ -221,7 +220,7 @@ class XMLObservationParser extends AbstractObservationParser{
 	/**
 	 * Parse value text according to previously parsed value attributes.
 	 * Requires previous call to {@link #parseValueAttributes(AttributeAccessor)}
-	 * @param valueText
+	 * @param valueText value string
 	 * @return new value which also contains value attributes
 	 */
 	protected Value parseValue(String valueText){

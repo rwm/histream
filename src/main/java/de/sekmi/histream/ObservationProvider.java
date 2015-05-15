@@ -23,9 +23,26 @@ package de.sekmi.histream;
 
 import java.util.function.Consumer;
 
+/**
+ * Provider of observations.
+ * 
+ * An observation provider usually needs an {@link ObservationFactory} to
+ * construct the observation it provides. The factory can be specified via 
+ * {@link #setObservationFactory(ObservationFactory)}.
+ */
 public interface ObservationProvider{
+	/**
+	 * Set the observation handler which will receive observations
+	 * produced by this observation provider.
+	 * @param consumer observation handler
+	 */
 	void setHandler(Consumer<Observation> consumer);
 	
+	/**
+	 * Set the observation factory which this provider will use
+	 * to construct observations.
+	 * @param factory observation factory
+	 */
 	void setObservationFactory(ObservationFactory factory);
 	
 	Class<?>[] getSupportedExtensions();

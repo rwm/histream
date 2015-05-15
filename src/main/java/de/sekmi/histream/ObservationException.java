@@ -40,6 +40,9 @@ public class ObservationException extends Exception{
 		super(message, cause);
 		this.fact = fact;
 	}
-	
+	/**
+	 * Get the observation associated with this exception.
+	 * @return associated observation or null if none.
+	 */
 	public Observation getObservation(){return fact;}
 }

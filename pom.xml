@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.2-alpha</version>
   
   	<inceptionYear>2013</inceptionYear>
   	<organization>
@@ -75,46 +75,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--  
-			
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jaxb2-maven-plugin</artifactId>
-            <version>1.6</version>
-            <executions>
-                <execution>
-                    <id>schemagen</id>
-                    <goals>
-                        <goal>schemagen</goal>
-                    </goals>
-            <phase>package</phase>
-              <configuration>
-
-                 <includes>
-                        <include>**/*.java</include>
-                    </includes>
-                 <outputDirectory>${project.build.directory}/generated-resources/schemagen</outputDirectory>
-              </configuration>
-                  </execution>
-              </executions>
-	</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -148,6 +108,7 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1201-jdbc41</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -47,7 +47,23 @@ import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
 /**
+ * Reads observations from flat text files.
  * 
+ * <p>
+ * Compatible text files are read line by line via {@link BufferedReader#readLine()}. 
+ * The line separator characters are system dependent.
+ * <p>
+ * The file MUST start with a header line which should list the headers specified in {@link #minHeaders}. 
+ * Additional column headers are allowed to the right of the minimum headers.
+ * <p>
+ * Each of the following lines may start with a comment character, which by default is '#'.
+ * <p>
+ * If the comment starts with '#@', then the line is understood as special command
+ * to the reader. Allowed commands are {@code #@meta}, {@code #@concept} and {@code #@group}.
+ * <p>
+ * Any non-empty lines which are not comments are parsed as delimited values.
+ * TODO describe colums.
+ *   
  * @author Raphael
  *
  */

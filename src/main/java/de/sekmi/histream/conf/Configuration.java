@@ -80,7 +80,7 @@ public class Configuration {
      * <p>
      * If an exception is thrown by the constructor if any plugin, the previously instantiated
      * plugins are closed in reverse order. Any exceptions thrown by the close methods are suppressed
-     * by the constructor exception (via {@link Exception#addSuppressed(Throwable)).
+     * by the constructor exception (via {@link Exception#addSuppressed(Throwable)}).
      * @return plugin instances
      * @throws Exception exception thrown by any plugin during construction
      */

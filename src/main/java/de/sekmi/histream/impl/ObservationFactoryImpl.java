@@ -83,12 +83,12 @@ public class ObservationFactoryImpl implements ObservationFactory{
 	
 	/**
 	 * Set extension
-	 * @param observation
-	 * @param extensionType
-	 * @param extension
+	 * @param observation observation
+	 * @param extensionType extension type
+	 * @param extension extension
 	 * @throws IllegalArgumentException if extension type is not part of the registered extensions
 	 */
-	protected <T> void setExtension(ObservationImpl observation, Class<T> extensionType, T extension)throws IllegalArgumentException {
+	<T> void setExtension(ObservationImpl observation, Class<T> extensionType, T extension)throws IllegalArgumentException {
 		ExtensionEntry e = extensions.get(extensionType);
 		if( e == null )throw new IllegalArgumentException("Unsupported extension type "+extensionType);
 		setExtension(observation, e, extension);

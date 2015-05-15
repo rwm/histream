@@ -34,15 +34,15 @@ public interface PatientStore {
 	
 	/**
 	 * Get alias ids for the given patient (e.g. resulting from a merge) 
-	 * @param patient
-	 * @return
+	 * @param patient patient instance
+	 * @return alias ids
 	 */
 	String[] getAliasIds(Patient patient);
 	
 	/**
 	 * Deletes the patient identified by given id. This method does not remove any other associated
 	 * data e.g. like visits, observations.
-	 * @param id
+	 * @param id patient id
 	 */
 	void purge(String id);
 }

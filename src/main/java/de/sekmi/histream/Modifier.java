@@ -20,7 +20,15 @@ package de.sekmi.histream;
  * #L%
  */
 
-
+/**
+ * Sub concept of an {@link Observation}. 
+ * 
+ * Multiple modifiers are allowed for a single observation,
+ * as long as each modifier uses a different concept id / modifier code.
+ *  
+ * @author marap1
+ *
+ */
 public interface Modifier extends ConceptValuePair{
 	@Override 
 	String getConceptId();
@@ -28,6 +36,9 @@ public interface Modifier extends ConceptValuePair{
 	@Override 
 	Value getValue();
 	
+	/**
+	 * Sets the value for this modifier
+	 * @param value value
+	 */
 	void setValue(Value value);
-
 }

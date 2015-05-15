@@ -20,12 +20,23 @@ package de.sekmi.histream;
  * #L%
  */
 
-
+/**
+ * Accessor which can be used to access and set extension instances for observations.
+ * 
+ * While extension can also accessed via {@link Observation#getExtension(Class)}, the main
+ * difference is that this class does not to lookup the extension type and thus provides
+ * faster access. Additionally, this interface can be used to set an extension explicitly
+ * via {@link #set(Observation, Object)}.
+ * 
+ * @author marap1
+ *
+ * @param <T> extension type
+ */
 public interface ExtensionAccessor<T> {
 	/**
 	 * Get the extension type instance. The instance is created automatically on first access.
-	 * @param observation
-	 * @return
+	 * @param observation observation
+	 * @return extension instance
 	 */
 	T access(Observation observation);
 	

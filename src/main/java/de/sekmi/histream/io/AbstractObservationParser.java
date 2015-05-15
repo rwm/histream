@@ -47,8 +47,8 @@ public class AbstractObservationParser {
 	
 	/**
 	 * Set meta information for this parser
-	 * @param key
-	 * @param value
+	 * @param key meta key
+	 * @param value meta value
 	 */
 	protected void setMeta(String key, String value){
 		if( value == null ){

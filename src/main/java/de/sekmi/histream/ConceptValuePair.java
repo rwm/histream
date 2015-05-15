@@ -1,5 +1,7 @@
 package de.sekmi.histream;
 
+import de.sekmi.histream.impl.AbstractValue;
+
 /*
  * #%L
  * histream
@@ -20,8 +22,24 @@ package de.sekmi.histream;
  * #L%
  */
 
-
+/**
+ * Pair of concept and value. 
+ * Basic common interface for both {@link Observation} an {@link Modifier}.
+ * 
+ * @author marap1
+ *
+ */
 public interface ConceptValuePair {
+	/**
+	 * Get the concept id
+	 * @return concept id
+	 */
 	public String getConceptId();
+	
+	/**
+	 * Get the value. This method shall not return {@code null}.
+	 * If a non-existing value is needed, use {@link AbstractValue#NONE}
+	 * @return value value
+	 */
 	public Value getValue();
 }
