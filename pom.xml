@@ -4,6 +4,8 @@
 	<artifactId>histream</artifactId>
 	<version>0.2-alpha</version>
   
+	<packaging>pom</packaging>
+	
   	<inceptionYear>2013</inceptionYear>
   	<organization>
   		<name>R.W.Majeed</name>
@@ -13,6 +15,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+	
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -21,72 +24,62 @@
 			<comments>A business-friendly OSS license</comments>
 		</license>
 	</licenses>
+	<modules>
+		<module>histream-core</module>
+	</modules>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>de.sekmi.histream.impl.RunConfiguration</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>first</id>
-						<goals>
-							<goal>update-file-header</goal>
-						</goals>
-						<phase>process-sources</phase>
-						<configuration>
-							<licenseName>apache_v2</licenseName>
-							<roots>
-								<root>src/main/java</root>
-								<root>src/test</root>
-							</roots>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.4</version>
-				<configuration>
-					<!-- Configures the used assembly descriptor -->
-					<descriptors>
-						<descriptor>src/assembly/assembly.xml</descriptor>
-					</descriptors>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>1.8</version>
+					<executions>
+						<execution>
+							<id>first</id>
+							<goals>
+								<goal>update-file-header</goal>
+							</goals>
+							<phase>process-sources</phase>
+							<configuration>
+								<licenseName>apache_v2</licenseName>
+								<roots>
+									<root>src/main/java</root>
+									<root>src/test</root>
+								</roots>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.5.4</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<reporting>
 		<plugins>
@@ -103,12 +96,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.4-1201-jdbc41</version>
-			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 </project>
