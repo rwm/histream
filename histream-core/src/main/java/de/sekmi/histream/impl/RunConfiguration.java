@@ -141,7 +141,6 @@ public class RunConfiguration implements Closeable{
 			JOptionPane.showMessageDialog(null, "This program should be run with a console", "HIStream "+readVersion(), JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		
 		// TODO check for file histream.xml
 		File xml = new File("histream.xml");
 		if( !xml.canRead() ){
@@ -158,6 +157,10 @@ public class RunConfiguration implements Closeable{
 			System.exit(1);
 		}
 		
+		readFiles(xml, args);
+
+	}
+	public static void readFiles(File xml, String files[])throws Exception{		
 		System.out.println("HIStream "+readVersion()+" starting");
 		long millis = System.currentTimeMillis();
 		
@@ -167,14 +170,10 @@ public class RunConfiguration implements Closeable{
 		// TODO set error handlers for destinations
 		
 		// if listeners specified, run as server (don't exit)
-		args = new String[]{
-				"src/test/resources/dwh-eav.xml",
-				"src/test/resources/dwh-flat.txt"
-				};
 		
-		if( args.length > 0 ){
-			for( int i=0; i<args.length; i++ ){
-				File file = new File(args[i]);
+		if( files.length > 0 ){
+			for( int i=0; i<files.length; i++ ){
+				File file = new File(files[i]);
 				FileObservationProvider p = rc.providerForFile(file);
 				if( p != null ){
 					System.out.println("ETL("+p.getMeta("etl.strategy")+"): "+file);
