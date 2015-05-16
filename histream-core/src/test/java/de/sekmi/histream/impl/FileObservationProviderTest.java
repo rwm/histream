@@ -33,11 +33,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.io.AbstractObservationParser;
-import de.sekmi.histream.io.FlatObservationProvider;
-import de.sekmi.histream.io.XMLObservationProvider;
+import de.sekmi.histream.io.FlatObservationSupplier;
+import de.sekmi.histream.io.XMLObservationSupplier;
 
 
 public class FileObservationProviderTest {
@@ -145,14 +146,14 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testStAXReader() throws Exception {
-		XMLObservationProvider xos = new XMLObservationProvider(factory, new FileInputStream("src/test/resources/dwh-eav.xml"));
+		ObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("src/test/resources/dwh-eav.xml"));
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(xos), false).forEach(handler);
 		handler.finish();
 	}
 	
 	@Test
 	public void testFlatReader() throws Exception {
-		FlatObservationProvider s = new FlatObservationProvider(factory, new FileInputStream("src/test/resources/dwh-flat.txt"));
+		ObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("src/test/resources/dwh-flat.txt"));
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(handler);
 		handler.finish();
 	}

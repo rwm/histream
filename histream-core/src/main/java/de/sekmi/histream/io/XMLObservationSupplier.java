@@ -38,17 +38,19 @@ import javax.xml.stream.XMLStreamReader;
 
 
 
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.impl.AbstractValue;
 
-public class XMLObservationProvider extends XMLObservationParser implements FileObservationProvider{
+public class XMLObservationSupplier extends XMLObservationParser implements ObservationSupplier{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";
 	private XMLStreamReader reader;
 	
 	private AttributeAccessor atts;
 	
-	public XMLObservationProvider(ObservationFactory factory, XMLStreamReader reader) throws XMLStreamException {
+	public XMLObservationSupplier(ObservationFactory factory, XMLStreamReader reader) throws XMLStreamException {
 		setObservationFactory(factory);
 		this.reader = reader;
 		atts = new AttributeAccessor() {
@@ -63,7 +65,7 @@ public class XMLObservationProvider extends XMLObservationParser implements File
 		readMeta();
 		readVisit();
 	}
-	public XMLObservationProvider(ObservationFactory factory, InputStream input) throws XMLStreamException, FactoryConfigurationError {
+	public XMLObservationSupplier(ObservationFactory factory, InputStream input) throws XMLStreamException, FactoryConfigurationError {
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
 	

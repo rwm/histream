@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
@@ -67,8 +68,8 @@ import de.sekmi.histream.impl.StringValue;
  * @author Raphael
  *
  */
-public class FlatObservationProvider extends AbstractObservationParser implements FileObservationProvider{
-	private static final Logger log = Logger.getLogger(FlatObservationProvider.class.getName());
+public class FlatObservationSupplier extends AbstractObservationParser implements ObservationSupplier{
+	private static final Logger log = Logger.getLogger(FlatObservationSupplier.class.getName());
 	/**
 	 * Minimum headers required in first line. Additional columns to the right are ignored (warning)
 	 */
@@ -145,7 +146,7 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 		public String getFlags(){return fields[10];}
 	}
 	
-	public FlatObservationProvider(ObservationFactory factory, BufferedReader reader) throws IOException{
+	public FlatObservationSupplier(ObservationFactory factory, BufferedReader reader) throws IOException{
 		setObservationFactory(factory);
 		this.reader = reader;
 		this.fieldSeparator = "\t";
@@ -207,7 +208,7 @@ public class FlatObservationProvider extends AbstractObservationParser implement
 
 	}
 	
-	public FlatObservationProvider(ObservationFactory factory, InputStream input) throws IOException{
+	public FlatObservationSupplier(ObservationFactory factory, InputStream input) throws IOException{
 		this(factory, new BufferedReader(new InputStreamReader(input)));
 	}
 

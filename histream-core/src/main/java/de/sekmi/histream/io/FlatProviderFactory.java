@@ -27,9 +27,10 @@ import java.io.IOException;
 import java.util.Map;
 
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Plugin;
 
-public class FlatProviderFactory implements FileObservationProviderFactory, Plugin{
+public class FlatProviderFactory implements FileObservationSupplierFactory, Plugin{
 
 	public FlatProviderFactory(Map<String,String> props) {
 		// no configuration needed
@@ -40,8 +41,8 @@ public class FlatProviderFactory implements FileObservationProviderFactory, Plug
 	}
 
 	@Override
-	public FileObservationProvider forFile(File file, ObservationFactory factory) throws IOException {
-		return new FlatObservationProvider(factory, new FileInputStream(file));
+	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
+		return new FlatObservationSupplier(factory, new FileInputStream(file));
 	}
 
 }

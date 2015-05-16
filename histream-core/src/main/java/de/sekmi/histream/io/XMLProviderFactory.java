@@ -30,9 +30,10 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Plugin;
 
-public class XMLProviderFactory implements FileObservationProviderFactory, Plugin{
+public class XMLProviderFactory implements FileObservationSupplierFactory, Plugin{
 
 	public XMLProviderFactory(Map<String,String> props) {
 		// no configuration needed
@@ -43,9 +44,9 @@ public class XMLProviderFactory implements FileObservationProviderFactory, Plugi
 	}
 
 	@Override
-	public FileObservationProvider forFile(File file, ObservationFactory factory) throws IOException {
+	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
 		try {
-			return new XMLObservationProvider(factory, new FileInputStream(file));
+			return new XMLObservationSupplier(factory, new FileInputStream(file));
 		} catch (XMLStreamException | FactoryConfigurationError e) {
 			throw new IOException(e);
 		}

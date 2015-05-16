@@ -40,7 +40,7 @@ import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
 /**
- * Parser for EAV XML documents. This class is used by {@link XMLObservationProvider}.
+ * Parser for EAV XML documents. This class is used by {@link XMLObservationSupplier}.
  * 
  * @author marap1
  *

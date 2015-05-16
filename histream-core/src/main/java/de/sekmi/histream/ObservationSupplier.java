@@ -1,4 +1,4 @@
-package de.sekmi.histream.io;
+package de.sekmi.histream;
 
 /*
  * #%L
@@ -23,10 +23,10 @@ package de.sekmi.histream.io;
 
 import java.util.function.Supplier;
 
-import de.sekmi.histream.Observation;
-
 /**
- * Converts a file into a supply of observations.
+ * Supplier of observations.
+ * 
+ * Also provides meta informaiton via {@link #getMeta(String)}
  * <p>
  * When an instance is constructed, meta information should be read from
  * the file (e.g. etl strategy and other instructions)
@@ -36,7 +36,7 @@ import de.sekmi.histream.Observation;
  * @author Raphael
  *
  */
-public interface FileObservationProvider extends Supplier<Observation>{
+public interface ObservationSupplier extends Supplier<Observation>{
 	
 	/**
 	 * Retrieve meta information for this supply of observations.

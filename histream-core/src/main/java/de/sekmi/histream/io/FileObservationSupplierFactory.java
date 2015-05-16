@@ -1,4 +1,4 @@
-package de.sekmi.histream;
+package de.sekmi.histream.io;
 
 /*
  * #%L
@@ -21,21 +21,12 @@ package de.sekmi.histream;
  */
 
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-/**
- * Observation provider parsing input streams to provide observations.
- * 
- * @author marap1
- *
- */
-public interface ObservationParser extends ObservationProvider {
+import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 
-	/**
-	 * Parse an input stream to produce observations
-	 * @param input input stream
-	 * @throws IOException for io errors occurred during parsing
-	 */
-	public void parse(InputStream input) throws IOException;
+public interface FileObservationSupplierFactory {
+	ObservationSupplier forFile(File file, ObservationFactory factory)throws IOException;
 }
