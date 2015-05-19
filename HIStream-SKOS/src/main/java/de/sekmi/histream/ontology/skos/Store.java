@@ -1,9 +1,11 @@
 package de.sekmi.histream.ontology.skos;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -21,29 +23,63 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 
+import de.sekmi.histream.Plugin;
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
 
-public class Store implements Ontology {
+public class Store implements Ontology, Plugin {
 	private Repository repo;
 	private RepositoryConnection rc;
 	private final static Concept[] noConcepts = new Concept[]{};
 	
-	public Store(File[] files) throws RepositoryException, RDFParseException, IOException{
+	/**
+	 * Plugin constructor which accepts configuration parameters.
+	 * 
+	 * <p>
+	 * Configuration keys have the form {@code rdf.baseURI.1}, {@code rdf.file.1}, {@code rdf.format.1}.
+	 * rdf.file is mandatory, other parameters are optional.
+	 * @param configuration configuration parameters
+	 * @throws FileNotFoundException if one of the specified files can not be found 
+	 * @throws IOException for i/o exceptions while reading the files
+	 * @throws RDFParseException if rdf files can not be parsed
+	 * @throws RepositoryException for any other exceptions during ontology initialisation
+	 */
+	public Store(Map<String,String> conf) throws RepositoryException, RDFParseException, IOException{
+		int i=0;
+		List<File> files = new ArrayList<>();
+		List<String> baseURIs = new ArrayList<>();
+
+		while( conf.containsKey("rdf.file."+i) ){
+			File file = new File(conf.get("rdf.file."+i));
+			if( !file.exists() )throw new FileNotFoundException("rdf.file."+i+" not found: "+file.getAbsolutePath());
+			files.add(file);
+			
+			String baseURI = conf.get("rdf.baseURI."+i);
+			baseURIs.add(baseURI);
+		}
+		initializeRepo((File[])files.toArray(), (String[])baseURIs.toArray());
+	}
+	
+	private void initializeRepo(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 
 		rc = repo.getConnection();
-		String baseURI = null;
-		
-		for( File file : files ){
-			rc.add(file, baseURI, RDFFormat.TURTLE);
-		}
+
+		for( int i=0; i<files.length; i++ ){
+			File file = files[i];
+			String base_uri = baseURIs[i];
+			rc.add(file, base_uri, RDFFormat.TURTLE);
+		}		
+	}
+
+	public Store(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
+		initializeRepo(files, baseURIs);
 	}
 	
 	public Store(File file) throws RepositoryException, RDFParseException, IOException{
-		this(new File[]{file});
+		this(new File[]{file}, new String[]{null});
 	}
 	
 	public RepositoryConnection getConnection(){return rc;}
