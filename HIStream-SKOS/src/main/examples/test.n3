@@ -1,0 +1,123 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:	<http://www.w3.org/2002/07/owl#> .
+@prefix dc:	<http://purl.org/dc/elements/1.1/> .
+@prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix nom:	<http://sekmi.de/histream/nomenclature#> .
+@prefix : 	<http://sekmi.de/histream/concepts#> .
+
+: dc:title "HIStream concept ontology".
+
+:versionOf a owl:ObjectProperty;
+	rdfs:domain skos:Concept;
+	rdfs:range skos:Concept.
+
+:hasVersion a owl:ObjectProperty;
+	owl:inverseOf :versionOf;
+	rdfs:domain skos:Concept;
+	rdfs:range skos:Concept.
+
+
+:Diagnoses a skos:ConceptScheme;
+	skos:hasTopConcept :Icd10.
+
+:Procedures a skos:ConceptScheme;
+	skos:hasTopConcept :Ops301.
+
+:Icd10 a skos:Concept; 
+	skos:inScheme :Diagnoses;
+	skos:prefLabel "Diagnosen (ICD-10)"@de;
+	skos:prefLabel "Diagnoses (ICD-10)"@en;
+	skos:narrower :Icd10a00b99;
+	dc:description "Diagnosen nach ICD-10".
+		
+:Icd10a00b99 a skos:Concept;
+	skos:inScheme :Diagnoses;
+	skos:prefLabel "A00-B99"@de;	
+	skos:narrower :Icd10a00a09;
+	dc:description "Bestimmte infektiöse und parasitäre Krankheiten"@de.
+
+:Icd10a00a09 a skos:Concept;
+	skos:inScheme :Diagnoses;
+	skos:prefLabel "Infektiöse Darmkrankheiten (A00-A09)"@de;	
+	skos:narrower :Icd10_a00_9;
+	dc:description "Infektiöse Darmkrankheiten"@de.
+
+:Icd10_a00_9 a skos:Concept;
+	skos:inScheme :Diagnoses;
+	skos:notation "A00.9"^^nom:icd10_2010;
+	skos:notation "A00.9"^^nom:icd10_2011;
+	skos:notation "A00.9"^^nom:icd10_2012;
+	skos:notation "I10-2011:A00.9"^^xsd:string;
+	skos:prefLabel "A00.9: Cholera, nicht näher bezeichnet"@de .
+	
+
+:Ops301 a skos:Concept; 
+	skos:inScheme :Procedures;
+	skos:prefLabel "Prozeduren (OPS)"@de;
+	skos:prefLabel "Procedures (OPS/German ICPM)"@en;
+	dc:description "Prozeduren und Therapien nach OPS".
+	
+:Patient a skos:ConceptScheme;
+	skos:hasTopConcept :PatientConcept.
+
+:PatientConcept a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Patient"@de;
+	skos:prefLabel "Patient"@en;
+	skos:narrower :MasterData;
+	skos:narrower :Timepoints.
+
+:MasterData a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Stammdaten"@de;
+	skos:prefLabel "Master data"@en;
+	skos:narrower :Age;
+	skos:narrower :Sex.
+
+:Age a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Alter"@de;
+	skos:prefLabel "Age"@en;
+	skos:notation "p:age"^^xsd:string.
+
+:Sex a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Geschlecht"@de;
+	skos:prefLabel "Sex"@en;
+	skos:notation "p:sex"^^xsd:string.
+
+:Timepoints a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Zeitpunkte"@de;
+	skos:prefLabel "Time points"@en;
+	skos:narrower :Admission;
+	skos:narrower :Discharge;
+	dc:description "Zeitpunkte xxx".
+
+:Admission a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Aufnahme"@de;
+	skos:prefLabel "Admission"@en;
+	skos:narrower :AdmissionI;
+	skos:narrower :AdmissionO;
+	skos:narrower :AdmissionE.
+	
+:AdmissionI a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Stationär"@de;
+	skos:prefLabel "Inpatient"@en;
+	skos:notation "ADM:admission:I"^^xsd:string.
+
+:AdmissionO a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Ambulant"@de;
+	skos:prefLabel "Outpatient"@en;
+	skos:notation "ADM:admission:O"^^xsd:string.
+
+:AdmissionE a skos:Concept;
+	skos:inScheme :Patient;
+	skos:prefLabel "Notaufnahme"@de;
+	skos:prefLabel "Emergency"@en;
+	skos:notation "ADM:admission:E"^^xsd:string.

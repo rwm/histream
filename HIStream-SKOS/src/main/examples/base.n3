@@ -1,0 +1,33 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:	<http://www.w3.org/2002/07/owl#> .
+@prefix dc:	<http://purl.org/dc/elements/1.1/> .
+@prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix nom:	<http://sekmi.de/histream/nomenclature#> .
+@prefix : 	<http://sekmi.de/histream/concepts#> .
+
+nom: dc:title "HIStream concept ontology nomenclature base".
+
+nom:nomenclature a rdfs:Class ;
+	rdfs:subClassOf rdfs:Datatype .
+
+nom:CodingSystem a rdfs:Class ;
+	rdfs:subClassOf rdfs:Datatype .
+
+nom:enum a rdfs:Class ;
+	rdfs:subClassOf rdfs:Datatype .
+
+nom:ConceptModifier a rdfs:Class ;
+	rdfs:subclassOf skos:Concept .
+
+# TODO: rdfs:Property correct???
+nom:valueType a rdfs:Property .
+
+nom:valueEnum a rdfs:Property .
+
+nom:enumEntry a rdfs:Class .
+
+nom:constValue a rdfs:Class .
+
+nom:hasModifier a rdfs:Property .
