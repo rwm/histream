@@ -56,7 +56,7 @@ public class OntologyTest {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		try( Store store = new Store(new File[]{new File("src/main/examples/test2.n3")}) ){
+		try( Store store = new Store(new File("src/main/examples/test2.n3")) ){
 			store.printConceptHierarchy();
 			
 			Concept c = store.getConceptByNotation("Type");
