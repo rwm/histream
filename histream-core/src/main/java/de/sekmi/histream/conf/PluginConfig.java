@@ -56,20 +56,13 @@ public class PluginConfig {
     
     public String getClazz(){ return clazz; }
     
-    @SuppressWarnings("unchecked")
 	public Plugin newInstance() throws Exception{
-		Constructor<? extends Plugin> c;
-		try {
-			c = (Constructor<? extends Plugin>) resolveClass().getConstructor(Map.class);
-		} catch (NoSuchMethodException | SecurityException| ClassNotFoundException e) {
-			throw new Exception("Unable to find constructor",e);
-		}
     	HashMap<String, String> props = new HashMap<>();
     	if( property != null ){
 	    	for( PluginProperty prop : property ){
 	    		props.put(prop.name, prop.value);
 	    	}
     	}
-    	return c.newInstance(props);
+    	return Plugin.newInstance(resolveClass(), props);
     }
 }

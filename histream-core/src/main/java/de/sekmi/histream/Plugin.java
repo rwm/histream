@@ -23,7 +23,11 @@ package de.sekmi.histream;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.Properties;
+
 
 /**
  * 
@@ -40,4 +44,14 @@ public interface Plugin extends Closeable{
 
 	@Override
 	default void close()throws IOException{}
+	
+	@SuppressWarnings("unchecked")
+	static Plugin newInstance(Class<?> pluginClass, Map<String,String> configuration)
+			throws NoSuchMethodException,SecurityException,ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		Constructor<? extends Plugin> c;
+		c = (Constructor<? extends Plugin>) pluginClass.getConstructor(Map.class);
+		
+    	return c.newInstance(configuration);
+
+	}
 }
