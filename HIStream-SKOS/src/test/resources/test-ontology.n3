@@ -39,16 +39,16 @@ nom: dc:title "HIStream concept ontology for testing".
 	skos:prefLabel	"Integer_label_de"@de ;
 	dc:description	"Description_de"@de ;
 	dc:description	"Description_neutral" ;
-	skos:notation	"Int" .
+	skos:notation	"T:type:int" .
 
 :TestStringConcept a skos:Concept;
 	skos:inScheme	:TestData ;
 	nom:valueType	xsd:string ;
 	skos:prefLabel	"String_label_en"@en ;
-	skos:notation	"String" .
+	skos:notation	"T:type:str" .
 	
 :TestDecimalConcept a skos:Concept;
 	skos:inScheme	:TestData ;
 	nom:valueType	xsd:decimal ;
 	skos:prefLabel	"Decimal_label_en"@en ;
-	skos:notation	"Dec" .
+	skos:notation	"T:type:dec" .

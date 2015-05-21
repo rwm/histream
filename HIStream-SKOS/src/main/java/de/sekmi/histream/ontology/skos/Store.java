@@ -32,6 +32,7 @@ public class Store implements Ontology, Plugin {
 	private Repository repo;
 	private RepositoryConnection rc;
 	private final static Concept[] noConcepts = new Concept[]{};
+	private long lastModified;
 	
 	/**
 	 * Plugin constructor which accepts configuration parameters.
@@ -46,7 +47,7 @@ public class Store implements Ontology, Plugin {
 	 * @throws RepositoryException for any other exceptions during ontology initialisation
 	 */
 	public Store(Map<String,String> conf) throws RepositoryException, RDFParseException, IOException{
-		int i=0;
+		int i=1;
 		List<File> files = new ArrayList<>();
 		List<String> baseURIs = new ArrayList<>();
 
@@ -57,8 +58,10 @@ public class Store implements Ontology, Plugin {
 			
 			String baseURI = conf.get("rdf.baseURI."+i);
 			baseURIs.add(baseURI);
+			
+			i++;
 		}
-		initializeRepo((File[])files.toArray(), (String[])baseURIs.toArray());
+		initializeRepo(files.toArray(new File[files.size()]), baseURIs.toArray(new String[baseURIs.size()]));
 	}
 	
 	private void initializeRepo(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
@@ -66,11 +69,16 @@ public class Store implements Ontology, Plugin {
 	    repo.initialize();
 
 		rc = repo.getConnection();
+		
+		this.lastModified = 0;
 
 		for( int i=0; i<files.length; i++ ){
 			File file = files[i];
 			String base_uri = baseURIs[i];
 			rc.add(file, base_uri, RDFFormat.TURTLE);
+		    
+			// use timestamps from files for last modified date
+			lastModified = Math.max(lastModified, file.lastModified());
 		}		
 	}
 
@@ -169,7 +177,7 @@ public class Store implements Ontology, Plugin {
 	
 	String getLocalString(Resource subject, URI predicate, String language) throws OntologyException {
 		// empty language same as no language
-		if( language.length() == 0 )
+		if( language != null && language.length() == 0 )
 			language = null;
 		
 		try {
@@ -206,6 +214,11 @@ public class Store implements Ontology, Plugin {
 		} catch (RepositoryException e) {
 			throw new IOException(e);
 		}
+	}
+
+	@Override
+	public long lastModified() {
+		return lastModified;
 	}
 	
 }

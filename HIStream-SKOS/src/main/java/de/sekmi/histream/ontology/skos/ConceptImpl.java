@@ -63,12 +63,14 @@ public class ConceptImpl implements Concept {
 
 	@Override
 	public String getPrefLabel(Locale locale) throws OntologyException {
-		return store.getLocalString(getResource(), SKOS.PREF_LABEL, locale.toString());
+		String lang = (locale==null)?null:locale.toString(); 
+		return store.getLocalString(getResource(), SKOS.PREF_LABEL, lang);
 	}
 
 	@Override
 	public String getDescription(Locale locale) throws OntologyException {
-		return store.getLocalString(getResource(), DC.DESCRIPTION, locale.toString());
+		String lang = (locale==null)?null:locale.toString(); 
+		return store.getLocalString(getResource(), DC.DESCRIPTION, lang);
 	}
 	
 	

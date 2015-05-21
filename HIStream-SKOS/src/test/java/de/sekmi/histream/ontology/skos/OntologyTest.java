@@ -24,10 +24,10 @@ public class OntologyTest {
 	@Test
 	public void getConceptByIdTest() throws OntologyException{
 		Assert.assertNull(store.getConceptByNotation("notfound"));
-		Concept c = store.getConceptByNotation("Int");
+		Concept c = store.getConceptByNotation("T:type:int");
 		Assert.assertNotNull(c);
 		Assert.assertEquals(1, c.getIDs().length);
-		Assert.assertEquals("Int", c.getIDs()[0]);
+		Assert.assertEquals("T:type:int", c.getIDs()[0]);
 	}
 	@Test
 	public void getNarrowerTest() throws OntologyException{
@@ -41,7 +41,7 @@ public class OntologyTest {
 	}
 	@Test
 	public void testLanguage() throws OntologyException{
-		Concept c = store.getConceptByNotation("Int");
+		Concept c = store.getConceptByNotation("T:type:int");
 		Assert.assertNotNull(c);
 		Assert.assertEquals("Integer_label_de", c.getPrefLabel(Locale.GERMAN));
 		Assert.assertEquals("Integer_label_en", c.getPrefLabel(Locale.ENGLISH));
@@ -56,7 +56,7 @@ public class OntologyTest {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		try( Store store = new Store(new File("src/main/examples/test2.n3")) ){
+		try( Store store = new Store(new File("src/test/resources/test-ontology.n3")) ){
 			store.printConceptHierarchy();
 			
 			Concept c = store.getConceptByNotation("Type");
