@@ -132,9 +132,17 @@ public class RunConfiguration implements Closeable{
 	
 	private static final String readVersion() throws IOException{
 		InputStream inputStream = RunConfiguration.class.getClassLoader().getResourceAsStream("META-INF/maven/de.sekmi.histream/histream-core/pom.properties");
-		Properties props = new Properties();
-		props.load(inputStream);
-		return props.getProperty("version","[unknown]");
+		String version;
+		if( inputStream != null ){
+			Properties props = new Properties();
+			props.load(inputStream);
+			version = props.getProperty("version","[unknown]");
+		}else{
+			// file is not run from jar
+			// try to get the version somewhere else
+			version = "[unknown]";
+		}
+		return version;
 	}
 	public static void main(String args[])throws Exception{
 		if( System.console() == null ){
