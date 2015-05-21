@@ -18,7 +18,7 @@ public class OntologyTest {
 	
 	@Before
 	public void setupOntology()throws Exception{
-		store = new Store(new File("src/test/resources/test-ontology.n3"));
+		store = new Store(new File("src/main/examples/test-ontology.n3"));
 	}
 
 	@Test

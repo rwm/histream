@@ -14,6 +14,7 @@
       
       <!-- Now, select which projects to include in this module-set. -->
       <includes>
+        <include>de.sekmi.histream:histream-core</include>
         <include>de.sekmi.histream:histream-i2b2</include>
         <include>de.sekmi.histream:histream-hl7</include>
         <include>de.sekmi.histream:histream-skos</include>
@@ -22,6 +23,15 @@
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>
+      <sources>
+	<includeModuleDirectory>false</includeModuleDirectory>
+	<fileSets>
+		<fileSet>
+			<outputDirectory>examples</outputDirectory>
+			<directory>src/main/examples</directory>
+		</fileSet>
+	</fileSets>
+      </sources>
     </moduleSet>
   </moduleSets>
 
