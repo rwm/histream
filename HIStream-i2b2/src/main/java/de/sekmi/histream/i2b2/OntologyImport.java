@@ -23,42 +23,60 @@ import de.sekmi.histream.ontology.OntologyException;
 public class OntologyImport implements AutoCloseable{
 	private static final Logger log = Logger.getLogger(OntologyImport.class.getName());
 	private Ontology ontology;
-	private Connection db;
+	private Connection dbMeta;
+	private Connection dbData;
 	private Map<String,String> config;
 	private Locale locale;
 	
-	private PreparedStatement insertOnt;
+	private PreparedStatement insertMeta;
 	private PreparedStatement insertAccess;
+	private PreparedStatement insertConcept;
 	
+	private int insertMetaCount;
+	private int insertAccessCount;
+	private int insertConceptCount;
 	
 	private String sourceId;
-	private long sourceTimestamp;
+	private Timestamp sourceTimestamp;
 	
 	public OntologyImport(){
 		
 	}
 	
-	private String getOntTable(){return config.get("ont.i2b2.meta.table");}
-	private String getAccessTable(){return config.get("ont.i2b2.meta.access");}
+	private String getMetaTable(){return config.get("meta.table");}
+	private String getAccessTable(){return config.get("meta.access");}
+	private String getConceptTable(){return config.get("data.concept.table");}
 	
 	private void prepareStatements() throws SQLException{
-		insertOnt = db.prepareStatement("INSERT INTO "+getOntTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
-		String access_table_name = getOntTable();
+		insertMeta = dbMeta.prepareStatement("INSERT INTO "+getMetaTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
+		String access_table_name = getMetaTable();
 		if( access_table_name.indexOf('.') >= 0 ){
 			// name contains tablespace
 			// find just the name
 			access_table_name = access_table_name.substring(access_table_name.indexOf('.')+1);
 		}
-		insertAccess = db.prepareStatement("INSERT INTO "+getAccessTable()+"(c_table_cd,c_table_name,c_protected_access,c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_facttablecolumn,c_dimtablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip)VALUES(?,'"+access_table_name+"','N',?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?)");
+		insertAccess = dbMeta.prepareStatement("INSERT INTO "+getAccessTable()+"(c_table_cd,c_table_name,c_protected_access,c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_facttablecolumn,c_dimtablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip)VALUES(?,'"+access_table_name+"','N',?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?)");
+		insertConcept = dbData.prepareStatement("INSERT INTO "+getConceptTable()+"(concept_path,concept_cd,name_char,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,current_timestamp,?,current_timestamp,?)");
 	}
 	
 	private void deleteFromDatabase() throws SQLException{
-		PreparedStatement deleteOnt = db.prepareStatement("DELETE FROM "+getOntTable()+" WHERE sourcesystem_cd=?");
-		PreparedStatement deleteAccess = db.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
-		deleteOnt.setString(1, sourceId);
+		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
+		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
+		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
+		int count;
+		
+		deleteConcepts.setString(1, sourceId);
+		count = deleteConcepts.executeUpdate();
+		System.out.println("Deleted "+count+" rows from "+getConceptTable());
+
 		deleteAccess.setString(1, sourceId+"%");
-		deleteOnt.executeUpdate();
-		deleteAccess.executeUpdate();
+		count = deleteAccess.executeUpdate();
+		System.out.println("Deleted "+count+" rows from "+getAccessTable());
+
+		deleteOnt.setString(1, sourceId);
+		count = deleteOnt.executeUpdate();
+		System.out.println("Deleted "+count+" rows from "+getMetaTable());
+
 	}
 	
 	public void processOntology() throws SQLException, OntologyException{
@@ -72,12 +90,12 @@ public class OntologyImport implements AutoCloseable{
 		}
 		
 		// parse base path
-		String base = config.get("ont.i2b2.basepath");
+		String base = config.get("meta.basepath");
 		int base_level;
 		if( base != null && !base.equals("\\") ){
 			String[] baseParts = base.split("\\\\");
 			if( baseParts.length < 2 || baseParts[0].length() != 0 || !base.endsWith("\\") )
-				throw new IllegalArgumentException("ont.i2b2.basepath must start and end with a backslash (\\)");
+				throw new IllegalArgumentException("meta.basepath must start and end with a backslash (\\)");
 			base_level = baseParts.length - 1;
 		}else{
 			base = "\\";
@@ -86,11 +104,24 @@ public class OntologyImport implements AutoCloseable{
 		
 		Concept[] concepts = ontology.getTopConcepts();
 		for( Concept c : concepts ){
-			insertConcept(base_level, base, c, true);
+			insertMeta(base_level, base, c, true);
 		}
+		
+		System.out.println("Inserted "+insertConceptCount+" rows to "+getConceptTable());
+		System.out.println("Inserted "+insertAccessCount+" rows to "+getAccessTable());
+		System.out.println("Inserted "+insertMetaCount+" rows to "+getMetaTable());
 	}
-	private void insertConcept(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
-		insertOnt.setInt(1, level);
+	private void insertConceptDimension(String path, String name, String concept_cd) throws SQLException{
+		insertConcept.setString(1, path);
+		insertConcept.setString(2, concept_cd);
+		insertConcept.setString(3, name);
+		insertConcept.setTimestamp(4, sourceTimestamp);
+		insertConcept.setString(5, sourceId);
+		insertConcept.executeUpdate();
+		insertConceptCount ++;
+	}
+	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
+		insertMeta.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
 		String path_part = label; // TODO unique key sufficient, e.g. try label.hashCode()
 		
@@ -105,58 +136,58 @@ public class OntologyImport implements AutoCloseable{
 			}
 		}
 		String path = path_prefix + path_part+"\\";
-		insertOnt.setString(2, path);
-		insertOnt.setString(3, label);
+		insertMeta.setString(2, path);
+		insertMeta.setString(3, label);
 		// c_synonym_cd
 		String synonymCd = "N";
-		insertOnt.setString(4, synonymCd); // TODO use set to find out if a concept is used multiple times -> synonym Y
+		insertMeta.setString(4, synonymCd); // TODO use set to find out if a concept is used multiple times -> synonym Y
 		
 		// c_visualattributes
 		Concept[] subConcepts = concept.getNarrower();
 		String visualAttr = (subConcepts.length == 0)?"LA":"FA";
-		insertOnt.setString(5, visualAttr);
+		insertMeta.setString(5, visualAttr);
 
 		// c_basecode
 		String[] conceptIds = concept.getIDs();
 		// TODO support multiple ids (e.g. adding virtual leaves)
 		if( conceptIds.length == 0 ){			
-			insertOnt.setNull(6, Types.VARCHAR);
+			insertMeta.setNull(6, Types.VARCHAR);
 		}else{
 			// concept has id and can occur in fact table
-			insertOnt.setString(6, conceptIds[0]);
+			insertMeta.setString(6, conceptIds[0]);
 			
 			if( conceptIds.length > 1 ){
 				log.warning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
 			}
-			// TODO insert into concept_dimension, need access rights for that
-			/*
-			 * INSERT into concept_dimension(concept_path,concept_cd,name_char,sourcesystem_cd)
-			 * values('\i2b2\TestData_label_en\String_label_en\','T:type:str','String_label_en','test')
-			 */
+			// insert into concept_dimension
+			// TODO make sure, each concept_path is inserted only once
+			insertConceptDimension(path, label, conceptIds[0]);
+			// XXX support for multiple conceptIds can be hacked by appending a number to the path for each conceptid and insert each conceptid
 		}
 		
 		// c_metadataxml
-		insertOnt.setString(7, null);
+		insertMeta.setString(7, null);
 		
 		// c_dimcode (with concept_dimension.concept_path LIKE)
-		insertOnt.setString(8, path);
+		insertMeta.setString(8, path);
 		
 		// c_tooltip
 		// try to use concept description
 		String descr = concept.getDescription(locale);
 		if( descr == null )descr = path; // use path if no description available
-		insertOnt.setString(9, path);
+		insertMeta.setString(9, path);
 		
 		// m_applied_path
-		insertOnt.setString(10, "@");
+		insertMeta.setString(10, "@");
 		
 		// download_date
-		insertOnt.setTimestamp(11, new Timestamp(sourceTimestamp));
+		insertMeta.setTimestamp(11, sourceTimestamp);
 		
 		// sourcesystem_cd
-		insertOnt.setString(12, sourceId);
+		insertMeta.setString(12, sourceId);
 		
-		insertOnt.executeUpdate();
+		insertMeta.executeUpdate();
+		insertMetaCount ++;
 		
 		if( accessRoot ){
 			insertAccess.setString(1, sourceId+"_"+Integer.toHexString(concept.hashCode()));
@@ -168,57 +199,87 @@ public class OntologyImport implements AutoCloseable{
 			insertAccess.setString(7, path);
 			insertAccess.setString(8, descr);
 			insertAccess.executeUpdate();
+			
+			insertAccessCount ++;
 		}
 		// insert sub concepts
 		for( Concept sub : subConcepts ){
-			insertConcept(level+1, path, sub, false);
+			insertMeta(level+1, path, sub, false);
 		}
 	}
 	public void loadOntology(Class<?> ontologyClass, Map<String,String> config) throws Exception{
 		Plugin plugin = Plugin.newInstance(ontologyClass, config);
 		assert plugin instanceof Ontology;
 		ontology = (Ontology)plugin;
-		sourceTimestamp = ontology.lastModified();
+		sourceTimestamp = new Timestamp(ontology.lastModified());
 	}
 
+	/**
+	 * Each key in src that starts with keyPrefix is copied (without the prefix) and its value to dest
+	 * @param src map containing key,value pairs
+	 * @param keyPrefix prefix to match src keys
+	 * @param dest destination properties
+	 */
+	private void copyProperties(Map<String,String> src, String keyPrefix, Properties dest){
+		src.forEach( 
+				(key,value) -> {
+					if( key.startsWith(keyPrefix) ){
+						dest.put(key.substring(keyPrefix.length()), value);
+					}
+				} 
+		);
+	}
 	public void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
 		
 		this.config = props;
-		sourceId = config.get("ont.i2b2.sourcesystem_cd");
+		sourceId = config.get("meta.sourcesystem_cd");
 
-		Properties jdbcProps = new Properties();
-		// TODO put only properties relevant to jdbc
-		jdbcProps.putAll(props);
-		db = DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), jdbcProps);
-		db.setAutoCommit(true);
+		String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
+
+		Properties jdbc;
+		// use only properties relevant to JDBC
+		// meta connection
+		jdbc = new Properties();
+		copyProperties(config, "meta.jdbc.", jdbc);
+		copyProperties(config, "jdbc.", jdbc);
+		dbMeta = DriverManager.getConnection(connectString, jdbc);
+		dbMeta.setAutoCommit(true);
+
+		// data connection
+		jdbc = new Properties();
+		copyProperties(config, "data.jdbc.", jdbc);
+		copyProperties(config, "jdbc.", jdbc);
+		dbData = DriverManager.getConnection(connectString, jdbc);
+		dbData.setAutoCommit(true);
+		
 		prepareStatements();
 	}
 	
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void main(String args[])throws FileNotFoundException, IOException{
-		if( args.length != 3 ){
-			System.err.println("Usage: class.path.for.Ontology ontology.properties database.properties");
+		if( args.length != 2 ){
+			System.err.println("Usage: ontology.properties import.properties");
 			System.exit(1);
 		}
-		Class<?> ont;
-		try {
-			ont = Class.forName(args[0]);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException("Class not found: "+args[0], e);
-		}
-		if( !Ontology.class.isAssignableFrom(ont) ){
-			throw new IllegalArgumentException(args[0]+" does not implement the Ontology interface");
-		}
-		File ontConfig = new File(args[1]);
-		File impConfig = new File(args[2]);
+		File ontConfig = new File(args[0]);
+		File impConfig = new File(args[1]);
 		if( !ontConfig.canRead() ){
-			System.err.println("Unable to read ontology properties from "+args[1]);
+			System.err.println("Unable to read ontology properties from "+args[0]);
 			System.exit(1);
 		}
 		if( !impConfig.canRead() ){
-			System.err.println("Unable to read import properties from "+args[2]);
+			System.err.println("Unable to read import properties from "+args[1]);
+			System.exit(1);
+		}
+
+		Properties ont_props = new Properties();
+		ont_props.load(new FileInputStream(ontConfig));
+
+		String ontClass = ont_props.getProperty("ontology.class");
+		if( ontClass == null ){
+			System.err.println("Need to specify ontology.class in "+args[0]);
 			System.exit(1);
 		}
 
@@ -241,11 +302,20 @@ public class OntologyImport implements AutoCloseable{
 		}
 
 		
-		props = new Properties();
-		props.load(new FileInputStream(ontConfig));
+		Class<?> ont;
+		try {
+			ont = Class.forName(ontClass);
+		} catch (ClassNotFoundException e) {
+			o.close();
+			throw new IllegalArgumentException("Class not found: "+ontClass, e);
+		}
+		if( !Ontology.class.isAssignableFrom(ont) ){
+			o.close();
+			throw new IllegalArgumentException(args[0]+" does not implement the Ontology interface");
+		}
 
 		try {
-			o.loadOntology(ont, (Map)props);
+			o.loadOntology(ont, (Map)ont_props);
 		} catch (Exception e) {
 			System.out.println("Error while loading ontology");
 			e.printStackTrace();
@@ -271,9 +341,15 @@ public class OntologyImport implements AutoCloseable{
 	@Override
 	public void close() {
 		try {
-			db.close();
+			dbMeta.close();
 		} catch (SQLException e) {
-			System.out.println("Error closing database");
+			System.out.println("Error closing database connection");
+			e.printStackTrace();
+		}
+		try {
+			dbData.close();
+		} catch (SQLException e) {
+			System.out.println("Error closing database connection");
 			e.printStackTrace();
 		}
 		if( ontology != null )try {
