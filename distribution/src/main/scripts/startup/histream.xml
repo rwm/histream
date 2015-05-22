@@ -46,31 +46,15 @@
 			<property name="project">demo</property>					
 			<property name="nullProvider">LCS-I2B2:PROVIDERS</property>					
 		</plugin>
+		<!-- needed to parse XML files -->
 		<plugin class="de.sekmi.histream.io.XMLProviderFactory"/>
+		<!-- needed to parse flat text files -->
 		<plugin class="de.sekmi.histream.io.FlatProviderFactory"/>
 		
-		<!-- 
-		<plugin class="de.sekmi.histream.i2b2.services.HiveServer">
-			<property name="user">i2b2demodata</property>
-		</plugin>
-		<plugin class="de.sekmi.histream.hl7.MLLPListener">
-			<property name="port">123</property>
-		</plugin> -->
 	</plugins>
-	<!-- Wie kann die Konfiguration benutzt werden, wenn z.B. Dateien von der Kommandozeile
-	gelesen werden sollen und dann das Programm beendet werden soll?
-	 -->
+	<!-- source not needed, files are specified at command line -->
 	<!-- 
 	<source plugin="de.sekmi.histream.hl7.MLLPListener" />
-	<source plugin="de.sekmi.histream.impl.SAXObservationProvider" />
 	-->
-	<!-- TODO source umbenennen in listener (fuer netzwerkschnittstellen) -->
-	
 	<destination plugin="de.sekmi.histream.i2b2.I2b2Inserter" />
-	
-	<!-- kann dateien von Kommandozeile lesen -->
-	<filehandler  type="text/xml" plugin-ref="de.sekmi.histream.hl7.MLLPListener">
-		<url src="file://....xml" />
-	</filehandler>
-		
 </histream>

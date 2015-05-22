@@ -5,12 +5,27 @@ HIStream
 Building from source
 ---------------------
 Build requirements: JDK 8, Maven
-Run `mvn clean install`
+
+Run `mvn clean install` to download dependencies and build all sub-modules.
+The binary distribution zip files can then be found in distribution/target.
 
 
-Running HIStream from JAR
--------------------------
-`
-java -Djava.util.logging.config.file=target\classes\logging.properties -cp target\histream-0.0.1-SNAPSHOT.jar;target\dependency\postgresql-9.4-1201-jdbc41.jar de.sekmi.histream.impl.RunConfiguration
-`
+Running HIStream
+================
 
+Import Data into the i2b2 Data Warehouse
+----------------------------------------
+
+Easy way: 
+1. copy/unzip the binary distribution ..-i2b2.zip (or ..-full.zip) from distribution/target.
+2. adjust the database settings in histream.xml
+3. To import data into i2b2 run `startup examples/dwh-eav.xml` or `startup examples/dwh-eav.xml`
+
+Import SKOS ontology into i2b2
+------------------------------
+Incomplete.
+1. copy/unzip the binary distribution ..-full.zip from distribution/target. 
+The plugins histream-skos and histream-i2b2 are needed.
+2. adjust examples/ontology-import.properties
+3. adjust paths to RDF files in example/skos-ontology.properties
+4. Run `java -cp "lib\*" de.sekmi.histream.i2b2.OntologyImport de.sekmi.histream.ontology.skos.Store example/skos-ontology.properties examples/ontology-import.properties`

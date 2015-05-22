@@ -1,5 +1,5 @@
 <assembly>
-    <id>bin</id>
+    <id>i2b2</id>
     <!-- Specifies that our binary distribution is a zip package -->
     <formats>
         <format>zip</format>
@@ -21,6 +21,15 @@
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>
+      <sources>
+	<includeModuleDirectory>false</includeModuleDirectory>
+	<fileSets>
+		<fileSet>
+			<outputDirectory>examples</outputDirectory>
+			<directory>src/main/examples</directory>
+		</fileSet>
+	</fileSets>
+      </sources>
     </moduleSet>
   </moduleSets>
 
