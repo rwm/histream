@@ -40,7 +40,7 @@ public class Store implements Ontology, Plugin {
 	 * <p>
 	 * Configuration keys have the form {@code rdf.baseURI.1}, {@code rdf.file.1}, {@code rdf.format.1}.
 	 * rdf.file is mandatory, other parameters are optional.
-	 * @param configuration configuration parameters
+	 * @param conf configuration parameters
 	 * @throws FileNotFoundException if one of the specified files can not be found 
 	 * @throws IOException for i/o exceptions while reading the files
 	 * @throws RDFParseException if rdf files can not be parsed
@@ -97,7 +97,7 @@ public class Store implements Ontology, Plugin {
 	 * The iterator will be closed after the method returns
 	 * @param result statement iterator which yields SKOSConcept resources as objects
 	 * @return array of concepts
-	 * @throws RepositoryException 
+	 * @throws RepositoryException for repository errors
 	 */
 	private Concept[] collectConcepts(RepositoryResult<Statement> result) throws RepositoryException{
 		List<Concept> concepts = new ArrayList<>();
