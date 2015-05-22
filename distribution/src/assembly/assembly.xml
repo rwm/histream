@@ -15,6 +15,7 @@
       <!-- Now, select which projects to include in this module-set. -->
       <includes>
         <include>de.sekmi.histream:histream-i2b2</include>
+        <include>de.sekmi.histream:histream-core</include>
       </includes>
       <binaries>
         <outputDirectory>lib</outputDirectory>
