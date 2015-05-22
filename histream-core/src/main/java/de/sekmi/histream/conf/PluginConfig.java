@@ -20,10 +20,7 @@ package de.sekmi.histream.conf;
  * #L%
  */
 
-
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

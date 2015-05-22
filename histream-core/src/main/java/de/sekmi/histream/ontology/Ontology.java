@@ -9,12 +9,18 @@ import java.io.Closeable;
  *
  */
 public interface Ontology extends Closeable{
+	/**
+	 * Find a concept by it's id value. In SKOS terms, the id is equivalent to the concept's notation.
+	 * @param id concept id
+	 * @return concept
+	 * @throws OntologyException for ontology errors
+	 */
 	public Concept getConceptByNotation(String id) throws OntologyException;
 	
 	/**
 	 * Return the top concepts of this ontology
 	 * @return top concepts
-	 * @throws OntologyException
+	 * @throws OntologyException for ontology errors
 	 */
 	public Concept[] getTopConcepts() throws OntologyException;
 	
