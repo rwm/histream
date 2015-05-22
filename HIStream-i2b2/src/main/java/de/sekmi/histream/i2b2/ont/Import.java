@@ -1,4 +1,4 @@
-package de.sekmi.histream.i2b2;
+package de.sekmi.histream.i2b2.ont;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,8 +20,8 @@ import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
 
-public class OntologyImport implements AutoCloseable{
-	private static final Logger log = Logger.getLogger(OntologyImport.class.getName());
+public class Import implements AutoCloseable{
+	private static final Logger log = Logger.getLogger(Import.class.getName());
 	private Ontology ontology;
 	private Connection dbMeta;
 	private Connection dbData;
@@ -39,7 +39,7 @@ public class OntologyImport implements AutoCloseable{
 	private String sourceId;
 	private Timestamp sourceTimestamp;
 	
-	public OntologyImport(){
+	public Import(){
 		
 	}
 	
@@ -284,7 +284,7 @@ public class OntologyImport implements AutoCloseable{
 		}
 
 		Properties props;
-		OntologyImport o = new OntologyImport();
+		Import o = new Import();
 
 		// open database
 		props = new Properties();
