@@ -28,7 +28,8 @@ public class OntologyImport implements AutoCloseable{
 	private Locale locale;
 	
 	private PreparedStatement insertOnt;
-	private PreparedStatement deleteOntSource;
+	private PreparedStatement insertAccess;
+	
 	
 	private String sourceId;
 	private long sourceTimestamp;
@@ -37,21 +38,31 @@ public class OntologyImport implements AutoCloseable{
 		
 	}
 	
-	private String getOntTable(){return config.get("ont.i2b2.table");}
+	private String getOntTable(){return config.get("ont.i2b2.meta.table");}
+	private String getAccessTable(){return config.get("ont.i2b2.meta.access");}
 	
 	private void prepareStatements() throws SQLException{
 		insertOnt = db.prepareStatement("INSERT INTO "+getOntTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
-		deleteOntSource = db.prepareStatement("DELETE FROM "+getOntTable()+" WHERE sourcesystem_cd=?");
+		String access_table_name = getOntTable();
+		if( access_table_name.indexOf('.') >= 0 ){
+			// name contains tablespace
+			// find just the name
+			access_table_name = access_table_name.substring(access_table_name.indexOf('.')+1);
+		}
+		insertAccess = db.prepareStatement("INSERT INTO "+getAccessTable()+"(c_table_cd,c_table_name,c_protected_access,c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_facttablecolumn,c_dimtablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip)VALUES(?,'"+access_table_name+"','N',?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?)");
 	}
-	public int deleteFromSource(String sourceId) throws SQLException{
-		deleteOntSource.setString(1, sourceId);
-		return deleteOntSource.executeUpdate();
+	
+	private void deleteFromDatabase() throws SQLException{
+		PreparedStatement deleteOnt = db.prepareStatement("DELETE FROM "+getOntTable()+" WHERE sourcesystem_cd=?");
+		PreparedStatement deleteAccess = db.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
+		deleteOnt.setString(1, sourceId);
+		deleteAccess.setString(1, sourceId+"%");
+		deleteOnt.executeUpdate();
+		deleteAccess.executeUpdate();
 	}
 	
 	public void processOntology() throws SQLException, OntologyException{
-		sourceId = config.get("ont.i2b2.sourcesystem_cd");
-		sourceTimestamp = ontology.lastModified();
-		deleteFromSource(sourceId);
+		deleteFromDatabase();
 
 		// parse language for locale
 		if( config.get("ont.language") == null ){
@@ -75,10 +86,10 @@ public class OntologyImport implements AutoCloseable{
 		
 		Concept[] concepts = ontology.getTopConcepts();
 		for( Concept c : concepts ){
-			insertConcept(base_level, base, c);
+			insertConcept(base_level, base, c, true);
 		}
 	}
-	private void insertConcept(int level, String path_prefix, Concept concept) throws SQLException, OntologyException{		
+	private void insertConcept(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
 		insertOnt.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
 		String path_part = label; // TODO unique key sufficient, e.g. try label.hashCode()
@@ -97,11 +108,13 @@ public class OntologyImport implements AutoCloseable{
 		insertOnt.setString(2, path);
 		insertOnt.setString(3, label);
 		// c_synonym_cd
-		insertOnt.setString(4, "N"); // TODO use set to find out if a concept is used multiple times -> synonym Y
+		String synonymCd = "N";
+		insertOnt.setString(4, synonymCd); // TODO use set to find out if a concept is used multiple times -> synonym Y
 		
 		// c_visualattributes
 		Concept[] subConcepts = concept.getNarrower();
-		insertOnt.setString(5, (subConcepts.length == 0)?"LA":"FA");
+		String visualAttr = (subConcepts.length == 0)?"LA":"FA";
+		insertOnt.setString(5, visualAttr);
 
 		// c_basecode
 		String[] conceptIds = concept.getIDs();
@@ -115,7 +128,11 @@ public class OntologyImport implements AutoCloseable{
 			if( conceptIds.length > 1 ){
 				log.warning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
 			}
-			// TODO insert into concept_dimension
+			// TODO insert into concept_dimension, need access rights for that
+			/*
+			 * INSERT into concept_dimension(concept_path,concept_cd,name_char,sourcesystem_cd)
+			 * values('\i2b2\TestData_label_en\String_label_en\','T:type:str','String_label_en','test')
+			 */
 		}
 		
 		// c_metadataxml
@@ -141,20 +158,35 @@ public class OntologyImport implements AutoCloseable{
 		
 		insertOnt.executeUpdate();
 		
+		if( accessRoot ){
+			insertAccess.setString(1, sourceId+"_"+Integer.toHexString(concept.hashCode()));
+			insertAccess.setInt(2, level);
+			insertAccess.setString(3, path);
+			insertAccess.setString(4, label);
+			insertAccess.setString(5, synonymCd);
+			insertAccess.setString(6, visualAttr);
+			insertAccess.setString(7, path);
+			insertAccess.setString(8, descr);
+			insertAccess.executeUpdate();
+		}
 		// insert sub concepts
 		for( Concept sub : subConcepts ){
-			insertConcept(level+1, path, sub);
+			insertConcept(level+1, path, sub, false);
 		}
 	}
 	public void loadOntology(Class<?> ontologyClass, Map<String,String> config) throws Exception{
 		Plugin plugin = Plugin.newInstance(ontologyClass, config);
 		assert plugin instanceof Ontology;
 		ontology = (Ontology)plugin;
+		sourceTimestamp = ontology.lastModified();
 	}
 
 	public void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
+		
 		this.config = props;
+		sourceId = config.get("ont.i2b2.sourcesystem_cd");
+
 		Properties jdbcProps = new Properties();
 		// TODO put only properties relevant to jdbc
 		jdbcProps.putAll(props);
