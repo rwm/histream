@@ -58,6 +58,12 @@
 			<artifactId>sesame-rio-turtle</artifactId>
 			<version>2.8.3</version>
 		</dependency>
+		<!-- redirect slf4j to java.util.logging, use version used by org.openrdf -->
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-jdk14</artifactId>
+		    <version>1.7.10</version>
+		</dependency>
 
 	</dependencies>
 </project>
