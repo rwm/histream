@@ -1,9 +1,15 @@
+de.sekmi.histream.ontology
+-> implement value types for concepts
+-> implement modifier for concepts
+-> also in SKOS
 
-Move i2b2 classes to i2b2 submodule
+de.sekmi.histream.i2b2.ont.Import 
+-> should write metadata_xml to allow value queries (int/dec/string)
+-> should also import modifiers (first need to implement that in Ontology interface and SKOS)
 
-Add hl7 submodule
+de.sekmi.histream.hl7
+-> implement MLLP parsing
 
-Test eclipse project generation
 
 Deploy site to sourceforge via mvn site:deploy
 https://maven.apache.org/plugins/maven-site-plugin/examples/site-deploy-to-sourceforge.net.html
