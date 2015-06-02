@@ -120,8 +120,9 @@ public class FileObservationProviderTest {
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:group:1", o.getConceptId());
-				Assert.assertEquals(Value.Type.None, o.getValue().getType());
-				Assert.assertTrue(o.hasModifiers()); 
+				Assert.assertEquals(Value.Type.Text, o.getValue().getType());
+				Assert.assertEquals("groupvalue", o.getValue().getValue());
+				Assert.assertTrue(o.hasModifiers());
 				Enumeration<Modifier> e = o.getModifiers();
 				// TODO check modifier count
 				Modifier m = o.getModifier("T:mod:1");

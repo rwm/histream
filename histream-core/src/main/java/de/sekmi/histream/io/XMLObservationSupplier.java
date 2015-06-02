@@ -31,18 +31,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 
-
-
-
-
-
-
-
-
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
-import de.sekmi.histream.impl.AbstractValue;
 
 public class XMLObservationSupplier extends XMLObservationParser implements ObservationSupplier{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";
@@ -168,8 +159,9 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 		}
 		newObservation(atts);
 		if( reader.getLocalName().equals("eav-group") ){
-			// no value for group item
-			fact.setValue(AbstractValue.NONE);
+			// group item can have value
+			parseValueAttributes(atts);
+			fact.setValue(parseValue(atts.getValue("value")));
 			
 			// parse modifiers
 			reader.nextTag();

@@ -38,7 +38,7 @@ XX12345	XXE12345	T:type:dec	dec	123.456	mm
 XX12345	XXE12345	T:full	dec	123.456	mm	2010	2011	T:PROV	T:LOC	A
 #  test group items
 #@group(start)
-XX12345	XXE12345	T:group:1	@
+XX12345	XXE12345	T:group:1	str	groupvalue
 XX12345	XXE12345	T:mod:1	@
 XX12345	XXE12345	T:mod:2	str	def456
 XX12345	XXE12345	T:mod:3	dec	78.9	mm					A
