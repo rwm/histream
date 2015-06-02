@@ -1,9 +1,19 @@
-SET PATH=%PATH%;%USERPROFILE%\Tools\apache-maven-3.2.3\bin
+SET MVN=%USERPROFILE%\Tools\apache-maven-3.2.3\bin
+IF EXIST "%MVN%" GOTO JAV
+
+SET MVN=%USERPROFILE%\Tools\apache-maven-3.3.3\bin
+IF EXIST "%MVN%" GOTO JAV
+
+:JAV
+SET PATH=%PATH%;%MVN%
 
 SET JAVA_HOME=C:\Program Files\Java\jdk1.7.0_17
 IF EXIST "%JAVA_HOME%" GOTO OK
 
 SET JAVA_HOME=c:\Program Files\Java\jdk1.8.0_25
+IF EXIST "%JAVA_HOME%" GOTO OK
+
+SET JAVA_HOME=c:\Program Files\Java\jdk1.8.0_45
 IF EXIST "%JAVA_HOME%" GOTO OK
 
 SET JAVA_HOME=C:\Program Files\Java\jdk1.6.0_35
