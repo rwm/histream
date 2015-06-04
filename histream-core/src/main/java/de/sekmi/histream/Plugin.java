@@ -26,14 +26,13 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Properties;
 
 
 /**
  * 
  * <p>
  * A Plugin should implement a constructor accepting a single 
- * {@link Properties} object for configuration. The {@link Closeable#close()}
+ * {@link Map} object for configuration. The {@link Closeable#close()}
  * method is called when the plugin is unloaded or during normal termination.
  * 
  * @author Raphael

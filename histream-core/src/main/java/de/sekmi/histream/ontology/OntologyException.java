@@ -1,5 +1,11 @@
 package de.sekmi.histream.ontology;
 
+/**
+ * Ontology exception
+ * 
+ * @author Raphael
+ *
+ */
 public class OntologyException extends Exception{
 	/**
 	 * 

@@ -38,8 +38,8 @@ import de.sekmi.histream.Plugin;
 
 
 /**
- * Configuration for HIStream processing. Uses javax.xml.bind for loading XML files
- * via 
+ * Configuration for HIStream processing. Uses javax.xml.bind for loading XML files.
+ *
  * @author Raphael
  *
  */
@@ -67,6 +67,12 @@ public class Configuration {
     public PluginRef[] getSources(){return source;}
     
     
+    /**
+     * Load configuration from XML file.
+     * 
+     * @param file XML file containing the configuration
+     * @return configuration contained in the specified file
+     */
     public static final Configuration fromFile(File file){
     	return JAXB.unmarshal(file, Configuration.class);
     }
