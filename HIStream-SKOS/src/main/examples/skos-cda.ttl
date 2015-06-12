@@ -1,0 +1,35 @@
+@prefix rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:	<http://www.w3.org/2002/07/owl#> .
+@prefix dc:	<http://purl.org/dc/elements/1.1/> .
+@prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
+@prefix i2b2: <http://sekmi.de/skos-i2b2#> .
+@prefix snomed: <http://purl.bioontology.org/ontology/SNOMEDCT/>
+
+@prefix : <http://aktin.org/skos-cda#> .
+
+
+:AKTIN a skos:ConceptScheme ;
+	skos:hasTopConcept :EmergencyNote .
+
+:EmergencyNote a skos:Concept ;
+  skos:narrower :Basismodul ;
+  skos:narrower :Traumamodul .
+  
+:Basismodul a skos:Concept ;
+  skos:narrower :GCS .
+  
+:GCS a skos:Concept .
+
+:Pupillenweitenuntersuchung a skos:Concept ;
+# wert ist weite
+  owl:hasPart xxxx ; # subclass of 164020000
+  # z.B. snomed:37125009 # wide pupil
+  owl:hasPart eyeStructure; # one of 18944008, 8966001 (left eye, right eye)
+  # z.B. snomed:8966001 # left eye (structure)
+
+# modifier ist seite
+
+# siehe auch http://www.w3.org/2001/sw/BestPractices/OEP/SimplePartWhole/
+# und http://www.w3.org/TR/owl2-new-features/

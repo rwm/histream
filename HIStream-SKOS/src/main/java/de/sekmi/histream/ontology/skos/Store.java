@@ -50,7 +50,7 @@ public class Store implements Ontology, Plugin {
 		int i=1;
 		List<File> files = new ArrayList<>();
 		List<String> baseURIs = new ArrayList<>();
-
+		// TODO: allow specification of directory
 		while( conf.containsKey("rdf.file."+i) ){
 			File file = new File(conf.get("rdf.file."+i));
 			if( !file.exists() )throw new FileNotFoundException("rdf.file."+i+" not found: "+file.getAbsolutePath());
@@ -113,6 +113,7 @@ public class Store implements Ontology, Plugin {
 		else return concepts.toArray(new Concept[concepts.size()]);
 	}
 	public Concept[] getTopConcepts()throws OntologyException{
+		// TODO use ConceptSchema specified in configuration
 		return getRelatedConcepts(null, SKOS.HAS_TOP_CONCEPT);	
 	}
 	private Concept[] getRelatedConcepts(Resource subject, URI predicate)throws OntologyException{
