@@ -66,6 +66,10 @@
 				<value modifier="T:mod:2" type="xsi:string">def456</value>
 				<value modifier="T:mod:3" type="xsi:decimal" unit="mm" flag="A">78.9</value>
 			</eav-group>
+			<!--  group without value -->
+			<eav-group concept="T:group:2">
+				<value modifier="T:mod:1"/>
+			</eav-group>
 
 		</facts>
 	</visit>

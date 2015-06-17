@@ -227,7 +227,7 @@ class XMLObservationParser extends AbstractObservationParser{
 		AbstractValue val;
 		switch( factType ){
 		case None:
-			if( valueText.length() != 0 )
+			if( valueText != null && valueText.length() != 0 )
 				log.warning("Value type None, but content not empty");
 			val = AbstractValue.NONE;
 			break;

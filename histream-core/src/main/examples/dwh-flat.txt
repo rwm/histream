@@ -43,4 +43,8 @@ XX12345	XXE12345	T:mod:1	@
 XX12345	XXE12345	T:mod:2	str	def456
 XX12345	XXE12345	T:mod:3	dec	78.9	mm					A
 #@group(end)
+#@group(start)
+XX12345	XXE12345	T:group:2	@
+XX12345	XXE12345	T:mod:1	@
+#@group(end)
 

@@ -141,6 +141,14 @@ public class FileObservationProviderTest {
 				Assert.assertEquals(new BigDecimal("78.9"), m.getValue().getNumericValue());
 				
 			},
+			(Observation o) ->  {
+				Assert.assertEquals("T:group:2", o.getConceptId());
+				Assert.assertEquals(Value.Type.None, o.getValue().getType());
+				Modifier m = o.getModifier("T:mod:1");
+				Assert.assertNotNull(m);
+				Assert.assertEquals("T:mod:1", m.getConceptId());
+				Assert.assertEquals(Value.Type.None, m.getValue().getType());
+			},
 			
 		});
 	}
