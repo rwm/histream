@@ -6,6 +6,7 @@
 @prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
 @prefix i2b2: <http://sekmi.de/skos-i2b2#> .
+@prefix dwh: <http://sekmi.de/histream/dwh#> .
 @prefix snomed: <http://purl.bioontology.org/ontology/SNOMEDCT/>
 
 :FF.2235.qspab_60 a dwh:Concept ;
@@ -23,4 +24,8 @@
 :FF.XXXX.example a dwh:Concept ;
 	dwh:valueType :YesNoEnum .
 
-:YesNoEnum owl:oneOf ("Y"^^xsd:string "N"^^xsd:string) .
+# TODO: need to implement labels for enum values
+:YesNoEnum owl:oneOf (
+	[rdf:value "Y"^^xsd:string ; prefLabel "Ja"@de] 
+	[rdf:value "N"^^xsd:string ; prefLabel "Nein"@de]
+) .

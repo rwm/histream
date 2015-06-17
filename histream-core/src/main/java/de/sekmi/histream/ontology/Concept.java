@@ -33,6 +33,8 @@ public interface Concept {
 	 * 
 	 * SKOS allows multiple notations for a single concept, 
 	 * but there should be no two concepts sharing the same notation.
+	 * <p>
+	 * TODO i2b2 appears to support multiple notation via the M attribute (instead of L)
 	 * 
 	 * @return String array containing all id's assigned to this concept
 	 * @throws OntologyException for ontology errors

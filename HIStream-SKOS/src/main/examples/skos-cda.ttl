@@ -24,10 +24,13 @@
 
 :Pupillenweitenuntersuchung a skos:Concept ;
 # wert ist weite
-  owl:hasPart xxxx ; # subclass of 164020000
+  owl:hasPart :pupilWidth ; # bzw. [subclassOf snomed:164020000; skos:prefLabel "Pupillenweite"@de]
   # z.B. snomed:37125009 # wide pupil
-  owl:hasPart eyeStructure; # one of 18944008, 8966001 (left eye, right eye)
+  owl:hasPart :eyeStructure ; # [oneOf (snomed:18944008 snomed:8966001); skos:prefLabel "Auge"@de] (left eye, right eye)
   # z.B. snomed:8966001 # left eye (structure)
+  skos:notation snomed:XXX .
+
+:eyeStructure 
 
 # modifier ist seite
 

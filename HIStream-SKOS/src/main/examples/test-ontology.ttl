@@ -4,10 +4,10 @@
 @prefix dc:	<http://purl.org/dc/elements/1.1/> .
 @prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
-@prefix nom:	<http://sekmi.de/histream/nomenclature#> .
-@prefix : 	<http://sekmi.de/histream/concepts#> .
+@prefix dwh: <http://sekmi.de/histream/dwh#> .
+@prefix : 	<http://sekmi.de/histream/skos/tests#> .
 
-nom: dc:title "HIStream concept ontology for testing".
+: dc:title "HIStream concept ontology for testing".
 
 :TestScheme a skos:ConceptScheme ;
 	skos:hasTopConcept :TestData .
@@ -23,18 +23,17 @@ nom: dc:title "HIStream concept ontology for testing".
 
 :TestEnumConcept a skos:Concept;
 	skos:inScheme 	:TestData;
-	nom:valueType	nom:enum;
-	nom:valueEnum	[
-		nom:enumEntry 	[ nom:constValue "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ] ;
-		nom:enumEntry 	[ nom:constValue "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ] ;
-	] ;
+	dwh:valueType	:testEnum;
 	skos:prefLabel 	"Enum_label_de"@de;
 	skos:prefLabel 	"Enum_label_en"@en;
 	skos:notation 	"Enum"^^:TestCS .
 
+:testEnum owl:oneOf ([rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
+					 [rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]) .
+
 :TestIntegerConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	nom:valueType	xsd:integer ;
+	dwh:valueType	xsd:integer ;
 	skos:prefLabel	"Integer_label_en"@en ;
 	skos:prefLabel	"Integer_label_de"@de ;
 	dc:description	"Description_de"@de ;
@@ -43,12 +42,12 @@ nom: dc:title "HIStream concept ontology for testing".
 
 :TestStringConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	nom:valueType	xsd:string ;
+	dwh:valueType	xsd:string ;
 	skos:prefLabel	"String_label_en"@en ;
 	skos:notation	"T:type:str" .
 	
 :TestDecimalConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	nom:valueType	xsd:decimal ;
+	dwh:valueType	xsd:decimal ;
 	skos:prefLabel	"Decimal_label_en"@en ;
 	skos:notation	"T:type:dec" .
