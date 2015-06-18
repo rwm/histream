@@ -62,4 +62,21 @@ public interface Concept {
 	 * @throws OntologyException for ontology errors
 	 */
 	String getDescription(Locale locale) throws OntologyException;
+	
+	/**
+	 * Get concepts which are part of this concepts. 
+	 * <p>
+	 * The part relationship is different from the narrower relationship
+	 * in the sense that {@link #getNarrower()} will point to more specific concepts while
+	 * {@link #getParts()} will divide the concept in the sense of a whole/part relationship.
+	 * 
+	 * @return concepts which are part of this concept, or {@code null} if this concept cannot be divided.
+	 */
+	Concept[] getParts();
+	
+	/**
+	 * Get restrictions for the values of this concept.
+	 * @return value restrictions or {@code null} if no restrictions are provided
+	 */
+	ValueRestriction getValueRestriction();
 }

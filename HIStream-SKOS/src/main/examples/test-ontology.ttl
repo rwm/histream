@@ -23,13 +23,13 @@
 
 :TestEnumConcept a skos:Concept;
 	skos:inScheme 	:TestData;
-	dwh:valueType	:testEnum;
+	dwh:valueRestriction [ a				owl:Restriction ;
+						  owl:oneOf ([rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
+					 				[rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]) 
+					 	 ] ;
 	skos:prefLabel 	"Enum_label_de"@de;
 	skos:prefLabel 	"Enum_label_en"@en;
 	skos:notation 	"Enum"^^:TestCS .
-
-:testEnum owl:oneOf ([rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
-					 [rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]) .
 
 :TestIntegerConcept a skos:Concept;
 	skos:inScheme	:TestData ;
@@ -48,6 +48,15 @@
 	
 :TestDecimalConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:valueType	xsd:decimal ;
+	dwh:valueRestriction [ a				owl:Restriction ;
+						  owl:allValuesFrom [a 				rdfs:Datatype; 
+						  					 owl:onDatatype	xsd:decimal; 
+										     owl:withRestrictions( [ xsd:minInclusive 200 ] 
+										     					   [ xsd:maxInclusive 400 ] )
+											]
+						  ] ;
+						  # oder via rdfs:range?  http://stackoverflow.com/questions/24531940/defining-datarange-expression-in-protege-for-a-data-type-property
+						  # oder via owl:DataRange
+						  # oder restriction owl:onProperty rdf:value
 	skos:prefLabel	"Decimal_label_en"@en ;
 	skos:notation	"T:type:dec" .

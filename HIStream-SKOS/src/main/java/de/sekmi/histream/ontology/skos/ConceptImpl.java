@@ -13,6 +13,7 @@ import org.openrdf.repository.RepositoryResult;
 
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.OntologyException;
+import de.sekmi.histream.ontology.ValueRestriction;
 
 public class ConceptImpl implements Concept {
 
@@ -71,6 +72,18 @@ public class ConceptImpl implements Concept {
 	public String getDescription(Locale locale) throws OntologyException {
 		String lang = (locale==null)?null:locale.toString(); 
 		return store.getLocalString(getResource(), DC.DESCRIPTION, lang);
+	}
+
+	@Override
+	public Concept[] getParts() {
+		// TODO implement
+		return null;
+	}
+
+	@Override
+	public ValueRestriction getValueRestriction() {
+		// TODO implement
+		return null;
 	}
 	
 	
