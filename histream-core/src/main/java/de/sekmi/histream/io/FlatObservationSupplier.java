@@ -350,7 +350,13 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		// TODO compare patid, encounter, timestamp
 		// parse and add value
 		Value value = parseValue(record);
-		fact.addModifier(record.getConcept()).setValue(value);
+		try{
+			fact.addModifier(record.getConcept()).setValue(value);
+		}catch( IllegalArgumentException e ){
+			log.severe("Unable to add modifier in line "+lineNo+": "+record.getConcept());
+			// TODO FIX line numbers not incremented correctly (line 220000 lines but should be 220006)
+			throw e;
+		}
 	}
 	
 	@Override
