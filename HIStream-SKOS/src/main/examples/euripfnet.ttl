@@ -9,7 +9,10 @@
 @prefix dwh: <http://sekmi.de/histream/dwh#> .
 @prefix snomed: <http://purl.bioontology.org/ontology/SNOMEDCT/>
 
+:eurIPFreg a skos:ConceptScheme .
+
 :FF.2235.qspab_60 a dwh:Concept ;
+	skos:inScheme :eurIPFreg ;
 	skos:notation "FF.2235.qspab_60" .  
 	dwh:mapTo [
 		dwh:ifValueEquals 1 ;
