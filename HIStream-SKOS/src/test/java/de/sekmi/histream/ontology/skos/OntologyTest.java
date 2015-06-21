@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.OntologyException;
+import de.sekmi.histream.ontology.ValueRestriction;
 import de.sekmi.histream.ontology.skos.Store;
 
 public class OntologyTest {
@@ -28,6 +29,9 @@ public class OntologyTest {
 		Assert.assertNotNull(c);
 		Assert.assertEquals(1, c.getIDs().length);
 		Assert.assertEquals("T:type:int", c.getIDs()[0]);
+		ValueRestriction rest = c.getValueRestriction();
+		Assert.assertNotNull(rest);
+		
 	}
 	@Test
 	public void getNarrowerTest() throws OntologyException{

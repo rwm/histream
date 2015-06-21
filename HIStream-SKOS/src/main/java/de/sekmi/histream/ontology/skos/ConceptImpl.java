@@ -30,7 +30,7 @@ public class ConceptImpl implements Concept {
 		return store.getNarrower(this);
 	}
 	
-	public Resource getResource(){
+	Resource getResource(){
 		return res;
 	}
 	
@@ -81,9 +81,29 @@ public class ConceptImpl implements Concept {
 	}
 
 	@Override
-	public ValueRestriction getValueRestriction() {
-		// TODO implement
-		return null;
+	public ValueRestriction getValueRestriction() throws OntologyException {
+		
+		try {
+			RepositoryResult<Statement> rs = store.getConnection().getStatements(getResource(), HIStreamOntology.DWH_RESTRICTION, null, true);
+			try{
+				if( !rs.hasNext() )
+					return null; // no restriction
+				Value o = rs.next().getObject();
+
+				// TODO: load restriction
+				RestrictionImpl ret = new RestrictionImpl();
+				
+				
+				if( rs.hasNext() ){
+					throw new OntologyException("More than one dwh:restriction for "+res);
+				}
+				return ret;
+			}finally{
+				rs.close();
+			}
+		} catch (RepositoryException e) {
+			throw new OntologyException(e);
+		}
 	}
 	
 	

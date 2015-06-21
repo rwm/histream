@@ -78,5 +78,5 @@ public interface Concept {
 	 * Get restrictions for the values of this concept.
 	 * @return value restrictions or {@code null} if no restrictions are provided
 	 */
-	ValueRestriction getValueRestriction();
+	ValueRestriction getValueRestriction() throws OntologyException;
 }

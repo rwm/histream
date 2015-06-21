@@ -23,7 +23,8 @@
 
 :TestEnumConcept a skos:Concept;
 	skos:inScheme 	:TestData;
-	dwh:valueRestriction [ a				owl:Restriction ;
+	dwh:restriction [ a				owl:Restriction ;
+						owl:onProperty rdf:value;
 						  owl:oneOf ([rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
 					 				[rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]) 
 					 	 ] ;
@@ -31,9 +32,13 @@
 	skos:prefLabel 	"Enum_label_en"@en;
 	skos:notation 	"Enum"^^:TestCS .
 
+dwh:IntegerRestriction a owl:Restriction ;
+	owl:onProperty rdf:value ;
+	owl:allValuesFrom xsd:integer .
+
 :TestIntegerConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:valueType	xsd:integer ;
+	dwh:restriction dwh:IntegerRestriction ;
 	skos:prefLabel	"Integer_label_en"@en ;
 	skos:prefLabel	"Integer_label_de"@de ;
 	dc:description	"Description_de"@de ;
@@ -48,7 +53,8 @@
 	
 :TestDecimalConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:valueRestriction [ a				owl:Restriction ;
+	dwh:restriction [ a				owl:Restriction ;
+							owl:onProperty	rdf:value ;
 						  owl:allValuesFrom [a 				rdfs:Datatype; 
 						  					 owl:onDatatype	xsd:decimal; 
 										     owl:withRestrictions( [ xsd:minInclusive 200 ] 
