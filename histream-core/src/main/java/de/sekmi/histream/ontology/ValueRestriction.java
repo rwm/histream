@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 public interface ValueRestriction {
 	Class<?> getType();
+	// TODO move locale to getEnumeration
 	EnumValue[] getEnumeration();
 	Number minInclusive();
 	Number maxInclusive();

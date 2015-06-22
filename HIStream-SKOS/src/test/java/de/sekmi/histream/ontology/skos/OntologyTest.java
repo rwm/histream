@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.ontology.Concept;
+import de.sekmi.histream.ontology.EnumValue;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
 import de.sekmi.histream.ontology.skos.Store;
@@ -29,10 +30,34 @@ public class OntologyTest {
 		Assert.assertNotNull(c);
 		Assert.assertEquals(1, c.getIDs().length);
 		Assert.assertEquals("T:type:int", c.getIDs()[0]);
-		ValueRestriction rest = c.getValueRestriction();
+		ValueRestriction rest = c.getValueRestriction(Locale.GERMAN);
 		Assert.assertNotNull(rest);
-		
 	}
+
+	@Test
+	public void enumRestrictionTest() throws OntologyException{
+		Concept c = store.getConceptByNotation("T:Enum");
+		Assert.assertNotNull(c);
+		// German language
+		ValueRestriction rest = c.getValueRestriction(Locale.GERMAN);
+		Assert.assertNotNull(rest);
+		EnumValue[] e = rest.getEnumeration();
+		Assert.assertNotNull(e);
+		Assert.assertEquals(2, e.length);
+		Assert.assertEquals("1", e[0].getValue());
+		Assert.assertEquals("1_de", e[0].getPrefLabel());
+		Assert.assertEquals("2", e[1].getValue());
+		Assert.assertEquals("2_de", e[1].getPrefLabel());
+		// German language
+		rest = c.getValueRestriction(Locale.ENGLISH);
+		e = rest.getEnumeration();
+		Assert.assertNotNull(e);
+		Assert.assertEquals(2, e.length);
+		Assert.assertEquals("1", e[0].getValue());
+		Assert.assertEquals("1_en", e[0].getPrefLabel());
+	}
+
+
 	@Test
 	public void getNarrowerTest() throws OntologyException{
 		Concept[] top = store.getTopConcepts();

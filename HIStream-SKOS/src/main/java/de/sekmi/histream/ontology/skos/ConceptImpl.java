@@ -81,18 +81,20 @@ public class ConceptImpl implements Concept {
 	}
 
 	@Override
-	public ValueRestriction getValueRestriction() throws OntologyException {
+	public ValueRestriction getValueRestriction(Locale locale) throws OntologyException {
 		
 		try {
-			RepositoryResult<Statement> rs = store.getConnection().getStatements(getResource(), HIStreamOntology.DWH_RESTRICTION, null, true);
+			RepositoryResult<Statement> rs = store.getConnection().getStatements(getResource(), HIStreamOntology.DWH_RESTRICTION, null, false);
 			try{
-				if( !rs.hasNext() )
+				if( !rs.hasNext() ){
 					return null; // no restriction
-				Value o = rs.next().getObject();
-
-				// TODO: load restriction
-				RestrictionImpl ret = new RestrictionImpl();
+				}
+				Value obj = rs.next().getObject();
 				
+				if( !(obj instanceof Resource) ){
+					throw new OntologyException("dwh:restriction expected to be a rdf resource");
+				}
+				ValueRestriction ret = RestrictionImpl.loadFromRDF(store.getConnection(), (Resource)obj, locale);
 				
 				if( rs.hasNext() ){
 					throw new OntologyException("More than one dwh:restriction for "+res);

@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
-import org.openrdf.model.Value;
 import org.openrdf.model.util.Literals;
 import org.openrdf.model.vocabulary.SKOS;
 import org.openrdf.repository.Repository;
@@ -177,33 +175,11 @@ public class Store implements Ontology, Plugin {
 	}
 	
 	String getLocalString(Resource subject, URI predicate, String language) throws OntologyException {
-		// empty language same as no language
-		if( language != null && language.length() == 0 )
-			language = null;
-		
 		try {
-			RepositoryResult<Statement> rs = rc.getStatements(subject, predicate, null, true);
-			try{
-				while( rs.hasNext() ){
-					Value v = rs.next().getObject();
-					if( !(v instanceof Literal) )continue;
-					Literal l = (Literal)v;
-					String lit_lang = l.getLanguage();
-					if( language == null && lit_lang == null ){
-						// neutral literal (without language)
-						return l.getLabel();
-					}else if( lit_lang != null && language != null && lit_lang.equals(language) ){
-						// language matched
-						return l.getLabel();
-					}
-				}
-			}finally{
-				rs.close();
-			}
+			return RDFUtils.getLocalString(rc, subject, predicate, language);
 		}catch( RepositoryException e ){
 			throw new OntologyException(e);
 		}
-		return null; // no value found
 	}
 
 	

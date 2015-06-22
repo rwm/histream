@@ -30,7 +30,8 @@
 					 	 ] ;
 	skos:prefLabel 	"Enum_label_de"@de;
 	skos:prefLabel 	"Enum_label_en"@en;
-	skos:notation 	"Enum"^^:TestCS .
+	skos:notation 	"T:Enum" .
+#	skos:notation 	"Enum"^^:TestCS .
 
 dwh:IntegerRestriction a owl:Restriction ;
 	owl:onProperty rdf:value ;

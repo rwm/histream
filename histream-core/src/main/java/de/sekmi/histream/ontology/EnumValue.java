@@ -1,8 +1,14 @@
 package de.sekmi.histream.ontology;
 
-import java.util.Locale;
+public class EnumValue {
+	private String label;
+	private Object value;
 
-public interface EnumValue {
-	String getPrefLabel(Locale locale);
-	Object getValue();
+	public EnumValue(String label, Object value){
+		this.label = label;
+		this.value = value;
+	}
+
+	public String getPrefLabel(){return label;}
+	public Object getValue(){return value;}
 }
