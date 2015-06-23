@@ -30,7 +30,7 @@ public class OntologyTest {
 		Assert.assertNotNull(c);
 		Assert.assertEquals(1, c.getIDs().length);
 		Assert.assertEquals("T:type:int", c.getIDs()[0]);
-		ValueRestriction rest = c.getValueRestriction(Locale.GERMAN);
+		ValueRestriction rest = c.getValueRestriction();
 		Assert.assertNotNull(rest);
 	}
 
@@ -39,9 +39,9 @@ public class OntologyTest {
 		Concept c = store.getConceptByNotation("T:Enum");
 		Assert.assertNotNull(c);
 		// German language
-		ValueRestriction rest = c.getValueRestriction(Locale.GERMAN);
+		ValueRestriction rest = c.getValueRestriction();
 		Assert.assertNotNull(rest);
-		EnumValue[] e = rest.getEnumeration();
+		EnumValue[] e = rest.getEnumeration(Locale.GERMAN);
 		Assert.assertNotNull(e);
 		Assert.assertEquals(2, e.length);
 		Assert.assertEquals("1", e[0].getValue());
@@ -49,8 +49,7 @@ public class OntologyTest {
 		Assert.assertEquals("2", e[1].getValue());
 		Assert.assertEquals("2_de", e[1].getPrefLabel());
 		// German language
-		rest = c.getValueRestriction(Locale.ENGLISH);
-		e = rest.getEnumeration();
+		e = rest.getEnumeration(Locale.ENGLISH);
 		Assert.assertNotNull(e);
 		Assert.assertEquals(2, e.length);
 		Assert.assertEquals("1", e[0].getValue());

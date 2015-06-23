@@ -76,9 +76,8 @@ public interface Concept {
 	
 	/**
 	 * Get restrictions for the values of this concept.
-	 * @param locale locale for labels (e.g. in enumerations)
 	 * @return value restrictions or {@code null} if no restrictions are provided
 	 * @throws OntologyException for ontology errors
 	 */
-	ValueRestriction getValueRestriction(Locale locale) throws OntologyException;
+	ValueRestriction getValueRestriction() throws OntologyException;
 }

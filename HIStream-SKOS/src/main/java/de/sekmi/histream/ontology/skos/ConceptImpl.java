@@ -33,6 +33,9 @@ public class ConceptImpl implements Concept {
 	Resource getResource(){
 		return res;
 	}
+	Store getStore(){
+		return store;
+	}
 	
 	public String toString(){
 		return res.toString();
@@ -81,7 +84,7 @@ public class ConceptImpl implements Concept {
 	}
 
 	@Override
-	public ValueRestriction getValueRestriction(Locale locale) throws OntologyException {
+	public ValueRestriction getValueRestriction() throws OntologyException {
 		
 		try {
 			RepositoryResult<Statement> rs = store.getConnection().getStatements(getResource(), HIStreamOntology.DWH_RESTRICTION, null, false);
@@ -94,7 +97,7 @@ public class ConceptImpl implements Concept {
 				if( !(obj instanceof Resource) ){
 					throw new OntologyException("dwh:restriction expected to be a rdf resource");
 				}
-				ValueRestriction ret = RestrictionImpl.loadFromRDF(store.getConnection(), (Resource)obj, locale);
+				ValueRestriction ret = new RestrictionImpl(this, (Resource)obj);
 				
 				if( rs.hasNext() ){
 					throw new OntologyException("More than one dwh:restriction for "+res);
