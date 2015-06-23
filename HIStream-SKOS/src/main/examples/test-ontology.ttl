@@ -4,8 +4,8 @@
 @prefix dc:	<http://purl.org/dc/elements/1.1/> .
 @prefix skos: 	<http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:	<http://www.w3.org/2001/XMLSchema#> .
-@prefix dwh: <http://sekmi.de/histream/dwh#> .
-@prefix : 	<http://sekmi.de/histream/skos/tests#> .
+@prefix dwh:	<http://sekmi.de/histream/dwh#> .
+@prefix :	<http://sekmi.de/histream/skos/tests#> .
 
 : dc:title "HIStream concept ontology for testing".
 
@@ -18,28 +18,35 @@
 	skos:narrower :TestStringConcept ;
 	skos:narrower :TestIntegerConcept ;
 	skos:narrower :TestDecimalConcept ;
+	skos:narrower :TestEnumConcept ;
 	
 	dc:description "Top concept for test data" .
 
 :TestEnumConcept a skos:Concept;
 	skos:inScheme 	:TestData;
-	dwh:restriction [ a				owl:Restriction ;
-						owl:onProperty rdf:value;
-						  owl:oneOf ([rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
-					 				[rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]) 
-					 	 ] ;
+	dwh:restriction [ a	owl:Restriction ;
+				owl:onProperty rdf:value;
+				owl:oneOf (
+					[rdf:value "1"^^xsd:string; skos:prefLabel "1_de"@de; skos:prefLabel "1_en"@en ]
+					[rdf:value "2"^^xsd:string; skos:prefLabel "2_de"@de; skos:prefLabel "2_en"@en ]
+				)
+			] ;
 	skos:prefLabel 	"Enum_label_de"@de;
 	skos:prefLabel 	"Enum_label_en"@en;
 	skos:notation 	"T:Enum" .
-#	skos:notation 	"Enum"^^:TestCS .
+#######	skos:notation 	"Enum"^^:TestCS .
 
-dwh:IntegerRestriction a owl:Restriction ;
+dwh:Integer a owl:Restriction ;
 	owl:onProperty rdf:value ;
 	owl:allValuesFrom xsd:integer .
+	
+dwh:String a owl:Restriction ;
+	owl:onProperty rdf:value ;
+	owl:allValuesFrom xsd:string .
 
 :TestIntegerConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:restriction dwh:IntegerRestriction ;
+	dwh:restriction dwh:Integer ;
 	skos:prefLabel	"Integer_label_en"@en ;
 	skos:prefLabel	"Integer_label_de"@de ;
 	dc:description	"Description_de"@de ;
@@ -48,22 +55,21 @@ dwh:IntegerRestriction a owl:Restriction ;
 
 :TestStringConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:valueType	xsd:string ;
+	dwh:restriction dwh:String ;
 	skos:prefLabel	"String_label_en"@en ;
 	skos:notation	"T:type:str" .
 	
 :TestDecimalConcept a skos:Concept;
 	skos:inScheme	:TestData ;
-	dwh:restriction [ a				owl:Restriction ;
-							owl:onProperty	rdf:value ;
-						  owl:allValuesFrom [a 				rdfs:Datatype; 
-						  					 owl:onDatatype	xsd:decimal; 
-										     owl:withRestrictions( [ xsd:minInclusive 200 ] 
-										     					   [ xsd:maxInclusive 400 ] )
-											]
-						  ] ;
-						  # oder via rdfs:range?  http://stackoverflow.com/questions/24531940/defining-datarange-expression-in-protege-for-a-data-type-property
-						  # oder via owl:DataRange
-						  # oder restriction owl:onProperty rdf:value
+	dwh:restriction [ a	owl:Restriction ;
+				owl:onProperty	rdf:value ;
+				owl:allValuesFrom[	a		rdfs:Datatype; 
+							owl:onDatatype	xsd:decimal; 
+							owl:withRestrictions( 
+									[ xsd:minInclusive 200 ] 	
+									[ xsd:maxInclusive 400 ]
+							)
+						]
+			] ;
 	skos:prefLabel	"Decimal_label_en"@en ;
 	skos:notation	"T:type:dec" .

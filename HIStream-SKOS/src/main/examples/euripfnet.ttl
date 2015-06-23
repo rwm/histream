@@ -20,15 +20,4 @@
 		dwh:replaceValue :noValue
 	] .
 
-	# TODO use anonymous nodes
 	# TODO how to map negations (eg NO hypertension)
-
-
-:FF.XXXX.example a dwh:Concept ;
-	dwh:valueType :YesNoEnum .
-
-# TODO: need to implement labels for enum values
-:YesNoEnum owl:oneOf (
-	[rdf:value "Y"^^xsd:string ; prefLabel "Ja"@de] 
-	[rdf:value "N"^^xsd:string ; prefLabel "Nein"@de]
-) .

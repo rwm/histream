@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,10 +16,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import de.sekmi.histream.Plugin;
 import de.sekmi.histream.ontology.Concept;
+import de.sekmi.histream.ontology.EnumValue;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
+import de.sekmi.histream.ontology.ValueRestriction;
 
 public class Import implements AutoCloseable{
 	private static final Logger log = Logger.getLogger(Import.class.getName());
@@ -120,6 +128,83 @@ public class Import implements AutoCloseable{
 		insertConcept.executeUpdate();
 		insertConceptCount ++;
 	}
+	private String generateMetadataXML(ValueRestriction vr) throws XMLStreamException, OntologyException{
+		StringWriter xmlbuf = new StringWriter();
+		XMLOutputFactory xmlout = XMLOutputFactory.newInstance();
+		XMLStreamWriter xml = xmlout.createXMLStreamWriter(xmlbuf);
+		
+		//xml.writeStartDocument();
+		xml.writeStartElement("ValueMetadata");
+		
+		xml.writeStartElement("Version");
+		xml.writeCharacters("3.02");
+		xml.writeEndElement();
+		
+		xml.writeStartElement("CreationDateTime");
+		xml.writeCharacters("10/07/2002 15:08:07"); // TODO use correct time
+		xml.writeEndElement();
+		
+		// TestID, TestName,
+		EnumValue[] ev = vr.getEnumeration(locale);
+		if( ev != null ){
+			xml.writeStartElement("DataType");
+			xml.writeCharacters("Enum");
+			xml.writeEndElement();
+			
+			xml.writeStartElement("Oktousevalues");
+			xml.writeCharacters("Y");
+			xml.writeEndElement();
+			
+			xml.writeStartElement("EnumValues");
+			for( EnumValue v : ev ){
+				xml.writeStartElement("Val");
+				xml.writeAttribute("description",v.getPrefLabel());
+				xml.writeCharacters(v.getValue().toString());
+				xml.writeEndElement();
+			}
+			xml.writeEndElement();
+		}else{
+
+			String i2b2type;
+			QName type = vr.getType();
+			if( type != null ){
+				switch( type.getLocalPart() ){
+				case "integer":
+				case "int":
+					i2b2type = "Integer";
+					break;
+				case "float":
+				case "decimal":
+					i2b2type = "Float";
+					break;
+				case "string":
+				default:
+					 i2b2type = "String";
+				}
+			}else{
+				// no type information
+				i2b2type = "String";
+			}
+			xml.writeStartElement("DataType");
+			xml.writeCharacters(i2b2type);
+			xml.writeEndElement();
+			// TODO other datatypes
+			// PosFloat, Float, PosInteger, Integer
+			// String, largestring
+			xml.writeStartElement("Oktousevalues");
+			xml.writeCharacters("Y");
+			xml.writeEndElement();
+			
+		}
+		xml.writeEndDocument();
+		xml.close();
+		try {
+			xmlbuf.close();
+		} catch (IOException e) {
+			throw new XMLStreamException(e);
+		}
+		return xmlbuf.toString();
+	}
 	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
 		insertMeta.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
@@ -145,6 +230,7 @@ public class Import implements AutoCloseable{
 		// c_visualattributes
 		Concept[] subConcepts = concept.getNarrower();
 		String visualAttr = (subConcepts.length == 0)?"LA":"FA";
+		// TODO MA for multiple items
 		insertMeta.setString(5, visualAttr);
 
 		// c_basecode
@@ -163,10 +249,26 @@ public class Import implements AutoCloseable{
 			// TODO make sure, each concept_path is inserted only once
 			insertConceptDimension(path, label, conceptIds[0]);
 			// XXX support for multiple conceptIds can be hacked by appending a number to the path for each conceptid and insert each conceptid
+			// XXX see some concepts in i2b2 demodata religion with visualattributes M
 		}
 		
+		
 		// c_metadataxml
-		insertMeta.setString(7, null);
+		ValueRestriction vr = concept.getValueRestriction();
+		if( vr == null ){
+			insertMeta.setString(7, null);
+		}else{
+			// build metadata xml
+			
+			// set value
+			try {
+				insertMeta.setString(7, generateMetadataXML(vr));
+			} catch (XMLStreamException e) {
+				// TODO log error
+				e.printStackTrace();
+				insertMeta.setString(7, null);
+			}
+		}
 		
 		// c_dimcode (with concept_dimension.concept_path LIKE)
 		insertMeta.setString(8, path);
@@ -257,6 +359,29 @@ public class Import implements AutoCloseable{
 	}
 	
 	
+	@Override
+	public void close() {
+		try {
+			dbMeta.close();
+		} catch (SQLException e) {
+			System.out.println("Error closing database connection");
+			e.printStackTrace();
+		}
+		try {
+			dbData.close();
+		} catch (SQLException e) {
+			System.out.println("Error closing database connection");
+			e.printStackTrace();
+		}
+		if( ontology != null )try {
+			ontology.close();
+		} catch (IOException e) {
+			System.err.println("Error closing ontology");
+			e.printStackTrace();
+		}
+	}
+
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void main(String args[])throws FileNotFoundException, IOException{
 		if( args.length != 2 ){
@@ -338,25 +463,4 @@ public class Import implements AutoCloseable{
 	}
 
 
-	@Override
-	public void close() {
-		try {
-			dbMeta.close();
-		} catch (SQLException e) {
-			System.out.println("Error closing database connection");
-			e.printStackTrace();
-		}
-		try {
-			dbData.close();
-		} catch (SQLException e) {
-			System.out.println("Error closing database connection");
-			e.printStackTrace();
-		}
-		if( ontology != null )try {
-			ontology.close();
-		} catch (IOException e) {
-			System.err.println("Error closing ontology");
-			e.printStackTrace();
-		}
-	}
 }
