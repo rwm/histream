@@ -189,9 +189,15 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		try {
 			
 			insertFact(o, null, 1);
+			db.commit();
 			
 			insertCount ++;
 		} catch (SQLException e) {
+			try {
+				db.rollback();
+			} catch (SQLException suppressed) {
+				e.addSuppressed(suppressed);
+			}
 			throw new ObservationException(o, e);
 		}
 		
@@ -275,6 +281,17 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		}
 	}
 
+	/**
+	 * Insert a fact into the observation_fact table, including all associated modifiers.
+	 * <p>
+	 * This method makes use of database transactions to ensure only complete facts are inserted.
+	 * Therefore, {@code db.commit()} should be called following a call to this function. If any exception
+	 * is encountered, {@code db.rollback()} should be called.
+	 * @param o Observation/fact to insert
+	 * @param m Modifier to insert for the fact. Should be {@code null} and is only used during recursion.
+	 * @param instanceNum instance num
+	 * @throws SQLException exception during insert. Call {@code db.rollback()} if caught.
+	 */
 	private synchronized void insertFact(Observation o, Modifier m, int instanceNum)throws SQLException{
 		if( m == null && o.hasModifiers() ){
 			// method called for observation (not modifier) with modifiers
@@ -348,25 +365,15 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.executeUpdate();
 		
 		if( o.hasModifiers() == false ){
-			// no modifiers involved, commit immediately
-			db.commit();
+			// no modifiers involved, transaction done
 		}else if( m == null ){
-			// insert all modifiers and commit thereafter
-			try{
-				// loop through modifiers
-				Enumeration<Modifier> e = o.getModifiers();
-				while( e.hasMoreElements() ){
-					Modifier mod = e.nextElement();
-					insertFact(o, mod, instanceNum);
-				}
-				db.commit();
-			}catch( SQLException e ){
-				// error during modifier insertion
-				db.rollback();
-				log.warning("Rollback performed");
-				throw e; // exception is handled upstream
+			// insert all modifiers
+			// loop through modifiers
+			Enumeration<Modifier> e = o.getModifiers();
+			while( e.hasMoreElements() ){
+				Modifier mod = e.nextElement();
+				insertFact(o, mod, instanceNum);
 			}
-			
 		}else{
 			// just inserted a modifier, wait with commit
 		}
