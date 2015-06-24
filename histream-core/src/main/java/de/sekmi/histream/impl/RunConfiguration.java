@@ -27,6 +27,8 @@ import java.io.IOException;
 
 
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -182,7 +184,7 @@ public class RunConfiguration implements Closeable{
 	}
 	public static void readFiles(File xml, String files[])throws Exception{		
 		System.out.println("HIStream "+readVersion()+" starting");
-		long millis = System.currentTimeMillis();
+		Instant begin = Instant.now();
 		
 		Configuration conf = Configuration.fromFile(xml);
 		RunConfiguration rc = new RunConfiguration(conf);
@@ -206,8 +208,8 @@ public class RunConfiguration implements Closeable{
 		}
 		
 		rc.close();
-		float duration = (System.currentTimeMillis() - millis)/1000f;
-		System.out.println("HIStream finished ("+duration+"s)");
+		Duration duration = Duration.between(begin, Instant.now());
+		System.out.println("HIStream finished (duration "+duration.toString()+")");
 	}
 
 	@Override
