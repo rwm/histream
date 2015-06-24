@@ -155,14 +155,14 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testStAXReader() throws Exception {
-		ObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("src/main/examples/dwh-eav.xml"));
+		ObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(xos), false).forEach(handler);
 		handler.finish();
 	}
 	
 	@Test
 	public void testFlatReader() throws Exception {
-		ObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("src/main/examples/dwh-flat.txt"));
+		ObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("examples/dwh-flat.txt"));
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(handler);
 		handler.finish();
 	}

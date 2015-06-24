@@ -15,7 +15,7 @@ public class DemoInsert {
 	public static void main(String[] args) throws Exception {
 		String[] files = new String[1];
 		files[0] = "c:/temp/dzl/eurIPF.txt";
-		files[0] = "../histream-core/src/main/examples/dwh-flat.txt";
+		files[0] = "../histream-core/examples/dwh-flat.txt";
 		RunConfiguration.readFiles(new File("c:/temp/dzl/histream.xml"),files);
 	}
 

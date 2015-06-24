@@ -12,6 +12,6 @@ public class Demo {
 
 	public static void main(String args[]) throws Exception{
 		
-		Import.main(new String[]{"../HIStream-i2b2/src/main/examples/skos-ontology.properties","../HIStream-i2b2/src/main/examples/i2b2-ont-import.properties"});
+		Import.main(new String[]{"../HIStream-i2b2/examples/skos-ontology.properties","../HIStream-i2b2/examples/i2b2-ont-import.properties"});
 	}
 }

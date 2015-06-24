@@ -28,7 +28,7 @@
 	<fileSets>
 		<fileSet>
 			<outputDirectory>examples</outputDirectory>
-			<directory>src/main/examples</directory>
+			<directory>examples</directory>
 		</fileSet>
 	</fileSets>
       </sources>

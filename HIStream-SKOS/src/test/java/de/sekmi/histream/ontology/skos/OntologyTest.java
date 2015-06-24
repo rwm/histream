@@ -20,7 +20,7 @@ public class OntologyTest {
 	
 	@Before
 	public void setupOntology()throws Exception{
-		store = new Store(new File("src/main/examples/test-ontology.ttl"));
+		store = new Store(new File("examples/test-ontology.ttl"));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class OntologyTest {
 	}
 	
 	public static void main(String[] args) throws Exception{
-		try( Store store = new Store(new File("src/main/examples/test-ontology.n3")) ){
+		try( Store store = new Store(new File("examples/test-ontology.ttl")) ){
 			store.printConceptHierarchy();
 			
 			Concept c = store.getConceptByNotation("Type");
