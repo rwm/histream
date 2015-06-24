@@ -65,7 +65,7 @@ public class OntologyTest {
 		
 		Concept[] narrower = top[0].getNarrower();
 		Assert.assertNotNull(narrower);	
-		Assert.assertEquals(3, narrower.length);
+		Assert.assertEquals(4, narrower.length);
 	}
 	@Test
 	public void testLanguage() throws OntologyException{
