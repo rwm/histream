@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 
 import de.sekmi.histream.Extension;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationHandler;
 import de.sekmi.histream.ObservationSupplier;
@@ -44,6 +45,7 @@ import de.sekmi.histream.Plugin;
 import de.sekmi.histream.conf.Configuration;
 import de.sekmi.histream.conf.PluginConfig;
 import de.sekmi.histream.conf.PluginRef;
+import de.sekmi.histream.impl.AbstractObservationHandler;
 import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FileObservationSupplierFactory;
 
@@ -54,10 +56,17 @@ public class RunConfiguration implements Closeable{
 	private FileObservationSupplierFactory[] fileFactories;
 	private Consumer<Observation> destinationChain;
 	private ObservationHandler[] destinationHandlers;
+	private Consumer<ObservationException> errorHandler;
 	
 	public RunConfiguration(Configuration conf) throws Exception{
 		factory = new ObservationFactoryImpl();
 		plugins = conf.createPluginInstances();
+		errorHandler = new Consumer<ObservationException>() {
+			@Override
+			public void accept(ObservationException t) {
+				System.err.println("Error:"+t.getMessage());
+			}
+		};
 		
 		List<FileObservationSupplierFactory> ffs = new ArrayList<>();
 		
@@ -99,6 +108,9 @@ public class RunConfiguration implements Closeable{
 		// chain subsequent destinations in order of configuration
 		for( int i=0; i<ds.length; i++ ){
 			Consumer<Observation> dest = (Consumer<Observation>)plugins[getPluginIndex(conf, ds[i].getPlugin())];
+			if( dest instanceof AbstractObservationHandler ){
+				((AbstractObservationHandler)dest).setErrorHandler(errorHandler);
+			}
 			if( destinationChain == null )destinationChain = dest;
 			else destinationChain = destinationChain.andThen(dest);
 			
