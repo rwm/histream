@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import de.sekmi.histream.Plugin;
 import de.sekmi.histream.ontology.Concept;
-import de.sekmi.histream.ontology.EnumValue;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
@@ -145,7 +144,7 @@ public class Import implements AutoCloseable{
 		xml.writeEndElement();
 		
 		// TestID, TestName,
-		EnumValue[] ev = vr.getEnumeration(locale);
+		Object[] ev = vr.getEnumerationValues();
 		if( ev != null ){
 			xml.writeStartElement("DataType");
 			xml.writeCharacters("Enum");
@@ -156,10 +155,20 @@ public class Import implements AutoCloseable{
 			xml.writeEndElement();
 			
 			xml.writeStartElement("EnumValues");
-			for( EnumValue v : ev ){
+			// load enum values
+			String[] labels = vr.getEnumerationLabels(locale);
+			if( labels == null ){
+				// no labels for the specified language
+				// use values as labels
+				labels = new String[ev.length];
+				for( int i=0; i<labels.length; i++ ){
+					labels[i] = ev[i].toString();
+				}
+			}
+			for( int i=0; i<ev.length; i++ ){
 				xml.writeStartElement("Val");
-				xml.writeAttribute("description",v.getPrefLabel());
-				xml.writeCharacters(v.getValue().toString());
+				xml.writeAttribute("description",labels[i]);
+				xml.writeCharacters(ev[i].toString());
 				xml.writeEndElement();
 			}
 			xml.writeEndElement();

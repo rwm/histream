@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 
 
+
+
 import javax.xml.namespace.QName;
 
 import org.openrdf.model.Literal;
@@ -21,33 +23,30 @@ import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
-
-
-
-import de.sekmi.histream.ontology.EnumValue;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
 
 public class RestrictionImpl implements ValueRestriction {
 
-	QName type;
-	ConceptImpl concept;
-	Resource resource;
+	final QName type;
+	final ConceptImpl concept;
+	final Resource resource;
+	final Object[] enumValues;
 	
 	RestrictionImpl(ConceptImpl concept, Resource restriction) throws RepositoryException, OntologyException{
 		RepositoryConnection rdf = concept.getStore().getConnection();
 		this.concept = concept;
 		this.resource = restriction;
 		
-		if( !rdf.hasStatement(restriction, RDF.TYPE, OWL.RESTRICTION, false) ){
+		if( !rdf.hasStatement(resource, RDF.TYPE, OWL.RESTRICTION, false) ){
 			throw new OntologyException("Type owl:Restriction expected for "+restriction);
 		}
-		if( !rdf.hasStatement(restriction, OWL.ONPROPERTY, RDF.VALUE, false) ){
+		if( !rdf.hasStatement(resource, OWL.ONPROPERTY, RDF.VALUE, false) ){
 			throw new OntologyException("owl:Restriction only supported owl:onProperty rdf:value");
 		}
 		
 		// load type
-		Value o = RDFUtils.getObject(rdf, restriction, OWL.ALLVALUESFROM);
+		Value o = RDFUtils.getObject(rdf, resource, OWL.ALLVALUESFROM);
 		if( o != null ){
 			String localPart;
 			if( o.equals(XMLSchema.INTEGER) || o.equals(XMLSchema.INT) || o.equals(XMLSchema.LONG) ){
@@ -66,8 +65,34 @@ public class RestrictionImpl implements ValueRestriction {
 			}
 			if( localPart != null ){
 				this.type = new QName(XMLSchema.NAMESPACE,localPart);
+			}else{
+				this.type = null;
+				// XXX allow restriction without type?
 			}
+		}else{
+			this.type = null;
 		}
+		
+		// load enum values
+		o = RDFUtils.getObject(rdf, resource, OWL.ONEOF);
+		if( o != null ){
+			final List<String> list = new ArrayList<>();
+			RDFUtils.forEachRDFListItem(rdf, (Resource)o, v -> { 
+				try {
+					Literal literal = RDFUtils.getLiteralObject(rdf, (Resource)v, RDF.VALUE);
+					// TODO: use correct types from literal
+					list.add(literal.getLabel());
+				} catch (Exception e) {
+					// TODO log error
+				}
+			});
+			enumValues = list.toArray(new String[list.size()]);			
+		}else{
+			// no enumeration values
+			enumValues = null;
+		}
+		
+
 	}
 	
 	@Override
@@ -76,7 +101,11 @@ public class RestrictionImpl implements ValueRestriction {
 	}
 
 	@Override
-	public EnumValue[] getEnumeration(Locale locale) throws OntologyException {
+	public String[] getEnumerationLabels(Locale locale) throws OntologyException {
+		if( enumValues == null ){
+			// restriction does not have enum values
+			return null;
+		}
 		// load enum
 		RepositoryConnection rdf = concept.getStore().getConnection();
 		Value o;
@@ -85,21 +114,27 @@ public class RestrictionImpl implements ValueRestriction {
 			if( o == null )return null;
 			
 			final String language = (locale==null)?null:locale.toString();
-			final List<EnumValue> list = new ArrayList<>();
+			final List<String> list = new ArrayList<>();
 			RDFUtils.forEachRDFListItem(rdf, (Resource)o, v -> { 
 				try {
 					String label = RDFUtils.getLocalString(rdf, (Resource)v, SKOS.PREF_LABEL, language);
-					Literal literal = RDFUtils.getLiteralObject(rdf, (Resource)v, RDF.VALUE);
-					// TODO: use correct types from literal
-					list.add(new EnumValue(label, literal.stringValue()));
+					list.add(label);
 				} catch (Exception e) {
-					// TODO log warning
-				} 
+					// TODO log error
+				}
+				//Literal literal = RDFUtils.getLiteralObject(rdf, (Resource)v, RDF.VALUE);
+				// TODO: use correct types from literal
 			});
-			return list.toArray(new EnumValue[list.size()]);
+			return list.toArray(new String[list.size()]);
 		} catch (RepositoryException e) {
 			throw new OntologyException(e);
 		}
+	}
+	
+
+	@Override
+	public Object[] getEnumerationValues() {
+		return enumValues;
 	}
 
 	@Override
@@ -131,6 +166,7 @@ public class RestrictionImpl implements ValueRestriction {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 
 }

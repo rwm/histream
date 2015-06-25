@@ -7,13 +7,17 @@ import javax.xml.namespace.QName;
 
 public interface ValueRestriction {
 	QName getType();
-	EnumValue[] getEnumeration(Locale locale) throws OntologyException;
+	Object[] getEnumerationValues();
+	String[] getEnumerationLabels(Locale locale) throws OntologyException;
 	Number minInclusive();
 	Number maxInclusive();
 	Integer minLength();
 	Integer maxLength();
 	Pattern getPattern();
 
+	// TODO implement validation (maybe necessary to separate enum values and enum labels)
+	//boolean validate(Value value);
+	
 	public static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema#"; 
 
 	public static final QName TYPE_DECIMAL = new QName(XSD_NAMESPACE,"decimal");

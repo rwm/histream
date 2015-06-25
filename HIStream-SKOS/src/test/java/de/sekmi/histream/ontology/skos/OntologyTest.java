@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.ontology.Concept;
-import de.sekmi.histream.ontology.EnumValue;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
 import de.sekmi.histream.ontology.skos.Store;
@@ -38,22 +37,26 @@ public class OntologyTest {
 	public void enumRestrictionTest() throws OntologyException{
 		Concept c = store.getConceptByNotation("T:Enum");
 		Assert.assertNotNull(c);
-		// German language
+		// Values
 		ValueRestriction rest = c.getValueRestriction();
 		Assert.assertNotNull(rest);
-		EnumValue[] e = rest.getEnumeration(Locale.GERMAN);
-		Assert.assertNotNull(e);
-		Assert.assertEquals(2, e.length);
-		Assert.assertEquals("1", e[0].getValue());
-		Assert.assertEquals("1_de", e[0].getPrefLabel());
-		Assert.assertEquals("2", e[1].getValue());
-		Assert.assertEquals("2_de", e[1].getPrefLabel());
+		Object[] values = rest.getEnumerationValues();
+		Assert.assertEquals("1", values[0]);
+		Assert.assertEquals("2", values[1]);
+
 		// German language
-		e = rest.getEnumeration(Locale.ENGLISH);
-		Assert.assertNotNull(e);
-		Assert.assertEquals(2, e.length);
-		Assert.assertEquals("1", e[0].getValue());
-		Assert.assertEquals("1_en", e[0].getPrefLabel());
+		String[] labels = rest.getEnumerationLabels(Locale.GERMAN);
+		Assert.assertNotNull(labels);
+		Assert.assertEquals(2, labels.length);
+		Assert.assertEquals("1_de", labels[0]);
+		Assert.assertEquals("2_de", labels[1]);
+		
+		// English language
+		labels = rest.getEnumerationLabels(Locale.ENGLISH);
+		Assert.assertNotNull(labels);
+		Assert.assertEquals(2, labels.length);
+		Assert.assertEquals("1_en", labels[0]);
+		Assert.assertEquals("2_en", labels[1]);
 	}
 
 
