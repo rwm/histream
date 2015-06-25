@@ -31,6 +31,12 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.Value;
 
+/**
+ * Implementation of {@link Observation}.
+ * TODO add jaxb annotations to produce/load xml
+ * @author Raphael
+ *
+ */
 public class ObservationImpl implements Observation{
 	protected ObservationFactoryImpl factory;
 	
