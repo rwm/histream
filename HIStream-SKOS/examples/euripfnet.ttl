@@ -13,11 +13,33 @@
 
 :FF.2235.qspab_60 a dwh:Concept ;
 	skos:inScheme :eurIPFreg ;
-	skos:notation "FF.2235.qspab_60" .  
-	dwh:mapTo [
-		dwh:ifValueEquals 1 ;
+	skos:notation "FF.2235.qspab_60" ;
+	dwh:mapFact [
+		dwh:condition 	"./value='1'"^^dwh:XPath ;
 		dwh:target	snomed:11399002 ; # pulmonary arterial hypertension
-		dwh:replaceValue :noValue
+		rdf:value	rdf:nil
+	] ;
+	dwh:mapFact [
+		dwh:condition 	dwh:otherwise ; # none of the previous conditions matches
+		dwh:target	snomed:11399002 ; # pulmonary arterial hypertension
+		rdf:value	rdf:nil
+	] ;
+	dwh:generateFact [
+		dwh:condition	"true"^^<http://www.w3.org/TR/xpath-31/>
+		dwh:target	snomed:11399002 ; # pulmonary arterial hypertension
+		dwh:value	rdf:nil
+	# use string literal with xsl:if@test boolean-expression 
+	#  which results in xpath expression boolean(xpath:Expr). Expr := OrExpr
+	#  eg. using http://www.w3.org/TR/xslt#element-if , http://www.w3.org/TR/xslt#dt-expression
+	#  without context but with variable bindings
+	#  eg evaluate with https://docs.oracle.com/javase/8/docs/api/javax/xml/xpath/XPath.html
+	#    with context of xml-node eav-item/eav-group <-!!!!!!! or better context of jaxb-observation (remove interface?)
+	#    literal data type can be http://www.w3.org/TR/xslt#dt-expression or http://www.w3.org/TR/xpath/#NT-Expr
+	 
+	# other possibility: SWRL? http://www.w3.org/Submission/SWRL/ 
+	# other possibility: RIF? http://www.w3.org/TR/rif-in-rdf/ (looks better)
+	# eg https://github.com/sandhawke/Python-RIF-in-RDF/blob/master/test/ser.ttl
+	# 
 	] .
 
 	# TODO how to map negations (eg NO hypertension)
