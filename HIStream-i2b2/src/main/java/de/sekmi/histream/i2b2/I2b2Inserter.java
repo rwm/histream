@@ -27,8 +27,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -369,9 +369,9 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		}else if( m == null ){
 			// insert all modifiers
 			// loop through modifiers
-			Enumeration<Modifier> e = o.getModifiers();
-			while( e.hasMoreElements() ){
-				Modifier mod = e.nextElement();
+			Iterator<Modifier> e = o.getModifiers();
+			while( e.hasNext() ){
+				Modifier mod = e.next();
 				insertFact(o, mod, instanceNum);
 			}
 		}else{

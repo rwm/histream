@@ -168,10 +168,9 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 			while( reader.isStartElement() ){
 				if( !reader.getLocalName().equals("value") )throw new XMLStreamException("Only element 'value' allowed in eav-group",reader.getLocation());
 				
-				modifier = fact.addModifier(atts.getValue("modifier"));
-				
 				parseValueAttributes(atts);
-				modifier.setValue(parseValue(reader.getElementText()));
+
+				modifier = fact.addModifier(atts.getValue("modifier"), parseValue(reader.getElementText()));
 				
 				reader.nextTag();
 			}

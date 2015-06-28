@@ -21,7 +21,7 @@ package de.sekmi.histream;
  */
 
 
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import de.sekmi.histream.ext.ExternalSourceType;
 
@@ -60,13 +60,17 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	
 	/**
 	 * Whether this observation contains sub-concepts (=modifiers).
-	 * 
 	 * @see #getModifier(String)
 	 * @return true if modifiers are present, false otherwise
 	 */
 	boolean hasModifiers();
 	Modifier getModifier(String modifierId);
-	Enumeration<Modifier> getModifiers();
+	
+	/**
+	 * Get all modifiers
+	 * @return modifiers
+	 */
+	Iterator<Modifier> getModifiers();
 	
 	/**
 	 * Add a sub concept to this observation.
@@ -75,8 +79,9 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	 * to the modifier.
 	 * 
 	 * @param modifierId concept id for the new modifier
+	 * @param value modifier value
 	 * @return new modifier
 	 * @throws IllegalArgumentException if the given modifierId is already used.
 	 */
-	Modifier addModifier(String modifierId)throws IllegalArgumentException;
+	Modifier addModifier(String modifierId, Value value)throws IllegalArgumentException;
 }

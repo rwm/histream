@@ -24,7 +24,7 @@ package de.sekmi.histream.impl;
 import java.io.FileInputStream;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.stream.StreamSupport;
 import java.math.BigDecimal;
 
@@ -123,18 +123,18 @@ public class FileObservationProviderTest {
 				Assert.assertEquals(Value.Type.Text, o.getValue().getType());
 				Assert.assertEquals("groupvalue", o.getValue().getValue());
 				Assert.assertTrue(o.hasModifiers());
-				Enumeration<Modifier> e = o.getModifiers();
+				Iterator<? extends Modifier> e = o.getModifiers();
 				// TODO check modifier count
 				Modifier m = o.getModifier("T:mod:1");
 				Assert.assertNotNull(m);
 				Assert.assertEquals("T:mod:1", m.getConceptId());
 				Assert.assertEquals(Value.Type.None, m.getValue().getType());
-				Assert.assertTrue(e.hasMoreElements());
+				Assert.assertTrue(e.hasNext());
 				m = o.getModifier("T:mod:2");
 				Assert.assertNotNull(m);
 				Assert.assertEquals(Value.Type.Text, m.getValue().getType());
 				Assert.assertEquals("def456", m.getValue().getValue());
-				Assert.assertTrue(e.hasMoreElements());
+				Assert.assertTrue(e.hasNext());
 				m = o.getModifier("T:mod:3");
 				Assert.assertNotNull(m);
 				Assert.assertEquals(Value.Type.Numeric, m.getValue().getType());

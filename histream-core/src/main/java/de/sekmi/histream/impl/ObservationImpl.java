@@ -22,8 +22,8 @@ package de.sekmi.histream.impl;
 
 
 import java.time.Instant;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
@@ -33,7 +33,7 @@ import de.sekmi.histream.Value;
 
 /**
  * Implementation of {@link Observation}.
- * TODO add jaxb annotations to produce/load xml
+ * TODO DOM view of observation
  * @author Raphael
  *
  */
@@ -55,7 +55,7 @@ public class ObservationImpl implements Observation{
 	/**
 	 * Modifiers
 	 */
-	protected Hashtable<String, Modifier> modifiers;
+	protected Hashtable<String, ModifierImpl> modifiers;
 	
 	/**
 	 * Array of extensions, managed by the ObservationFactory
@@ -117,21 +117,21 @@ public class ObservationImpl implements Observation{
 	}
 	
 	@Override
-	public Enumeration<Modifier> getModifiers(){
-		return modifiers.elements();
-	}
-	
-	/**
-	 * Assign a modifier to the concept. This will overwrite any existing modifier
-	 * with the same modifierId.
-	 * 
-	 * @param modifier modifier
-	 */
-	public void setModifier(Modifier modifier){
-		// lazy create hashtable only, when a modifier is set
-		if( modifiers == null )modifiers = new Hashtable<>();
-		// potentially overwriting existing modifier
-		modifiers.put(modifier.getConceptId(), modifier);
+	public Iterator<Modifier> getModifiers(){
+		final Iterator<ModifierImpl> iter = modifiers.values().iterator();
+		return new Iterator<Modifier>(){
+
+			@Override
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+
+			@Override
+			public Modifier next() {
+				return iter.next();
+			}
+		};
+		//return (Iterator<Modifier>)modifiers.values().iterator();
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public class ObservationImpl implements Observation{
 	}
 
 	@Override
-	public Modifier addModifier(String modifierId) {
+	public Modifier addModifier(String modifierId, Value value) {
 		ModifierImpl m = new ModifierImpl(modifierId);
 		// lazy allocate modifiers
 		if( modifiers == null ){
@@ -180,6 +180,8 @@ public class ObservationImpl implements Observation{
 		if( modifiers.containsKey(modifierId) )
 			throw new IllegalArgumentException("Duplicate modifier key");
 		
+		m.setValue(value);
+
 		// add to modifier list
 		modifiers.put(modifierId, m);
 		return m;
