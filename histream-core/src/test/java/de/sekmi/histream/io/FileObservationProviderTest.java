@@ -1,4 +1,4 @@
-package de.sekmi.histream.impl;
+package de.sekmi.histream.io;
 
 /*
  * #%L
@@ -25,17 +25,24 @@ import java.io.FileInputStream;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
+import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 import java.math.BigDecimal;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Modifier;
+import de.sekmi.histream.impl.ObservationFactoryImpl;
+import de.sekmi.histream.impl.SimplePatientExtension;
+import de.sekmi.histream.impl.SimpleVisitExtension;
+import de.sekmi.histream.impl.TestObservationHandler;
 import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FlatObservationSupplier;
 import de.sekmi.histream.io.XMLObservationSupplier;
@@ -52,6 +59,10 @@ public class FileObservationProviderTest {
 		factory.registerExtension(new SimplePatientExtension());
 		factory.registerExtension(new SimpleVisitExtension());
 		//factory.registerExtension(new ConceptExtension());
+	}
+	
+	public ObservationFactory getFactory(){
+		return factory;
 	}
 	
 	@Before
@@ -153,18 +164,25 @@ public class FileObservationProviderTest {
 		});
 	}
 	
+	public void validateExample(Supplier<Observation> supplier){
+		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(supplier), false).forEach(handler);		
+	}
+	
+	@After
+	public void closeHandler(){
+		handler.finish();
+	}
+	
 	@Test
 	public void testStAXReader() throws Exception {
 		ObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(xos), false).forEach(handler);
-		handler.finish();
+		validateExample(xos);
 	}
 	
 	@Test
 	public void testFlatReader() throws Exception {
 		ObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("examples/dwh-flat.txt"));
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(handler);
-		handler.finish();
+		validateExample(s);
 	}
 	
 }

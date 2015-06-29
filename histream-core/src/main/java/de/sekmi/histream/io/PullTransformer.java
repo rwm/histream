@@ -13,15 +13,34 @@ import de.sekmi.histream.Observation;
  * @author Raphael
  *
  */
-public class PullTransformer implements Supplier<Observation>{
-	private Supplier<Observation> source;
-	public PullTransformer(Supplier<Observation> source){
+public class PullTransformer extends AbstractTransformer implements Supplier<Observation>{
+	final private Supplier<Observation> source;
+	
+	public PullTransformer(Supplier<Observation> source, Transformation transformation){
+		super(transformation);
 		this.source = source;
 	}
 
 	@Override
 	public Observation get() {
-		// TODO filter, buffer
-		return source.get();
+		Observation ret;
+		do{
+			if( !fifo.isEmpty() ){ // try to empty queue
+				ret = fifo.remove();
+				break;
+			}
+			
+			// next transformation
+			Observation o = source.get();
+			if( o == null ){
+				// source depleted
+				ret = null;
+				break;
+			}
+		
+			ret = transformation.transform(o, fifoPush);
+		}while( ret == null );
+		
+		return ret;
 	}
 }
