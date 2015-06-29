@@ -1,8 +1,6 @@
 package de.sekmi.histream.io;
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
 
@@ -17,46 +15,20 @@ public interface Transformation {
 
 	/**
 	 * Transforms a single observation. 
-	 * The original observation is not changed. 
+	 * The original observation might be changed, removed (if null is returned) or added 
+	 * (passed to the generatedReceiver).
 	 * @param fact observation to transform
-	 * @return new transformed observation or empty opional if it should be removed
+	 * @return new transformed observation or empty optional if it should be removed
 	 */
-	Optional<Observation> transform(Observation fact);
+	Observation transform(Observation fact, Consumer<Observation> generatedReceiver);
 	
-	/**
-	 * Returns whether this transformation wants the supplied observation to be removed.
-	 * @param fact observation to check for removal
-	 * @return true if the observation should be removed, false to keep the observation
-	 */
-	boolean wantRemoved(Observation fact);
-	
-	
-	/**
-	 * Modifies the supplied observation to match the transformation rule.
-	 * @param fact observation to modify (in place)
-	 * @return whether the supplied observation was modified.
-	 */
-	boolean modify(Observation fact);
-	
-	
-	/**
-	 * Returns a function which applies this transformations 
-	 * modifications to any observation. Observations will not
-	 * be removed by the returned function.
-	 * 
-	 * @return function which applies this transformation
-	 */
-	Function<Observation, Observation> modificationFunction();
-	
-	/**
-	 * Returns a predicate which indicates whether to allow the
-	 * observation.
-	 * <p>
-	 * The predicate's {@link Predicate#test(Object)} function will 
-	 * true if the argument should be allowed or modified, and false 
-	 * if the argument should be removed.
-	 * @return predicate indicating whether to allow or remove an observation
-	 */
-	Predicate<Observation> allowedPredicate();
-	
+	public static final Transformation Identity = new Transformation(){
+
+		@Override
+		public Observation transform(Observation fact,
+				Consumer<Observation> generatedReceiver) {
+			return fact;
+		}
+		
+	};
 }
