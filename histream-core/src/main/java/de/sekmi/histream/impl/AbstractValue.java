@@ -23,24 +23,41 @@ package de.sekmi.histream.impl;
 
 import java.math.BigDecimal;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+
 import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.Value;
 
+@XmlTransient
 public abstract class AbstractValue implements Value{
-	protected AbnormalFlag abnormalFlag;
+	@XmlAttribute(name="flag")
+	protected AbnormalFlag flag;
+	@XmlAttribute(name="unit")
 	protected String units;
 	
 	public static AbstractValue NONE = new NilValue();
 	
 	@Override
-	public AbnormalFlag getAbnormalFlag() {return abnormalFlag;}
+	public AbnormalFlag getAbnormalFlag() {return flag;}
 
 	public void setAbnormalFlag(AbnormalFlag flag){
-		this.abnormalFlag = flag;
+		this.flag = flag;
 	}
 	
 	@Override
 	public String getUnits() {return units;}
+	
+	/**
+	 * Compare whether the abstract properties defined in this class match
+	 * @param o other abstract value to compare
+	 * @return true when all abstract properties match, false otherwise
+	 */
+	protected boolean equals(AbstractValue o){
+		if( !(o.units == null && this.units == null) && !(this.units != null && this.units.equals(o.units)) )return false;
+		if( !(o.flag == null && this.flag == null) && !(this.flag != null && this.flag.equals(o.flag)) )return false;
+		return true;
+	}
 	
 	private static class NilValue extends AbstractValue{
 

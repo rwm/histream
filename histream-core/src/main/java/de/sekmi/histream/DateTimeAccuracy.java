@@ -29,12 +29,17 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
+
 /**
  * Local date and time with specified accuracy. Maximum resolution is seconds.
  * For supported accuracy, see {@link #setAccuracy(ChronoUnit)}.
  * @author Raphael
  *
  */
+@XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
 public class DateTimeAccuracy implements Temporal {
 	private LocalDateTime dateTime;
 	private ChronoUnit accuracy;

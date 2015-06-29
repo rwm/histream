@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fact xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="fact.xsd" 
+	patient="12345" encounter="23456" concept="T:testconcept1" start="2015-01-09T22:30" end="2015-01" location="L:ocation" provider="provider">
+	<value xsi:type="numeric" unit="mm" flag="A" operator="E">123</value>
+	<modifier code="M:test"><value xsi:type="string">123</value></modifier>
+</fact>

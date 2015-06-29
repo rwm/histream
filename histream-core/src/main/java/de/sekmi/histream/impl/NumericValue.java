@@ -23,14 +23,41 @@ package de.sekmi.histream.impl;
 
 import java.math.BigDecimal;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+
+@XmlRootElement(name="value")
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlType(name="numeric")
 public class NumericValue extends AbstractValue {
+	@XmlValue
 	private BigDecimal value;
+	@XmlAttribute
 	private Operator operator;
 	
 	private BigDecimal referenceLow;
 	private BigDecimal referenceHigh;
 	
+	@Override
+	public boolean equals(Object other){
+		if( !other.getClass().equals(NumericValue.class) )return false;
+		else if( other == this )return true;
+		NumericValue o = (NumericValue)other;
+		// compare abstract components
+		if( !this.equals((AbstractValue)o) )return false;
+		// compare numeric features
+		if( !this.operator.equals(o.operator) )return false;
+		if( !o.value.equals(this.value) )return false;
+		return true;
+	}
 
+	protected NumericValue(){
+		this.value = BigDecimal.ZERO;
+	}
 	public NumericValue(BigDecimal value){
 		this(value, null);
 	}

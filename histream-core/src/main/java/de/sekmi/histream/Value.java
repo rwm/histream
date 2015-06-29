@@ -23,7 +23,6 @@ package de.sekmi.histream;
 
 import java.math.BigDecimal;
 
-import javax.xml.bind.annotation.XmlEnum;
 
 /**
  * Interface for observation value. 
@@ -66,7 +65,6 @@ public interface Value {
 	 * @author marap1
 	 *
 	 */
-	@XmlEnum
 	public enum Type{
 		/**
 		 * No value (getValue will return null)
@@ -91,7 +89,6 @@ public interface Value {
 	 * @author marap1
 	 *
 	 */
-	@XmlEnum
 	public enum Operator{
 		Equal("EQ"), 
 		LessThan("L"), 

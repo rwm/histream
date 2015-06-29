@@ -21,13 +21,30 @@ package de.sekmi.histream.impl;
  */
 
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
+
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Value;
 
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlSeeAlso({StringValue.class,NumericValue.class})
 public class ModifierImpl implements Modifier {
+	@XmlAttribute(name="code")
 	private String modifierId;
+
+	@XmlTransient
 	private Value value;
-	
+
+	/**
+	 * Constructor for JAXB
+	 */
+	protected ModifierImpl(){
+	}
 	public ModifierImpl(String modifierId){
 		this.modifierId = modifierId;
 	}
@@ -43,6 +60,18 @@ public class ModifierImpl implements Modifier {
 
 	@Override
 	public void setValue(Value value) {
+		this.value = value;
+	}
+
+	/**
+	 * Getter for JAXB
+	 * @return abstract value
+	 */
+	@XmlElement(name="value")
+	protected AbstractValue getAbstractValue(){
+		return (AbstractValue)value;
+	}
+	protected void setAbstractValue(AbstractValue value){
 		this.value = value;
 	}
 

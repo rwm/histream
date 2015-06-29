@@ -22,8 +22,18 @@ package de.sekmi.histream.impl;
 
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
@@ -37,32 +47,53 @@ import de.sekmi.histream.Value;
  * @author Raphael
  *
  */
+@XmlRootElement(name="fact")
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlSeeAlso({StringValue.class,NumericValue.class})
 public class ObservationImpl implements Observation{
+	@XmlTransient
 	protected ObservationFactoryImpl factory;
-	
+
+	@XmlAttribute(name="patient")
 	protected String patientId;
+
+	@XmlAttribute(name="encounter")
 	protected String encounterId;
+
+	@XmlAttribute(name="provider")
 	protected String providerId;
+
+	@XmlAttribute(name="location")
 	protected String locationId;
+
+	@XmlAttribute(name="concept")
 	protected String conceptId;
+
+	@XmlTransient
 	protected Value value;
+
+	@XmlAttribute(name="start")
 	protected DateTimeAccuracy startTime;
+
+	@XmlAttribute(name="end")
 	protected DateTimeAccuracy endTime;
-	
+
 	protected Instant sourceTimestamp;
 	protected String sourceId;
-	
+
 	/**
 	 * Modifiers
 	 */
+	@XmlTransient // see getModifierList / setModifierList
 	protected Hashtable<String, ModifierImpl> modifiers;
-	
+
 	/**
 	 * Array of extensions, managed by the ObservationFactory
 	 */
+	@XmlTransient
 	protected Object[] extensions;
-	
-	
+
+
 	/**
 	 * Constructor should not be called directly. Instead, use
 	 * {@link ObservationFactory#createObservation(String, String, DateTimeAccuracy)}.
@@ -71,14 +102,20 @@ public class ObservationImpl implements Observation{
 	protected ObservationImpl(ObservationFactoryImpl factory){
 		this.factory = factory;
 	}
-	
+
+	/**
+	 * Constructor for JAXB. Make sure to set the factory after unmarshalling.
+	 */
+	protected ObservationImpl(){
+	}
+
 	@Override
 	public String getPatientId() {return patientId;}
 	public void setPatientId(String patientId){this.patientId = patientId;}
 
 	@Override
 	public String getEncounterId() {return encounterId;}
-	
+
 	@Override
 	public void setEncounterId(String encounterId){this.encounterId = encounterId;}
 
@@ -187,9 +224,47 @@ public class ObservationImpl implements Observation{
 		return m;
 	}
 
+	/**
+	 * Return the number of modifiers
+	 * @return number of modifiers
+	 */
+	public int getModifierCount(){
+		if( modifiers == null )return 0;
+		else return modifiers.size();
+	}
 	@Override
 	public void setLocationId(String locationId) {
 		this.locationId = locationId;
+	}
+
+	/**
+	 * Getter for JAXB
+	 * @return modifier list
+	 */
+	@XmlElement(name="modifier")
+	protected List<ModifierImpl> getModifierList(){
+		if( modifiers == null || modifiers.isEmpty() )return null;
+
+		return new ArrayList<ModifierImpl>(modifiers.values());
+	}
+	protected void setModifierList(List<ModifierImpl> list){
+		modifiers = new Hashtable<String, ModifierImpl>();
+		for( ModifierImpl i : list ){
+			modifiers.put(i.getConceptId(), i);
+		}
+	}
+
+	/**
+	 * Getter for JAXB
+	 * @return abstract value
+	 */
+	@XmlElement(name="value")
+	protected AbstractValue getAbstractValue(){
+		if( value == null )return null;
+		else return (AbstractValue)value;
+	}
+	protected void setAbstractValue(AbstractValue value){
+		this.value = value;
 	}
 
 	

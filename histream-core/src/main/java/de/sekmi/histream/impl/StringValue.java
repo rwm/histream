@@ -23,13 +23,35 @@ package de.sekmi.histream.impl;
 
 import java.math.BigDecimal;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+
+@XmlRootElement(name="value")
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlType(name="string")
 public class StringValue extends AbstractValue{
+	protected static final String EMPTY_STRING = "";
+
+	@XmlValue
 	private String value;
 
+	public StringValue(){
+		this.value = EMPTY_STRING;
+	}
 	public StringValue(String value){
 		this.value = value;
 	}
-	
+
+	@Override
+	public boolean equals(Object other){
+		if( !StringValue.class.equals(other.getClass()) )return false;
+		if( other == this )return true;
+		if( !equals((AbstractValue)other) )return false;
+		return value.equals(((StringValue)other).value);
+	}
 
 	@Override
 	public String getValue() {return value;}
