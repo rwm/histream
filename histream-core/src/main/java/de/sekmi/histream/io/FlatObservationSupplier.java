@@ -43,7 +43,6 @@ import de.sekmi.histream.Value;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
-import de.sekmi.histream.impl.AbstractValue;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
@@ -289,7 +288,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 	}
 	
 	private Value parseValue(Record record){
-		if( record.getType() == null )return AbstractValue.NONE;
+		if( record.getType() == null )return null;
 		Value value;
 		switch( record.getType() ){
 		case "dat": // date
@@ -303,7 +302,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		default:
 			// throw error
 		case "nil":
-			value = AbstractValue.NONE;
+			value = null;
 		}
 		
 		return value;

@@ -67,10 +67,6 @@ public interface Value {
 	 */
 	public enum Type{
 		/**
-		 * No value (getValue will return null)
-		 */
-		None,
-		/**
 		 * Text value
 		 */
 		Text,

@@ -88,7 +88,7 @@ class XMLObservationParser extends AbstractObservationParser{
 	
 	protected void parseValueType(String type){
 		if( type == null ){
-			factType = Type.None;
+			factType = null;
 		}else switch( type ){
 		case "xsi:string":
 			factType = Type.Text;
@@ -225,22 +225,23 @@ class XMLObservationParser extends AbstractObservationParser{
 	 */
 	protected Value parseValue(String valueText){
 		AbstractValue val;
-		switch( factType ){
-		case None:
+		if( factType == null ){
 			if( valueText != null && valueText.length() != 0 )
 				log.warning("Value type None, but content not empty");
-			val = AbstractValue.NONE;
-			break;
-		case Text:
-			val = new StringValue(valueText);
-			break;
-		case Numeric:
-			val = new NumericValue(new BigDecimal(valueText), valueUnit, valueOp);
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported fact type "+factType);
+			val = null;
+		}else{
+			switch( factType ){
+			case Text:
+				val = new StringValue(valueText);
+				break;
+			case Numeric:
+				val = new NumericValue(new BigDecimal(valueText), valueUnit, valueOp);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported fact type "+factType);
+			}
+			val.setAbnormalFlag(valueFlag);
 		}
-		val.setAbnormalFlag(valueFlag);
 		// TOOD: set operator
 		return val;
 	}

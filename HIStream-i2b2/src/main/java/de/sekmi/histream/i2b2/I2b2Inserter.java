@@ -78,6 +78,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private String nullLocationCd;
 	private String nullModifierCd;
 	private String nullValueFlagCd;
+	private String nullValueTypeCd;
 	private Preprocessor etlPreprocessor;
 	private int insertCount;
 	
@@ -87,6 +88,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
 		// TODO nullBlob (technically null allowed, but '' is used in demodata)
 		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
+		this.nullValueTypeCd = "@"; // TODO check database
 		insertCount = 0;
 		open(config);
 	}
@@ -310,34 +312,9 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.setInt(7, instanceNum);
 
 		Value v = (m==null)?o.getValue():m.getValue();
-		switch( v.getType() ){
-		case Numeric:
+		if( v == null ){
 			// valtype_cd
-			insertFact.setString(8, "N");
-			// tval_char
-			insertFact.setString(9, getI2b2Operator(v));
-			// nval_num
-			insertFact.setBigDecimal(10, v.getNumericValue());
-			// value_flag_cd
-			insertFact.setString(11, getI2b2ValueFlagCd(v));
-			// units_cd
-			insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
-			break;
-		case Text:
-			// valtype_cd
-			insertFact.setString(8, "T");
-			// tval_char
-			insertFact.setString(9, v.getValue());
-			// nval_num
-			insertFact.setBigDecimal(10, null);
-			// value_flag_cd
-			insertFact.setString(11, getI2b2ValueFlagCd(v));
-			// units_cd
-			insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
-			break;
-		case None:
-			// valtype_cd
-			insertFact.setString(8, "@");
+			insertFact.setString(8, nullValueTypeCd);
 			// tval_char
 			insertFact.setString(9, null);
 			// nval_num
@@ -346,9 +323,35 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 			insertFact.setString(11, nullValueFlagCd);
 			// units_cd
 			insertFact.setString(12, nullUnitCd);
-			break;
-		default:
-			throw new UnsupportedOperationException("Incomplete refactoring, unsupported value type "+v.getType());
+		}else{
+			switch( v.getType() ){
+			case Numeric:
+				// valtype_cd
+				insertFact.setString(8, "N");
+				// tval_char
+				insertFact.setString(9, getI2b2Operator(v));
+				// nval_num
+				insertFact.setBigDecimal(10, v.getNumericValue());
+				// value_flag_cd
+				insertFact.setString(11, getI2b2ValueFlagCd(v));
+				// units_cd
+				insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
+				break;
+			case Text:
+				// valtype_cd
+				insertFact.setString(8, "T");
+				// tval_char
+				insertFact.setString(9, v.getValue());
+				// nval_num
+				insertFact.setBigDecimal(10, null);
+				// value_flag_cd
+				insertFact.setString(11, getI2b2ValueFlagCd(v));
+				// units_cd
+				insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
+				break;
+			default:
+				throw new UnsupportedOperationException("Incomplete refactoring, unsupported value type "+v.getType());
+			}
 		}
 		// end_date
 		if( o.getEndTime() == null ){

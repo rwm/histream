@@ -1,7 +1,5 @@
 package de.sekmi.histream;
 
-import de.sekmi.histream.impl.AbstractValue;
-
 /*
  * #%L
  * histream
@@ -37,9 +35,8 @@ public interface ConceptValuePair {
 	public String getConceptId();
 	
 	/**
-	 * Get the value. This method shall not return {@code null}.
-	 * If a non-existing value is needed, use {@link AbstractValue#NONE}
-	 * @return value value
+	 * Get the value. Returns {@code null} if there is no value.
+	 * @return value value or {@code null} 
 	 */
 	public Value getValue();
 }

@@ -20,9 +20,6 @@ package de.sekmi.histream.impl;
  * #L%
  */
 
-
-import java.math.BigDecimal;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -33,21 +30,20 @@ import de.sekmi.histream.Value;
 public abstract class AbstractValue implements Value{
 	@XmlAttribute(name="flag")
 	protected AbnormalFlag flag;
+
 	@XmlAttribute(name="unit")
 	protected String units;
-	
-	public static AbstractValue NONE = new NilValue();
-	
+
 	@Override
 	public AbnormalFlag getAbnormalFlag() {return flag;}
 
 	public void setAbnormalFlag(AbnormalFlag flag){
 		this.flag = flag;
 	}
-	
+
 	@Override
 	public String getUnits() {return units;}
-	
+
 	/**
 	 * Compare whether the abstract properties defined in this class match
 	 * @param o other abstract value to compare
@@ -58,26 +54,4 @@ public abstract class AbstractValue implements Value{
 		if( !(o.flag == null && this.flag == null) && !(this.flag != null && this.flag.equals(o.flag)) )return false;
 		return true;
 	}
-	
-	private static class NilValue extends AbstractValue{
-
-		@Override
-		public String getValue() {return null;}
-
-		@Override
-		public BigDecimal getNumericValue() {return null;}
-
-		@Override
-		public Type getType() {return Type.None;}
-
-		@Override
-		public Operator getOperator() {return null;}
-
-		@Override
-		public BigDecimal getReferenceLow() {return null;}
-
-		@Override
-		public BigDecimal getReferenceHigh() {return null;}
-	}
-
 }
