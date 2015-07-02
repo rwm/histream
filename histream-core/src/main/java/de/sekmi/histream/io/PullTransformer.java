@@ -1,5 +1,6 @@
 package de.sekmi.histream.io;
 
+import java.io.UncheckedIOException;
 import java.util.function.Supplier;
 
 import de.sekmi.histream.Observation;
@@ -38,7 +39,11 @@ public class PullTransformer extends AbstractTransformer implements Supplier<Obs
 				break;
 			}
 		
-			ret = transformation.transform(o, fifoPush);
+			try {
+				ret = transformation.transform(o, fifoPush);
+			} catch (TransformationException e) {
+				throw new UncheckedIOException(e);
+			}
 		}while( ret == null );
 		
 		return ret;

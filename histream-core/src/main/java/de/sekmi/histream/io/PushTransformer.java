@@ -1,5 +1,6 @@
 package de.sekmi.histream.io;
 
+import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
@@ -13,10 +14,15 @@ public class PushTransformer extends AbstractTransformer implements Consumer<Obs
 
 	@Override
 	public void accept(Observation t) {
-		Observation ret = transformation.transform(t, fifoPush);
+		Observation ret;
+		try {
+			ret = transformation.transform(t, fifoPush);
+		} catch (TransformationException e) {
+			throw new UncheckedIOException(e);
+		}
 		
 		if( ret != null ){
-			target.accept(ret);			
+			target.accept(ret);
 		}
 		
 		while( !fifo.isEmpty() ){

@@ -77,7 +77,7 @@ public class RestrictionImpl implements ValueRestriction {
 		o = RDFUtils.getObject(rdf, resource, OWL.ONEOF);
 		if( o != null ){
 			final List<String> list = new ArrayList<>();
-			RDFUtils.forEachRDFListItem(rdf, (Resource)o, v -> { 
+			RDFUtils.forEachRDFListItem(rdf,(Resource)o, v -> { 
 				try {
 					Literal literal = RDFUtils.getLiteralObject(rdf, (Resource)v, RDF.VALUE);
 					// TODO: use correct types from literal

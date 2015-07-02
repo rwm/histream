@@ -23,6 +23,7 @@ public class RDFUtils {
 			rs.close();			
 		}
 	}
+
 	public static void forEachRDFListItem(RepositoryConnection connection, Resource rdfList, Consumer<Value> consumer) throws RepositoryException{
 		do{
 			// get value

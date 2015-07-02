@@ -20,7 +20,7 @@ public interface Transformation {
 	 * @param fact observation to transform
 	 * @return new transformed observation or empty optional if it should be removed
 	 */
-	Observation transform(Observation fact, Consumer<Observation> generatedReceiver);
+	Observation transform(Observation fact, Consumer<Observation> generatedReceiver) throws TransformationException;
 	
 	public static final Transformation Identity = new Transformation(){
 
