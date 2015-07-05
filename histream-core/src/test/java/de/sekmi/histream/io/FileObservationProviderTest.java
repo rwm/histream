@@ -22,12 +22,17 @@ package de.sekmi.histream.io;
 
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 import java.math.BigDecimal;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -59,11 +64,7 @@ public class FileObservationProviderTest {
 		factory.registerExtension(new SimplePatientExtension());
 		factory.registerExtension(new SimpleVisitExtension());
 		//factory.registerExtension(new ConceptExtension());
-	}
-	
-	public ObservationFactory getFactory(){
-		return factory;
-	}
+	}	
 	
 	@Before
 	public void initializeHandler(){
@@ -164,6 +165,18 @@ public class FileObservationProviderTest {
 		});
 	}
 	
+	public ObservationFactory getFactory(){
+		return factory;
+	}
+	
+	public ObservationSupplier getExampleSupplier() throws IOException{
+		try {
+			return new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
+		} catch (XMLStreamException | FactoryConfigurationError e) {
+			throw new IOException(e);
+		}
+	}
+
 	public void validateExample(Supplier<Observation> supplier){
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(supplier), false).forEach(handler);		
 	}
@@ -174,15 +187,17 @@ public class FileObservationProviderTest {
 	}
 	
 	@Test
-	public void testStAXReader() throws Exception {
-		ObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
+	public void testStAXReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError  {
+		XMLObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
 		validateExample(xos);
+		xos.close();
 	}
 	
 	@Test
-	public void testFlatReader() throws Exception {
-		ObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("examples/dwh-flat.txt"));
+	public void testFlatReader() throws FileNotFoundException, IOException  {
+		FlatObservationSupplier s = new FlatObservationSupplier(factory, new FileInputStream("examples/dwh-flat.txt"));
 		validateExample(s);
+		s.close();
 	}
 	
 }

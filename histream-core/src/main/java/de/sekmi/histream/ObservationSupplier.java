@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * @author Raphael
  *
  */
-public interface ObservationSupplier extends Supplier<Observation>{
+public interface ObservationSupplier extends Supplier<Observation>, AutoCloseable{
 	
 	/**
 	 * Retrieve meta information for this supply of observations.
@@ -46,4 +46,6 @@ public interface ObservationSupplier extends Supplier<Observation>{
 	 * @return value for the meta key
 	 */
 	String getMeta(String key);
+	
+	void close() throws Exception;
 }

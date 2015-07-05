@@ -424,4 +424,9 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		fact = null; // clear local copy
 		return ret;
 	}
+
+	@Override
+	public void close() throws IOException {
+		reader.close();
+	}
 }

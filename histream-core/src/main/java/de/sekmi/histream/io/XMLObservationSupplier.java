@@ -199,5 +199,9 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 		}
 		return o;
 	}
+	@Override
+	public void close() throws XMLStreamException{
+		reader.close();
+	}
 
 }
