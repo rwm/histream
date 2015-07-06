@@ -10,4 +10,8 @@ public class ScriptException extends Exception{
 	public ScriptException(Throwable cause){
 		super(cause);
 	}
+	
+	public ScriptException(String message){
+		super(message);
+	}
 }
