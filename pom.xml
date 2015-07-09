@@ -29,7 +29,7 @@
 	<modules>
 		<module>histream-core</module>
 		<module>HIStream-i2b2</module>
-		<module>HIStream-HL7</module>
+		<!--<module>HIStream-HL7</module>-->
 		<module>HIStream-SKOS</module>
 		<module>distribution</module>
 	</modules>

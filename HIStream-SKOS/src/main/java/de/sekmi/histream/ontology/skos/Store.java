@@ -256,8 +256,7 @@ public class Store implements Ontology, Plugin {
 	 * @param notation notation for the concept
 	 * @param schemaURI schema in which to search for the notation. can be null
 	 * @return transformation rules
-	 * @throws RepositoryException XXX
-	 * @throws OntologyException 
+	 * @throws OntologyException for ontology errors
 	 */
 	public TransformationRules getConceptTransformations(String notation, String schemaURI) throws OntologyException{
 		ArrayList<Rule> rules = new ArrayList<Rule>();
