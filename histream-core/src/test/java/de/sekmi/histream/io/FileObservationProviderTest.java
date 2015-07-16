@@ -170,13 +170,13 @@ public class FileObservationProviderTest {
 		return factory;
 	}
 	public ObservationSupplier getExampleSupplier() throws IOException{
-		return getExampleSupplier("examples/dwh-eav.xml");
+		return getExampleSupplier("examples/dwh-jaxb.xml");
 	}
 	
 	public ObservationSupplier getExampleSupplier(String path) throws IOException{
 		try {
-			return new XMLObservationSupplier(factory, new FileInputStream(path));
-		} catch (XMLStreamException | FactoryConfigurationError e) {
+			return new JAXBObservationSupplier(factory, new FileInputStream(path));
+		} catch (XMLStreamException | FactoryConfigurationError | JAXBException e) {
 			throw new IOException(e);
 		}
 	}
