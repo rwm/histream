@@ -13,4 +13,7 @@ public class TransformationException extends IOException {
 	public TransformationException(String message, Throwable cause){
 		super(message,cause);
 	}
+	public TransformationException(String message){
+		super(message);
+	}
 }

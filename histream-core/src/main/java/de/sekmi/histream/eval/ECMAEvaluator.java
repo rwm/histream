@@ -43,4 +43,11 @@ public class ECMAEvaluator implements Engine{
 		return ((Boolean)ret).booleanValue();
 	}
 
+	@Override
+	public void validateExpressionSyntax(String expression)
+			throws ScriptException {
+		// TODO test expression with dummy observation
+		
+	}
+
 }
