@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 import java.math.BigDecimal;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
@@ -168,10 +169,13 @@ public class FileObservationProviderTest {
 	public ObservationFactory getFactory(){
 		return factory;
 	}
-	
 	public ObservationSupplier getExampleSupplier() throws IOException{
+		return getExampleSupplier("examples/dwh-eav.xml");
+	}
+	
+	public ObservationSupplier getExampleSupplier(String path) throws IOException{
 		try {
-			return new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
+			return new XMLObservationSupplier(factory, new FileInputStream(path));
 		} catch (XMLStreamException | FactoryConfigurationError e) {
 			throw new IOException(e);
 		}
@@ -189,6 +193,13 @@ public class FileObservationProviderTest {
 	@Test
 	public void testStAXReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError  {
 		XMLObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
+		validateExample(xos);
+		xos.close();
+	}
+	
+	@Test
+	public void testJAXBReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError, JAXBException  {
+		XMLObservationSupplier xos = new JAXBObservationSupplier(factory, new FileInputStream("examples/dwh-jaxb.xml"));
 		validateExample(xos);
 		xos.close();
 	}

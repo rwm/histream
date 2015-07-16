@@ -37,7 +37,7 @@ import de.sekmi.histream.ObservationSupplier;
 
 public class XMLObservationSupplier extends XMLObservationParser implements ObservationSupplier{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";
-	private XMLStreamReader reader;
+	protected XMLStreamReader reader;
 	
 	private AttributeAccessor atts;
 	
@@ -110,7 +110,7 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 		reader.nextTag();
 
 	}
-	private void readVisit()throws XMLStreamException{
+	protected void readVisit()throws XMLStreamException{
 		if( !reader.getLocalName().equals("visit") )throw new XMLStreamException("Element visit expected instead of "+reader.getLocalName(),reader.getLocation());
 		reader.nextTag();
 		while( !reader.getLocalName().equals("facts") ){
@@ -131,7 +131,7 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 		// should be an observation
 	}
 	
-	private Observation readObservation()throws XMLStreamException{
+	protected Observation readObservation()throws XMLStreamException{
 		// </facts> might occur after previous call to readObservation()
 		while( reader.isEndElement() ){
 			switch( reader.getLocalName() ){

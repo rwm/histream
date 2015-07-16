@@ -42,6 +42,12 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	@Override 
 	String getConceptId();
 	
+	/**
+	 * Replace the concept id. All modifiers will be removed from the observation.
+	 * @param newConceptId new concept id
+	 */
+	void replaceConcept(String newConceptId);
+	
 	@Override 
 	Value getValue();
 	void setValue(Value value);

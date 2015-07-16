@@ -76,7 +76,9 @@ class XMLObservationParser extends AbstractObservationParser{
 	protected AbnormalFlag valueFlag;
 	protected Value.Operator valueOp;
 	
+	// cached visit for visit extension
 	protected Visit visit;
+	// cached patient for patient extension
 	protected Patient patient;
 
 	

@@ -23,7 +23,6 @@ package de.sekmi.histream.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +33,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
@@ -49,6 +49,7 @@ import de.sekmi.histream.Value;
  */
 @XmlRootElement(name="fact")
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder={"abstractValue","modifierList"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
 public class ObservationImpl implements Observation{
 	@XmlTransient
@@ -85,7 +86,7 @@ public class ObservationImpl implements Observation{
 	 * Modifiers
 	 */
 	@XmlTransient // see getModifierList / setModifierList
-	protected Hashtable<String, ModifierImpl> modifiers;
+	protected List<ModifierImpl> modifiers;
 
 	/**
 	 * Array of extensions, managed by the ObservationFactory
@@ -149,13 +150,22 @@ public class ObservationImpl implements Observation{
 
 	@Override
 	public Modifier getModifier(String modifierId) {
-		if( modifiers != null )return modifiers.get(modifierId);
-		else return null;
+		if( modifiers == null ){
+			// no modifiers
+			return null;
+		}
+		
+		for( Modifier m : modifiers ){
+			if( m.getConceptId().equals(modifierId) )return m;
+		}
+		
+		// not found
+		return null;
 	}
 	
 	@Override
 	public Iterator<Modifier> getModifiers(){
-		final Iterator<ModifierImpl> iter = modifiers.values().iterator();
+		final Iterator<ModifierImpl> iter = modifiers.iterator();
 		return new Iterator<Modifier>(){
 
 			@Override
@@ -208,19 +218,20 @@ public class ObservationImpl implements Observation{
 
 	@Override
 	public Modifier addModifier(String modifierId, Value value) {
-		ModifierImpl m = new ModifierImpl(modifierId);
 		// lazy allocate modifiers
 		if( modifiers == null ){
-			modifiers = new Hashtable<>();
-		}
+			modifiers = new ArrayList<>();
+		}else
 		// check for duplicate assignment
-		if( modifiers.containsKey(modifierId) )
+		if( getModifier(modifierId) != null ){
 			throw new IllegalArgumentException("Duplicate modifier key");
-		
+		}
+
+		ModifierImpl m = new ModifierImpl(modifierId);
 		m.setValue(value);
 
 		// add to modifier list
-		modifiers.put(modifierId, m);
+		modifiers.add(m);
 		return m;
 	}
 
@@ -237,22 +248,6 @@ public class ObservationImpl implements Observation{
 		this.locationId = locationId;
 	}
 
-	/**
-	 * Getter for JAXB
-	 * @return modifier list
-	 */
-	@XmlElement(name="modifier")
-	protected List<ModifierImpl> getModifierList(){
-		if( modifiers == null || modifiers.isEmpty() )return null;
-
-		return new ArrayList<ModifierImpl>(modifiers.values());
-	}
-	protected void setModifierList(List<ModifierImpl> list){
-		modifiers = new Hashtable<String, ModifierImpl>();
-		for( ModifierImpl i : list ){
-			modifiers.put(i.getConceptId(), i);
-		}
-	}
 
 	/**
 	 * Getter for JAXB
@@ -265,6 +260,32 @@ public class ObservationImpl implements Observation{
 	}
 	protected void setAbstractValue(AbstractValue value){
 		this.value = value;
+	}
+
+	/**
+	 * Getter for JAXB
+	 * @return modifier list
+	 */
+	@XmlElement(name="modifier")
+	protected List<ModifierImpl> getModifierList(){
+		if( modifiers == null ){
+			// make sure the list exists, 
+			// otherwise, JAXB unmarshal may fail as some JAXB implementation will populate this list
+			// without ever calling setModifierList (e.g. in JDK8)
+			modifiers = new ArrayList<>();
+		}
+		return modifiers;
+	}
+	protected void setModifierList(List<ModifierImpl> list){
+		modifiers = list;
+	}
+
+	@Override
+	public void replaceConcept(String newConceptId) {
+		this.conceptId = newConceptId;
+		this.modifiers = null;
+		// TODO notify extensions of concept change
+		
 	}
 
 	

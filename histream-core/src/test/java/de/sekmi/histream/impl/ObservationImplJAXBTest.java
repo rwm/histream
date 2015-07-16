@@ -30,6 +30,9 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.Modifier;
+import de.sekmi.histream.Observation;
+import de.sekmi.histream.Value;
 
 public class ObservationImplJAXBTest {
 	public static final File EXAMPLE_FACT_XSD = new File("examples/fact.xsd");
@@ -81,6 +84,7 @@ public class ObservationImplJAXBTest {
 			DOMResult dom = new DOMResult();
 			ObservationImpl o = createObservation(i);
 			JAXB.marshal(o, dom);
+			
 		}
 	}
 	@Test
@@ -102,6 +106,20 @@ public class ObservationImplJAXBTest {
 			Assert.assertEquals(ObservationImpl.class, o2.getClass());
 			// verify values
 			Assert.assertEquals(o1.getValue(), ((ObservationImpl)o2).getValue());
+			
+			ObservationImpl ou = (ObservationImpl)o2;
+			switch( i ){
+			case 0:
+				Assert.assertFalse(ou.hasModifiers());
+				break;
+			case 1:
+				Assert.assertFalse(ou.hasModifiers());
+				break;
+			case 2:
+				Assert.assertTrue(ou.hasModifiers());
+				break;
+				
+			}
 		}
 	}
 	
@@ -112,7 +130,21 @@ public class ObservationImplJAXBTest {
 		for( int i=0; i<EXAMPLE_FACT_FILES.length; i++ ){
 			Object obj = u.unmarshal(EXAMPLE_FACT_FILES[i]);
 			Assert.assertEquals(ObservationImpl.class, obj.getClass());
-			//ObservationImpl o = (ObservationImpl)obj;
+			Observation o = (ObservationImpl)obj;
+			if( i == 0 ){
+				Assert.assertEquals("T:testconcept1", o.getConceptId());
+				Assert.assertEquals("12345", o.getPatientId());
+				Assert.assertNotNull(o.getValue());
+				Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
+				Assert.assertEquals(new BigDecimal(123), o.getValue().getNumericValue());
+				Assert.assertTrue(o.hasModifiers());
+				Modifier m = o.getModifier("M:test");
+				Assert.assertNotNull(m);
+				Assert.assertNotNull(m.getValue());
+				Assert.assertEquals(Value.Type.Text, m.getValue().getType());
+				Assert.assertEquals("123", m.getValue().getValue());
+				
+			}
 		}
 		
 	}
@@ -133,7 +165,21 @@ public class ObservationImplJAXBTest {
 			validator.validate(new StreamSource(EXAMPLE_FACT_FILES[i]));
 		}
 	}
-	
+	/*
+	@Test
+	public void testModifierListBug() throws JAXBException{
+		Marshaller m = jaxb.createMarshaller();
+		Unmarshaller u = jaxb.createUnmarshaller();
+		ObservationImpl o1 = createObservation(2);
+		StringWriter s = new StringWriter();
+		
+		m.marshal(o1, s);
+		System.out.println("Marshalled:");
+		System.out.println(s);
+		Object o2 = u.unmarshal(new StringReader(s.toString()));
+
+	}
+	*/
 	public static void main(String args[]) throws JAXBException{
 		ObservationImplJAXBTest oj = new ObservationImplJAXBTest();
 		oj.initialize();
