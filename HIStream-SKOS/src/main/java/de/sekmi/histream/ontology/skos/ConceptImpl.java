@@ -30,7 +30,7 @@ public class ConceptImpl implements Concept {
 		return store.getNarrower(this);
 	}
 	
-	Resource getResource(){
+	public Resource getResource(){
 		return res;
 	}
 	Store getStore(){

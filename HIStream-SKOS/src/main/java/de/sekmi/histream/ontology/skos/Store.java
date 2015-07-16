@@ -17,6 +17,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.util.Literals;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.SKOS;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -30,6 +31,7 @@ import de.sekmi.histream.Plugin;
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
+import de.sekmi.histream.ontology.skos.transform.ConditionType;
 import de.sekmi.histream.ontology.skos.transform.Rule;
 import de.sekmi.histream.ontology.skos.transform.TransformationRules;
 
@@ -255,7 +257,7 @@ public class Store implements Ontology, Plugin {
 	 * TODO move method to ConceptImpl
 	 * @param notation notation for the concept
 	 * @param schemaURI schema in which to search for the notation. can be null
-	 * @return transformation rules
+	 * @return transformation rules or {@code null} if there are no rules
 	 * @throws OntologyException for ontology errors
 	 */
 	public TransformationRules getConceptTransformations(String notation, String schemaURI) throws OntologyException{
@@ -276,7 +278,8 @@ public class Store implements Ontology, Plugin {
 		} catch (RepositoryException e) {
 			throw new OntologyException(e);
 		}
-		return new TransformationRules(rules.toArray(new Rule[rules.size()]));
+		if( rules.size() == 0 )return null;
+		else return new TransformationRules(rules.toArray(new Rule[rules.size()]));
 	}
 	public void forEachRDFListItem(Resource rdfList, Consumer<Value> consumer) throws RepositoryException{
 		do{
@@ -319,7 +322,7 @@ public class Store implements Ontology, Plugin {
 					v[4] = s.getObject();
 				}else if( s.getPredicate().equals(HIStreamOntology.DWH_OTHERWISE) ){
 					v[5] = s.getObject();
-				}//TODO: else if DWH_OTHERWISE
+				}
 				// TODO add exceptions to errors
 		});
 		if( v[0] != null ){
@@ -332,7 +335,7 @@ public class Store implements Ontology, Plugin {
 			if( !(v[0] instanceof Literal) )throw new SKOSException(r, "dwh:condition needs literal object");
 			Literal condition = (Literal)v[0];
 			// TODO: load otherwise
-			return new Rule(condition, new ConceptImpl(this, (Resource)v[2]));
+			return Rule.forCondition(condition, new ConceptImpl(this, (Resource)v[2]));
 
 		}else if( v[1] != null ){
 			// choose specified
@@ -350,7 +353,14 @@ public class Store implements Ontology, Plugin {
 					errors.add(e);
 				}
 			});
-			// TODO load otherwise
+			// load otherwise
+			if( v[5] != null ){
+				// TODO move to separate method to reuse this code
+				Value targ = RDFUtils.getObject(rc, (Resource)v[5], HIStreamOntology.DWH_TARGET);
+				if( targ == null )throw new SKOSException(r, "dwh:otherwise must include a dwh:target");
+				// TODO: load otherwise into a rule
+				
+			}
 			if( errors.isEmpty() ){
 				return new Rule(list.toArray(new Rule[list.size()]), null);
 			}else{
@@ -366,7 +376,9 @@ public class Store implements Ontology, Plugin {
 			if( !(v[4] instanceof Literal) )throw new SKOSException(r, "rdf:value needs literal object");
 			if( v[2] == null )throw new SKOSException(r, "dwh:mapFact with rdf:value must also contain dwh:target");
 			Literal value = (Literal)v[4];
-			return new Rule(value, new ConceptImpl(this, (Resource)v[2]));
+			if( !value.getDatatype().equals(XMLSchema.STRING) )throw new SKOSException(r, "rdf:value for comparison must have datatype xsd:string");
+			return new Rule(value.stringValue(), ConditionType.StringValueEquals, new ConceptImpl(this, (Resource)v[2]));
+			//return Rule.forCondition(value, new ConceptImpl(this, (Resource)v[2]));
 		}else{
 			// unsupported mapping
 			throw new SKOSException(r, "dwh:mapFact must contain one of dwh:condition, dwh:choose, dwh:value");

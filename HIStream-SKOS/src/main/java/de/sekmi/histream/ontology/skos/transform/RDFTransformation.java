@@ -3,11 +3,19 @@ package de.sekmi.histream.ontology.skos.transform;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import javax.xml.bind.JAXBException;
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.eval.ECMAEvaluator;
+import de.sekmi.histream.eval.Engine;
+import de.sekmi.histream.eval.ScriptException;
+import de.sekmi.histream.eval.StringValueEqualsEngine;
+import de.sekmi.histream.impl.XPathEvaluator;
 import de.sekmi.histream.io.Transformation;
 import de.sekmi.histream.io.TransformationException;
 import de.sekmi.histream.ontology.OntologyException;
+import de.sekmi.histream.ontology.skos.ConceptImpl;
 import de.sekmi.histream.ontology.skos.Store;
 
 public class RDFTransformation implements Transformation {
@@ -17,13 +25,23 @@ public class RDFTransformation implements Transformation {
 	private String schema;
 	private boolean dropFactsWithoutRules;
 	private HashMap<String, TransformationRules> cache;
+	private Engine engineXPath;
+	private Engine engineES;
 	
-	public RDFTransformation(ObservationFactory factory, Store store, String schema, boolean dropFactsWithoutRules){
+	
+	public RDFTransformation(ObservationFactory factory, Store store, String schema, boolean dropFactsWithoutRules)throws TransformationException{
 		this.store = store;
 		this.factory = factory;
 		this.schema = schema;
 		this.dropFactsWithoutRules = dropFactsWithoutRules;
 		this.cache = new HashMap<>();
+		// TODO initialize evaluation engines for XPath and ECMAScript
+		try {
+			engineXPath = new XPathEvaluator();
+		} catch (JAXBException e) {
+			throw new TransformationException("Initialization error for XPath engine",e);
+		}
+		engineES = new ECMAEvaluator();
 	}
 
 	@Override
@@ -53,11 +71,83 @@ public class RDFTransformation implements Transformation {
 		}
 		
 		// TODO perform transformation
+		try {
+			Rule[] map = rules.getMapRules();
+			for( Rule rule : map ){
+				applyRule(rule, fact);
+			}
+		} catch (OntologyException e) {
+			throw new TransformationException("Rule evaluation failed", e);
+		}
+		
 		// TODO perform generations
 		if( factory != null ){}
 		
 		return fact;
 	}
 	
+	
+	private boolean applyRule(Rule rule, Observation fact) throws OntologyException, TransformationException{
+		ConceptImpl target;
+		if( rule.choose != null ){
+			int i = -1;
+			for( i=0; i<rule.choose.length; i++ ){
+				if( applyRule(rule.choose[i], fact) ){
+					// rule matched
+					target = rule.choose[i].target;
+					break;
+				}
+			}
+			if( i == rule.choose.length && rule.otherwise != null ){
+				// no match for choose rules, try otherwise
+				target = rule.otherwise.target;
+			}else{
+				return false;
+			}
+		}else if( rule.condition != null ){
+			Engine ng;
+			switch( rule.conditionType ){
+			case ECMAScript:
+				ng = engineES;
+				break;
+			case XPath:
+				ng = engineXPath;
+				break;
+			case StringValueEquals:
+				ng = StringValueEqualsEngine.ENGINE;
+				break;
+			default:
+				throw new TransformationException("Unsupported condition type: "+rule.conditionType);
+			}
+			
+			boolean matched;
+			try {
+				matched = ng.test(rule.condition, fact);
+			} catch (ScriptException e) {
+				throw new TransformationException("Evaluation error: "+rule.condition, e);
+			}
+			if( matched ){
+				// match
+				target = rule.target;
+			}else if( rule.otherwise != null ){
+				// try otherwise
+				target = rule.otherwise.target;
+			}else{
+				// no match
+				return false;
+			}
+			
+		}else{
+			throw new TransformationException("Rule without 'choose' or 'condition'");
+		}
+		
+		// map to target
+		String[] ids = target.getIDs();
+		if( ids.length == 0 )throw new TransformationException("No notation found in target concept "+target);
+		fact.replaceConcept(ids[0]);
+		// TODO: is there a way to specify which notation should be used if there are multiple notations?
+		return true;
+
+	}
 
 }

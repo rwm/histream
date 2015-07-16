@@ -20,8 +20,12 @@
 	skos:notation "T:t1" .
 :t2 a dwh:Concept ;
 	skos:inScheme :target ;
-	skos:prefLabel "Target Concept 1"@en ;
-	skos:notation "T:t1" .
+	skos:prefLabel "Target Concept 2"@en ;
+	skos:notation "T:t2" .
+:t3 a dwh:Concept ;
+	skos:inScheme :target ;
+	skos:prefLabel "Target Concept 3"@en ;
+	skos:notation "T:t3" .
 
 
 # Source schema
@@ -33,7 +37,7 @@
 	skos:notation "source1" ;
 	dwh:mapFact [
 		a		dwh:MapRule ; # optional
-		dwh:condition 	"./value='1'"^^dwh:XPath ;
+		dwh:condition 	"fact/value='1'"^^dwh:XPath ;
 		dwh:target	:t1 ;
 		dwh:modify	dwh:removeValue
 	] .
@@ -42,17 +46,17 @@
 	skos:notation "source2" ;
 	dwh:mapFact [
 		a		dwh:MapRule ; # optional
-		dwh:condition 	"fact.value==1"^^dwh:Javascript ;
-		dwh:target	:t1 ;
+		dwh:condition 	"fact.value.value==1"^^dwh:ECMAScript ;
+		dwh:target	:t2 ;
 		dwh:modify	dwh:removeValue
 	] .
 
 :MapChooseValue a dwh:Concept ;
 	skos:inScheme :source ;
-	skos:notation "map2" ;
+	skos:notation "source3" ;
 	dwh:mapFact [
-		dwh:choose	([rdf:value "1"; dwh:target :t1] [rdf:value "1"; dwh:target :t2]) ;
-		dwh:otherwise	[dwh:target	snomed:11399002 ; dwh:modify dwh:removeValue]; # pulmonary arterial hypertension
+		dwh:choose	([rdf:value "1"; dwh:target :t1] [rdf:value "2"; dwh:target :t2]) ;
+		dwh:otherwise	[dwh:target	:t3 ; dwh:modify dwh:removeValue]; # pulmonary arterial hypertension
 		dwh:modify	dwh:removeValue
 	] .
 

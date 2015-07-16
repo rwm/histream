@@ -28,6 +28,14 @@
 			<artifactId>histream-core</artifactId>
 			<version>0.2-alpha</version>
 		</dependency>
+		<!-- include tests from core for testing -->
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-core</artifactId>
+			<version>0.2-alpha</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
 		
 		<!-- dependencies for RDF libraries -->
 		<dependency>
