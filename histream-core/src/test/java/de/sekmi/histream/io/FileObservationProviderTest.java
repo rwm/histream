@@ -103,7 +103,7 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:str", o.getConceptId());
 				Assert.assertEquals(Value.Type.Text, o.getValue().getType());
-				Assert.assertEquals("abc123", o.getValue().getValue());
+				Assert.assertEquals("abc123", o.getValue().getStringValue());
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:int", o.getConceptId());
@@ -134,7 +134,7 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:group:1", o.getConceptId());
 				Assert.assertEquals(Value.Type.Text, o.getValue().getType());
-				Assert.assertEquals("groupvalue", o.getValue().getValue());
+				Assert.assertEquals("groupvalue", o.getValue().getStringValue());
 				Assert.assertTrue(o.hasModifiers());
 				Iterator<? extends Modifier> e = o.getModifiers();
 				// TODO check modifier count
@@ -146,7 +146,7 @@ public class FileObservationProviderTest {
 				m = o.getModifier("T:mod:2");
 				Assert.assertNotNull(m);
 				Assert.assertEquals(Value.Type.Text, m.getValue().getType());
-				Assert.assertEquals("def456", m.getValue().getValue());
+				Assert.assertEquals("def456", m.getValue().getStringValue());
 				Assert.assertTrue(e.hasNext());
 				m = o.getModifier("T:mod:3");
 				Assert.assertNotNull(m);

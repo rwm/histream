@@ -46,7 +46,7 @@
 	skos:notation "source2" ;
 	dwh:mapFact [
 		a		dwh:MapRule ; # optional
-		dwh:condition 	"fact.value.value==1"^^dwh:ECMAScript ;
+		dwh:condition 	"fact.value.stringValue==1"^^dwh:ECMAScript ;
 		dwh:target	:t2 ;
 		dwh:modify	dwh:removeValue
 	] .

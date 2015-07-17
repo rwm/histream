@@ -341,7 +341,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 				// valtype_cd
 				insertFact.setString(8, "T");
 				// tval_char
-				insertFact.setString(9, v.getValue());
+				insertFact.setString(9, v.getStringValue());
 				// nval_num
 				insertFact.setBigDecimal(10, null);
 				// value_flag_cd

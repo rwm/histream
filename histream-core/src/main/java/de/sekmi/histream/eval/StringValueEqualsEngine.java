@@ -28,7 +28,7 @@ public class StringValueEqualsEngine implements Engine {
 		if( fact.getValue() == null ){
 			return expression == null;
 		}else{
-			return fact.getValue().getValue().equals(expression);
+			return fact.getValue().getStringValue().equals(expression);
 		}
 	}
 

@@ -36,7 +36,7 @@ public interface Value {
 	 * String value. Numeric values will be converted to String.
 	 * @return String value
 	 */
-	String getValue();
+	String getStringValue();
 	
 	BigDecimal getNumericValue();
 	

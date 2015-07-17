@@ -79,7 +79,7 @@ public class NumericValue extends AbstractValue {
 	
 	
 	@Override
-	public String getValue() {return value.toString();}
+	public String getStringValue() {return value.toString();}
 
 	@Override
 	public BigDecimal getNumericValue() {return value;}

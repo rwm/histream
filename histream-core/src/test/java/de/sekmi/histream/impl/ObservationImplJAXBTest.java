@@ -142,7 +142,7 @@ public class ObservationImplJAXBTest {
 				Assert.assertNotNull(m);
 				Assert.assertNotNull(m.getValue());
 				Assert.assertEquals(Value.Type.Text, m.getValue().getType());
-				Assert.assertEquals("123", m.getValue().getValue());
+				Assert.assertEquals("123", m.getValue().getStringValue());
 				
 			}
 		}

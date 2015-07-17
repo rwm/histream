@@ -54,7 +54,7 @@ public class StringValue extends AbstractValue{
 	}
 
 	@Override
-	public String getValue() {return value;}
+	public String getStringValue() {return value;}
 
 	@Override
 	public BigDecimal getNumericValue() {return null;}
