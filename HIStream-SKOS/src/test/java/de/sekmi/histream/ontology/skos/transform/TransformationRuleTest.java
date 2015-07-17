@@ -74,13 +74,12 @@ public class TransformationRuleTest {
 		o2 = t.transform(o, null);
 		Assert.assertEquals("T:t2", o2.getConceptId());
 		
-		// TODO implement choose+otherwise
-		/*
+		// test choose+otherwise
 		o = s.get();
 		Assert.assertEquals("source3", o.getConceptId());
 		o2 = t.transform(o, null);
 		Assert.assertEquals("T:t3", o2.getConceptId());
-		*/
+		
 		
 		
 		s.close();

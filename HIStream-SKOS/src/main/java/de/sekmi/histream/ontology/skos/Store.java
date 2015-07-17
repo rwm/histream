@@ -307,6 +307,11 @@ public class Store implements Ontology, Plugin {
 		}while( rdfList != null );
 	}
 	
+	private Rule loadOtherwiseRule(Resource r) throws SKOSException, RepositoryException{
+		Value targ = RDFUtils.getObject(rc, r, HIStreamOntology.DWH_TARGET);
+		if( targ == null )throw new SKOSException(r, "dwh:otherwise must include a dwh:target");
+		return new Rule(null,ConditionType.Otherwise,new ConceptImpl(this, (Resource)targ), null);
+	}
 	private Rule loadMapFactRule(Resource r, boolean disableChoose) throws OntologyException, RepositoryException{
 		final Value[] v = new Value[6];
 		forEachStatement(r, null, s -> {
@@ -334,8 +339,13 @@ public class Store implements Ontology, Plugin {
 			// load condition
 			if( !(v[0] instanceof Literal) )throw new SKOSException(r, "dwh:condition needs literal object");
 			Literal condition = (Literal)v[0];
-			// TODO: load otherwise
-			return Rule.forCondition(condition, new ConceptImpl(this, (Resource)v[2]));
+
+			// load otherwise
+			Rule otherwise = null;
+			if( v[5] != null ){
+				otherwise = loadOtherwiseRule((Resource)v[5]);
+			}
+			return Rule.forCondition(condition, new ConceptImpl(this, (Resource)v[2]), otherwise);
 
 		}else if( v[1] != null ){
 			// choose specified
@@ -354,15 +364,12 @@ public class Store implements Ontology, Plugin {
 				}
 			});
 			// load otherwise
+			Rule otherwise = null;
 			if( v[5] != null ){
-				// TODO move to separate method to reuse this code
-				Value targ = RDFUtils.getObject(rc, (Resource)v[5], HIStreamOntology.DWH_TARGET);
-				if( targ == null )throw new SKOSException(r, "dwh:otherwise must include a dwh:target");
-				// TODO: load otherwise into a rule
-				
+				otherwise = loadOtherwiseRule((Resource)v[5]);
 			}
 			if( errors.isEmpty() ){
-				return new Rule(list.toArray(new Rule[list.size()]), null);
+				return new Rule(list.toArray(new Rule[list.size()]), otherwise);
 			}else{
 				final Throwable first = errors.get(0);
 				SKOSException error = new SKOSException(first);
@@ -377,7 +384,8 @@ public class Store implements Ontology, Plugin {
 			if( v[2] == null )throw new SKOSException(r, "dwh:mapFact with rdf:value must also contain dwh:target");
 			Literal value = (Literal)v[4];
 			if( !value.getDatatype().equals(XMLSchema.STRING) )throw new SKOSException(r, "rdf:value for comparison must have datatype xsd:string");
-			return new Rule(value.stringValue(), ConditionType.StringValueEquals, new ConceptImpl(this, (Resource)v[2]));
+			// no otherwise allowed, use null
+			return new Rule(value.stringValue(), ConditionType.StringValueEquals, new ConceptImpl(this, (Resource)v[2]), null);
 			//return Rule.forCondition(value, new ConceptImpl(this, (Resource)v[2]));
 		}else{
 			// unsupported mapping

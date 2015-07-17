@@ -56,8 +56,8 @@
 	skos:notation "source3" ;
 	dwh:mapFact [
 		dwh:choose	([rdf:value "1"; dwh:target :t1] [rdf:value "2"; dwh:target :t2]) ;
+		dwh:modify	dwh:removeValue ;
 		dwh:otherwise	[dwh:target	:t3 ; dwh:modify dwh:removeValue]; # pulmonary arterial hypertension
-		dwh:modify	dwh:removeValue
 	] .
 
 
