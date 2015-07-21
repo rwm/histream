@@ -73,3 +73,17 @@ dwh:String a owl:Restriction ;
 			] ;
 	skos:prefLabel	"Decimal_label_en"@en ;
 	skos:notation	"T:type:dec" .
+
+# Test inferred topConcept and narrower
+:OtherScheme a skos:ConceptScheme .
+
+:OtherTop a skos:Concept ;
+	skos:inScheme	:OtherScheme ;
+	skos:topConceptOf	:OtherScheme ;
+	skos:prefLabel "OtherTop_label_en"@en .
+
+:OtherSub a skos:Concept ;
+	skos:inScheme	:OtherScheme ;
+	skos:broader	:OtherTop ;
+	skos:prefLabel "OtherSub_label_en"@en ;
+	skos:notation	"other" .

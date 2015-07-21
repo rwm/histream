@@ -25,6 +25,16 @@ public class ConceptImpl implements Concept {
 		this.res = concept;
 	}
 	
+	@Override 
+	public boolean equals(Object other){
+		if( other.getClass() != ConceptImpl.class )return false;
+		return res.equals(((ConceptImpl)other).res);
+	}
+	@Override
+	public int hashCode(){
+		return res.hashCode();
+	}
+	
 	@Override
 	public Concept[] getNarrower() throws OntologyException {
 		return store.getNarrower(this);

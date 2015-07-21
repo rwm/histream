@@ -16,10 +16,12 @@ import de.sekmi.histream.ontology.skos.Store;
 
 public class OntologyTest {
 	Store store;
+	final static String NS_PREFIX="http://sekmi.de/histream/skos/tests#";
 	
 	@Before
 	public void setupOntology()throws Exception{
 		store = new Store(new File("examples/test-ontology.ttl"));
+		store.setConceptScheme(NS_PREFIX+"TestScheme");
 	}
 
 	@Test
@@ -70,6 +72,37 @@ public class OntologyTest {
 		Assert.assertNotNull(narrower);	
 		Assert.assertEquals(4, narrower.length);
 	}
+	
+	@Test
+	public void inferredBroaderTest() throws OntologyException{
+		Concept[] top = store.getTopConcepts();
+		Assert.assertNotNull(top);
+		Assert.assertEquals(1, top.length);
+		
+		Concept[] narrower = top[0].getNarrower();
+		Assert.assertNotNull(narrower);	
+		for( int i=0; i<narrower.length; i++ ){
+			Concept[] broader = narrower[i].getBroader();
+			Assert.assertNotNull(broader);
+			Assert.assertEquals(1, broader.length);
+			Assert.assertEquals(top[0], broader[0]);		
+		}
+	}
+	
+	@Test
+	public void inferredHasTopConceptAndNarrowerTest() throws OntologyException{
+		Concept[] top = store.getTopConcepts(NS_PREFIX+"OtherScheme");
+		Assert.assertNotNull(top);
+		Assert.assertEquals(1, top.length);
+		
+		Concept[] narrower = top[0].getNarrower();
+		Assert.assertNotNull(narrower);
+		Assert.assertEquals(1, narrower.length);
+		String[] ids = narrower[0].getIDs();
+		Assert.assertEquals(1, ids.length);
+		Assert.assertEquals("other", ids[0]);
+	}
+	
 	@Test
 	public void testLanguage() throws OntologyException{
 		Concept c = store.getConceptByNotation("T:type:int");

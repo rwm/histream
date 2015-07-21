@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -36,10 +37,14 @@ import de.sekmi.histream.ontology.skos.transform.Rule;
 import de.sekmi.histream.ontology.skos.transform.TransformationRules;
 
 public class Store implements Ontology, Plugin {
+	private static final Logger log = Logger.getLogger(Store.class.getName());
 	private Repository repo;
 	private RepositoryConnection rc;
 	private final static Concept[] noConcepts = new Concept[]{};
 	private long lastModified;
+	private Resource inferredContext;
+	// SKOS scheme to enforce unique notations
+	private Resource scheme;
 	
 	/**
 	 * Plugin constructor which accepts configuration parameters.
@@ -47,6 +52,8 @@ public class Store implements Ontology, Plugin {
 	 * <p>
 	 * Configuration keys have the form {@code rdf.baseURI.1}, {@code rdf.file.1}, {@code rdf.format.1}.
 	 * rdf.file is mandatory, other parameters are optional.
+	 * rdf.skosScheme can specify the skos:ConceptScheme to find top concepts and unique notations
+	 *  
 	 * @param conf configuration parameters
 	 * @throws FileNotFoundException if one of the specified files can not be found 
 	 * @throws IOException for i/o exceptions while reading the files
@@ -69,14 +76,42 @@ public class Store implements Ontology, Plugin {
 			i++;
 		}
 		initializeRepo(files.toArray(new File[files.size()]), baseURIs.toArray(new String[baseURIs.size()]));
+		if( conf.containsKey("rdf.skosScheme") ){
+			this.scheme = repo.getValueFactory().createURI(conf.get("rdf.skosScheme")); 
+		}
 	}
-	
+	/**
+	 * Infer inverse relations. 
+	 * The first predicate is searched. For each found statement the inverse predicate is added if it didn't exist previously. 
+	 * @param predicate predicate to search (use the less common one)
+	 * @param inversePredicate inverse predicate to add
+	 * @return number of inferred statements
+	 * @throws RepositoryException error
+	 */
+	protected int inferInverseRelations(URI predicate, URI inversePredicate) throws RepositoryException{
+		RepositoryResult<Statement> res = rc.getStatements(null, predicate, null, false);
+		int count=0;
+		try{
+			while( res.hasNext() ){
+				Statement stmt = res.next();
+				// try to find whether inverse is already existing
+				if( stmt.getObject() instanceof Resource 
+						&& !rc.hasStatement((Resource)stmt.getObject(), inversePredicate, stmt.getSubject(), false) )
+				{
+					rc.add((Resource)stmt.getObject(), inversePredicate, stmt.getSubject(), inferredContext);
+					count ++;
+				}
+			}
+		}finally{
+			res.close();
+		}
+		return count;
+	}
 	private void initializeRepo(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
-
 		rc = repo.getConnection();
-		
+		inferredContext = repo.getValueFactory().createURI("http://sekmi.de/histream/inferredInverse");
 		this.lastModified = 0;
 
 		for( int i=0; i<files.length; i++ ){
@@ -86,15 +121,27 @@ public class Store implements Ontology, Plugin {
 		    
 			// use timestamps from files for last modified date
 			lastModified = Math.max(lastModified, file.lastModified());
-		}		
+		}
+		int inferred = 0;
+	    inferred += inferInverseRelations(SKOS.TOP_CONCEPT_OF, SKOS.HAS_TOP_CONCEPT);
+	    inferred += inferInverseRelations(SKOS.BROADER, SKOS.NARROWER);
+	    inferred += inferInverseRelations(SKOS.NARROWER, SKOS.BROADER);
+	    if( inferred != 0 ){
+	    	log.fine("Inferred "+inferred+" statements.");
+	    }
+	    
 	}
 
 	public Store(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
 		initializeRepo(files, baseURIs);
 	}
 	
+
 	public Store(File file) throws RepositoryException, RDFParseException, IOException{
 		this(new File[]{file}, new String[]{null});
+	}
+	public void setConceptScheme(String schemeURI){
+		this.scheme = repo.getValueFactory().createURI(schemeURI);
 	}
 	
 	public RepositoryConnection getConnection(){return rc;}
@@ -120,8 +167,11 @@ public class Store implements Ontology, Plugin {
 		else return concepts.toArray(new Concept[concepts.size()]);
 	}
 	public Concept[] getTopConcepts()throws OntologyException{
-		// TODO use ConceptSchema specified in configuration
-		return getRelatedConcepts(null, SKOS.HAS_TOP_CONCEPT);	
+		// if this.scheme is null, top concepts of all schemes are returned
+		return getRelatedConcepts(this.scheme, SKOS.HAS_TOP_CONCEPT);
+	}
+	public Concept[] getTopConcepts(String schemeURI)throws OntologyException{
+		return getRelatedConcepts(repo.getValueFactory().createURI(schemeURI), SKOS.HAS_TOP_CONCEPT);
 	}
 	private Concept[] getRelatedConcepts(Resource subject, URI predicate)throws OntologyException{
 		RepositoryResult<Statement> rr;
