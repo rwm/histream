@@ -25,6 +25,16 @@ public class OntologyTest {
 	}
 
 	@Test
+	public void testGetSchemes() throws OntologyException{
+		Concept c = store.getConceptByNotation("other");
+		Assert.assertNotNull(c);
+		String[] schemes = c.getSchemes();
+		Assert.assertNotNull(schemes);
+		Assert.assertEquals(2, schemes.length);
+		// TODO verify scheme set (order is irrelevant)
+	}
+
+	@Test
 	public void getConceptByIdTest() throws OntologyException{
 		Assert.assertNull(store.getConceptByNotation("notfound"));
 		Concept c = store.getConceptByNotation("T:type:int");
@@ -126,7 +136,6 @@ public class OntologyTest {
 			Concept c = store.getConceptByNotation("Type");
 			System.out.println("Concept:"+c);
 		}
-		
 	}
 
 }

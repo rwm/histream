@@ -120,6 +120,17 @@ public class ConceptImpl implements Concept {
 			throw new OntologyException(e);
 		}
 	}
+
+	@Override
+	public String[] getSchemes() throws OntologyException {
+		ArrayList<String> ids = new ArrayList<>();
+		try {
+			store.forEachObject(this.res, SKOS.IN_SCHEME, scheme -> ids.add(scheme.stringValue()));
+		} catch (RepositoryException e) {
+			throw new OntologyException(e);
+		}
+		return ids.toArray(new String[ids.size()]);
+	}
 	
 	
 

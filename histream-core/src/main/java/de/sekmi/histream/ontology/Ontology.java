@@ -23,6 +23,13 @@ public interface Ontology extends Closeable{
 	 * @throws OntologyException for ontology errors
 	 */
 	public Concept[] getTopConcepts() throws OntologyException;
+	/**
+	 * Return the top concepts of this ontology in the specified scheme
+	 * @param scheme scheme to which all returned top concepts belong 
+	 * @return top concepts
+	 * @throws OntologyException for ontology errors
+	 */
+	public Concept[] getTopConcepts(String scheme) throws OntologyException;
 	
 	/**
 	 * Returns the time when this ontology was last modified.

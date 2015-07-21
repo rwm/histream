@@ -42,6 +42,14 @@ public interface Concept {
 	String[] getIDs() throws OntologyException;
 	
 	/**
+	 * Get the schemes to which this concept belongs.
+	 * A concept may belong to no scheme. In this case an empty array is returned.
+	 * @return scheme URIs
+	 * @throws OntologyException on error
+	 */
+	String[] getSchemes() throws OntologyException;
+	
+	/**
 	 * Get the concept's preferred label for a given locale.
 	 * 
 	 * Specify {@link Locale#ROOT} or null to access a language neutral

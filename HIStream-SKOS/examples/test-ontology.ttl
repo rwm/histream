@@ -84,6 +84,7 @@ dwh:String a owl:Restriction ;
 
 :OtherSub a skos:Concept ;
 	skos:inScheme	:OtherScheme ;
+	skos:inScheme	:TestScheme ;
 	skos:broader	:OtherTop ;
 	skos:prefLabel "OtherSub_label_en"@en ;
 	skos:notation	"other" .
