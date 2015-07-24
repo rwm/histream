@@ -3,6 +3,7 @@ package de.sekmi.histream.i2b2.services;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -54,21 +55,14 @@ public class HiveServer implements Provider<Source>{
 		//scriptEngine = scriptManager.getEngineByName("nashorn");
 		// load scripts
 	}
-	public void loadMainScript(){
+	public void loadMainScript() throws IOException, ScriptException{
 		scriptEngine = scriptManager.getEngineByName("nashorn");
-		try {
-			scriptEngine.eval(new FileReader(scriptDir.resolve("main.js").toFile()));
+		try( Reader scriptFile = new FileReader(scriptDir.resolve("main.js").toFile()) ) {
+			scriptEngine.eval(scriptFile);
 			Object o = scriptEngine.eval("typeof httpRequest === 'function'");
 			if( o == null || !(o instanceof Boolean) || ((Boolean)o) != true ){
 				throw new ScriptException("global function 'httpRequest(?,?,?,?)' needed");
 			}
-		} catch (ScriptException e) {
-			e.printStackTrace();
-			scriptEngine = null;
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			scriptEngine = null;
 		}
 	}
 	
@@ -83,7 +77,12 @@ public class HiveServer implements Provider<Source>{
 				break;
 			}
 			System.out.println("Reloading scripts..");
-			loadMainScript();
+			try {
+				loadMainScript();
+			} catch (IOException | ScriptException e1) {
+				System.err.println("Error loading script");
+				e1.printStackTrace();
+			}
 			// pollEvents() is needed for the key to reset properly
 			for( WatchEvent<?> e : key.pollEvents() ){
 				if( e == null )continue;// noop
@@ -95,7 +94,9 @@ public class HiveServer implements Provider<Source>{
 			}
 		}
 	}
-	public void loadScipts()throws IOException{
+	@SuppressWarnings("resource") // cannot close default filesystem
+	public void loadScipts()throws IOException, ScriptException{
+		
 		FileSystem fs = FileSystems.getDefault();
 		scriptDir = fs.getPath("src", "main", "scripts", "i2b2-ws");
 		if( !Files.isDirectory(scriptDir) )throw new FileNotFoundException("Script dir not found: "+scriptDir);
@@ -118,7 +119,7 @@ public class HiveServer implements Provider<Source>{
 			}
 		}*/
 	}
-	public static void main(String args[]) throws IOException{
+	public static void main(String args[]) throws IOException, ScriptException{
 		HiveServer hs = new HiveServer();
 		hs.loadScipts();
 		Endpoint e = Endpoint.create(HTTPBinding.HTTP_BINDING, hs);

@@ -113,9 +113,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	}
 	
 	private void loadMaxEncounterNum() throws SQLException{
-		Statement s = db.createStatement();
-		String sql = "SELECT MAX(encounter_num) FROM visit_dimension";
-		try( ResultSet rs = s.executeQuery(sql) ){
+		try( Statement s = db.createStatement() ){
+			String sql = "SELECT MAX(encounter_num) FROM visit_dimension";
+			ResultSet rs = s.executeQuery(sql);
 			if( rs.next() ){
 				maxEncounterNum = rs.getInt(1);
 			}else{
@@ -123,6 +123,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 				// start numbering patients with 1
 				maxEncounterNum = 1;
 			}
+			rs.close();
 		}
 		log.info("MAX(encounter_num) = "+maxEncounterNum);
 	}
@@ -143,6 +144,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 				count ++;
 			}
 		}
+		stmt.close();
 		log.info("Loaded MAX(instance_num) for "+count+" encounters");
 		if( noMatch != 0 ){
 			log.warning("Encountered "+noMatch+" encounter_num in observation_fact without matching visits");

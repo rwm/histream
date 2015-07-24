@@ -150,6 +150,7 @@ public class RunConfiguration implements Closeable{
 		if( inputStream != null ){
 			Properties props = new Properties();
 			props.load(inputStream);
+			inputStream.close();
 			version = props.getProperty("version","[unknown]");
 		}else{
 			// file is not run from jar
@@ -200,6 +201,7 @@ public class RunConfiguration implements Closeable{
 				if( p != null ){
 					System.out.println("ETL("+p.getMeta("etl.strategy")+"): "+file);
 					rc.processFile(p);
+					p.close();
 				}else{
 					System.err.println("Unable to find parser for file "+file);
 				}

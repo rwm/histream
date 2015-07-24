@@ -9,18 +9,20 @@ import org.junit.Test;
 
 public class TransformerTest {
 	
+	@SuppressWarnings("resource")
 	@Test
 	public void testPullTransformerIdentity() throws FileNotFoundException, IOException{
 		FileObservationProviderTest f = new FileObservationProviderTest();
 		f.initializeObservationFactory();
 
 		Transformation t = Transformation.Identity;
-		FlatObservationSupplier sup = new FlatObservationSupplier(f.getFactory(), new FileInputStream("examples/dwh-flat.txt"));
-		PullTransformer p = new PullTransformer(sup, t);
-		
-		// validate content after identity transformation
-		f.initializeHandler();
-		f.validateExample(p);
-		f.closeHandler();
+		try( FlatObservationSupplier sup = new FlatObservationSupplier(f.getFactory(), new FileInputStream("examples/dwh-flat.txt")) ){
+			PullTransformer p = new PullTransformer(sup, t);
+			
+			// validate content after identity transformation
+			f.initializeHandler();
+			f.validateExample(p);
+			f.closeHandler();
+		}
 	}
 }

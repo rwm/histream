@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,14 +76,17 @@ public class Import implements AutoCloseable{
 		deleteConcepts.setString(1, sourceId);
 		count = deleteConcepts.executeUpdate();
 		System.out.println("Deleted "+count+" rows from "+getConceptTable());
+		deleteConcepts.close();
 
 		deleteAccess.setString(1, sourceId+"%");
 		count = deleteAccess.executeUpdate();
 		System.out.println("Deleted "+count+" rows from "+getAccessTable());
+		deleteAccess.close();
 
 		deleteOnt.setString(1, sourceId);
 		count = deleteOnt.executeUpdate();
 		System.out.println("Deleted "+count+" rows from "+getMetaTable());
+		deleteOnt.close();
 
 	}
 	
@@ -409,7 +413,9 @@ public class Import implements AutoCloseable{
 		}
 
 		Properties ont_props = new Properties();
-		ont_props.load(new FileInputStream(ontConfig));
+		try( InputStream in = new FileInputStream(ontConfig) ){
+			ont_props.load(in);
+		}
 
 		String ontClass = ont_props.getProperty("ontology.class");
 		if( ontClass == null ){
@@ -422,7 +428,10 @@ public class Import implements AutoCloseable{
 
 		// open database
 		props = new Properties();
-		props.load(new FileInputStream(impConfig));
+		try( InputStream in = new FileInputStream(impConfig) ){
+			props.load(in);
+		}
+		
 		try {
 			o.openDatabase((Map)props);
 		} catch (ClassNotFoundException e) {

@@ -40,6 +40,7 @@ public class FlatProviderFactory implements FileObservationSupplierFactory, Plug
 		// don't need to close anything
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
 		return new FlatObservationSupplier(factory, new FileInputStream(file));

@@ -141,9 +141,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 
 
 	private void loadMaxPatientNum() throws SQLException{
-		Statement s = db.createStatement();
-		String sql = "SELECT MAX(patient_num) FROM patient_dimension";
-		try( ResultSet rs = s.executeQuery(sql) ){
+		try( Statement s = db.createStatement() ){
+			String sql = "SELECT MAX(patient_num) FROM patient_dimension";
+			ResultSet rs = s.executeQuery(sql);
 			if( rs.next() ){
 				maxPatientNum = rs.getInt(1);
 			}else{
@@ -151,6 +151,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 				// start numbering patients with 1
 				maxPatientNum = 1;
 			}
+			rs.close();
 		}
 		log.info("MAX(patient_num) = "+maxPatientNum);
 	}
