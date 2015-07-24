@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +52,12 @@ public class Store implements Ontology, Plugin {
 	 * Plugin constructor which accepts configuration parameters.
 	 * 
 	 * <p>
-	 * Configuration keys have the form {@code rdf.baseURI.1}, {@code rdf.file.1}, {@code rdf.format.1}.
+	 * Configuration keys have the form {@code rdf.baseURI}, {@code rdf.file.1}, {@code rdf.format.1}.
 	 * rdf.file is mandatory, other parameters are optional.
-	 * rdf.skosScheme can specify the skos:ConceptScheme to find top concepts and unique notations
+	 * <p>
+	 * {@code rdf.baseURI} specifies a URI to resolve any relative URIs that are in the data against. See {@link #Store(Collection, String)}.
+	 * <p>
+	 * {@code rdf.skosScheme} can specify the skos:ConceptScheme to find top concepts and unique notations
 	 *  
 	 * @param conf configuration parameters
 	 * @throws FileNotFoundException if one of the specified files can not be found 
@@ -63,19 +68,16 @@ public class Store implements Ontology, Plugin {
 	public Store(Map<String,String> conf) throws RepositoryException, RDFParseException, IOException{
 		int i=1;
 		List<File> files = new ArrayList<>();
-		List<String> baseURIs = new ArrayList<>();
+		String baseURI = conf.get("rdf.baseURI");
 		// TODO: allow specification of directory
 		while( conf.containsKey("rdf.file."+i) ){
 			File file = new File(conf.get("rdf.file."+i));
 			if( !file.exists() )throw new FileNotFoundException("rdf.file."+i+" not found: "+file.getAbsolutePath());
 			files.add(file);
 			
-			String baseURI = conf.get("rdf.baseURI."+i);
-			baseURIs.add(baseURI);
-			
 			i++;
 		}
-		initializeRepo(files.toArray(new File[files.size()]), baseURIs.toArray(new String[baseURIs.size()]));
+		initializeRepo(files, baseURI);
 		if( conf.containsKey("rdf.skosScheme") ){
 			this.scheme = repo.getValueFactory().createURI(conf.get("rdf.skosScheme")); 
 		}
@@ -107,17 +109,15 @@ public class Store implements Ontology, Plugin {
 		}
 		return count;
 	}
-	private void initializeRepo(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
+	private void initializeRepo(Iterable<File> files, String baseURI) throws RepositoryException, RDFParseException, IOException{
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 		rc = repo.getConnection();
 		inferredContext = repo.getValueFactory().createURI("http://sekmi.de/histream/inferredInverse");
 		this.lastModified = 0;
 
-		for( int i=0; i<files.length; i++ ){
-			File file = files[i];
-			String base_uri = baseURIs[i];
-			rc.add(file, base_uri, RDFFormat.TURTLE);
+		for( File file : files ){
+			rc.add(file, baseURI, RDFFormat.TURTLE);
 		    
 			// use timestamps from files for last modified date
 			lastModified = Math.max(lastModified, file.lastModified());
@@ -132,13 +132,13 @@ public class Store implements Ontology, Plugin {
 	    
 	}
 
-	public Store(File[] files, String[] baseURIs) throws RepositoryException, RDFParseException, IOException{
-		initializeRepo(files, baseURIs);
+	public Store(Iterable<File> files, String baseURI) throws RepositoryException, RDFParseException, IOException{
+		initializeRepo(files, baseURI);
 	}
 	
 
 	public Store(File file) throws RepositoryException, RDFParseException, IOException{
-		this(new File[]{file}, new String[]{null});
+		this(Arrays.asList(new File[]{file}), (String)null);
 	}
 	public void setConceptScheme(String schemeURI){
 		this.scheme = repo.getValueFactory().createURI(schemeURI);
