@@ -3,6 +3,7 @@ package de.sekmi.histream.ontology.skos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,7 +78,7 @@ public class Store implements Ontology, Plugin {
 			
 			i++;
 		}
-		initializeRepo(files, baseURI);
+		initializeRepo(files, null, baseURI);
 		if( conf.containsKey("rdf.skosScheme") ){
 			this.scheme = repo.getValueFactory().createURI(conf.get("rdf.skosScheme")); 
 		}
@@ -109,18 +110,27 @@ public class Store implements Ontology, Plugin {
 		}
 		return count;
 	}
-	private void initializeRepo(Iterable<File> files, String baseURI) throws RepositoryException, RDFParseException, IOException{
+	private void initializeRepo(Iterable<File> files, Iterable<URL> urls, String baseURI) throws RepositoryException, RDFParseException, IOException{
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 		rc = repo.getConnection();
 		inferredContext = repo.getValueFactory().createURI("http://sekmi.de/histream/inferredInverse");
 		this.lastModified = 0;
 
-		for( File file : files ){
-			rc.add(file, baseURI, RDFFormat.TURTLE);
-		    
-			// use timestamps from files for last modified date
-			lastModified = Math.max(lastModified, file.lastModified());
+		if( files != null ){
+			for( File file : files ){
+				rc.add(file, baseURI, RDFFormat.TURTLE);
+			    
+				// use timestamps from files for last modified date
+				lastModified = Math.max(lastModified, file.lastModified());
+			}
+		}
+		if( urls != null ){
+			for( URL url : urls ){
+				rc.add(url, baseURI, RDFFormat.TURTLE);
+				// TODO: determine last modified (should work for file,jar,http urls)
+				lastModified = System.currentTimeMillis();
+			}
 		}
 		int inferred = 0;
 	    inferred += inferInverseRelations(SKOS.TOP_CONCEPT_OF, SKOS.HAS_TOP_CONCEPT);
@@ -133,7 +143,11 @@ public class Store implements Ontology, Plugin {
 	}
 
 	public Store(Iterable<File> files, String baseURI) throws RepositoryException, RDFParseException, IOException{
-		initializeRepo(files, baseURI);
+		initializeRepo(files,null, baseURI);
+	}
+	public Store(Iterable<URL> urls) throws RepositoryException, RDFParseException, IOException{
+		// TODO: clean implementation
+		initializeRepo(null, urls, null);
 	}
 	
 
