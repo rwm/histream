@@ -11,7 +11,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -263,31 +262,47 @@ public class Import implements AutoCloseable{
 		String synonymCd = "N";
 		insertMeta.setString(4, synonymCd); // TODO use set to find out if a concept is used multiple times -> synonym Y
 		
-		// c_visualattributes
+		// c_visualattributes and c_basecode
 		Concept[] subConcepts = concept.getNarrower();
-		String visualAttr = (subConcepts.length == 0)?"LA":"FA";
-		// TODO MA for multiple items
-		insertMeta.setString(5, visualAttr);
-
-		// c_basecode
 		String[] conceptIds = concept.getIDs();
-		// TODO support multiple ids (e.g. adding virtual leaves)
-		if( conceptIds.length == 0 ){			
-			insertMeta.setNull(6, Types.VARCHAR);
-		}else{
-			// concept has id and can occur in fact table
+		
+
+		if( conceptIds.length == 0 ){
+			// no notations ==> concept can not be queried
+			// force directory (may be empty if no sub-concepts)
+			insertMeta.setString(5, "FA");
+			insertMeta.setString(6, null);
+		}else if( conceptIds.length == 1 ){
+			// exactly one notation
+			String visualAttr = (subConcepts.length == 0)?"LA":"FA";
+			insertMeta.setString(5, visualAttr);
 			insertMeta.setString(6, conceptIds[0]);
-			
-			if( conceptIds.length > 1 ){
-				log.warning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
-			}
-			// insert into concept_dimension
-			// TODO make sure, each concept_path is inserted only once
-			insertConceptDimension(path, label, conceptIds[0]);
+		}else if( subConcepts.length == 0 ){
+			// no sub-concepts but multiple notations,
+			// TODO use MA and 
+			insertMeta.setString(5, "LA");
+			insertMeta.setString(6, conceptIds[0]);
 			// XXX support for multiple conceptIds can be hacked by appending a number to the path for each conceptid and insert each conceptid
 			// XXX see some concepts in i2b2 demodata religion with visualattributes M
+		}else{
+			// has sub concepts and multiple notations,
+			// no way to represent this in i2b2
+			// just use the first notation and log warning
+			insertMeta.setString(5, "FA");
+			insertMeta.setString(6, conceptIds[0]);
+			log.warning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
+		}
+
+		// c_basecode
+		// TODO support multiple ids (e.g. adding virtual leaves)
+		if( conceptIds.length != 0 ){			
+			// insert into concept_dimension
+			insertConceptDimension(path, label, conceptIds[0]);
+			// concept has id and can occur in fact table			
+			// TODO make sure, each concept_path is inserted only once
 		}
 		
+
 		
 		// c_metadataxml
 		ValueRestriction vr = concept.getValueRestriction();
@@ -333,7 +348,7 @@ public class Import implements AutoCloseable{
 			insertAccess.setString(3, path);
 			insertAccess.setString(4, label);
 			insertAccess.setString(5, synonymCd);
-			insertAccess.setString(6, visualAttr);
+			insertAccess.setString(6, "FA");// no leafs on root
 			insertAccess.setString(7, path);
 			insertAccess.setString(8, descr);
 			insertAccess.executeUpdate();
