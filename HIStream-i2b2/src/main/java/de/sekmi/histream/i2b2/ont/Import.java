@@ -28,6 +28,14 @@ import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
 
+/**
+ * Import ontology data into i2b2.
+ * <p>
+ * Use the methods in the following order: {@link #openDatabase(Map)}, {@link #loadOntology(Class, Map)}, {@link #processOntology()}, {@link #close
+ *
+ * @author Raphael
+ *
+ */
 public class Import implements AutoCloseable{
 	private static final Logger log = Logger.getLogger(Import.class.getName());
 	private Ontology ontology;
@@ -47,8 +55,23 @@ public class Import implements AutoCloseable{
 	private String sourceId;
 	private Timestamp sourceTimestamp;
 	
-	public Import(){
-		
+	/**
+	 * Connect to the i2b2 database.
+	 * The current implementation supports only Postgres databases for i2b2 versions >= 1.7.05(?)
+	 * <p>
+	 * Two connections are established: One for access to the metadata schema, the second for access to concept_dimension in the data schema.
+	 * Connection arguments start with {@code meta.jdbc.} or {@code data.jdbc.}.
+	 * 
+	 * @param props connection parameters.
+	 * Use {@code meta.sourcesystem_cd} for the source system.
+	 * {@code jdbc.host}, {@code jdbc.port}, {@code jdbc.database} are used to construct the connect string. 
+	 * Any other parameters starting with {@code jdbc.} are also passed to {@link DriverManager#getConnection(String, Properties)}.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public Import(Map<String,String> props) throws ClassNotFoundException, SQLException{
+		openDatabase(props);
 	}
 	
 	private String getMetaTable(){return config.get("meta.table");}
@@ -322,11 +345,16 @@ public class Import implements AutoCloseable{
 			insertMeta(level+1, path, sub, false);
 		}
 	}
+	/*
 	public void loadOntology(Class<?> ontologyClass, Map<String,String> config) throws Exception{
 		Plugin plugin = Plugin.newInstance(ontologyClass, config);
 		assert plugin instanceof Ontology;
 		ontology = (Ontology)plugin;
 		sourceTimestamp = new Timestamp(ontology.lastModified());
+	}*/
+	public void setOntology(Ontology ontology){
+		this.ontology = ontology;
+		this.sourceTimestamp = new Timestamp(ontology.lastModified());
 	}
 
 	/**
@@ -344,7 +372,8 @@ public class Import implements AutoCloseable{
 				} 
 		);
 	}
-	public void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
+
+	private void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
 		
 		this.config = props;
@@ -373,7 +402,8 @@ public class Import implements AutoCloseable{
 	
 	
 	@Override
-	public void close() {
+	public void close()/* throws SQLException, IOException*/{
+		// TODO: throw exceptions
 		try {
 			dbMeta.close();
 		} catch (SQLException e) {
@@ -386,12 +416,14 @@ public class Import implements AutoCloseable{
 			System.out.println("Error closing database connection");
 			e.printStackTrace();
 		}
+		// don't close ontology, must be closed by caller
+		/*
 		if( ontology != null )try {
 			ontology.close();
 		} catch (IOException e) {
 			System.err.println("Error closing ontology");
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	
@@ -424,16 +456,16 @@ public class Import implements AutoCloseable{
 		}
 
 		Properties props;
-		Import o = new Import();
 
 		// open database
 		props = new Properties();
 		try( InputStream in = new FileInputStream(impConfig) ){
 			props.load(in);
 		}
+		Import o= null;
 		
 		try {
-			o.openDatabase((Map)props);
+			o = new Import((Map)props);
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load database driver");
 			e.printStackTrace();
@@ -457,8 +489,10 @@ public class Import implements AutoCloseable{
 			throw new IllegalArgumentException(args[0]+" does not implement the Ontology interface");
 		}
 
+		Ontology inst=null;
 		try {
-			o.loadOntology(ont, (Map)ont_props);
+			inst = (Ontology)Plugin.newInstance(ont, (Map)ont_props);
+			o.setOntology(inst);
 		} catch (Exception e) {
 			System.out.println("Error while loading ontology");
 			e.printStackTrace();
@@ -474,8 +508,8 @@ public class Import implements AutoCloseable{
 			System.err.println("Ontology error");
 			e.printStackTrace();
 		}
-		
 		o.close();
+		inst.close();
 		
 		
 	}
