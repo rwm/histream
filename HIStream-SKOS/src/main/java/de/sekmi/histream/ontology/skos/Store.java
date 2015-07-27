@@ -66,7 +66,7 @@ public class Store implements Ontology, Plugin {
 	 * @throws RDFParseException if rdf files can not be parsed
 	 * @throws RepositoryException for any other exceptions during ontology initialisation
 	 */
-	public Store(Map<String,String> conf) throws RepositoryException, RDFParseException, IOException{
+	public Store(Map<String,String> conf) throws RepositoryException, IOException{
 		int i=1;
 		List<File> files = new ArrayList<>();
 		String baseURI = conf.get("rdf.baseURI");
@@ -110,28 +110,35 @@ public class Store implements Ontology, Plugin {
 		}
 		return count;
 	}
-	private void initializeRepo(Iterable<File> files, Iterable<URL> urls, String baseURI) throws RepositoryException, RDFParseException, IOException{
+	private void initializeRepo(Iterable<File> files, Iterable<URL> urls, String baseURI) throws RepositoryException, IOException{
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 		rc = repo.getConnection();
 		inferredContext = repo.getValueFactory().createURI("http://sekmi.de/histream/inferredInverse");
 		this.lastModified = 0;
 
-		if( files != null ){
-			for( File file : files ){
-				rc.add(file, baseURI, RDFFormat.TURTLE);
-			    
-				// use timestamps from files for last modified date
-				lastModified = Math.max(lastModified, file.lastModified());
+			if( files != null ){
+				for( File file : files ){
+					try{
+						rc.add(file, baseURI, RDFFormat.TURTLE);
+					}catch( RDFParseException e ){
+						throw new IOException("Parse error for file "+file+":"+e.getLineNumber()+": "+e.getMessage(),e);
+					}
+					// use timestamps from files for last modified date
+					lastModified = Math.max(lastModified, file.lastModified());
+				}
 			}
-		}
-		if( urls != null ){
-			for( URL url : urls ){
-				rc.add(url, baseURI, RDFFormat.TURTLE);
-				// TODO: determine last modified (should work for file,jar,http urls)
-				lastModified = System.currentTimeMillis();
+			if( urls != null ){
+				for( URL url : urls ){
+					try{
+						rc.add(url, baseURI, RDFFormat.TURTLE);
+					}catch( RDFParseException e ){
+						throw new IOException("Parse error for url "+url+":"+e.getLineNumber()+": "+e.getMessage(),e);
+					}
+					// TODO: determine last modified (should work for file,jar,http urls)
+					lastModified = System.currentTimeMillis();
+				}
 			}
-		}
 		int inferred = 0;
 	    inferred += inferInverseRelations(SKOS.TOP_CONCEPT_OF, SKOS.HAS_TOP_CONCEPT);
 	    inferred += inferInverseRelations(SKOS.BROADER, SKOS.NARROWER);
@@ -142,16 +149,16 @@ public class Store implements Ontology, Plugin {
 	    
 	}
 
-	public Store(Iterable<File> files, String baseURI) throws RepositoryException, RDFParseException, IOException{
+	public Store(Iterable<File> files, String baseURI) throws RepositoryException, IOException{
 		initializeRepo(files,null, baseURI);
 	}
-	public Store(Iterable<URL> urls) throws RepositoryException, RDFParseException, IOException{
+	public Store(Iterable<URL> urls) throws RepositoryException, IOException{
 		// TODO: clean implementation
 		initializeRepo(null, urls, null);
 	}
 	
 
-	public Store(File file) throws RepositoryException, RDFParseException, IOException{
+	public Store(File file) throws RepositoryException, IOException{
 		this(Arrays.asList(new File[]{file}), (String)null);
 	}
 	public void setConceptScheme(String schemeURI){
