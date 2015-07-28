@@ -52,6 +52,7 @@ public class Import implements AutoCloseable{
 	private int insertConceptCount;
 	
 	private String sourceId;
+	private String scheme;
 	private Timestamp sourceTimestamp;
 	
 	/**
@@ -65,7 +66,8 @@ public class Import implements AutoCloseable{
 	 * Use {@code meta.sourcesystem_cd} for the source system.
 	 * {@code jdbc.host}, {@code jdbc.port}, {@code jdbc.database} are used to construct the connect string. 
 	 * Any other parameters starting with {@code jdbc.} are also passed to {@link DriverManager#getConnection(String, Properties)}.
-	 * 
+	 * <p>
+	 * More parameters: {@code ont.language} and {@code ont.scheme}.
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 */
@@ -121,6 +123,10 @@ public class Import implements AutoCloseable{
 		}else{
 			locale = Locale.forLanguageTag(config.get("ont.language"));
 		}
+		// parse scheme
+		if( config.get("ont.language") != null ){
+			this.scheme = config.get("ont.scheme");
+		}
 		
 		// parse base path
 		String base = config.get("meta.basepath");
@@ -135,7 +141,9 @@ public class Import implements AutoCloseable{
 			base_level = 0;
 		}
 		
-		Concept[] concepts = ontology.getTopConcepts();
+		Concept[] concepts = ontology.getTopConcepts(this.scheme);
+
+
 		for( Concept c : concepts ){
 			insertMeta(base_level, base, c, true);
 		}
@@ -248,13 +256,18 @@ public class Import implements AutoCloseable{
 		if( label == null ){
 			// no label for language, try to get neutral label
 			label = concept.getPrefLabel(null);
+			path_part = label;
 			if( label == null ){
 				// concept does not have a label
-				path_part = Integer.toHexString(concept.hashCode());
 				label = concept.toString();
+				path_part = label;//Integer.toHexString(concept.hashCode());
 				log.warning("Missing prefLabel for concept "+concept+" substituted with hashCode:"+label);
 			}
 		}
+		// TODO find better way to generate path_part
+		path_part = Integer.toHexString(label.hashCode());
+		
+		// use hashcode
 		String path = path_prefix + path_part+"\\";
 		insertMeta.setString(2, path);
 		insertMeta.setString(3, label);

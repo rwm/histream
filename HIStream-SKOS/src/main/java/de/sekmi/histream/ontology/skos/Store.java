@@ -194,7 +194,11 @@ public class Store implements Ontology, Plugin {
 	
 	@Override
 	public Concept[] getTopConcepts(String scheme)throws OntologyException{
-		return getRelatedConcepts(repo.getValueFactory().createURI(scheme), SKOS.HAS_TOP_CONCEPT);
+		URI schemeURI = null;
+		if( scheme != null ){
+			schemeURI = repo.getValueFactory().createURI(scheme);
+		}
+		return getRelatedConcepts(schemeURI, SKOS.HAS_TOP_CONCEPT);
 	}
 	private Concept[] getRelatedConcepts(Resource subject, URI predicate)throws OntologyException{
 		RepositoryResult<Statement> rr;
