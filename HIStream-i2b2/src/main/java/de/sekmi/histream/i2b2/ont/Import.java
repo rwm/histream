@@ -251,21 +251,17 @@ public class Import implements AutoCloseable{
 	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
 		insertMeta.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
-		String path_part = label; // TODO unique key sufficient, e.g. try label.hashCode()
+		String path_part = concept.getID(); // TODO unique key sufficient, e.g. try label.hashCode()
 		
 		if( label == null ){
 			// no label for language, try to get neutral label
 			label = concept.getPrefLabel(null);
-			path_part = label;
 			if( label == null ){
 				// concept does not have a label
-				label = concept.toString();
-				path_part = label;//Integer.toHexString(concept.hashCode());
-				log.warning("Missing prefLabel for concept "+concept+" substituted with hashCode:"+label);
+				label = concept.getID();
+				log.warning("Missing prefLabel for concept "+concept+" substituted with ID");
 			}
 		}
-		// TODO find better way to generate path_part
-		path_part = Integer.toHexString(label.hashCode());
 		
 		// use hashcode
 		String path = path_prefix + path_part+"\\";
@@ -277,7 +273,7 @@ public class Import implements AutoCloseable{
 		
 		// c_visualattributes and c_basecode
 		Concept[] subConcepts = concept.getNarrower();
-		String[] conceptIds = concept.getIDs();
+		String[] conceptIds = concept.getNotations();
 		
 
 		if( conceptIds.length == 0 ){

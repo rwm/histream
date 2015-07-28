@@ -39,8 +39,8 @@ public class OntologyTest {
 		Assert.assertNull(store.getConceptByNotation("notfound"));
 		Concept c = store.getConceptByNotation("T:type:int");
 		Assert.assertNotNull(c);
-		Assert.assertEquals(1, c.getIDs().length);
-		Assert.assertEquals("T:type:int", c.getIDs()[0]);
+		Assert.assertEquals(1, c.getNotations().length);
+		Assert.assertEquals("T:type:int", c.getNotations()[0]);
 		ValueRestriction rest = c.getValueRestriction();
 		Assert.assertNotNull(rest);
 	}
@@ -108,7 +108,7 @@ public class OntologyTest {
 		Concept[] narrower = top[0].getNarrower();
 		Assert.assertNotNull(narrower);
 		Assert.assertEquals(1, narrower.length);
-		String[] ids = narrower[0].getIDs();
+		String[] ids = narrower[0].getNotations();
 		Assert.assertEquals(1, ids.length);
 		Assert.assertEquals("other", ids[0]);
 	}

@@ -63,7 +63,6 @@ public class Store implements Ontology, Plugin {
 	 * @param conf configuration parameters
 	 * @throws FileNotFoundException if one of the specified files can not be found 
 	 * @throws IOException for i/o exceptions while reading the files
-	 * @throws RDFParseException if rdf files can not be parsed
 	 * @throws RepositoryException for any other exceptions during ontology initialisation
 	 */
 	public Store(Map<String,String> conf) throws RepositoryException, IOException{

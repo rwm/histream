@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.vocabulary.DC;
 import org.openrdf.model.vocabulary.SKOS;
@@ -52,7 +53,7 @@ public class ConceptImpl implements Concept {
 	}
 
 	@Override
-	public String[] getIDs() throws OntologyException {
+	public String[] getNotations() throws OntologyException {
 		ArrayList<String> ids = new ArrayList<>();
 		try{
 			RepositoryResult<Statement> s =	store.getConnection().getStatements(res, SKOS.NOTATION, null, true);
@@ -130,6 +131,13 @@ public class ConceptImpl implements Concept {
 			throw new OntologyException(e);
 		}
 		return ids.toArray(new String[ids.size()]);
+	}
+
+	@Override
+	public String getID() {
+		URI me = (URI)res;
+		// TODO: use better namespace prefix instead of hashcode
+		return Integer.toHexString(me.getNamespace().hashCode())+":"+me.getLocalName();
 	}
 	
 	

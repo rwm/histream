@@ -39,8 +39,14 @@ public interface Concept {
 	 * @return String array containing all id's assigned to this concept
 	 * @throws OntologyException for ontology errors
 	 */
-	String[] getIDs() throws OntologyException;
+	String[] getNotations() throws OntologyException;
 	
+	/**
+	 * Get id identifying this concept which is unique to the ontology
+	 * For RDF, this will be the rdf:about URI which can have abbreviated namespace prefix.
+	 * @return unique id
+	 */
+	String getID();
 	/**
 	 * Get the schemes to which this concept belongs.
 	 * A concept may belong to no scheme. In this case an empty array is returned.
@@ -60,6 +66,7 @@ public interface Concept {
 	 * @throws OntologyException for ontology errors
 	 */
 	String getPrefLabel(Locale locale) throws OntologyException;
+	// TODO: allow specification of multiple locales in order of preference
 	
 	/**
 	 * Get the concept's description for a given locale.

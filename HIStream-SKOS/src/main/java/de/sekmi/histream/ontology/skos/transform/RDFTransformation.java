@@ -142,7 +142,7 @@ public class RDFTransformation implements Transformation {
 		}
 		
 		// map to target
-		String[] ids = target.getIDs();
+		String[] ids = target.getNotations();
 		if( ids.length == 0 )throw new TransformationException("No notation found in target concept "+target);
 		fact.replaceConcept(ids[0]);
 		// TODO: is there a way to specify which notation should be used if there are multiple notations?
