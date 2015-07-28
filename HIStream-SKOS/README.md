@@ -8,6 +8,14 @@ TODO: write validator script, which checks that
 1. Every concept with a notation has specified at least one ConceptScheme
 2. Notations are unique (within a ConceptScheme)
 
+TODO
+----
+* Add interface and algorithm to walk the Graph via narrower. Interface methods 
+  visitConcept and postVisitConcept
+* Command line interface to load and validate ontology files (e.g. CLI.java)
+* Allow restriction / specification of units via http://www.qudt.org/
+
+
 Processing ontologies with Jena
 -------------------------------
 
