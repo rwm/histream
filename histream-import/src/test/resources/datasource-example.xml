@@ -1,0 +1,118 @@
+<!DOCTYPE configuration >
+<datasource version="1.0">
+	<meta>
+		<etl-strategy></etl-strategy>
+		<source-id></source-id>
+	</meta>
+	<!-- erstmal weglassen -->
+	<transformations>
+		<xml-source url="xxxx.xml">
+			<transform with="a.xslt" to="lala.txt" />
+			<transform with="b.xslt" to="dddd.txt" />
+		</xml-source>
+	</transformations>
+
+	<!-- 
+	<value-mappings>
+		<map id="geschlecht">
+			<value from="M" to="M" />
+			<value from="W" to="F" /> 
+		</map>
+	</value-mappings>
+	 -->
+	 
+	<patient-table>
+		<source>
+			<sql jdbc-driver="com.mysql..." db-url="jdbc:mysql://localhost/EMP" db-user="asdf" db-password="mkmlkd">
+			SELECT * FROM patienten p
+			</sql>
+		</source>
+		<idat>
+			<patient-id>ID</patient-id>
+			<firstname>Vorname</firstname>
+			<surname>Nachname</surname>
+			<birthdate></birthdate>
+			<deathdate></deathdate>
+			<gender map="geschlecht">geschlecht</gender>
+			<ignore>...</ignore>
+		</idat>
+		
+		<mdat>
+			<concept id="gewicht">
+				<value>gewicht</value>
+				<start>eingabedatum</start>
+				<unit constant="kg"/>
+			</concept>
+			<concept id="lufu">
+				<value>lufu_fev1</value>
+				<start>visit_date</start>
+			</concept>
+		</mdat>
+		
+	</patient-table>
+	<!-- optional -->
+	<visit-table>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>event</visit-id>
+			<start format="ISO" na="@" truncate-to="year">asdf</start>
+			<end>asdff</end>
+			<ignore>...</ignore>
+		</idat>
+		<mdat>
+			<!-- in/out code -->
+			<concept id="lufu">
+				<value>lufu_fev1</value>
+				<start>visit_date</start>
+			</concept>
+		</mdat>
+	</visit-table>
+	
+	<widetable>
+		<source>
+			<file url="file://c:/lala.txt" type="text/csv" key-column="PatientID" />
+		</source>
+		<idat>
+			<patient-id>asdfg</patient-id>
+			<visit-id>a33edd</visit-id>
+		</idat>
+		<mdat>
+			<concept id="blutdruck">
+				<value field="value" />
+				<start field="beginn" />
+				<end field="ende" />
+				<unit field="einheit" />
+				<modifier id="method">
+					<value field="methode" />
+					<unit fixed="mm" />
+				</modifier>
+				<modifier id="other">
+					<value field="other" />
+				</modifier>
+			</concept>
+		</mdat>
+		..
+	</widetable>
+	
+	<eavtable>
+		<source>
+			<file url="file://c:/lala.txt" type="text/csv;delimiter=\t;encoding=UTF-8;" key-column="PatientID" />
+			<!-- file ODER sql -->
+			<sql>
+				SELECT konzept, beginn, ende, einheit FROM blutdruckmessungen WHERE patid=?
+			</sql>
+		</source>
+		<idat>
+			<patient-id>asdf</patient-id>
+			<visit-id>asdf</visit-id>
+			<ignore>...</ignore>
+		</idat>
+		<columns>
+			<concept>parameter</concept>
+			<value>wert</value>
+			<start>beginn</start>
+			<end></end>
+			<unit>end</unit>
+		</columns>
+	</eavtable>
+</datasource>

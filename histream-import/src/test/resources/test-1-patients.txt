@@ -1,0 +1,4 @@
+patid	inogriert1	name	vorname	geburtsdatum	verstorben	geschlecht	patfakt1
+1	a	n1	v1	01.02.2003	11.02.2003	F	c
+2	b	n2	v2	02.03.2004		M	d
+3	c	n3	v3	03.04.2005		F	e

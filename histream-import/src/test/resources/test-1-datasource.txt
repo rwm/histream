@@ -1,0 +1,83 @@
+<!DOCTYPE configuration >
+<datasource version="1.0">
+	<meta>
+		<etl-strategy>replace-source</etl-strategy>
+		<source-id>test-1</source-id>
+	</meta>
+	<!-- erstmal weglassen -->
+	<transformations>
+		<xml-source url="xxxx.xml">
+			<transform with="a.xslt" to="lala.txt" />
+			<transform with="b.xslt" to="dddd.txt" />
+		</xml-source>
+	</transformations>
+
+	<!-- 
+	<value-mappings>
+		<map id="geschlecht">
+			<value from="M" to="M" />
+			<value from="W" to="F" /> 
+		</map>
+	</value-mappings>
+	 -->
+	 
+	<patient-table>
+        <source xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fileSource">
+            <url>file:test-1-patients.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<firstname>vorname</firstname>
+			<surname>nachname</surname>
+			<birthdate>geburtsdatum</birthdate>
+			<deathdate>verstorben</deathdate>
+			<gender>geschlecht</gender>
+			<ignore>ignoriert1</ignore>
+			<ignore>patfakt1</ignore>
+		</idat>		
+	</patient-table>
+	<!-- optional -->
+	<visit-table>
+        <source xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fileSource">
+            <url>file:test-1-visits.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>fallnr</visit-id>
+			<start format="ISO" na="@" truncate-to="year">start</start>
+			<end>end</end>
+		</idat>
+		<mdat>
+			<!-- in/out code -->
+			<concept id="weight">
+				<value>gewicht</value>
+				<start>start</start>
+			</concept>
+		</mdat>
+	</visit-table>
+	
+	<wide-table>
+        <source xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="fileSource">
+            <url>file:test-1-widetable.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>fallnr</visit-id>
+		</idat>
+		<mdat>
+			<concept id="natrium">
+				<value>na</value>
+				<start>zeitpunkt</start>
+				<unit constant-value="mmol/l" />
+				<modifier id="other">
+					<value field="other" />
+				</modifier>
+			</concept>
+		</mdat>
+		..
+	</wide-table>
+
+</datasource>
