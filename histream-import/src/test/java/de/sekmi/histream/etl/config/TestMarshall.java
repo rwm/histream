@@ -17,7 +17,7 @@ public class TestMarshall {
 
 	@Test
 	public void testUnmarshall() throws IOException{
-		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.txt") ){
+		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.xml") ){
 			DataSource ds = JAXB.unmarshal(in, DataSource.class);
 			Assert.assertNotNull(ds.meta);
 			Assert.assertEquals("replace-source",ds.meta.etlStrategy);
@@ -67,24 +67,24 @@ public class TestMarshall {
 		s.patientTable = new PatientTable();
 		s.patientTable.source = new FileSource("file:patient.source","text/csv");
 		s.patientTable.idat = new PatientTable.IDAT();
-		s.patientTable.idat.patientId = new Column("patid"); 
+		s.patientTable.idat.patientId = new StringColumn("patid"); 
 		s.visitTable = new VisitTable();
 		s.visitTable.source = new FileSource("file:lala.txt", "text/plain");
 		s.visitTable.idat = new VisitTable.IDAT();
-		s.visitTable.idat.patientId = new Column("patid");
-		s.visitTable.idat.visitId = new Column("visit");		
+		s.visitTable.idat.patientId = new StringColumn("patid");
+		s.visitTable.idat.visitId = new StringColumn("visit");		
 		s.visitTable.concepts = new Concept[1];
-		s.visitTable.concepts[0] = new Concept("vconcept","start");
+		s.visitTable.concepts[0] = new Concept("vconcept","start","yyyy-MM-ddTHH:mm:ss");
 		s.wideTables = new WideTable[1];
 		s.wideTables[0] = new WideTable();
 		s.wideTables[0].source = new SQLSource("org.postgresql.Driver","jdbc:postgresql://localhost:15432/i2b2");
 		s.wideTables[0].idat = new DataTableIdat();
-		s.wideTables[0].idat.patientId = new Column("patid");
+		s.wideTables[0].idat.patientId = new StringColumn("patid");
 		s.wideTables[0].concepts = new Concept[2];
-		s.wideTables[0].concepts[0] = new Concept("ACC","zeit");
+		s.wideTables[0].concepts[0] = new Concept("ACC","zeit","yyyy-MM-ddTHH:mm:ss");
 		s.wideTables[0].concepts[0].modifiers = new Concept.Modifier[1];
 		s.wideTables[0].concepts[0].modifiers[0] = new Concept.Modifier("DOSE"); 
-		s.wideTables[0].concepts[0].modifiers[0].value = new Column("dosis"); 
+		s.wideTables[0].concepts[0].modifiers[0].value = new StringColumn("dosis"); 
 		
 		
 		JAXB.marshal(s, System.out);

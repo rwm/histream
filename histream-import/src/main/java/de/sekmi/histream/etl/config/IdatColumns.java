@@ -4,5 +4,5 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class IdatColumns {
 	@XmlElement(name="patient-id")
-	Column patientId;
+	StringColumn patientId;
 }

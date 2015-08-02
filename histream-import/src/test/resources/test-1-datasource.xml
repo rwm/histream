@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+	<meta>
+		<etl-strategy>replace-source</etl-strategy>
+		<source-id>test-1</source-id>
+	</meta>
+	<!-- erstmal weglassen -->
+	<transformations>
+		<xml-source url="xxxx.xml">
+			<transform with="a.xslt" to="lala.txt" />
+			<transform with="b.xslt" to="dddd.txt" />
+		</xml-source>
+	</transformations>
+
+	<!-- 
+	<value-mappings>
+		<map id="geschlecht">
+			<value from="M" to="M" />
+			<value from="W" to="F" /> 
+		</map>
+	</value-mappings>
+	 -->
+	 
+	<patient-table>
+        <source xsi:type="fileSource">
+            <url>file:test-1-patients.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<firstname>vorname</firstname>
+			<surname>nachname</surname>
+			<birthdate>geburtsdatum</birthdate>
+			<deathdate>verstorben</deathdate>
+			<gender>geschlecht</gender>
+			<ignore xsi:type="stringColumn">ignoriert1</ignore>
+			<ignore xsi:type="stringColumn">patfakt1</ignore>
+		</idat>		
+	</patient-table>
+	<!-- optional -->
+	<visit-table>
+        <source xsi:type="fileSource">
+            <url>file:test-1-visits.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>fallnr</visit-id>
+			<start format="ISO" na="@" truncate-to="year">start</start>
+			<end>end</end>
+		</idat>
+		<mdat>
+			<!-- in/out code -->
+			<concept id="weight">
+				<value xsi:type="stringColumn">gewicht</value>
+				<start>start</start>
+			</concept>
+		</mdat>
+	</visit-table>
+	
+	<wide-table>
+        <source xsi:type="fileSource">
+            <url>file:test-1-widetable.txt</url>
+            <type>text/csv</type>
+        </source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>fallnr</visit-id>
+		</idat>
+		<mdat>
+			<concept id="natrium">
+				<value xsi:type="stringColumn">na</value>
+				<start>zeitpunkt</start>
+				<unit constant-value="mmol/l" />
+				<modifier id="other">
+					<value xsi:type="stringColumn">other</value>
+				</modifier>
+			</concept>
+		</mdat>
+		..
+	</wide-table>
+
+</datasource>

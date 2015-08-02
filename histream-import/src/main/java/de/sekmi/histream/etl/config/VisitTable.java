@@ -18,9 +18,9 @@ public class VisitTable extends Table implements WideInterface{
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static class IDAT extends IdatColumns{
 		@XmlElement(name="visit-id")
-		Column visitId;
-		Column start;
-		Column end;
+		StringColumn visitId;
+		DateTimeColumn start;
+		DateTimeColumn end;
 		// TODO inpatient/outpatient state
 		Column[] ignore;
 	}

@@ -16,10 +16,10 @@ public class Concept{
 	String id;
 	// TODO: value should contain also type (string,decimal,integer,...)
 	Column value;
-	Column unit;
+	StringColumn unit;
 	@XmlElement(required=true)
-	Column start;
-	Column end;
+	DateTimeColumn start;
+	DateTimeColumn end;
 	@XmlElement(name="modifier")
 	Modifier[] modifiers;
 	// ...
@@ -30,7 +30,7 @@ public class Concept{
 		String id;
 		// TODO: value with type
 		Column value;
-		Column unit;
+		StringColumn unit;
 		
 		private Modifier(){
 		}
@@ -43,10 +43,10 @@ public class Concept{
 	private Concept(){
 	}
 	
-	public Concept(String id, String startColumn){
+	public Concept(String id, String startColumn, String format){
 		this();
 		this.id = id;
-		this.start = new Column(startColumn);
+		this.start = new DateTimeColumn(startColumn, format);
 	}
 	
 }

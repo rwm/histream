@@ -21,12 +21,11 @@ public class PatientTable extends Table implements WideInterface{
 
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static class IDAT extends IdatColumns{
-		Column firstname;
-		Column lastname;
-		Column birthdate;
-		Column deathdate;
-		Column gender;
+		StringColumn firstname;
+		StringColumn lastname;
+		DateTimeColumn birthdate;
+		DateTimeColumn deathdate;
+		StringColumn gender;
 		Column[] ignore;
 	}
-
 }
