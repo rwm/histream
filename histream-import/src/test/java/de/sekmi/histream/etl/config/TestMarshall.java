@@ -25,6 +25,7 @@ public class TestMarshall {
 			// patient table
 			Assert.assertNotNull(ds.patientTable);
 			Assert.assertNotNull(ds.patientTable.source);
+			Assert.assertEquals("\\t", ((FileSource)ds.patientTable.source).separator);
 			Assert.assertNotNull(ds.patientTable.idat);
 			Assert.assertEquals("patid",ds.patientTable.idat.patientId.name);
 			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.name);
@@ -65,7 +66,9 @@ public class TestMarshall {
 		s.xmlSources[0].transform = new XmlSource.Transform[1];
 		s.xmlSources[0].transform[0] = new XmlSource.Transform("file:my.xsl","c:/to/file");
 		s.patientTable = new PatientTable();
-		s.patientTable.source = new FileSource("file:patient.source","text/csv");
+		FileSource fs = new FileSource("file:patient.source","text/csv");
+		fs.separator = "\\t";
+		s.patientTable.source = fs;
 		s.patientTable.idat = new PatientTable.IDAT();
 		s.patientTable.idat.patientId = new StringColumn("patid"); 
 		s.visitTable = new VisitTable();
@@ -83,11 +86,10 @@ public class TestMarshall {
 		s.wideTables[0].concepts = new Concept[2];
 		s.wideTables[0].concepts[0] = new Concept("ACC","zeit","yyyy-MM-ddTHH:mm:ss");
 		s.wideTables[0].concepts[0].modifiers = new Concept.Modifier[1];
-		s.wideTables[0].concepts[0].modifiers[0] = new Concept.Modifier("DOSE"); 
-		s.wideTables[0].concepts[0].modifiers[0].value = new StringColumn("dosis"); 
-		
-		
+		s.wideTables[0].concepts[0].modifiers[0] = new Concept.Modifier("DOSE");
+		s.wideTables[0].concepts[0].modifiers[0].value = new StringColumn("dosis");
+
 		JAXB.marshal(s, System.out);
-		
+
 	}
 }

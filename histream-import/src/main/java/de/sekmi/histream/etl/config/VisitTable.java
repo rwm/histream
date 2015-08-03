@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import de.sekmi.histream.etl.ColumnMap;
+
 public class VisitTable extends Table implements WideInterface{
 	@XmlElement
 	IDAT idat;
@@ -23,5 +25,17 @@ public class VisitTable extends Table implements WideInterface{
 		DateTimeColumn end;
 		// TODO inpatient/outpatient state
 		Column[] ignore;
+	}
+	@Override
+	public ColumnMap getColumnMap(String[] headers) {
+		ColumnMap map = new ColumnMap(headers);
+		map.registerColumn(idat.patientId);
+		map.registerColumn(idat.visitId);
+		map.registerColumn(idat.start);
+		map.registerColumn(idat.end);
+		for( Concept c : concepts ){
+			mapRegisterConcept(map, c);
+		}
+		return map;
 	}
 }

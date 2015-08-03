@@ -1,9 +1,13 @@
 package de.sekmi.histream.etl.config;
 
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+
+import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.etl.ParseException;
 
 /**
  * Date and Time column.
@@ -30,5 +34,26 @@ public class DateTimeColumn extends Column{
 	
 	protected DateTimeColumn(){
 		super();
+	}
+	
+	@Override
+	public Object valueOf(Object value) throws ParseException{
+		value = super.valueOf(value);
+		if( value instanceof String ){
+			// parse date according to format
+			if( formatter == null && format != null ){
+				formatter = DateTimeFormatter.ofPattern(format);
+			}
+			if( formatter == null ){
+				throw new ParseException("format must be specified for DateTime fields if strings are parsed");
+			}
+			// TODO parse
+			return DateTimeAccuracy.parse(formatter,(String)value);
+		}else if( value instanceof Timestamp ){
+			// convert from timestamp
+			return null;
+		}else{
+			throw new IllegalArgumentException("Don't know how to parse type "+value.getClass()+" to datetime");
+		}
 	}
 }

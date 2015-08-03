@@ -7,9 +7,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
+import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ParseException;
+
 @XmlTransient
 @XmlSeeAlso({StringColumn.class})
-public class Column {
+public abstract class Column {
 	protected Column(){
 	}
 	public Column(String name){
@@ -62,6 +65,8 @@ public class Column {
 	@XmlValue
 	String name;
 	
+	public String getName(){return name;}
+	
 	/**
 	 * Convert a string input value to the output data type. The resulting type depends
 	 * on the type attribute and can be one of Long, BigDecimal, String, DateTime
@@ -72,7 +77,7 @@ public class Column {
 	 * @param value input value. e.g. from text table column
 	 * @return output type representing the input value
 	 */
-	public Object valueOf(String value){
+	public Object valueOf(Object value)throws ParseException{
 		if( constantValue != null ){
 			value = constantValue;
 		}
@@ -82,20 +87,25 @@ public class Column {
 		}
 		
 		if( value != null && regexMatch != null ){
-			value = applyRegularExpression(value);
+			if( !(value instanceof String) ){
+				throw new ParseException("regex-match can only be used on String, but found "+value.getClass().getName());
+			}
+			
+			value = applyRegularExpression((String)value);
 		}
 		
 		return value;
 	}
 	
+	public Object valueOf(ColumnMap map, Object[] row) throws ParseException{
+		return this.valueOf(row[map.indexOf(this)]);
+	}
+
 	public String applyRegularExpression(String input){
 		// TODO: apply
 		return input;
 	}
-	
-	public static class IntegerColumn extends Column{
-		
-	}
+
 	public static class DecimalColumn extends Column{
 		@XmlTransient
 		DecimalFormat decimalFormat;
