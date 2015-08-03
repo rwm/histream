@@ -1,5 +1,7 @@
 package de.sekmi.histream;
 
+import java.time.DateTimeException;
+
 /*
  * #%L
  * histream
@@ -22,9 +24,11 @@ package de.sekmi.histream;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
@@ -229,5 +233,55 @@ public class DateTimeAccuracy implements Temporal {
 			throw new IllegalArgumentException("Expected yyyy-mm-ddThh:mm:ss");
 		}
 		throw new UnsupportedOperationException("Timezone support not implemented yet");
+	}
+	
+	/**
+	 * Parse date time with a formatter.
+	 * 
+	 * @param formatter formatter
+	 * @param text input text
+	 * @return date time with accuracy
+	 */
+	public static DateTimeAccuracy parse(DateTimeFormatter formatter, CharSequence text){
+		TemporalAccessor a = formatter.parse(text);
+		int year = a.get(ChronoField.YEAR);
+		// month
+		int month;
+		try{
+			month = a.get(ChronoField.MONTH_OF_YEAR);
+		}catch( DateTimeException e ){
+			return new DateTimeAccuracy(year);
+		}
+		
+		int day;
+		try{
+			day = a.get(ChronoField.DAY_OF_MONTH);
+		}catch( DateTimeException e ){
+			return new DateTimeAccuracy(year,month);
+		}
+
+		int hour;
+		try{
+			hour = a.get(ChronoField.HOUR_OF_DAY);
+		}catch( DateTimeException e ){
+			return new DateTimeAccuracy(year,month,day);
+		}
+
+		int minute;
+		try{
+			minute = a.get(ChronoField.MINUTE_OF_HOUR);
+		}catch( DateTimeException e ){
+			return new DateTimeAccuracy(year,month,day, hour);
+		}
+		
+		int seconds;
+		try{
+			seconds = a.get(ChronoField.SECOND_OF_MINUTE);
+		}catch( DateTimeException e ){
+			return new DateTimeAccuracy(year,month,day, hour, minute);
+		}
+
+		return new DateTimeAccuracy(year,month,day, hour, minute, seconds);
+		// milliseconds not supported for now
 	}
 }
