@@ -8,7 +8,7 @@ import javax.xml.bind.JAXB;
 import org.junit.Test;
 
 import de.sekmi.histream.etl.PatientRow;
-import de.sekmi.histream.etl.PatientStream;
+import de.sekmi.histream.etl.RecordSupplier;
 import org.junit.Assert;
 
 public class TestReadTables {
@@ -19,7 +19,7 @@ public class TestReadTables {
 		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.xml") ){
 			ds = JAXB.unmarshal(in, DataSource.class);
 		}
-		try( PatientStream s = ds.patientTable.open() ){
+		try( RecordSupplier<PatientRow> s = ds.patientTable.open() ){
 			PatientRow r = s.get();
 			Assert.assertEquals("1", r.getId());
 			System.out.println(r.getBirthDate());

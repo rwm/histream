@@ -3,14 +3,14 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import de.sekmi.histream.etl.config.PatientTable;
+import de.sekmi.histream.etl.config.Table;
 
-public class PatientStream implements Supplier<PatientRow>, AutoCloseable{
+public class RecordSupplier<R> implements Supplier<R>, AutoCloseable{
 	RowSupplier rows;
-	PatientTable table;
+	Table<R> table;
 	ColumnMap map;
 	
-	public PatientStream(RowSupplier rows, PatientTable table) throws IOException{
+	public RecordSupplier(RowSupplier rows, Table<R> table) throws IOException{
 		this.rows = rows;
 		this.table = table;
 		this.map = table.getColumnMap(rows.getHeaders());
@@ -22,24 +22,20 @@ public class PatientStream implements Supplier<PatientRow>, AutoCloseable{
 	}
 
 	@Override
-	public PatientRow get() {
+	public R get() {
 		Object[] row = rows.get();
 
 		if( row == null ){
 			// no more rows
 			return null;
 		}
-		PatientRow p;
+		R p;
 		try {
-			p = table.fillPatient(map, row);
+			p = table.fillRecord(map, row);
 		} catch (ParseException e) {
 			throw new UncheckedParseException(e);
 		}
 
 		return p;
 	}
-
-
-
-
 }

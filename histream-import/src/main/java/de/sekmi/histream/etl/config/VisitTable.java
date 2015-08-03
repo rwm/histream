@@ -7,8 +7,10 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.etl.VisitRow;
 
-public class VisitTable extends Table implements WideInterface{
+public class VisitTable extends Table<VisitRow> implements WideInterface{
 	@XmlElement
 	IDAT idat;
 	
@@ -37,5 +39,10 @@ public class VisitTable extends Table implements WideInterface{
 			mapRegisterConcept(map, c);
 		}
 		return map;
+	}
+	@Override
+	public VisitRow fillRecord(ColumnMap map, Object[] row) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

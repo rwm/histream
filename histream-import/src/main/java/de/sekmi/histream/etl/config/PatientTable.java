@@ -1,6 +1,5 @@
 package de.sekmi.histream.etl.config;
 
-import java.io.IOException;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -11,7 +10,6 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.PatientRow;
-import de.sekmi.histream.etl.PatientStream;
 
 /**
  * Patient table. Contains patient id and other identifying information.
@@ -19,7 +17,7 @@ import de.sekmi.histream.etl.PatientStream;
  * @author marap1
  *
  */
-public class PatientTable extends Table implements WideInterface{
+public class PatientTable extends Table<PatientRow> implements WideInterface{
 	@XmlElement
 	IDAT idat;
 	
@@ -61,7 +59,9 @@ public class PatientTable extends Table implements WideInterface{
 		return map;
 	}
 	
-	public PatientRow fillPatient(ColumnMap map, Object[] row) throws ParseException{
+
+	@Override
+	public PatientRow fillRecord(ColumnMap map, Object[] row) throws ParseException {
 		PatientRow patient = new PatientRow();
 		patient.setId(idat.patientId.valueOf(map, row).toString());
 		patient.setNames((String)idat.firstname.valueOf(map, row), (String)idat.surname.valueOf(map, row));
@@ -69,10 +69,6 @@ public class PatientTable extends Table implements WideInterface{
 		patient.setDeathDate((DateTimeAccuracy)idat.deathdate.valueOf(map, row));
 		// TODO concepts
 		return patient;
-	}
-	
-	public PatientStream open() throws IOException{
-		return new PatientStream(source.rows(), this);
 	}
 	
 }

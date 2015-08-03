@@ -4,8 +4,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.etl.WideRow;
 
-public class WideTable extends Table {
+public class WideTable extends Table<WideRow> {
 
 	@XmlElement
 	DataTableIdat idat;
@@ -23,5 +25,11 @@ public class WideTable extends Table {
 			mapRegisterConcept(map, c);
 		}
 		return map;
+	}
+
+	@Override
+	public WideRow fillRecord(ColumnMap map, Object[] row) throws ParseException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,12 +1,16 @@
 package de.sekmi.histream.etl.config;
 
+import java.io.IOException;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.etl.RecordSupplier;
 
 @XmlTransient
-public abstract class Table {
+public abstract class Table<T> {
 
 	@XmlElement(required=true)
 	TableSource source;
@@ -33,4 +37,11 @@ public abstract class Table {
 			map.registerColumn(m.unit);
 		}
 	}
+	
+	public abstract T fillRecord(ColumnMap map, Object[] row) throws ParseException;
+	
+	public RecordSupplier<T> open() throws IOException{
+		return new RecordSupplier<>(source.rows(), this);
+	}
+
 }
