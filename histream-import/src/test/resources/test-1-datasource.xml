@@ -23,15 +23,15 @@
 	 
 	<patient-table>
         <source xsi:type="fileSource">
-            <url>file:test-1-patients.txt</url>
-            <type>text/csv</type>
+            <url>file:src/test/resources/test-1-patients.txt</url>
+            <separator>\t</separator>
         </source>
 		<idat>
 			<patient-id>patid</patient-id>
 			<firstname>vorname</firstname>
 			<surname>nachname</surname>
-			<birthdate>geburtsdatum</birthdate>
-			<deathdate>verstorben</deathdate>
+			<birthdate format="d.M.u">geburtsdatum</birthdate>
+			<deathdate format="d.M.u">verstorben</deathdate>
 			<gender>geschlecht</gender>
 			<ignore xsi:type="stringColumn">ignoriert1</ignore>
 			<ignore xsi:type="stringColumn">patfakt1</ignore>
@@ -42,6 +42,7 @@
         <source xsi:type="fileSource">
             <url>file:test-1-visits.txt</url>
             <type>text/csv</type>
+			<separator>\t</separator>
         </source>
 		<idat>
 			<patient-id>patid</patient-id>
@@ -61,7 +62,7 @@
 	<wide-table>
         <source xsi:type="fileSource">
             <url>file:test-1-widetable.txt</url>
-            <type>text/csv</type>
+			<separator>\t</separator>
         </source>
 		<idat>
 			<patient-id>patid</patient-id>

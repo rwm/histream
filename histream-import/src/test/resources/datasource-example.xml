@@ -31,8 +31,8 @@
 			<patient-id>ID</patient-id>
 			<firstname>Vorname</firstname>
 			<surname>Nachname</surname>
-			<birthdate></birthdate>
-			<deathdate></deathdate>
+			<birthdate>geburtsdatum</birthdate>
+			<deathdate>verstorben</deathdate>
 			<gender map="geschlecht">geschlecht</gender>
 			<ignore>...</ignore>
 		</idat>
