@@ -1,5 +1,8 @@
 package de.sekmi.histream.etl;
 
-public class VisitRow {
+import de.sekmi.histream.impl.VisitImpl;
+
+public class VisitRow extends VisitImpl{
+
 
 }

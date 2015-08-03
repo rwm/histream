@@ -40,15 +40,15 @@
 	<!-- optional -->
 	<visit-table>
         <source xsi:type="fileSource">
-            <url>file:test-1-visits.txt</url>
+            <url>file:src/test/resources/test-1-visits.txt</url>
             <type>text/csv</type>
 			<separator>\t</separator>
         </source>
 		<idat>
 			<patient-id>patid</patient-id>
 			<visit-id>fallnr</visit-id>
-			<start format="ISO" na="@" truncate-to="year">start</start>
-			<end>end</end>
+			<start format="d.M.u[ H[:m[:s]]]" na="@" truncate-to="year">start</start>
+			<end format="d.M.u[ H[:m[:s]]]">end</end>
 		</idat>
 		<mdat>
 			<!-- in/out code -->

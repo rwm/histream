@@ -27,7 +27,7 @@ public class FileRowSupplier extends RowSupplier {
 	}
 	
 	@Override
-	public String[] getHeaders() throws IOException {
+	public String[] getHeaders() {
 		return headers;
 	}
 

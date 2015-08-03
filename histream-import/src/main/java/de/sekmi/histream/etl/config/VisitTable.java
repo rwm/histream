@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.VisitRow;
@@ -29,8 +30,9 @@ public class VisitTable extends Table<VisitRow> implements WideInterface{
 		Column[] ignore;
 	}
 	@Override
-	public ColumnMap getColumnMap(String[] headers) {
+	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
+		
 		map.registerColumn(idat.patientId);
 		map.registerColumn(idat.visitId);
 		map.registerColumn(idat.start);
@@ -38,11 +40,18 @@ public class VisitTable extends Table<VisitRow> implements WideInterface{
 		for( Concept c : concepts ){
 			mapRegisterConcept(map, c);
 		}
+		
 		return map;
 	}
+
 	@Override
 	public VisitRow fillRecord(ColumnMap map, Object[] row) throws ParseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-}
+		VisitRow visit = new VisitRow();
+		visit.setId(idat.visitId.valueOf(map, row).toString());
+		visit.setPatientId(idat.patientId.valueOf(map, row).toString());
+		visit.setStartTime((DateTimeAccuracy)idat.start.valueOf(map, row));
+		visit.setEndTime((DateTimeAccuracy)idat.end.valueOf(map, row));
+		// TODO other 
+		// TODO concepts
+		return visit;
+	}}

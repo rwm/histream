@@ -36,26 +36,16 @@ public class PatientTable extends Table<PatientRow> implements WideInterface{
 	}
 
 	@Override
-	public ColumnMap getColumnMap(String[] headers) {
+	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
-		if( !map.registerColumn(idat.patientId) ){
-			throw new IllegalArgumentException("patientId column name '"+idat.patientId.name+"' not found in patient table headers");
-		}
-		if( idat.firstname != null && !map.registerColumn(idat.firstname) ){
-			throw new IllegalArgumentException("firstname column not found in patient header");
-		}
-		if( idat.surname != null && !map.registerColumn(idat.surname) ){
-			throw new IllegalArgumentException("surname column not found in patient header");
-		}
-		if( idat.birthdate != null && !map.registerColumn(idat.birthdate) ){
-			throw new IllegalArgumentException("birthdate column not found in patient header");
-		}
-		if( idat.deathdate != null && !map.registerColumn(idat.deathdate) ){
-			throw new IllegalArgumentException("deathdate column not found in patient header");
-		}
-		if( idat.gender != null && !map.registerColumn(idat.gender) ){
-			throw new IllegalArgumentException("gender column not found in patient header");
-		}
+		
+		map.registerColumn(idat.patientId);
+		map.registerColumn(idat.firstname);
+		map.registerColumn(idat.surname);
+		map.registerColumn(idat.birthdate);
+		map.registerColumn(idat.deathdate);
+		map.registerColumn(idat.gender);
+		
 		return map;
 	}
 	

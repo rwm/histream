@@ -10,7 +10,7 @@ public class RecordSupplier<R> implements Supplier<R>, AutoCloseable{
 	Table<R> table;
 	ColumnMap map;
 	
-	public RecordSupplier(RowSupplier rows, Table<R> table) throws IOException{
+	public RecordSupplier(RowSupplier rows, Table<R> table)throws ParseException{
 		this.rows = rows;
 		this.table = table;
 		this.map = table.getColumnMap(rows.getHeaders());

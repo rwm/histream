@@ -17,7 +17,7 @@ public class WideTable extends Table<WideRow> {
 	Concept[] concepts;
 
 	@Override
-	public ColumnMap getColumnMap(String[] headers) {
+	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
 		map.registerColumn(idat.patientId);
 		map.registerColumn(idat.visitId);

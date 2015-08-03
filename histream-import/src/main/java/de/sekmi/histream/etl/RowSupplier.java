@@ -8,7 +8,7 @@ public abstract class RowSupplier implements Supplier<Object[]>, AutoCloseable{
 	public RowSupplier(){
 		
 	}
-	public abstract String[] getHeaders()throws IOException;
+	public abstract String[] getHeaders();
 	
 	@Override
 	public abstract Object[] get();
