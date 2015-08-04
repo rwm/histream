@@ -30,8 +30,8 @@
 			<patient-id>patid</patient-id>
 			<firstname>vorname</firstname>
 			<surname>nachname</surname>
-			<birthdate format="d.M.u">geburtsdatum</birthdate>
-			<deathdate format="d.M.u">verstorben</deathdate>
+			<birthdate format="d.M.u" na="">geburtsdatum</birthdate>
+			<deathdate format="d.M.u" na="">verstorben</deathdate>
 			<gender>geschlecht</gender>
 			<ignore xsi:type="string">ignoriert1</ignore>
 			<ignore xsi:type="string">patfakt1</ignore>
@@ -47,14 +47,15 @@
 		<idat>
 			<patient-id>patid</patient-id>
 			<visit-id>fallnr</visit-id>
-			<start format="d.M.u[ H[:m[:s]]]" na="@" truncate-to="year">start</start>
-			<end format="d.M.u[ H[:m[:s]]]">end</end>
+			<start format="d.M.u[ H[:m[:s]]]" na="" truncate-to="year">start</start>
+			<end format="d.M.u[ H[:m[:s]]]" na="">end</end>
 		</idat>
 		<mdat>
 			<!-- in/out code -->
 			<concept id="weight">
 				<value xsi:type="string">gewicht</value>
-				<start>start</start>
+				<!-- TODO: verify that na values are no allowed for concept start timestamps -->
+				<start format="d.M.u[ H[:m[:s]]]" na="">start</start>
 			</concept>
 		</mdat>
 	</visit-table>
@@ -70,13 +71,16 @@
 		</idat>
 		<mdat>
 			<concept id="natrium">
-				<!-- TODO implement numeric columns -->
 				<value xsi:type="decimal">na</value>
 				<start format="d.M.u[ H[:m[:s]]]">zeitpunkt</start>
 				<unit constant-value="mmol/l" />
 				<modifier id="other">
 					<value xsi:type="string" constant-value=""/>
 				</modifier>
+			</concept>
+			<concept id="kalium">
+				<value xsi:type="decimal">k</value>
+				<start format="d.M.u[ H[:m[:s]]]">zeitpunkt</start>
 			</concept>
 		</mdat>
 		..
