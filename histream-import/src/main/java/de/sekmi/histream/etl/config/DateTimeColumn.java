@@ -39,7 +39,9 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	@Override
 	public DateTimeAccuracy valueOf(Object value) throws ParseException{
 		value = super.preprocessValue(value);
-		if( value instanceof String ){
+		if( value == null ){
+			return null;
+		}else if( value instanceof String ){
 			// parse date according to format
 			if( formatter == null && format != null ){
 				formatter = DateTimeFormatter.ofPattern(format);
