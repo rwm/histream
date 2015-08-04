@@ -18,7 +18,7 @@ import de.sekmi.histream.etl.ParseException;
  *
  */
 @XmlTransient
-@XmlSeeAlso({StringColumn.class})
+@XmlSeeAlso({StringColumn.class,IntegerColumn.class,DateTimeColumn.class,DecimalColumn.class})
 public abstract class Column<T> {
 	protected Column(){
 	}

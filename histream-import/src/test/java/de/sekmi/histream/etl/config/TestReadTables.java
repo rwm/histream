@@ -2,6 +2,7 @@ package de.sekmi.histream.etl.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.temporal.ChronoField;
 
 import javax.xml.bind.JAXB;
@@ -59,8 +60,8 @@ public class TestReadTables {
 			Assert.assertTrue(r.getFacts().size() > 0);
 			Observation o = r.getFacts().get(0);
 			Assert.assertEquals("natrium", o.getConceptId());
-			Assert.assertEquals(Value.Type.Text, o.getValue().getType());
-			Assert.assertEquals("124", o.getValue().getStringValue());
+			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
+			Assert.assertEquals(BigDecimal.valueOf(124), o.getValue().getNumericValue());
 		}
 	}
 }

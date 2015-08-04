@@ -1,7 +1,10 @@
 package de.sekmi.histream.etl.config;
 
+import javax.xml.bind.annotation.XmlType;
+
 import de.sekmi.histream.etl.ParseException;
 
+@XmlType(name="string")
 public class StringColumn extends Column<String>{
 
 	public StringColumn(String name) {
