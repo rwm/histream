@@ -1,6 +1,7 @@
 package de.sekmi.histream.etl.config;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -10,6 +11,13 @@ import javax.xml.bind.annotation.XmlValue;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
 
+/**
+ * Abstract table column.
+ * A column does not need a name, if it has a constant-value assigned.
+ * 
+ * @author marap1
+ *
+ */
 @XmlTransient
 @XmlSeeAlso({StringColumn.class})
 public abstract class Column {
@@ -98,7 +106,15 @@ public abstract class Column {
 	}
 	
 	public Object valueOf(ColumnMap map, Object[] row) throws ParseException{
-		return this.valueOf(row[map.indexOf(this)]);
+		if( name.isEmpty() ){
+			// use constant value if available
+			return valueOf(null);
+		}
+		Objects.requireNonNull(map);
+		Objects.requireNonNull(row);
+		Integer index = map.indexOf(this);
+		Objects.requireNonNull(index);
+		return this.valueOf(row[index]);
 	}
 
 	public String applyRegularExpression(String input){
@@ -116,5 +132,11 @@ public abstract class Column {
 		 */
 		@XmlAttribute
 		String format;
+	}
+	
+	public void validate()throws ParseException{
+		if( name.isEmpty() && constantValue == null ){
+			throw new ParseException("Empty column name only allowed if constant-value is specified");
+		}
 	}
 }

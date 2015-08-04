@@ -27,12 +27,20 @@ public class ColumnMap{
 	
 	/**
 	 * Register a column and lookup it's index in the header list.
-	 * @param column
+	 * @param column column to register
 	 * @throws ParseException if the column cannot be found in the headers
 	 * @throws NullPointerException if column is null
 	 */
 	public void registerColumn(Column column)throws ParseException{
 		Objects.requireNonNull(column);
+		column.validate(); // TODO: maybe call after unmarshal of column
+		
+		if( column.getName().isEmpty() ){
+			// no reference to column, probably constant value
+			// no need to register
+			return;
+		}
+		
 		if( map.containsKey(column.getName()) ){
 			// column name already registered
 			return;

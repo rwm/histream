@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.PatientRow;
@@ -51,7 +52,7 @@ public class PatientTable extends Table<PatientRow> implements WideInterface{
 	
 
 	@Override
-	public PatientRow fillRecord(ColumnMap map, Object[] row) throws ParseException {
+	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		PatientRow patient = new PatientRow();
 		patient.setId(idat.patientId.valueOf(map, row).toString());
 		patient.setNames((String)idat.firstname.valueOf(map, row), (String)idat.surname.valueOf(map, row));

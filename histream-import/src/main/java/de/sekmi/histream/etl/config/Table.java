@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.RecordSupplier;
@@ -50,10 +51,11 @@ public abstract class Table<T> {
 		}
 	}
 	
-	public abstract T fillRecord(ColumnMap map, Object[] row) throws ParseException;
+	public abstract T fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException;
 	
-	public RecordSupplier<T> open() throws IOException, ParseException{
-		return new RecordSupplier<>(source.rows(), this);
+	public RecordSupplier<T> open(ObservationFactory factory) throws IOException, ParseException{
+		return new RecordSupplier<>(source.rows(), this, factory);
 	}
+
 
 }

@@ -61,7 +61,7 @@
 	
 	<wide-table>
         <source xsi:type="fileSource">
-            <url>file:test-1-widetable.txt</url>
+            <url>file:src/test/resources/test-1-widetable.txt</url>
 			<separator>\t</separator>
         </source>
 		<idat>
@@ -70,11 +70,12 @@
 		</idat>
 		<mdat>
 			<concept id="natrium">
+				<!-- TODO implement numeric columns -->
 				<value xsi:type="stringColumn">na</value>
-				<start>zeitpunkt</start>
+				<start format="d.M.u[ H[:m[:s]]]">zeitpunkt</start>
 				<unit constant-value="mmol/l" />
 				<modifier id="other">
-					<value xsi:type="stringColumn">other</value>
+					<value xsi:type="stringColumn" constant-value=""/>
 				</modifier>
 			</concept>
 		</mdat>

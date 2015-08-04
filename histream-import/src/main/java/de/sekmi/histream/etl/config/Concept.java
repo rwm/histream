@@ -1,9 +1,19 @@
 package de.sekmi.histream.etl.config;
 
+import java.math.BigDecimal;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+
+import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.impl.NumericValue;
+import de.sekmi.histream.impl.StringValue;
 
 /**
  * Concept from a wide table
@@ -49,4 +59,34 @@ public class Concept{
 		this.start = new DateTimeColumn(startColumn, format);
 	}
 	
+	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
+		DateTimeAccuracy start = (DateTimeAccuracy)this.start.valueOf(map,row);
+		Observation o = factory.createObservation(patid, this.id, start);
+		if( visit != null ){
+			o.setEncounterId(visit);
+		}
+		Object value = this.value.valueOf(map, row);
+		String unit = null;
+		if( this.unit != null ){
+			unit = (String)this.unit.valueOf(map, row);
+		}
+		if( value == null ){
+			// no value
+			o.setValue(null);
+		}else if( value instanceof String ){
+			// string
+			o.setValue(new StringValue((String)value));
+			// TODO: set unit
+		}else if( value instanceof BigDecimal ){
+			// numeric
+			NumericValue v = new NumericValue((BigDecimal)value,unit);
+			o.setValue(v);
+		}else{
+			throw new ParseException("Unsupported value type for concept id "+this.id+": "+value.getClass());
+		}
+
+		// TODO: modifiers
+		
+		return o;
+	}
 }
