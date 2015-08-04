@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.sekmi.histream.Observation;
 
-public class WideRow {
+public class WideRow implements FactRow{
 	private String patid;
 	private String visit;
 	private List<Observation> facts;
@@ -19,9 +19,12 @@ public class WideRow {
 	public void addFact(Observation o){
 		this.facts.add(o);
 	}
+	@Override
 	public List<Observation> getFacts(){
 		return facts;
 	}
+	@Override
 	public String getPatientId(){return patid;}
+	@Override
 	public String getVisitId(){return visit;}
 }

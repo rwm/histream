@@ -1,5 +1,8 @@
 package de.sekmi.histream.etl.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -11,6 +14,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({Column.class, StringColumn.class})
 public class DataSource {
+	
 	@XmlElement
 	Meta meta;
 	
@@ -28,5 +32,16 @@ public class DataSource {
 	WideTable[] wideTables;
 	
 	
+	public PatientTable getPatientTable(){
+		return patientTable;
+	}
+	
+	public VisitTable getVisitTable(){
+		return visitTable;
+	}
+	
+	public List<WideTable> getWideTables(){
+		return Arrays.asList(wideTables);
+	}
 	
 }

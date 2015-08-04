@@ -6,10 +6,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ConceptTable;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.WideRow;
 
-public class WideTable extends Table<WideRow> {
+public class WideTable extends Table<WideRow> implements ConceptTable{
 
 	@XmlElement
 	DataTableIdat idat;
@@ -39,5 +40,10 @@ public class WideTable extends Table<WideRow> {
 			rec.addFact(o);
 		}
 		return rec;
+	}
+
+	@Override
+	public Concept[] getConcepts() {
+		return concepts;
 	}
 }

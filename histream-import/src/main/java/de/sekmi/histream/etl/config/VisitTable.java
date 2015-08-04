@@ -8,10 +8,11 @@ import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ConceptTable;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.VisitRow;
 
-public class VisitTable extends Table<VisitRow> implements WideInterface{
+public class VisitTable extends Table<VisitRow> implements ConceptTable{
 	@XmlElement
 	IDAT idat;
 	
@@ -54,4 +55,10 @@ public class VisitTable extends Table<VisitRow> implements WideInterface{
 		// TODO other 
 		// TODO concepts
 		return visit;
-	}}
+	}
+
+	@Override
+	public Concept[] getConcepts() {
+		return concepts;
+	}
+}

@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.ConceptTable;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.PatientRow;
 
@@ -17,7 +18,7 @@ import de.sekmi.histream.etl.PatientRow;
  * @author marap1
  *
  */
-public class PatientTable extends Table<PatientRow> implements WideInterface{
+public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	@XmlElement
 	IDAT idat;
 	
@@ -59,6 +60,12 @@ public class PatientTable extends Table<PatientRow> implements WideInterface{
 		patient.setDeathDate(idat.deathdate.valueOf(map, row));
 		// TODO concepts
 		return patient;
+	}
+
+
+	@Override
+	public Concept[] getConcepts() {
+		return concepts;
 	}
 	
 }

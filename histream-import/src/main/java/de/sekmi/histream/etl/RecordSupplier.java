@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.config.Table;
 
-public class RecordSupplier<R> implements Supplier<R>, AutoCloseable{
+public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoCloseable{
 	private RowSupplier rows;
 	private Table<R> table;
 	private ColumnMap map;

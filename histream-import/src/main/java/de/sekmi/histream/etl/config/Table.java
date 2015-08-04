@@ -7,11 +7,12 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.FactRow;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.RecordSupplier;
 
 @XmlTransient
-public abstract class Table<T> {
+public abstract class Table<T extends FactRow> {
 
 	@XmlElement(required=true)
 	TableSource source;
