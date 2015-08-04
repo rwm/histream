@@ -44,7 +44,7 @@ import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
  *
  */
 @XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
-public class DateTimeAccuracy implements Temporal {
+public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> {
 	private LocalDateTime dateTime;
 	private ChronoUnit accuracy;
 	
@@ -283,5 +283,9 @@ public class DateTimeAccuracy implements Temporal {
 
 		return new DateTimeAccuracy(year,month,day, hour, minute, seconds);
 		// milliseconds not supported for now
+	}
+	@Override
+	public int compareTo(DateTimeAccuracy o) {
+		return dateTime.compareTo(o.dateTime);
 	}
 }
