@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
@@ -58,7 +59,13 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 		patient.setNames(idat.firstname.valueOf(map, row), idat.surname.valueOf(map, row));
 		patient.setBirthDate(idat.birthdate.valueOf(map, row));
 		patient.setDeathDate(idat.deathdate.valueOf(map, row));
-		// TODO concepts
+		// concepts
+		if( concepts != null ){
+			for( Concept c : concepts ){
+				Observation o = c.createObservation(patient.getPatientId(), null, factory, map, row);
+				patient.getFacts().add(o);
+			}
+		}
 		return patient;
 	}
 

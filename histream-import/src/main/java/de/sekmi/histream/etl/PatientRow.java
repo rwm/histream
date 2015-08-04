@@ -1,5 +1,6 @@
 package de.sekmi.histream.etl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.sekmi.histream.Observation;
@@ -16,18 +17,19 @@ public class PatientRow extends PatientImpl implements FactRow{
 	String firstname;
 	String lastname;
 	// TODO concepts
+	List<Observation> facts;
 	
 
 	public void setNames(String first, String last){
 		this.firstname = first;
 		this.lastname = last;
+		this.facts = new ArrayList<>();
 	}
 
 
 	@Override
 	public List<Observation> getFacts() {
-		// TODO Auto-generated method stub
-		return null;
+		return facts;
 	}
 
 

@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
@@ -53,7 +54,14 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		visit.setStartTime(idat.start.valueOf(map, row));
 		visit.setEndTime(idat.end.valueOf(map, row));
 		// TODO other 
-		// TODO concepts
+		
+		// concepts
+		if( concepts != null ){
+			for( Concept c : concepts ){
+				Observation o = c.createObservation(visit.getPatientId(), visit.getId(), factory, map, row);
+				visit.getFacts().add(o);
+			}
+		}
 		return visit;
 	}
 
