@@ -41,7 +41,31 @@ public interface ObservationSupplier extends Supplier<Observation>, AutoCloseabl
 	/**
 	 * Retrieve meta information for this supply of observations.
 	 * <p>
-	 * Possible keys are source.id, source.timestamp, etl.strategy
+	 * Possible keys are source.id, source.timestamp, etl.strategy, order.grouped, order.sorted
+	 * <dl>
+	 * 	<dt>source.id</dt>
+	 * 	<dd>ID for the source which provides the observations
+	 * 
+	 *  <dt>source.timestamp</dt>
+	 *  <dd>Timestamp when the source data was extracted/downloaded/queried</dd>
+	 *  
+	 *  <dt>etl.strategy</dt>
+	 *  <dd>Strategy how to handle imported data. 
+	 *  {@code replace-source} will drop any previous imports 
+	 *  with the same {@code source.id}, {@code replace-visit} will 
+	 *  delete any previous data with the same patient+visit combination.
+	 *  </dd>
+	 *  
+	 *  <dt>order.grouped</dt>
+	 *  <dd>If set to true, guarantees that all facts belonging to the same 
+	 *  patient+visit combination are provided en bloc.
+	 *  </dd>
+	 *  
+	 *  <dt>order.sorted</dt>
+	 *  <dd>If set to true, guarantees that all facts within the same
+	 *  patient+visit combination occur in ascending order of start timestamp.
+	 *  </dd>
+	 * </dl>
 	 * @param key meta key
 	 * @return value for the meta key
 	 */
