@@ -25,7 +25,7 @@ public class Concept{
 	@XmlAttribute(required=true)
 	String id;
 	// TODO: value should contain also type (string,decimal,integer,...)
-	Column value;
+	Column<?> value;
 	StringColumn unit;
 	@XmlElement(required=true)
 	DateTimeColumn start;
@@ -39,7 +39,7 @@ public class Concept{
 		@XmlAttribute(required=true)
 		String id;
 		// TODO: value with type
-		Column value;
+		Column<?> value;
 		StringColumn unit;
 		
 		private Modifier(){
@@ -60,7 +60,7 @@ public class Concept{
 	}
 	
 	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
-		DateTimeAccuracy start = (DateTimeAccuracy)this.start.valueOf(map,row);
+		DateTimeAccuracy start = this.start.valueOf(map,row);
 		Observation o = factory.createObservation(patid, this.id, start);
 		if( visit != null ){
 			o.setEncounterId(visit);
@@ -68,8 +68,9 @@ public class Concept{
 		Object value = this.value.valueOf(map, row);
 		String unit = null;
 		if( this.unit != null ){
-			unit = (String)this.unit.valueOf(map, row);
+			unit = this.unit.valueOf(map, row);
 		}
+		// TODO: use type of column this.value to infer value type
 		if( value == null ){
 			// no value
 			o.setValue(null);

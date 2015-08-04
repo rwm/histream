@@ -16,7 +16,7 @@ import de.sekmi.histream.etl.ParseException;
  * @author Raphael
  *
  */
-public class DateTimeColumn extends Column{
+public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	@XmlTransient
 	DateTimeFormatter formatter;
 	/**
@@ -37,8 +37,8 @@ public class DateTimeColumn extends Column{
 	}
 	
 	@Override
-	public Object valueOf(Object value) throws ParseException{
-		value = super.valueOf(value);
+	public DateTimeAccuracy valueOf(Object value) throws ParseException{
+		value = super.preprocessValue(value);
 		if( value instanceof String ){
 			// parse date according to format
 			if( formatter == null && format != null ){

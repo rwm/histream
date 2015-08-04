@@ -1,6 +1,5 @@
 package de.sekmi.histream.etl.config;
 
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,7 +19,7 @@ import de.sekmi.histream.etl.ParseException;
  */
 @XmlTransient
 @XmlSeeAlso({StringColumn.class})
-public abstract class Column {
+public abstract class Column<T> {
 	protected Column(){
 	}
 	public Column(String name){
@@ -75,6 +74,8 @@ public abstract class Column {
 	
 	public String getName(){return name;}
 	
+	public abstract T valueOf(Object input) throws ParseException;
+	
 	/**
 	 * Convert a string input value to the output data type. The resulting type depends
 	 * on the type attribute and can be one of Long, BigDecimal, String, DateTime
@@ -85,7 +86,7 @@ public abstract class Column {
 	 * @param value input value. e.g. from text table column
 	 * @return output type representing the input value
 	 */
-	public Object valueOf(Object value)throws ParseException{
+	public Object preprocessValue(Object value)throws ParseException{
 		if( constantValue != null ){
 			value = constantValue;
 		}
@@ -105,7 +106,7 @@ public abstract class Column {
 		return value;
 	}
 	
-	public Object valueOf(ColumnMap map, Object[] row) throws ParseException{
+	public T valueOf(ColumnMap map, Object[] row) throws ParseException{
 		if( name.isEmpty() ){
 			// use constant value if available
 			return valueOf(null);
@@ -120,18 +121,6 @@ public abstract class Column {
 	public String applyRegularExpression(String input){
 		// TODO: apply
 		return input;
-	}
-
-	public static class DecimalColumn extends Column{
-		@XmlTransient
-		DecimalFormat decimalFormat;
-		
-		/**
-		 * Decimal format string for parsing via {@link DecimalFormat}
-		 * @see DecimalFormat#DecimalFormat(String)
-		 */
-		@XmlAttribute
-		String format;
 	}
 	
 	public void validate()throws ParseException{

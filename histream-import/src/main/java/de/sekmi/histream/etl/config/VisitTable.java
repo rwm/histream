@@ -6,7 +6,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
-import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
@@ -28,7 +27,7 @@ public class VisitTable extends Table<VisitRow> implements WideInterface{
 		DateTimeColumn start;
 		DateTimeColumn end;
 		// TODO inpatient/outpatient state
-		Column[] ignore;
+		Column<?>[] ignore;
 	}
 	@Override
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
@@ -48,10 +47,10 @@ public class VisitTable extends Table<VisitRow> implements WideInterface{
 	@Override
 	public VisitRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		VisitRow visit = new VisitRow();
-		visit.setId(idat.visitId.valueOf(map, row).toString());
-		visit.setPatientId(idat.patientId.valueOf(map, row).toString());
-		visit.setStartTime((DateTimeAccuracy)idat.start.valueOf(map, row));
-		visit.setEndTime((DateTimeAccuracy)idat.end.valueOf(map, row));
+		visit.setId(idat.visitId.valueOf(map, row));
+		visit.setPatientId(idat.patientId.valueOf(map, row));
+		visit.setStartTime(idat.start.valueOf(map, row));
+		visit.setEndTime(idat.end.valueOf(map, row));
 		// TODO other 
 		// TODO concepts
 		return visit;

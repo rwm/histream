@@ -31,8 +31,8 @@ public class WideTable extends Table<WideRow> {
 
 	@Override
 	public WideRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
-		String patid = (String)idat.patientId.valueOf(map, row);
-		String visit = (String)idat.visitId.valueOf(map, row);
+		String patid = idat.patientId.valueOf(map, row);
+		String visit = idat.visitId.valueOf(map, row);
 		WideRow rec = new WideRow(patid,visit);
 		for( Concept c : concepts ){
 			Observation o = c.createObservation(patid, visit, factory, map, row);

@@ -6,7 +6,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
@@ -33,7 +32,7 @@ public class PatientTable extends Table<PatientRow> implements WideInterface{
 		DateTimeColumn birthdate;
 		DateTimeColumn deathdate;
 		StringColumn gender;
-		Column[] ignore;
+		Column<?>[] ignore;
 	}
 
 	@Override
@@ -54,10 +53,10 @@ public class PatientTable extends Table<PatientRow> implements WideInterface{
 	@Override
 	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		PatientRow patient = new PatientRow();
-		patient.setId(idat.patientId.valueOf(map, row).toString());
-		patient.setNames((String)idat.firstname.valueOf(map, row), (String)idat.surname.valueOf(map, row));
-		patient.setBirthDate((DateTimeAccuracy)idat.birthdate.valueOf(map, row));
-		patient.setDeathDate((DateTimeAccuracy)idat.deathdate.valueOf(map, row));
+		patient.setId(idat.patientId.valueOf(map, row));
+		patient.setNames(idat.firstname.valueOf(map, row), idat.surname.valueOf(map, row));
+		patient.setBirthDate(idat.birthdate.valueOf(map, row));
+		patient.setDeathDate(idat.deathdate.valueOf(map, row));
 		// TODO concepts
 		return patient;
 	}

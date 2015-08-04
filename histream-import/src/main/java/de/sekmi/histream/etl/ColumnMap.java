@@ -31,7 +31,7 @@ public class ColumnMap{
 	 * @throws ParseException if the column cannot be found in the headers
 	 * @throws NullPointerException if column is null
 	 */
-	public void registerColumn(Column column)throws ParseException{
+	public void registerColumn(Column<?> column)throws ParseException{
 		Objects.requireNonNull(column);
 		column.validate(); // TODO: maybe call after unmarshal of column
 		
@@ -54,7 +54,7 @@ public class ColumnMap{
 		}
 		throw new ParseException("Column name '"+column.getName()+"' not found in header");
 	}
-	public Integer indexOf(Column column){
+	public Integer indexOf(Column<?> column){
 		return map.get(column.getName());
 	}
 }
