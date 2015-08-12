@@ -46,6 +46,7 @@
 			<property name="project">demo</property>					
 			<property name="nullProvider">LCS-I2B2:PROVIDERS</property>					
 		</plugin>
+		<!-- supported file formats -->
 		<plugin class="de.sekmi.histream.io.XMLProviderFactory"/>
 		<plugin class="de.sekmi.histream.io.FlatProviderFactory"/>
 		

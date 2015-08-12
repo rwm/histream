@@ -199,7 +199,7 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testJAXBReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError, JAXBException  {
-		XMLObservationSupplier xos = new JAXBObservationSupplier(factory, new FileInputStream("examples/dwh-jaxb.xml"));
+		JAXBObservationSupplier xos = new JAXBObservationSupplier(factory, new FileInputStream("examples/dwh-jaxb.xml"));
 		validateExample(xos);
 		xos.close();
 	}

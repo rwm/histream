@@ -208,6 +208,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 	}
 	
 	public FlatObservationSupplier(ObservationFactory factory, InputStream input) throws IOException{
+		// TODO: standard API functionality: close() method will not close InputStream passed in constructor
 		this(factory, new BufferedReader(new InputStreamReader(input)));
 	}
 

@@ -17,9 +17,11 @@
   limitations under the License.
   #L%
   -->
-<dwh-eav xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+<eav-data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
 	<!-- TODO namespace xmlns="http://sekmi.de/histream/dwh-eav..." -->
-	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes gr��er als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem Encounter-Start liegen -->
+	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes 
+	größer als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem 
+	Encounter-Start liegen -->
 	<meta>
 		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
 		<etl strategy="replace-visit" />
@@ -27,49 +29,50 @@
 		
 		<!-- weitere metadaten n�tig? wertebereich, datentypen, ontologie, ...? -->
 	</meta>
-	<visit>
-		<patid>XX12345</patid>
+	<patient id="XX12345">
 		<surname>Dampf</surname>
 		<names>A</names>
 		<birthdate>2001-01-01</birthdate>
 		<deathdate>2020</deathdate>
 		<sex>F</sex>
-		<encounter start="2014-01-01T10:30:00" end="2014-01-05T10:30:00">XXE12345</encounter>
-		<location>Zuhause</location>
-		<!-- TODO inpatient/outpatient -->
-		<provider>xxxa</provider>
-		<facts>
-			<fact concept="T:date:secs" start="2014-09-07T10:40:03"/>
-			<fact concept="T:date:mins" start="2014-09-07T10:40"/>
-			<fact concept="T:date:hours" start="2014-09-07T10"/>
-			<fact concept="T:date:day" start="2014-09-07"/>
-			<fact concept="T:date:month" start="2014-09"/>
-			<fact concept="T:date:year" start="2014"/>
-
-			<!-- test parsing of data types -->
-			<fact concept="T:type:str"><value xsi:type="string">abc123</value></fact>
-			<fact concept="T:type:int"><value xsi:type="numeric">123</value></fact>
-			<!-- value attributes can be used in elements fact and value -->
-			<fact concept="T:type:dec"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
-			<fact concept="T:full" start="2010" end="2011" location="T:LOC"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
-			<!-- 
-			<fact concept="T:type:enum" type="xsi:integer">1</fact>
-				-->
-			<!--  test group items -->
-			
-			<fact concept="T:group:1">
-				<value xsi:type="string">groupvalue</value>
-				<modifier code="T:mod:1"/>
-				<modifier code="T:mod:2"><value xsi:type="string">def456</value></modifier>
-				<modifier code="T:mod:3"><value xsi:type="numeric" unit="mm" flag="A">78.9</value></modifier>
-			</fact>
-			<!--  group without value -->
-			<fact concept="T:group:2">
-				<modifier code="T:mod:1"/>
-			</fact>
-
-		</facts>
-	</visit>
-	<!-- weitere zeitstempel -->
+		<encounter id="XXE12345">
+			<start>2014-01-01T10:30:00</start>
+			<end>2014-01-05T10:30:00</end>
+			<location>Zuhause</location>
+			<!-- TODO inpatient/outpatient -->
+			<provider>xxxa</provider>
+			<facts>
+				<fact concept="T:date:secs" start="2014-09-07T10:40:03"/>
+				<fact concept="T:date:mins" start="2014-09-07T10:40"/>
+				<fact concept="T:date:hours" start="2014-09-07T10"/>
+				<fact concept="T:date:day" start="2014-09-07"/>
+				<fact concept="T:date:month" start="2014-09"/>
+				<fact concept="T:date:year" start="2014"/>
 	
-</dwh-eav>
+				<!-- test parsing of data types -->
+				<fact concept="T:type:str"><value xsi:type="string">abc123</value></fact>
+				<fact concept="T:type:int"><value xsi:type="numeric">123</value></fact>
+				<!-- value attributes can be used in elements fact and value -->
+				<fact concept="T:type:dec"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
+				<fact concept="T:full" start="2010" end="2011" location="T:LOC"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
+				<!-- 
+				<fact concept="T:type:enum" type="xsi:integer">1</fact>
+					-->
+				<!--  test group items -->
+				
+				<fact concept="T:group:1">
+					<value xsi:type="string">groupvalue</value>
+					<modifier code="T:mod:1"/>
+					<modifier code="T:mod:2"><value xsi:type="string">def456</value></modifier>
+					<modifier code="T:mod:3"><value xsi:type="numeric" unit="mm" flag="A">78.9</value></modifier>
+				</fact>
+				<!--  group without value -->
+				<fact concept="T:group:2">
+					<modifier code="T:mod:1"/>
+				</fact>
+	
+			</facts>
+		</encounter>	
+	</patient>
+	
+</eav-data>

@@ -8,8 +8,6 @@ import org.junit.Test;
 
 
 public class TransformerTest {
-	
-	@SuppressWarnings("resource")
 	@Test
 	public void testPullTransformerIdentity() throws FileNotFoundException, IOException{
 		FileObservationProviderTest f = new FileObservationProviderTest();
