@@ -52,6 +52,7 @@ import de.sekmi.histream.Value;
 @XmlType(propOrder={"abstractValue","modifierList"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
 public class ObservationImpl implements Observation{
+	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
 	@XmlTransient
 	protected ObservationFactoryImpl factory;
 

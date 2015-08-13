@@ -37,7 +37,7 @@
 	skos:notation "source1" ;
 	dwh:mapFact [
 		a		dwh:MapRule ; # optional
-		dwh:condition 	"fact/value='1'"^^dwh:XPath ;
+		dwh:condition 	"f:fact/f:value='1'"^^dwh:XPath ;
 		dwh:target	:t1 ;
 		dwh:modify	dwh:removeValue
 	] .

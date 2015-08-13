@@ -1,5 +1,6 @@
 package de.sekmi.histream.impl;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 
 import org.junit.Assert;
@@ -19,6 +20,11 @@ public class XPathEvaluatorTest {
 		eval = new XPathEvaluator();
 	}
 	
+	@Test
+	public void testDefaultNamespace(){
+		Assert.assertEquals(ObservationImpl.XML_NAMESPACE, eval.xpath.getNamespaceContext().getNamespaceURI(XMLConstants.DEFAULT_NS_PREFIX));
+	}
+	
 	@Test 
 	public void testExpressions() throws Exception{
 		FileObservationProviderTest t = new FileObservationProviderTest();
@@ -27,7 +33,7 @@ public class XPathEvaluatorTest {
 		Observation o = s.get();
 		//System.out.println("XXX:"+eval.evaluateToString("translate(fact/@start,'-:T','')", o));
 		//System.out.println(XPathEvaluator.toXMLString(o));
-		String[] trueExpressions = new String[]{"fact/@patient", "fact/@concept", "fact/@start", "number(translate(fact/@start,'-:T',''))=201409070104003"};
+		String[] trueExpressions = new String[]{"f:fact/@patient", "f:fact/@concept", "f:fact/@start", "number(translate(f:fact/@start,'-:T',''))=201409070104003"};
 		for( String expr : trueExpressions ){
 			Assert.assertEquals(expr, true, eval.test(expr, o));
 		}
@@ -37,21 +43,21 @@ public class XPathEvaluatorTest {
 		}
 
 		// compare string value
-		Assert.assertEquals(true, eval.test("fact/value='abc123'", o));
+		Assert.assertEquals(true, eval.test("f:fact/f:value='abc123'", o));
 		
 		// compare numeric value
 		o = s.get();
-		Assert.assertEquals(true, eval.test("fact/value > 122 and fact/value < 124", o));
+		Assert.assertEquals(true, eval.test("f:fact/f:value > 122 and f:fact/f:value < 124", o));
 
 		// compare value with unit 
 		// XXX flag not supported yet
 		o = s.get();
 		o = s.get();
-		Assert.assertEquals(true, eval.test("fact/value/@unit = 'mm' and fact/value > 123", o));
+		Assert.assertEquals(true, eval.test("f:fact/f:value/@unit = 'mm' and f:fact/f:value > 123", o));
 
 		// compare modifier values
 		o = s.get();
-		Assert.assertEquals(true, eval.test("fact/modifier[@code='T:mod:3']/value = 78.9 and fact/modifier[@code='T:mod:1']", o));
+		Assert.assertEquals(true, eval.test("f:fact/f:modifier[@code='T:mod:3']/f:value = 78.9 and f:fact/f:modifier[@code='T:mod:1']", o));
 		
 		s.close();
 	}

@@ -17,7 +17,8 @@
   limitations under the License.
   #L%
   -->
-<dwh-eav xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+<eav-data xmlns="http://sekmi.de/histream/ns/eav-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<!-- TODO namespace xmlns="http://sekmi.de/histream/dwh-eav..." -->
 	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes gr��er als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem Encounter-Start liegen -->
 	<meta>
@@ -27,29 +28,31 @@
 		
 		<!-- weitere metadaten n�tig? wertebereich, datentypen, ontologie, ...? -->
 	</meta>
-	<visit>
-		<patid>XX12345</patid>
+	<patient id="XX12345">
 		<surname>Dampf</surname>
 		<names>A</names>
 		<birthdate>2001-01-01</birthdate>
 		<deathdate>2020</deathdate>
 		<sex>F</sex>
-		<encounter start="2014-01-01T10:30:00" end="2014-01-05T10:30:00">XXE12345</encounter>
-		<location>Zuhause</location>
-		<!-- TODO inpatient/outpatient -->
-		<provider>xxxa</provider>
-		<facts>
+		<encounter id="XXE12345">
+			<start>2014-01-01T10:30:00</start>
+			<end>2014-01-05T10:30:00</end>
+			<location>Zuhause</location>
+			<!-- TODO inpatient/outpatient -->
+			<provider>xxxa</provider>
+			<facts>
+	
+				<!-- test parsing of data types -->
+				<fact concept="source1"><value xsi:type="string">1</value></fact>
+				<fact concept="source1"><value xsi:type="string">2</value></fact>
+				<fact concept="source2"><value xsi:type="string">1</value></fact>
+				<fact concept="source3"><value xsi:type="string">1</value></fact>
+				<fact concept="source3"><value xsi:type="string">2</value></fact>
+				<fact concept="source3"><value xsi:type="string">99</value></fact>
 
-			<!-- test parsing of data types -->
-			<fact concept="source1"><value xsi:type="string">1</value></fact>
-			<fact concept="source1"><value xsi:type="string">2</value></fact>
-			<fact concept="source2"><value xsi:type="string">1</value></fact>
-			<fact concept="source3"><value xsi:type="string">1</value></fact>
-			<fact concept="source3"><value xsi:type="string">2</value></fact>
-			<fact concept="source3"><value xsi:type="string">99</value></fact>
-
-		</facts>
-	</visit>
+			</facts>
+		</encounter>
+	</patient>
 	<!-- weitere zeitstempel -->
 	
-</dwh-eav>
+</eav-data>

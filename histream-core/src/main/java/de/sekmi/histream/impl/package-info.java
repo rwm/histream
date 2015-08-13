@@ -5,9 +5,12 @@
  *
  */
 
-@XmlSchema(
+@XmlSchema(namespace=ObservationImpl.XML_NAMESPACE,
+elementFormDefault=XmlNsForm.QUALIFIED,
 	xmlns = {
-		@XmlNs(prefix = "xsi", namespaceURI = "http://www.w3.org/2001/XMLSchema-instance") 
+			
+		@XmlNs(prefix = "xsi", namespaceURI = javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI) 
+		//"http://www.w3.org/2001/XMLSchema-instance"
 	}
 )
 package de.sekmi.histream.impl;

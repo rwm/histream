@@ -26,11 +26,9 @@ import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
-@XmlRootElement(name="value")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name="numeric")
 public class NumericValue extends AbstractValue {

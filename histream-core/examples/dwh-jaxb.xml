@@ -17,8 +17,8 @@
   limitations under the License.
   #L%
   -->
-<eav-data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
-	<!-- TODO namespace xmlns="http://sekmi.de/histream/dwh-eav..." -->
+<eav-data xmlns="http://sekmi.de/histream/ns/eav-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes 
 	größer als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem 
 	Encounter-Start liegen -->
@@ -27,7 +27,7 @@
 		<etl strategy="replace-visit" />
 		<source timestamp="2015-04-21T08:58:00" id="test"/>
 		
-		<!-- weitere metadaten n�tig? wertebereich, datentypen, ontologie, ...? -->
+		<!-- weitere metadaten nötig? wertebereich, datentypen, ontologie, ...? -->
 	</meta>
 	<patient id="XX12345">
 		<surname>Dampf</surname>

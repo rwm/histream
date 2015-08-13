@@ -37,7 +37,8 @@ import de.sekmi.histream.Value;
 public class ObservationImplJAXBTest {
 	public static final File EXAMPLE_FACT_XSD = new File("examples/fact.xsd");
 	public static final File[] EXAMPLE_FACT_FILES = new File[]{
-		new File("examples/fact1.xml")
+			new File("examples/fact1.xml"),
+	//		new File("examples/fact2.xml"),
 	};
 	
 	JAXBContext jaxb;
@@ -84,7 +85,7 @@ public class ObservationImplJAXBTest {
 			DOMResult dom = new DOMResult();
 			ObservationImpl o = createObservation(i);
 			JAXB.marshal(o, dom);
-			
+			JAXB.marshal(o, System.out);
 		}
 	}
 	@Test
@@ -98,7 +99,9 @@ public class ObservationImplJAXBTest {
 			Object o2;
 			try{
 				m.marshal(o1, s);
+				System.out.println("Marshal+Unmarshal["+i+"]: "+s.toString());
 				o2 = u.unmarshal(new StringReader(s.toString()));
+
 			}catch( Throwable e ){
 				throw new Exception("Error for observation "+i, e);
 			}
@@ -106,7 +109,7 @@ public class ObservationImplJAXBTest {
 			Assert.assertEquals(ObservationImpl.class, o2.getClass());
 			// verify values
 			Assert.assertEquals(o1.getValue(), ((ObservationImpl)o2).getValue());
-			
+			System.out.println("Value:"+((ObservationImpl)o2).getValue());
 			ObservationImpl ou = (ObservationImpl)o2;
 			switch( i ){
 			case 0:
