@@ -40,6 +40,22 @@ public interface ExtensionAccessor<T> {
 	 */
 	T access(Observation observation);
 	
+	/**
+	 * Sets the extension type instance for the given observation.
+	 * @param observation observation to set the instance for
+	 * @param ext extension instance
+	 */
 	void set(Observation observation, T ext);
 	// TODO: if necessary, create method isAvailable which does not create the instance automatically
+	
+	/**
+	 * Get an extension type instance which is independent of a single observation. 
+	 * The instance is identified by the provided arguments.
+	 * 
+	 * @param args arguments to identify the static instance
+	 * @return extension instance
+	 * @throws UnsupportedOperationException if this extension does not support static instances
+	 * @throws IllegalArgumentException if the arguments are inappropriate to identify instances of this type.
+	 */
+	T accessStatic(Object... args) throws UnsupportedOperationException, IllegalArgumentException;
 }

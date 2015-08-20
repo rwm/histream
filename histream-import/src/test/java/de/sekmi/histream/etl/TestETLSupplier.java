@@ -39,6 +39,7 @@ public class TestETLSupplier {
 			debug_str.append(fact.getValue());
 			
 			System.out.println(debug_str.toString());
+			// TODO test patient extension, visit extension
 		}
 		s.close();
 	}

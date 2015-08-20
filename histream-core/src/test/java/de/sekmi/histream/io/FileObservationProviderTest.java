@@ -44,6 +44,8 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
@@ -65,6 +67,7 @@ public class FileObservationProviderTest {
 		factory.registerExtension(new SimplePatientExtension());
 		factory.registerExtension(new SimpleVisitExtension());
 		//factory.registerExtension(new ConceptExtension());
+		
 	}	
 	
 	@Before
@@ -74,6 +77,13 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("T:date:secs", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.SECONDS, o.getStartTime().getAccuracy());
 				Assert.assertEquals(3, o.getStartTime().getLong(ChronoField.SECOND_OF_MINUTE));
+				Patient p = o.getExtension(Patient.class);
+				Assert.assertNotNull("Patient extension required", p);
+				Assert.assertEquals("XX12345", p.getId());
+				// TODO: test more patient information
+				Visit v = o.getExtension(Visit.class);
+				Assert.assertNotNull("Visit extension required", v);
+				// TODO test visit information
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:mins", o.getConceptId());

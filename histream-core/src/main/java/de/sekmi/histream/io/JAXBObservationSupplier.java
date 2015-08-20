@@ -3,6 +3,8 @@ package de.sekmi.histream.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +17,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.ExternalSourceImpl;
+import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
 
 public class JAXBObservationSupplier implements ObservationSupplier {
@@ -29,6 +36,12 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 	
 
 	private ObservationFactory factory;
+	private ExtensionAccessor<Patient> patientAccessor;
+	private ExtensionAccessor<Visit> visitAccessor;
+	private Patient currentPatient;
+	private Visit currentVisit;
+	private ExternalSourceImpl source;
+	
 	private Unmarshaller unmarshaller;
 	private XMLStreamReader reader;
 	private Map<String,String> meta;
@@ -57,6 +70,10 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		// TODO: set schema
 		//unmarshaller.setSchema(schema);
 		this.reader = reader;
+		this.source = new ExternalSourceImpl();
+		this.visitAccessor = factory.getExtensionAccessor(Visit.class);
+		this.patientAccessor = factory.getExtensionAccessor(Patient.class);
+		
 		readToRoot();
 		readMeta();
 		readPatient();
@@ -74,6 +91,10 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		reader.nextTag();
 	}
 	
+	private Instant parseSourceTimestamp(String timestamp){
+		Calendar cal = javax.xml.bind.DatatypeConverter.parseDateTime(timestamp);
+		return cal.toInstant();
+	}
 	private void readMeta()throws XMLStreamException{
 		if( !reader.isStartElement() || !reader.getLocalName().equals("meta") )return;
 		
@@ -88,9 +109,15 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 			reader.nextTag();
 		}
 		if( reader.getLocalName().equals("source") ){
-			meta.put("source.timestamp", reader.getAttributeValue(null, "timestamp"));
-			meta.put("source.id", reader.getAttributeValue(null, "id"));
-
+			String sourceTimestamp = reader.getAttributeValue(null, "timestamp");
+			meta.put("source.timestamp", sourceTimestamp);
+			String sourceId = reader.getAttributeValue(null, "id");
+			meta.put("source.id", sourceId);
+			// set source
+			source.setSourceId(sourceId);
+			
+			source.setSourceTimestamp(parseSourceTimestamp(sourceTimestamp));
+			
 			reader.nextTag();
 			// should be end element
 			reader.nextTag();
@@ -121,6 +148,9 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 			patientData.put(reader.getLocalName(), reader.getElementText());
 			reader.nextTag();
 		}
+		// register with extension
+		currentPatient = patientAccessor.accessStatic(patientId, source);
+		// TODO set patient data
 	}
 	/**
 	 * Reads encounter element with content. 
@@ -149,6 +179,8 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		}
 		// TODO assert at <facts>
 		reader.nextTag();
+		
+		// TODO register visit with extension, set visit data
 	}
 	protected Observation readObservation()throws XMLStreamException{
 		if( reader.isWhiteSpace() ){
@@ -210,7 +242,12 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		}
 		// TODO set etc. from visit
 		
-		// TODO set ObservationFactory, initialize extensions
+		// set ObservationFactory, initialize extensions
+		fact.setFactory((ObservationFactoryImpl)factory);
+		patientAccessor.set(fact, currentPatient);
+		// TODO set current visit
+		// TODO add tests to verify patient/visit extensions for parsed facts
+		
 		return fact;
 	}
 

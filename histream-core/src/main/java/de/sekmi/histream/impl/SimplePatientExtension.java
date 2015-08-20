@@ -32,7 +32,10 @@ public class SimplePatientExtension implements Extension<PatientImpl>{
 	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
-	public PatientImpl createInstance() {return new PatientImpl();}
+	public PatientImpl createInstance(Object... args) {
+		// TODO use string patient id as identification
+		return new PatientImpl();
+	}
 
 	@Override
 	public PatientImpl createInstance(Observation observation) {

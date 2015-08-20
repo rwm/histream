@@ -584,22 +584,20 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		insertIde.setString(6, source.getSourceId());
 		insertIde.executeUpdate();
 	}
-	@Override
-	public I2b2Patient createInstance(Observation fact) {
-
-		
-		I2b2Patient pat = getCached(fact.getPatientId());
+	
+	private I2b2Patient getOrCreateInstance(String patientId, ExternalSourceType source){
+		I2b2Patient pat = getCached(patientId);
 		if( pat == null ){
 			// string id not known to cache
 			// create new patient
 			maxPatientNum ++;
 			int num = maxPatientNum;
 			pat = new I2b2Patient(num);
-			pat.setId(fact.getPatientId());
+			pat.setId(patientId);
 			
 			
 			// don't use source metadata, since we only know the patient id
-			pat.setSourceId(fact.getSourceId());
+			pat.setSourceId(source.getSourceId());
 			//pat.setSourceTimestamp(fact.getSourceTimestamp());
 
 			// put in cache and insert into storage
@@ -609,7 +607,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 				insertPatient(pat);
 				
 				// insert ide into patient_mapping
-				insertIde(num, pat.getId(), "A", fact);
+				insertIde(num, pat.getId(), "A", source);
 			} catch (SQLException e) {
 				insertionException(pat, e);
 			} 
@@ -620,6 +618,11 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		}
 		return pat;
 	}
+	
+	@Override
+	public I2b2Patient createInstance(Observation fact) {
+		return getOrCreateInstance(fact.getPatientId(), fact);		
+	}
 
 	@Override
 	public Class<?>[] getInstanceTypes() {
@@ -627,12 +630,15 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 
 	@Override
-	public I2b2Patient createInstance() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+	public I2b2Patient createInstance(Object... args) throws IllegalArgumentException {
+		if( args.length != 2 || !(args[0] instanceof String) || !(args[1] instanceof ExternalSourceType) ){
+			throw new IllegalArgumentException("Expected arguments: String patientId, ExternalSourceType source");
+		}
+		return getOrCreateInstance((String)args[0], (ExternalSourceType)args[1]);
 	}
 
 	@Override
-	public Patient retrieve(String id) {
+	public I2b2Patient retrieve(String id) {
 		return idCache.get(id);
 	}
 

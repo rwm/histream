@@ -21,7 +21,6 @@ package de.sekmi.histream.impl;
  */
 
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +50,7 @@ import de.sekmi.histream.Value;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder={"abstractValue","modifierList"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
-public class ObservationImpl implements Observation{
+public class ObservationImpl extends ExternalSourceImpl implements Observation{
 	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
 	@XmlTransient
 	protected ObservationFactoryImpl factory;
@@ -79,9 +78,6 @@ public class ObservationImpl implements Observation{
 
 	@XmlAttribute(name="end")
 	protected DateTimeAccuracy endTime;
-
-	protected Instant sourceTimestamp;
-	protected String sourceId;
 
 	/**
 	 * Modifiers
@@ -185,6 +181,10 @@ public class ObservationImpl implements Observation{
 	@Override
 	public ObservationFactory getFactory() {return factory;}
 
+	public void setFactory(ObservationFactoryImpl factory){
+		this.factory = factory;
+	}
+	
 	@Override
 	public <T> T getExtension(Class<T> extensionType) {
 		// delegate to factory
@@ -197,25 +197,6 @@ public class ObservationImpl implements Observation{
 		factory.setExtension(this, extensionType, extension);
 	}
 
-	@Override
-	public Instant getSourceTimestamp() {
-		return sourceTimestamp;
-	}
-
-	@Override
-	public void setSourceTimestamp(Instant instant) {
-		this.sourceTimestamp = instant;
-	}
-
-	@Override
-	public String getSourceId() {
-		return sourceId;
-	}
-
-	@Override
-	public void setSourceId(String sourceSystemId) {
-		this.sourceId = sourceSystemId;
-	}
 
 	@Override
 	public Modifier addModifier(String modifierId, Value value) {

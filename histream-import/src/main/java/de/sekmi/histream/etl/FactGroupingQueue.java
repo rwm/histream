@@ -74,11 +74,13 @@ public class FactGroupingQueue{
 		tableIndex = 0;
 		
 		currentPatient = patientTable.get();
+		// TODO sync patient with extension factory
 		addFactsToWorkQueue(currentPatient);
 		
 		// for every patient, facts without visitId (=null) are parsed first
 		currentVisitId = null;		
 		nextVisit = visitTable.get();
+		// TODO sync visit with extension factory
 	}
 	
 	private void addFactsToWorkQueue(FactRow r){
@@ -122,8 +124,9 @@ public class FactGroupingQueue{
 			// no more fitting facts in current prefetched rows
 			// try to get next visit for current patient
 			if( nextVisit != null && nextVisit.getPatientId().equals(currentPatient.getPatientId()) ){
-				// next visit also belongs to currrent patient, continue
+				// next visit also belongs to current patient, continue
 				currentVisitId = nextVisit.getVisitId();
+				// TODO: sync visit with extension factory
 				addFactsToWorkQueue(nextVisit);
 				nextVisit = visitTable.get();
 				tableIndex = 0;
@@ -138,6 +141,7 @@ public class FactGroupingQueue{
 					// we are done
 					break;
 				}
+				// TODO: sync patient with extension factory
 				addFactsToWorkQueue(currentPatient);
 				tableIndex = 0;
 				// goto top

@@ -26,6 +26,8 @@ package de.sekmi.histream;
  * Single instance which generates all observations. 
  * Manages extensions which enhance/annotate observations.
  * 
+ * TODO replace interface with implementation - one implementation is sufficient.
+ * 
  * @author marap1
  *
  */
@@ -60,4 +62,6 @@ public interface ObservationFactory {
 	 * @return new observation
 	 */
 	Observation createObservation(String patientId, String conceptId, DateTimeAccuracy startTime);
+	
+	
 }

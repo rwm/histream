@@ -613,8 +613,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	}
 
 	@Override
-	public I2b2Visit createInstance() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+	public I2b2Visit createInstance(Object... args) throws UnsupportedOperationException {
+		// TODO: implement
+		throw new UnsupportedOperationException("TODO: implement");
 	}
 
 	@Override
@@ -632,5 +633,6 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		}
 		if( count != 0 )log.info("Updated "+count+" visits in database");
 	}
+
 
 }

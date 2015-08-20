@@ -32,7 +32,8 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
-	public VisitImpl createInstance() {
+	public VisitImpl createInstance(Object... args) {
+		// TODO: use patient id and visit id to identify visit
 		return new VisitImpl();
 	}
 

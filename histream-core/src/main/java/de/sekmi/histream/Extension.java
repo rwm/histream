@@ -48,8 +48,9 @@ public interface Extension<T>{
 	 * calls to this method will result in an {@link UnsupportedOperationException}.
 	 * @return new instance 
 	 * @throws UnsupportedOperationException if instance creation without {@link Observation} is not possible.
+	 * @throws IllegalArgumentException if given arguments are unsuitable to instantiate/identify this type.
 	 */
-	T createInstance() throws UnsupportedOperationException;
+	T createInstance(Object... args) throws UnsupportedOperationException, IllegalArgumentException;
 	
 	/**
 	 * Get class of the instance type. Should be a basic interface like Patient, Visit, Location, Concept, etc.

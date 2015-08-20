@@ -175,6 +175,11 @@ public class ObservationFactoryImpl implements ObservationFactory{
 			public void set(Observation observation, T ext) {
 				setExtension((ObservationImpl)observation, entry, ext);
 			}
+
+			@Override
+			public T accessStatic(Object... args) throws UnsupportedOperationException, IllegalArgumentException {
+				return null;
+			}
 		};
 	}
 
