@@ -173,14 +173,24 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		}
 		if( visitData.containsKey("start") ){
 			encounterStart = DateTimeAccuracy.parsePartialIso8601(visitData.get("start"));
+		}else{
+			encounterStart = null;
 		}
 		if( visitData.containsKey("end") ){
 			encounterEnd = DateTimeAccuracy.parsePartialIso8601(visitData.get("end"));
+		}else{
+			encounterEnd = null;
 		}
 		// TODO assert at <facts>
 		reader.nextTag();
 		
-		// TODO register visit with extension, set visit data
+		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, source);
+		currentVisit.setStartTime(encounterStart);
+		currentVisit.setEndTime(encounterEnd);
+		currentVisit.setLocationId(visitData.get("location"));
+		// TODO set other visit data: gender, provider, in/out status
+		visitData.get("provider");
+		
 	}
 	protected Observation readObservation()throws XMLStreamException{
 		if( reader.isWhiteSpace() ){
@@ -245,7 +255,7 @@ public class JAXBObservationSupplier implements ObservationSupplier {
 		// set ObservationFactory, initialize extensions
 		fact.setFactory((ObservationFactoryImpl)factory);
 		patientAccessor.set(fact, currentPatient);
-		// TODO set current visit
+		visitAccessor.set(fact, currentVisit);
 		// TODO add tests to verify patient/visit extensions for parsed facts
 		
 		return fact;

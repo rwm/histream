@@ -23,6 +23,8 @@ package de.sekmi.histream.impl;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.Extension;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
 public class SimpleVisitExtension implements Extension<VisitImpl>{
@@ -33,14 +35,30 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 
 	@Override
 	public VisitImpl createInstance(Object... args) {
-		// TODO: use patient id and visit id to identify visit
-		return new VisitImpl();
+		if( args.length != 3 
+				|| !(args[0] instanceof String)
+				|| !(args[1] instanceof Patient)
+				|| !(args[2] instanceof ExternalSourceType) )
+		{
+			throw new IllegalArgumentException("Need arguments String, Patient, ExternalSourceType");
+		}
+		VisitImpl visit = new VisitImpl();
+		visit.setId((String)args[0]);
+		visit.setPatientId(((Patient)args[1]).getId());
+		ExternalSourceType source = (ExternalSourceType)args[2];
+		visit.setSourceId(source.getSourceId());
+		visit.setSourceTimestamp(source.getSourceTimestamp());
+		
+		return visit;
 	}
 
 	@Override
 	public VisitImpl createInstance(Observation observation) {
-		VisitImpl visit = createInstance();
-		visit.setId(observation.getEncounterId());
+		VisitImpl visit = createInstance(observation.getEncounterId(), observation.getExtension(Patient.class), observation);
+		//visit.setId();
+		//visit.setPatientId(observation.getPatientId());
+		//visit.setSourceId(observation.getSourceId());
+		//visit.setSourceTimestamp(observation.getSourceTimestamp());
 		return visit;
 	}
 

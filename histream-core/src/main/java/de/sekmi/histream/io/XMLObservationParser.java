@@ -177,6 +177,7 @@ class XMLObservationParser extends AbstractObservationParser{
 			visit = fact.getExtension(Visit.class);
 			visit.setStartTime(encounterStart);
 			visit.setEndTime(encounterEnd);
+			visit.setLocationId(visitData.get("location"));
 //			visit.setStatus(status.);
 			// TODO: set visit data
 			

@@ -32,8 +32,9 @@ import java.util.stream.StreamSupport;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ext.ExternalSourceType;
 
-public class AbstractObservationParser {
+public class AbstractObservationParser implements ExternalSourceType{
 	protected ObservationFactory factory;
 	// meta
 	protected Instant sourceTimestamp;
@@ -116,5 +117,25 @@ public class AbstractObservationParser {
 			return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 		}
 		
+	}
+
+	@Override
+	public Instant getSourceTimestamp() {
+		return sourceTimestamp;
+	}
+
+	@Override
+	public void setSourceTimestamp(Instant sourceTimestamp) {
+		this.sourceTimestamp = sourceTimestamp;
+	}
+
+	@Override
+	public String getSourceId() {
+		return sourceId;
+	}
+
+	@Override
+	public void setSourceId(String sourceSystemId) {
+		this.sourceId = sourceSystemId;
 	}
 }

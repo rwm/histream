@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.StoredExtensionType;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.ext.Visit.Status;
@@ -49,6 +50,9 @@ import de.sekmi.histream.ext.Visit.Status;
  * Some optional columns are used: active_status_cd, start_date, end_date, inout_cd, location_cd, sourcesystem_cd
  * <p>
  * TODO use encounter_mapping table to map actual (source) patient_ide to internal patient_num for facts.
+ * <p>
+ * The variable argument list for {@link #createInstance(Object...)} requires the following arguments:
+ * {@link String}{@code visitId}, {@link I2b2Patient}{@code patient}, {@link ExternalSourceType}{@code source}.
  * 
  * @author marap1
  *
@@ -530,28 +534,25 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		log.log(Level.SEVERE, "Unable to update visit "+visit.getId(), e);
 	}
 
-	@Override
-	public I2b2Visit createInstance(Observation fact) {
-		// TODO create visit using fact.getPatientId() and fact.getVisitId()
-		I2b2Visit visit = idCache.get(fact.getEncounterId());
+	private I2b2Visit getOrCreateInstance(String encounterId, I2b2Patient patient, ExternalSourceType source){
+		I2b2Visit visit = idCache.get(encounterId);
 		
 		if( visit == null ){
 			maxEncounterNum ++;
 			int encounter_num = maxEncounterNum;
-			I2b2Patient p = fact.getExtension(I2b2Patient.class);
-			visit = new I2b2Visit(encounter_num, p.getNum());
-			visit.setPatientId(fact.getPatientId());
+			visit = new I2b2Visit(encounter_num, patient.getNum());
+			visit.setPatientId(patient.getId());
 			
 			// created from observation, use source metadata
-			visit.setSourceId(fact.getSourceId());
-			visit.setSourceTimestamp(fact.getSourceTimestamp());
+			visit.setSourceId(source.getSourceId());
+			visit.setSourceTimestamp(source.getSourceTimestamp());
 
 			// put in cache
 			visitCache.put(encounter_num, visit);
 			
 
 			// only one alias which is also primary
-			setAliases(visit, new String[]{fact.getEncounterId()}, 0);
+			setAliases(visit, new String[]{encounterId}, 0);
 			
 			// insert to storage
 			try {
@@ -563,7 +564,11 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 			// but changes are written later via a call to update.
 			// (otherwise, the instance would need to know whether to perform INSERT or UPDATE)
 		}
-		return visit;
+		return visit;		
+	}
+	@Override
+	public I2b2Visit createInstance(Observation fact) {
+		return getOrCreateInstance(fact.getEncounterId(), fact.getExtension(I2b2Patient.class), fact);
 	}
 
 	@Override
@@ -614,6 +619,13 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 
 	@Override
 	public I2b2Visit createInstance(Object... args) throws UnsupportedOperationException {
+		if( args.length != 3 
+				|| !(args[0] instanceof String) 
+				|| !(args[1] instanceof I2b2Patient) 
+				|| !(args[2] instanceof ExternalSourceType) )
+		{
+			throw new IllegalArgumentException("Need arguments String visitId, I2b2Patient patient, ExternalSourceType source");
+		}
 		// TODO: implement
 		throw new UnsupportedOperationException("TODO: implement");
 	}

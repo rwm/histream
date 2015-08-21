@@ -177,8 +177,9 @@ public class ObservationFactoryImpl implements ObservationFactory{
 			}
 
 			@Override
+			@SuppressWarnings("unchecked")
 			public T accessStatic(Object... args) throws UnsupportedOperationException, IllegalArgumentException {
-				return null;
+				return (T)entry.extension.createInstance(args);
 			}
 		};
 	}

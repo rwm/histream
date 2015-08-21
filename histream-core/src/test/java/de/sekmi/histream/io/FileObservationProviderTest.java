@@ -83,6 +83,7 @@ public class FileObservationProviderTest {
 				// TODO: test more patient information
 				Visit v = o.getExtension(Visit.class);
 				Assert.assertNotNull("Visit extension required", v);
+				Assert.assertEquals("Zuhause", v.getLocationId());
 				// TODO test visit information
 			},
 			(Observation o) ->  {
