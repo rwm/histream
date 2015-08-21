@@ -47,7 +47,7 @@ public class TestReadTables {
 	public void testReadVisits() throws IOException, ParseException{
 		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of) ){
 			VisitRow r = s.get();
-			Assert.assertEquals("1", r.getId());
+			Assert.assertEquals("v1", r.getId());
 			Assert.assertEquals(2013, r.getStartTime().get(ChronoField.YEAR));
 			
 		}
