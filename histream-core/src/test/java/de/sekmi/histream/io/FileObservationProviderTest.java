@@ -46,6 +46,7 @@ import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
@@ -84,6 +85,8 @@ public class FileObservationProviderTest {
 				Visit v = o.getExtension(Visit.class);
 				Assert.assertNotNull("Visit extension required", v);
 				Assert.assertEquals("Zuhause", v.getLocationId());
+				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-01T10:30:00"), v.getStartTime());
+				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00"), v.getEndTime());
 				// TODO test visit information
 			},
 			(Observation o) ->  {
