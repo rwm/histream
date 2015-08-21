@@ -2,7 +2,7 @@
 <datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
 	<meta>
 		<etl-strategy>replace-source</etl-strategy>
-		<source-id>test-1</source-id>
+		<source timestamp="2015-04-21T08:58:00" id="test-1"/>
 	</meta>
 	<!-- erstmal weglassen -->
 	<transformations>

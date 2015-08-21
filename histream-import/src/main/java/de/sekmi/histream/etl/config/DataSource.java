@@ -31,6 +31,7 @@ public class DataSource {
 	@XmlElement(name="wide-table")
 	WideTable[] wideTables;
 	
+	public Meta getMeta(){return meta;}
 	
 	public PatientTable getPatientTable(){
 		return patientTable;

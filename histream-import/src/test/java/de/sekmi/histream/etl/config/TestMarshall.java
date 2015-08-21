@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 
 import javax.xml.bind.JAXB;
 
@@ -21,7 +22,7 @@ public class TestMarshall {
 			DataSource ds = JAXB.unmarshal(in, DataSource.class);
 			Assert.assertNotNull(ds.meta);
 			Assert.assertEquals("replace-source",ds.meta.etlStrategy);
-			Assert.assertEquals("test-1",ds.meta.sourceId);
+			Assert.assertEquals("test-1",ds.meta.source.id);
 			// patient table
 			Assert.assertNotNull(ds.patientTable);
 			Assert.assertNotNull(ds.patientTable.source);
@@ -57,9 +58,7 @@ public class TestMarshall {
 	@Test
 	public void testMarshal() throws MalformedURLException{
 		DataSource s = new DataSource();
-		s.meta = new Meta();
-		s.meta.sourceId = "SID";
-		s.meta.etlStrategy = "replace-source";
+		s.meta = new Meta("replace-source","SID",Calendar.getInstance());
 		s.xmlSources = new XmlSource[1];
 		s.xmlSources[0] = new XmlSource();
 		s.xmlSources[0].url = new URL("http://lala");

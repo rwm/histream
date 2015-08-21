@@ -16,4 +16,5 @@ import de.sekmi.histream.etl.RowSupplier;
 @XmlSeeAlso({FileSource.class, SQLSource.class})
 public abstract class TableSource{
 	public abstract RowSupplier rows() throws IOException;
+	// TODO allow table sources to specify timestamp
 }
