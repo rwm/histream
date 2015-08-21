@@ -23,18 +23,29 @@ package de.sekmi.histream.impl;
 
 import de.sekmi.histream.Extension;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 
 public class SimplePatientExtension implements Extension<PatientImpl>{
 	private final static Class<?>[] TYPES = new Class<?>[]{Patient.class, PatientImpl.class};
-	
+
 	@Override
 	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
 	public PatientImpl createInstance(Object... args) {
-		// TODO use string patient id as identification
-		return new PatientImpl();
+		if( args.length != 2 || !(args[0] instanceof String) || !(args[1] instanceof ExternalSourceType) ){
+			throw new IllegalArgumentException("need String patid, ExternalSourceType source");
+		}
+		PatientImpl p = new PatientImpl();
+
+		p.setId((String)args[0]);
+		ExternalSourceType s = (ExternalSourceType)args[1];
+
+		p.setSourceId(s.getSourceId());
+		p.setSourceTimestamp(s.getSourceTimestamp());
+
+		return p;
 	}
 
 	@Override
