@@ -81,7 +81,7 @@ public class TestETLSupplier {
 		Assert.assertNotNull(v);
 
 		Assert.assertEquals("v1", v.getId());
-		// TODO make sure custom partial date format is parsed correctly
+		// TODO make sure custom partial date format is parsed correctly for missing seconds
 		//Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-20T09:00"), v.getStartTime());
 		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-21T13:00:21"), v.getEndTime());
 
