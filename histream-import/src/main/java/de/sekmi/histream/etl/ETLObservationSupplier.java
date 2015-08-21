@@ -13,6 +13,7 @@ import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.etl.config.PatientTable;
 import de.sekmi.histream.etl.config.VisitTable;
 import de.sekmi.histream.etl.config.WideTable;
+import de.sekmi.histream.ext.Patient;
 
 /**
  * Supplier for observations which are loaded from arbitrary
@@ -64,12 +65,13 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		pt = ds.getPatientTable();
 		vt = ds.getVisitTable();
 		wt = ds.getWideTables();
+		// TODO long tables
 
 		// in case of exception, make sure already opened suppliers are closed
 		try{
 			pr = pt.open(factory);
 			vr = vt.open(factory);
-			queue = new FactGroupingQueue(pr, vr);
+			queue = new FactGroupingQueue(pr, vr, factory.getExtensionAccessor(Patient.class), ds.getMeta().getSource());
 
 			// open all tables
 			wr = new ArrayList<>(wt.size());

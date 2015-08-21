@@ -38,7 +38,7 @@ public class TestReadTables {
 	public void testReadPatients() throws IOException, ParseException{
 		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of) ){
 			PatientRow r = s.get();
-			Assert.assertEquals("1", r.getId());
+			Assert.assertEquals("p1", r.getId());
 			Assert.assertEquals(2003, r.getBirthDate().get(ChronoField.YEAR));
 			
 		}

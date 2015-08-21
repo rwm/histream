@@ -3,9 +3,13 @@ package de.sekmi.histream.etl;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
+import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
 
 /**
  * Algorithm:
@@ -20,9 +24,15 @@ import de.sekmi.histream.Observation;
  */
 public class FactGroupingQueue{
 	private RecordSupplier<? extends FactRow> patientTable, visitTable;
+	private ExtensionAccessor<Patient> patientAccessor;
+
+	private ExternalSourceType metaSource;
 	private List<RecordSupplier<? extends FactRow>> factTables;
-	
+
+
 	private FactRow currentPatient, nextVisit;
+	private Patient currentPatientInstance;
+
 	private String currentVisitId;
 	private List<FactRow> currentRows;
 	private Queue<Observation> workQueue;
@@ -48,12 +58,14 @@ public class FactGroupingQueue{
 	}
 
 
-	public FactGroupingQueue(RecordSupplier<? extends FactRow> patientTable, RecordSupplier<? extends FactRow>visitTable){
+	public FactGroupingQueue(RecordSupplier<? extends FactRow> patientTable, RecordSupplier<? extends FactRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExternalSourceType metaSource){
 		this.patientTable = patientTable;
+		this.patientAccessor = patientAccessor;
+		Objects.requireNonNull(patientAccessor);
 		this.visitTable = visitTable;
 		this.factTables = new ArrayList<>();
 		this.workQueue = new ArrayDeque<>();
-		
+		this.metaSource = metaSource;
 	}
 	public void addFactTable(RecordSupplier<? extends FactRow> supplier){
 		if( supplier == patientTable || supplier == visitTable )throw new IllegalArgumentException("Cannot add patient or visit table as fact table");
@@ -61,6 +73,31 @@ public class FactGroupingQueue{
 		factTables.add(supplier);
 	}
 	
+	/**
+	 * Current patient changed: {@link #currentPatient}
+	 */
+	private void patientChanged(){
+		currentPatientInstance = patientAccessor.accessStatic(currentPatient.getPatientId(), metaSource);
+		// TODO sync patient with extension factory
+		addFactsToWorkQueue(currentPatient);
+	}
+
+	/**
+	 * Current visit changed. Current visit id is in {@link #currentVisitId}.
+	 * For facts without visit information, {@link #currentVisitId} may be null.
+	 * If {@link #currentVisitId} is not null, nextVisit will contain the current visit's information.
+	 */
+	private void visitChanged(){
+		// TODO for facts contained in visit, add facts to work queue
+
+		if( currentVisitId == null ){
+			// set visit extension to null
+		}else{
+			// TODO sync visit with extension factory
+			addFactsToWorkQueue(nextVisit);
+		}
+	}
+
 	/**
 	 * Load first row from each table, fill and sort the observation queue
 	 */
@@ -74,17 +111,19 @@ public class FactGroupingQueue{
 		tableIndex = 0;
 		
 		currentPatient = patientTable.get();
-		// TODO sync patient with extension factory
-		addFactsToWorkQueue(currentPatient);
+		patientChanged();
 		
 		// for every patient, facts without visitId (=null) are parsed first
 		currentVisitId = null;		
+		visitChanged();
+		
 		nextVisit = visitTable.get();
-		// TODO sync visit with extension factory
 	}
 	
 	private void addFactsToWorkQueue(FactRow r){
 		for( Observation f : r.getFacts() ){
+			// set patient extension
+			patientAccessor.set(f, currentPatientInstance);
 			workQueue.add(f);
 		}
 	}
@@ -126,8 +165,8 @@ public class FactGroupingQueue{
 			if( nextVisit != null && nextVisit.getPatientId().equals(currentPatient.getPatientId()) ){
 				// next visit also belongs to current patient, continue
 				currentVisitId = nextVisit.getVisitId();
-				// TODO: sync visit with extension factory
-				addFactsToWorkQueue(nextVisit);
+				visitChanged();
+				
 				nextVisit = visitTable.get();
 				tableIndex = 0;
 				// goto top
@@ -141,8 +180,9 @@ public class FactGroupingQueue{
 					// we are done
 					break;
 				}
-				// TODO: sync patient with extension factory
-				addFactsToWorkQueue(currentPatient);
+				patientChanged();
+				visitChanged();
+				
 				tableIndex = 0;
 				// goto top
 				continue;
