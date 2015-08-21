@@ -28,6 +28,7 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		StringColumn visitId;
 		DateTimeColumn start;
 		DateTimeColumn end;
+		StringColumn location;
 		// TODO inpatient/outpatient state
 		Column<?>[] ignore;
 	}
@@ -39,6 +40,9 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		map.registerColumn(idat.visitId);
 		map.registerColumn(idat.start);
 		map.registerColumn(idat.end);
+		if( idat.location != null ){
+			map.registerColumn(idat.location);
+		}
 		for( Concept c : concepts ){
 			mapRegisterConcept(map, c);
 		}
@@ -53,6 +57,9 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		visit.setPatientId(idat.patientId.valueOf(map, row));
 		visit.setStartTime(idat.start.valueOf(map, row));
 		visit.setEndTime(idat.end.valueOf(map, row));
+		if( idat.location != null ){
+			visit.setLocationId(idat.location.valueOf(map, row));
+		}
 		// TODO other 
 		
 		// concepts

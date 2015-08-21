@@ -14,6 +14,7 @@ import de.sekmi.histream.etl.config.PatientTable;
 import de.sekmi.histream.etl.config.VisitTable;
 import de.sekmi.histream.etl.config.WideTable;
 import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 
 /**
  * Supplier for observations which are loaded from arbitrary
@@ -71,7 +72,10 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		try{
 			pr = pt.open(factory);
 			vr = vt.open(factory);
-			queue = new FactGroupingQueue(pr, vr, factory.getExtensionAccessor(Patient.class), ds.getMeta().getSource());
+			queue = new FactGroupingQueue(pr, vr, 
+					factory.getExtensionAccessor(Patient.class), 
+					factory.getExtensionAccessor(Visit.class), 
+					ds.getMeta().getSource());
 
 			// open all tables
 			wr = new ArrayList<>(wt.size());

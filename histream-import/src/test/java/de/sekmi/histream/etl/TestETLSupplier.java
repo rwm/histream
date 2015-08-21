@@ -10,10 +10,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
@@ -64,7 +66,26 @@ public class TestETLSupplier {
 		Patient p = fact.getExtension(Patient.class);
 		Assert.assertNotNull(p);
 		Assert.assertEquals("p1", p.getId());
-		// TODO verify other patient information
-	}
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-01"), p.getBirthDate());
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11"), p.getDeathDate());
 
+		// TODO verify other patient information
+
+	}
+	@Test
+	public void testVisitExtension() throws IOException{
+		Observation fact = os.get();
+		Assert.assertNotNull(fact);
+
+		Visit v = fact.getExtension(Visit.class);
+		Assert.assertNotNull(v);
+
+		Assert.assertEquals("v1", v.getId());
+		// TODO make sure custom partial date format is parsed correctly
+		//Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-20T09:00"), v.getStartTime());
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-21T13:00:21"), v.getEndTime());
+
+		Assert.assertEquals("v1", v.getId());
+		Assert.assertEquals(null, v.getLocationId());
+	}
 }

@@ -10,6 +10,7 @@ import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 
 /**
  * Algorithm:
@@ -23,15 +24,20 @@ import de.sekmi.histream.ext.Patient;
  *
  */
 public class FactGroupingQueue{
-	private RecordSupplier<? extends FactRow> patientTable, visitTable;
+	private RecordSupplier<PatientRow> patientTable;
+	private RecordSupplier<VisitRow> visitTable;
 	private ExtensionAccessor<Patient> patientAccessor;
+	private ExtensionAccessor<Visit> visitAccessor;
 
 	private ExternalSourceType metaSource;
 	private List<RecordSupplier<? extends FactRow>> factTables;
 
 
-	private FactRow currentPatient, nextVisit;
+	private PatientRow currentPatient;
+	private VisitRow nextVisit;
+	
 	private Patient currentPatientInstance;
+	private Visit currentVisitInstance;
 
 	private String currentVisitId;
 	private List<FactRow> currentRows;
@@ -58,10 +64,12 @@ public class FactGroupingQueue{
 	}
 
 
-	public FactGroupingQueue(RecordSupplier<? extends FactRow> patientTable, RecordSupplier<? extends FactRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExternalSourceType metaSource){
+	public FactGroupingQueue(RecordSupplier<PatientRow> patientTable, RecordSupplier<VisitRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExtensionAccessor<Visit> visitAccessor, ExternalSourceType metaSource){
 		this.patientTable = patientTable;
-		this.patientAccessor = patientAccessor;
 		Objects.requireNonNull(patientAccessor);
+		Objects.requireNonNull(visitAccessor);
+		this.patientAccessor = patientAccessor;
+		this.visitAccessor = visitAccessor;
 		this.visitTable = visitTable;
 		this.factTables = new ArrayList<>();
 		this.workQueue = new ArrayDeque<>();
@@ -78,7 +86,11 @@ public class FactGroupingQueue{
 	 */
 	private void patientChanged(){
 		currentPatientInstance = patientAccessor.accessStatic(currentPatient.getPatientId(), metaSource);
-		// TODO sync patient with extension factory
+		currentPatientInstance.setBirthDate(currentPatient.getBirthDate());
+		currentPatientInstance.setDeathDate(currentPatient.getDeathDate());
+		currentPatientInstance.setSex(currentPatient.getSex());
+		// TODO sync patient with extension factory / add fields
+		
 		addFactsToWorkQueue(currentPatient);
 	}
 
@@ -88,12 +100,18 @@ public class FactGroupingQueue{
 	 * If {@link #currentVisitId} is not null, nextVisit will contain the current visit's information.
 	 */
 	private void visitChanged(){
-		// TODO for facts contained in visit, add facts to work queue
 
 		if( currentVisitId == null ){
 			// set visit extension to null
+			// TODO later support facts without encounter
 		}else{
-			// TODO sync visit with extension factory
+			// sync visit with extension factory
+			currentVisitInstance = visitAccessor.accessStatic(currentVisitId, currentPatientInstance, metaSource);
+			currentVisitInstance.setStartTime(nextVisit.getStartTime());
+			currentVisitInstance.setEndTime(nextVisit.getEndTime());
+			currentVisitInstance.setLocationId(nextVisit.getLocationId());
+			currentVisitInstance.setStatus(nextVisit.getStatus());
+			
 			addFactsToWorkQueue(nextVisit);
 		}
 	}
@@ -124,6 +142,7 @@ public class FactGroupingQueue{
 		for( Observation f : r.getFacts() ){
 			// set patient extension
 			patientAccessor.set(f, currentPatientInstance);
+			visitAccessor.set(f, currentVisitInstance);
 			workQueue.add(f);
 		}
 	}
