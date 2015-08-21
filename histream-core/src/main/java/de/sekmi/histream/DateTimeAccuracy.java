@@ -32,6 +32,7 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -288,4 +289,15 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	public int compareTo(DateTimeAccuracy o) {
 		return dateTime.compareTo(o.dateTime);
 	}
+	
+	@Override
+	public boolean equals(Object other){
+		Objects.requireNonNull(other);
+		if( other.getClass() != DateTimeAccuracy.class )return false;
+		DateTimeAccuracy o = (DateTimeAccuracy)other;
+		if( !o.accuracy.equals(this.accuracy) )return false;
+		return dateTime.equals(o.dateTime);
+	}
+	
+	// TODO implement hashCode
 }

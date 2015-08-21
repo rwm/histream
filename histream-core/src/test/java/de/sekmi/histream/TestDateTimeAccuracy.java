@@ -1,13 +1,10 @@
 package de.sekmi.histream;
 
-import java.text.ParsePosition;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
 
 import org.junit.Assert;
 import org.junit.Test;
