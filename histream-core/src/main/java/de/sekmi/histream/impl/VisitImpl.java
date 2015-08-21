@@ -76,6 +76,7 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 		return locationId;
 	}
 	
+	@Override
 	public void setLocationId(String locationId){
 		this.locationId = locationId;
 		markDirty(true);

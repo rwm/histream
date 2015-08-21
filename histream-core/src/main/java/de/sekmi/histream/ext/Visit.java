@@ -40,6 +40,7 @@ public interface Visit extends IdExtensionType,ExternalSourceType {
 	void setStatus(Status status);
 	
 	String getLocationId();
+	void setLocationId(String locationId);
 	
 	public enum Status{
 		Inpatient, Outpatient, Emergency
