@@ -36,10 +36,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
@@ -93,6 +95,10 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 	private Map<String, SpecialConcept> specialConcepts;
 	
 	private Observation fact;
+	private ExtensionAccessor<Patient> patientAccessor;
+	private ExtensionAccessor<Visit> visitAccessor;
+	private Patient currentPatient;
+	private Visit currentVisit;
 	
 	/**
 	 * Unprocessed line if non null (used to look ahead)
@@ -152,6 +158,8 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		this.fieldSeparatorPattern = Pattern.compile(Pattern.quote(fieldSeparator));
 		this.metaAssignment = Pattern.compile("^#@meta\\(([a-z\\.]+)\\)=(.*)$");
 		this.specialConceptAssignment = Pattern.compile("^#@concept\\(([a-z\\.]+)\\)=(.*)$");
+		this.visitAccessor = factory.getExtensionAccessor(Visit.class);
+		this.patientAccessor = factory.getExtensionAccessor(Patient.class);
 		specialConcepts = new Hashtable<>();
 		fact = null;
 		lineNo = 0;
@@ -235,26 +243,26 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 	private DateTimeAccuracy getSourceDateTime(){
 		return new DateTimeAccuracy(LocalDateTime.ofInstant(sourceTimestamp, ZoneId.systemDefault()));
 	}
-	private void specialFields(SpecialConcept special, Record record){
-		// create temporary observation
-		// which is only used to fill the special concepts
-		DateTimeAccuracy ts;
-		if( record.getStartDate() == null ){
-			ts = getSourceDateTime();
-		}else{
-			ts = DateTimeAccuracy.parsePartialIso8601(record.getStartDate());
+	private void lazyCreatePatient(String patientId){
+		if( currentPatient == null || !currentPatient.getId().equals(patientId) ){
+			currentPatient = patientAccessor.accessStatic(patientId,this);
 		}
-		Observation tmp = factory.createObservation(record.getPatID(), record.getConcept(), ts);
-		tmp.setEncounterId(record.getVisitID());
-		tmp.setSourceId(sourceId);
-		tmp.setSourceTimestamp(sourceTimestamp);
+	}
+	private void lazyCreateVisit(String visitId, String patientId){
+		if( currentVisit == null || !currentVisit.getId().equals(visitId) ){
+			currentVisit = visitAccessor.accessStatic(visitId,currentPatient,(ExternalSourceType)this);
+		}
+	}
+	private void specialFields(SpecialConcept special, Record record){		
+		// make sure current patient is valid
+		lazyCreatePatient(record.getPatID());
 		
 		switch( special ){
 		case PatientBirthDate:
-			tmp.getExtension(Patient.class).setBirthDate(DateTimeAccuracy.parsePartialIso8601(record.getValue()));
+			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(record.getValue()));
 			break;
 		case PatientDeathDate:
-			tmp.getExtension(Patient.class).setDeathDate(DateTimeAccuracy.parsePartialIso8601(record.getValue()));
+			currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(record.getValue()));
 			break;
 		case PatientSex:
 			Patient.Sex sex;
@@ -269,7 +277,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			default:
 				sex = null;
 			}
-			tmp.getExtension(Patient.class).setSex(sex);
+			currentPatient.setSex(sex);
 			break;
 		case PatientNames:
 			// TODO
@@ -278,9 +286,14 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			// TODO
 			break;
 		case Visit:
-			Visit visit = tmp.getExtension(Visit.class);
-			visit.setStartTime(tmp.getStartTime());
-			visit.setEndTime(tmp.getEndTime());
+			lazyCreateVisit(record.getVisitID(), record.getPatID());
+			
+			currentVisit.setStartTime(DateTimeAccuracy.parsePartialIso8601(record.getStartDate()));
+			currentVisit.setEndTime(DateTimeAccuracy.parsePartialIso8601(record.getEndDate()));
+			
+			currentVisit.setLocationId(record.getLocation());
+			// TODO set provider
+			record.getProvider();
 			break;
 		default:
 			break;
@@ -320,12 +333,13 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			ts = DateTimeAccuracy.parsePartialIso8601(record.getStartDate());
 		}
 		fact = factory.createObservation(record.getPatID(), record.getConcept(), ts);
-		
-		// set other fields
-		
 		fact.setEncounterId(record.getVisitID());
+		patientAccessor.set(fact, currentPatient);
+		visitAccessor.set(fact, currentVisit);
+		// set other fields
 		fact.setSourceId(sourceId);
 		fact.setSourceTimestamp(sourceTimestamp);
+		
 		fact.setValue( parseValue(record) );
 		if( record.getEndDate() != null ){
 			fact.setEndTime(DateTimeAccuracy.parsePartialIso8601(record.getEndDate()));
