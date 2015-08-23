@@ -31,10 +31,10 @@
 	</meta>
 	<patient id="XX12345">
 		<surname>Dampf</surname>
-		<names>A</names>
+		<given-name>A</given-name>
+		<gender>Female</gender>
 		<birthdate>2001-01-01</birthdate>
 		<deathdate>2020</deathdate>
-		<sex>F</sex>
 		<encounter id="XXE12345">
 			<start>2014-01-01T10:30:00</start>
 			<end>2014-01-05T10:30:00</end>
