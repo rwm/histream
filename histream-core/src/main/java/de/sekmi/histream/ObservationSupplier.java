@@ -37,35 +37,36 @@ import java.util.function.Supplier;
  *
  */
 public interface ObservationSupplier extends Supplier<Observation>, AutoCloseable{
-	
 	/**
-	 * Retrieve meta information for this supply of observations.
-	 * <p>
-	 * Possible keys are source.id, source.timestamp, etl.strategy, order.grouped, order.sorted
-	 * <dl>
-	 * 	<dt>source.id</dt>
-	 * 	<dd>ID for the source which provides the observations
-	 * 
-	 *  <dt>source.timestamp</dt>
-	 *  <dd>Timestamp when the source data was extracted/downloaded/queried</dd>
-	 *  
-	 *  <dt>etl.strategy</dt>
-	 *  <dd>Strategy how to handle imported data. 
+	 * ID for the source which provides the observations
+	 */
+	public static final String META_SOURCE_ID = "source.id";
+	/**
+	 * Timestamp when the source data was extracted/downloaded/queried
+	 */
+	public static final String META_SOURCE_TIMESTAMP = "source.timestamp";
+
+	/**
+	 * Strategy how to handle imported data. 
 	 *  {@code replace-source} will drop any previous imports 
 	 *  with the same {@code source.id}, {@code replace-visit} will 
 	 *  delete any previous data with the same patient+visit combination.
-	 *  </dd>
-	 *  
-	 *  <dt>order.grouped</dt>
-	 *  <dd>If set to true, guarantees that all facts belonging to the same 
+	 */
+	public static final String META_ETL_STRATEGY = "etl.strategy";
+	/**
+	 * If set to true, guarantees that all facts belonging to the same 
 	 *  patient+visit combination are provided en bloc.
-	 *  </dd>
-	 *  
-	 *  <dt>order.sorted</dt>
-	 *  <dd>If set to true, guarantees that all facts within the same
+	 */
+	public static final String META_ORDER_GROUPED = "order.grouped";
+	/**
+	 * If set to true, guarantees that all facts within the same
 	 *  patient+visit combination occur in ascending order of start timestamp.
-	 *  </dd>
-	 * </dl>
+	 */
+	public static final String META_ORDER_SORTED = "order.sorted";
+	
+	/**
+	 * Retrieve meta information for this supply of observations.
+	 * For possible keys see {@link #META_ETL_STRATEGY} ...
 	 * @param key meta key
 	 * @return value for the meta key
 	 */

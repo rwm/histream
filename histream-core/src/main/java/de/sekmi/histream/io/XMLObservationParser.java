@@ -30,6 +30,7 @@ import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.Value.Type;
 import de.sekmi.histream.ext.Patient;
@@ -204,8 +205,8 @@ class XMLObservationParser extends AbstractObservationParser{
 	}
 
 	protected void parseSource(AttributeAccessor atts){
-		setMeta("source.timestamp", atts.getValue("timestamp"));
-		setMeta("source.id", atts.getValue("id"));
+		setMeta(ObservationSupplier.META_SOURCE_TIMESTAMP, atts.getValue("timestamp"));
+		setMeta(ObservationSupplier.META_SOURCE_ID, atts.getValue("id"));
 	}
 	protected void parseEncounter(AttributeAccessor atts){
 		encounterStart = DateTimeAccuracy.parsePartialIso8601(atts.getValue("start"));

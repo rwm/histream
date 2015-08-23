@@ -93,16 +93,16 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		if( reader.getLocalName().equals("etl") ){
 			String etlStrategy = reader.getAttributeValue(null, "strategy");
 			// TODO use constants for etl.strategy, etc.
-			if( etlStrategy != null )setMeta("etl.strategy", etlStrategy);
+			if( etlStrategy != null )setMeta(ObservationSupplier.META_ETL_STRATEGY, etlStrategy);
 			reader.nextTag();
 			// should be end element
 			reader.nextTag();
 		}
 		if( reader.getLocalName().equals("source") ){
 			String sourceTimestamp = reader.getAttributeValue(null, "timestamp");
-			setMeta("source.timestamp", sourceTimestamp);
+			setMeta(ObservationSupplier.META_SOURCE_TIMESTAMP, sourceTimestamp);
 			String sourceId = reader.getAttributeValue(null, "id");
-			setMeta("source.id", sourceId);
+			setMeta(ObservationSupplier.META_SOURCE_ID, sourceId);
 			// will be set automatically by setMeta
 			//setSourceId(sourceId);
 			//setSourceTimestamp(parseSourceTimestamp(sourceTimestamp));

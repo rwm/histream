@@ -81,7 +81,7 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 		if( reader.getLocalName().equals("etl") ){
 			String etlStrategy = reader.getAttributeValue(null, "strategy");
 			// TODO use constants for etl.strategy, etc.
-			if( etlStrategy != null )setMeta("etl.strategy", etlStrategy);
+			if( etlStrategy != null )setMeta(ObservationSupplier.META_ETL_STRATEGY, etlStrategy);
 			reader.nextTag();
 			// should be end element
 			reader.nextTag();
