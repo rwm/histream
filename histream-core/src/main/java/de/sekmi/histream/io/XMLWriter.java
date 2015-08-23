@@ -3,8 +3,8 @@ package de.sekmi.histream.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -13,9 +13,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
-import de.sekmi.histream.Plugin;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.AbstractObservationHandler;
@@ -29,37 +30,40 @@ import de.sekmi.histream.impl.ObservationImpl;
  * @author Raphael
  *
  */
-public class XMLWriter extends AbstractObservationHandler implements Closeable, Plugin {
+public class XMLWriter extends AbstractObservationHandler implements Closeable {
 	private static final String NAMESPACE = "http://sekmi.de/histream/ns/eav-data";
 	private Patient prevPatient;
 	private Visit prevVisit;
 	private Marshaller marshaller;
-	private OutputStream output;
 	private XMLStreamWriter writer;
 	private boolean writeFormatted;
 	private int formattingDepth;
-	
-	public XMLWriter(Map<String,String> config) throws JAXBException, XMLStreamException, FactoryConfigurationError{
+
+	private XMLWriter() throws JAXBException{
 		this.marshaller = JAXBContext.newInstance(ObservationImpl.class).createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		this.writeFormatted = true;
-		this.output = System.out;
-		XMLOutputFactory factory = XMLOutputFactory.newFactory();
+	}
+	public XMLWriter(OutputStream output) throws JAXBException, XMLStreamException, FactoryConfigurationError{
+		this();
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
+		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+		this.writer = factory.createXMLStreamWriter(output);
+		writeStartDocument();
+	}
 
-		this.writer = factory.createXMLStreamWriter(output, "UTF-8");
+	private void writeStartDocument() throws XMLStreamException{
+		writer.setDefaultNamespace(NAMESPACE);
+		writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		writer.writeStartDocument();
 		formatNewline();
-		writer.setDefaultNamespace(NAMESPACE);
-		//?? writer.setPrefix("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
 		writer.writeStartElement(NAMESPACE, JAXBObservationSupplier.DOCUMENT_ROOT);
 		writer.writeDefaultNamespace(NAMESPACE);
-		writer.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+		writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		formatNewline();
 		formatPush();
-		//Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		//transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		//transformer.
 	}
 	@Override
 	public void setMeta(String key, String value) {
@@ -87,7 +91,7 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable, 
 		writer.writeAttribute("id", visit.getId());
 		formatNewline();
 		formatPush();
-		
+
 		if( visit.getStartTime() != null ){
 			formatIndent();
 			writer.writeStartElement("start");
@@ -205,7 +209,7 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable, 
 			}
 			// TODO clone observation, remove patient/encounter/source information as it is contained in wrappers
 			formatIndent();
-			marshaller.marshal(observation, writer);
+			marshalFactWithContext(observation, thisPatient, thisVisit, null);
 			formatNewline();
 			
 		} catch (JAXBException | XMLStreamException e ) {
@@ -213,7 +217,43 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable, 
 		}
 		
 	}
-	
+
+	/**
+	 * Marshal a fact without writing context information from patient, visit and source.
+	 * TODO move method to separate helper class
+	 *
+	 * @param fact fact
+	 * @param patient patient context
+	 * @param visit visit context
+	 * @param source source context
+	 * @throws ObservationException for errors in fact
+	 * @throws JAXBException errors during marshal operation
+	 */
+	public void marshalFactWithContext(Observation fact, Patient patient, Visit visit, ExternalSourceType source) throws ObservationException, JAXBException{
+		ObservationImpl o = (ObservationImpl)fact;
+		String e = o.getEncounterId();
+		String p = o.getPatientId();
+
+		if( patient.getId().equals(p) ){
+			o.setPatientId(null);
+		}else{
+			p = null;
+		}
+
+		if( visit.getId().equals(e) ){
+			o.setEncounterId(null);
+		}else{
+			e = null;
+		}
+		marshaller.marshal(fact, writer);
+		if( p != null ){
+			o.setPatientId(p);
+		}
+		if( e != null ){
+			o.setEncounterId(e);
+		}
+	}
+
 	@Override
 	public void close() throws IOException{
 		try {
@@ -229,7 +269,6 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable, 
 			}
 			writer.writeEndDocument(); // automatically closes root element
 			writer.close();
-			output.close();
 		} catch (XMLStreamException e) {
 			throw new IOException(e);
 		}

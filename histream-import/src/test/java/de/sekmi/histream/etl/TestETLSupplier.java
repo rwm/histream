@@ -2,6 +2,7 @@ package de.sekmi.histream.etl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.stream.StreamSupport;
 
 import javax.xml.bind.JAXB;
 
@@ -19,6 +20,8 @@ import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
+import de.sekmi.histream.io.AbstractObservationParser;
+import de.sekmi.histream.io.XMLWriter;
 
 public class TestETLSupplier {
 	private DataSource ds;
@@ -40,6 +43,15 @@ public class TestETLSupplier {
 	public void freeResources() throws IOException{
 		os.close();		
 	}
+	
+	@Test
+	public void testXMLConversion() throws Exception{
+		XMLWriter w = new XMLWriter(System.out);
+		// TODO transfer meta information
+		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(os), false).forEach(w);
+		w.close();
+	}
+
 	
 	@Test
 	public void testReadFacts() throws IOException{
