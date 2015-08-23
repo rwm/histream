@@ -29,6 +29,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
  * Observation of a single event or a single fact assigned to a single patient.
  * 
  * TODO more details
+ * TODO remove ExternalSourceType from interfaces, move to property
  * 
  * @author Raphael
  *

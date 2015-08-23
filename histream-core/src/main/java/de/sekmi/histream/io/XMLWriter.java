@@ -20,6 +20,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.AbstractObservationHandler;
+import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationImpl;
 
 /**
@@ -38,11 +39,13 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 	private XMLStreamWriter writer;
 	private boolean writeFormatted;
 	private int formattingDepth;
+	private Meta meta;
 
 	private XMLWriter() throws JAXBException{
-		this.marshaller = JAXBContext.newInstance(ObservationImpl.class).createMarshaller();
+		this.marshaller = JAXBContext.newInstance(ObservationImpl.class, Meta.class).createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		this.writeFormatted = true;
+		this.meta = new Meta();
 	}
 	public XMLWriter(OutputStream output) throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this();
@@ -50,10 +53,9 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
 		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		this.writer = factory.createXMLStreamWriter(output);
-		writeStartDocument();
 	}
 
-	private void writeStartDocument() throws XMLStreamException{
+	private void writeStartDocument() throws XMLStreamException, JAXBException{
 		writer.setDefaultNamespace(NAMESPACE);
 		writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		writer.writeStartDocument();
@@ -64,11 +66,14 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 		writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		formatNewline();
 		formatPush();
+		
+		formatIndent();
+		marshaller.marshal(meta, writer);
+		formatNewline();
 	}
 	@Override
 	public void setMeta(String key, String value) {
-		// TODO Auto-generated method stub
-
+		meta.set(key, value);
 	}
 	private void formatNewline() throws XMLStreamException{
 		if( writeFormatted )writer.writeCharacters("\n");
@@ -185,7 +190,8 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 		Visit thisVisit = observation.getExtension(Visit.class);
 		try {
 			if( prevPatient == null ){
-				// TODO write start document, meta, patient
+				// write start document, meta, patient
+				writeStartDocument();
 				startPatient(thisPatient);
 			}else if( !prevPatient.getId().equals(thisPatient.getId()) ){
 				// close patient, write new patient
