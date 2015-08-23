@@ -21,15 +21,16 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
 
 public class JAXBObservationSupplier extends AbstractObservationParser implements ObservationSupplier {
-	private static final String DOCUMENT_ROOT = "eav-data";
-	private static final String PATIENT_ELEMENT = "patient";
-	private static final String ENCOUNTER_ELEMENT = "encounter";
-	private static final String FACT_WRAPPER = "facts";
+	static final String DOCUMENT_ROOT = "eav-data";
+	static final String PATIENT_ELEMENT = "patient";
+	static final String ENCOUNTER_ELEMENT = "encounter";
+	static final String FACT_WRAPPER = "facts";
 	
 	
 	private ExtensionAccessor<Patient> patientAccessor;
@@ -139,6 +140,15 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		// register with extension
 		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)this);
 		// TODO set patient data
+		if( patientData.containsKey("birthdate") ){
+			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("birthdate")));
+		}
+		if( patientData.containsKey("deathdate") ){
+			currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("deathdate")));
+		}
+		if( patientData.containsKey("gender") ){
+			currentPatient.setSex(Sex.valueOf(patientData.get("gender")));
+		}
 	}
 	/**
 	 * Reads encounter element with content. 

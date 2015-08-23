@@ -161,6 +161,9 @@ class XMLObservationParser extends AbstractObservationParser{
 				overwrite = true;
 			}
 			
+			// XXX only for testing
+			overwrite = true; // TODO rewrite overwrite/sync condition
+			
 			if( overwrite ){
 				patient.setBirthDate(birthDate);
 				patient.setDeathDate(deathDate);
