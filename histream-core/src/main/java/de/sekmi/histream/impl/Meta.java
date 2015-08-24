@@ -58,7 +58,9 @@ public class Meta {
 				ObservationSupplier.META_SOURCE_TIMESTAMP
 		};
 		for( String key : keys ){
-			target.setMeta(key, source.getMeta(key));
+			String value = source.getMeta(key);
+			if( value == null )continue; // skip null values
+			target.setMeta(key, value);
 		}
 	}
 }
