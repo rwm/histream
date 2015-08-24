@@ -37,11 +37,15 @@ public class TestXMLWriter {
 	public void testWriteMeta(){
 		Meta meta = new Meta();
 		meta.etlStrategy = "lala";
-		meta.source = new ExternalSourceImpl();
-		meta.source.setSourceId("sid");
-		meta.source.setSourceTimestamp(Instant.now());
+		meta.source = new ExternalSourceImpl("sid", Instant.now());
 		meta.order = new Meta.Order(true,false);
 		
+		JAXB.marshal(meta, System.out);
+		
+		meta = new Meta();
+		meta.etlStrategy = "lala";
+		meta.source = new ExternalSourceImpl("sid", null);
+		meta.order = null;
 		JAXB.marshal(meta, System.out);
 	}
 

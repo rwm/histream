@@ -15,18 +15,34 @@ public class ExternalSourceImpl implements ExternalSourceType {
 	private Instant timestamp;
 	private String id;
 
-	public static class Adapter extends XmlAdapter<String, Instant>{
-
+	/**
+	 * Empty constructor for JAXB
+	 */
+	public ExternalSourceImpl(){
+	}
+	/**
+	 * Create external source
+	 * @param id id string
+	 * @param timestamp timestamp
+	 */
+	public ExternalSourceImpl(String id, Instant timestamp){
+		this();
+		this.id = id;
+		this.timestamp = timestamp;
+	}
+	
+	private static class Adapter extends XmlAdapter<String, Instant>{
 		@Override
 		public Instant unmarshal(String v) throws Exception {
+			if( v == null )return null;
 			return javax.xml.bind.DatatypeConverter.parseDateTime(v).toInstant();
 		}
 
 		@Override
 		public String marshal(Instant v) throws Exception {
+			if( v == null )return null;
 			return v.toString();
 		}
-		
 	}
 
 	@XmlAttribute(name="timestamp")

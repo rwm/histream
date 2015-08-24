@@ -17,6 +17,7 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
@@ -47,7 +48,8 @@ public class TestETLSupplier {
 	@Test
 	public void testXMLConversion() throws Exception{
 		XMLWriter w = new XMLWriter(System.out);
-		// TODO transfer meta information
+		// transfer meta information
+		Meta.transfer(os, w);
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(os), false).forEach(w);
 		w.close();
 	}

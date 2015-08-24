@@ -8,7 +8,6 @@ import java.util.Queue;
 
 import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
@@ -29,7 +28,6 @@ public class FactGroupingQueue{
 	private ExtensionAccessor<Patient> patientAccessor;
 	private ExtensionAccessor<Visit> visitAccessor;
 
-	private ExternalSourceType metaSource;
 	private List<RecordSupplier<? extends FactRow>> factTables;
 
 
@@ -64,7 +62,7 @@ public class FactGroupingQueue{
 	}
 
 
-	public FactGroupingQueue(RecordSupplier<PatientRow> patientTable, RecordSupplier<VisitRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExtensionAccessor<Visit> visitAccessor, ExternalSourceType metaSource){
+	public FactGroupingQueue(RecordSupplier<PatientRow> patientTable, RecordSupplier<VisitRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExtensionAccessor<Visit> visitAccessor){
 		this.patientTable = patientTable;
 		Objects.requireNonNull(patientAccessor);
 		Objects.requireNonNull(visitAccessor);
@@ -73,7 +71,6 @@ public class FactGroupingQueue{
 		this.visitTable = visitTable;
 		this.factTables = new ArrayList<>();
 		this.workQueue = new ArrayDeque<>();
-		this.metaSource = metaSource;
 	}
 	public void addFactTable(RecordSupplier<? extends FactRow> supplier){
 		if( supplier == patientTable || supplier == visitTable )throw new IllegalArgumentException("Cannot add patient or visit table as fact table");
@@ -85,7 +82,7 @@ public class FactGroupingQueue{
 	 * Current patient changed: {@link #currentPatient}
 	 */
 	private void patientChanged(){
-		currentPatientInstance = patientAccessor.accessStatic(currentPatient.getPatientId(), metaSource);
+		currentPatientInstance = patientAccessor.accessStatic(currentPatient.getPatientId(), patientTable.getSource());
 		currentPatientInstance.setBirthDate(currentPatient.getBirthDate());
 		currentPatientInstance.setDeathDate(currentPatient.getDeathDate());
 		currentPatientInstance.setSex(currentPatient.getSex());
@@ -106,7 +103,7 @@ public class FactGroupingQueue{
 			// TODO later support facts without encounter
 		}else{
 			// sync visit with extension factory
-			currentVisitInstance = visitAccessor.accessStatic(currentVisitId, currentPatientInstance, metaSource);
+			currentVisitInstance = visitAccessor.accessStatic(currentVisitId, currentPatientInstance, visitTable.getSource());
 			currentVisitInstance.setStartTime(nextVisit.getStartTime());
 			currentVisitInstance.setEndTime(nextVisit.getEndTime());
 			currentVisitInstance.setLocationId(nextVisit.getLocationId());

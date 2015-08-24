@@ -62,25 +62,29 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	
 	private FactGroupingQueue queue;
 	
+	private DataSource ds;
+	
 	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
+		this.ds = ds;
+		
 		pt = ds.getPatientTable();
 		vt = ds.getVisitTable();
 		wt = ds.getWideTables();
 		// TODO long tables
 
+		String sourceId = ds.getMeta().getSourceId();
 		// in case of exception, make sure already opened suppliers are closed
 		try{
-			pr = pt.open(factory);
-			vr = vt.open(factory);
+			pr = pt.open(factory, sourceId);
+			vr = vt.open(factory, sourceId);
 			queue = new FactGroupingQueue(pr, vr, 
 					factory.getExtensionAccessor(Patient.class), 
-					factory.getExtensionAccessor(Visit.class), 
-					ds.getMeta().getSource());
+					factory.getExtensionAccessor(Visit.class));
 
 			// open all tables
 			wr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
-				RecordSupplier<WideRow> s = t.open(factory);
+				RecordSupplier<WideRow> s = t.open(factory, sourceId);
 				queue.addFactTable(s);
 				wr.add(s);
 			}
@@ -117,22 +121,33 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			}
 			vr=null;
 		}
-		Iterator<RecordSupplier<WideRow>> i = wr.iterator();
-		while( i.hasNext() ){
-			try{ i.next().close(); }
-			catch( IOException e ){ 
-				if( error != null )error.addSuppressed(e);
-				else error = e;
+		if( wr != null ){
+			Iterator<RecordSupplier<WideRow>> i = wr.iterator();
+			while( i.hasNext() ){
+				try{ i.next().close(); }
+				catch( IOException e ){ 
+					if( error != null )error.addSuppressed(e);
+					else error = e;
+				}
+				i.remove();
 			}
-			i.remove();
 		}
+
 		if( error != null )throw error;
 	}
 
 	@Override
-	public String getMeta(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public String getMeta(String key) {
+		switch( key ){
+		case ObservationSupplier.META_ETL_STRATEGY:
+			return ds.getMeta().getETLStrategy();
+		case ObservationSupplier.META_SOURCE_ID:
+			return ds.getMeta().getSourceId();
+		case ObservationSupplier.META_ORDER_GROUPED:
+			return "true";
+		default:
+			return null;
+		}
 	}
 
 }

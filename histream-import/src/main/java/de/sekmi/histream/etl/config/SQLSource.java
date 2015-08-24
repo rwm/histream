@@ -1,4 +1,5 @@
 package de.sekmi.histream.etl.config;
+
 import javax.xml.bind.annotation.XmlElement;
 
 import de.sekmi.histream.etl.RowSupplier;
@@ -23,5 +24,4 @@ public class SQLSource extends TableSource {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 }

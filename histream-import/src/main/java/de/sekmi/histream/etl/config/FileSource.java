@@ -34,4 +34,5 @@ public class FileSource extends TableSource{
 	public RowSupplier rows() throws IOException {
 		return new FileRowSupplier(url, Pattern.compile(separator));
 	}
+
 }

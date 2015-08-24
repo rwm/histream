@@ -3,21 +3,28 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.config.Table;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 
 public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoCloseable{
 	private RowSupplier rows;
 	private Table<R> table;
 	private ColumnMap map;
 	private ObservationFactory factory;
+	private ExternalSourceType source;
 	
-	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory)throws ParseException{
+	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory, String sourceId)throws ParseException{
 		this.rows = rows;
 		this.table = table;
 		this.map = table.getColumnMap(rows.getHeaders());
 		this.factory = factory;
+		this.source = new ExternalSourceImpl(sourceId, rows.getTimestamp());
 	}
+	
+	public final ExternalSourceType getSource(){ return this.source;}
 	
 	@Override
 	public void close() throws IOException {
@@ -37,6 +44,10 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 			p = table.fillRecord(map, row, factory);
 		} catch (ParseException e) {
 			throw new UncheckedParseException(e);
+		}
+		// fill source information
+		for( Observation o : p.getFacts() ){
+			o.setSource(source);
 		}
 
 		return p;

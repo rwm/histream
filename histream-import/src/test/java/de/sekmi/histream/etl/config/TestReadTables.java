@@ -17,6 +17,7 @@ import de.sekmi.histream.etl.PatientRow;
 import de.sekmi.histream.etl.RecordSupplier;
 import de.sekmi.histream.etl.VisitRow;
 import de.sekmi.histream.etl.WideRow;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 
 import org.junit.Assert;
@@ -36,7 +37,7 @@ public class TestReadTables {
 	
 	@Test
 	public void testReadPatients() throws IOException, ParseException{
-		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of) ){
+		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of,ds.getMeta().getSourceId()) ){
 			PatientRow r = s.get();
 			Assert.assertEquals("p1", r.getId());
 			Assert.assertEquals(2003, r.getBirthDate().get(ChronoField.YEAR));
@@ -45,7 +46,7 @@ public class TestReadTables {
 	}
 	@Test
 	public void testReadVisits() throws IOException, ParseException{
-		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of) ){
+		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of,ds.getMeta().getSourceId()) ){
 			VisitRow r = s.get();
 			Assert.assertEquals("v1", r.getId());
 			Assert.assertEquals(2013, r.getStartTime().get(ChronoField.YEAR));
@@ -54,7 +55,7 @@ public class TestReadTables {
 	}
 	@Test
 	public void testReadWideTable() throws IOException, ParseException{
-		try( RecordSupplier<WideRow> s = ds.wideTables[0].open(of) ){
+		try( RecordSupplier<WideRow> s = ds.wideTables[0].open(of,ds.getMeta().getSourceId()) ){
 			WideRow r = s.get();
 			Assert.assertNotNull(r);
 			Assert.assertTrue(r.getFacts().size() > 0);
@@ -62,6 +63,10 @@ public class TestReadTables {
 			Assert.assertEquals("natrium", o.getConceptId());
 			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 			Assert.assertEquals(BigDecimal.valueOf(124), o.getValue().getNumericValue());
+			ExternalSourceType e = o.getSource();
+			Assert.assertNotNull(e);
+			Assert.assertEquals("test-1", e.getSourceId());
+			
 		}
 	}
 }
