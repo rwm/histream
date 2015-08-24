@@ -190,6 +190,12 @@ public class ObservationImplJAXBTest {
 		o.removeContext(null, null, new ExternalSourceImpl("source1", Instant.parse("2000-01-01T00:00:00Z")));
 		Assert.assertNull(o.getSource());
 	}
+	
+	@Test
+	public void testFillContext(){
+		// TODO implement test
+	}
+
 	/*
 	@Test
 	public void testModifierListBug() throws JAXBException{

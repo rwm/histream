@@ -351,5 +351,36 @@ public class ObservationImpl implements Observation, Cloneable{
 			this.source = s;
 		}
 	}
+
+	/**
+	 * Fill some information from the provided context
+	 * @param patientId patient context
+	 * @param encounterId visit context
+	 * @param startTime start time context
+	 * @param source source context
+	 */
+	public void fillFromContext(String patientId, String encounterId, DateTimeAccuracy startTime, ExternalSourceType source) {
+		if( this.source == null ){
+			setSource(source);
+		}else if( source != null ){
+			if( this.source.getSourceId() == null && source.getSourceId() != null ){
+				this.source.setSourceId(source.getSourceId());
+			}
+			if( this.source.getSourceTimestamp() == null && source.getSourceTimestamp() != null ){
+				this.source.setSourceTimestamp(source.getSourceTimestamp());
+			}
+		}
+		
+		if( this.patientId == null ){
+			setPatientId(patientId);
+		}
+		if( this.encounterId == null ){
+			setEncounterId(encounterId);
+		}
+	
+		if( this.startTime == null ){
+			this.startTime = startTime;
+		}
+	}
 	
 }

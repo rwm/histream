@@ -215,24 +215,8 @@ public class JAXBObservationSupplier  implements ObservationSupplier {
 			throw new XMLStreamException("Fact patid differs from patient id", reader.getLocation());
 		}
 		
-		if( fact.getSource() == null ){
-			fact.setSource(meta.source);
-		}else{
-			if( fact.getSource().getSourceId() == null && meta.source.getSourceId() != null ){
-				fact.getSource().setSourceId(meta.source.getSourceId());
-			}
-			if( fact.getSource().getSourceTimestamp() == null && meta.source.getSourceTimestamp() != null ){
-				fact.getSource().setSourceTimestamp(meta.source.getSourceTimestamp());
-			}
-		}
+		fact.fillFromContext(patientId, encounterId, encounterStart, meta.source);
 		
-		fact.setPatientId(patientId);
-		fact.setEncounterId(encounterId);
-	
-		if( fact.getStartTime() == null ){
-			fact.setStartTime(encounterStart);
-			fact.setEndTime(encounterEnd);
-		}
 		// TODO set etc. from visit
 		
 		// set ObservationFactory, initialize extensions
