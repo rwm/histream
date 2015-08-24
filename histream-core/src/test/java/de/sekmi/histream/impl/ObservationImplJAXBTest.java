@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
@@ -33,6 +34,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.ExternalSourceType;
 
 public class ObservationImplJAXBTest {
 	public static final File EXAMPLE_FACT_XSD = new File("examples/fact.xsd");
@@ -61,6 +63,7 @@ public class ObservationImplJAXBTest {
 		case 0:
 			// string value
 			o.setValue(new StringValue("strval"));
+			o.setSource(new ExternalSourceImpl("source1",Instant.now()));
 			break;
 		case 1:
 			// numeric value without modifiers
@@ -141,11 +144,16 @@ public class ObservationImplJAXBTest {
 				Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 				Assert.assertEquals(new BigDecimal(123), o.getValue().getNumericValue());
 				Assert.assertTrue(o.hasModifiers());
+
 				Modifier m = o.getModifier("M:test");
 				Assert.assertNotNull(m);
 				Assert.assertNotNull(m.getValue());
 				Assert.assertEquals(Value.Type.Text, m.getValue().getType());
 				Assert.assertEquals("123", m.getValue().getStringValue());
+
+				ExternalSourceType s = o.getSource();
+				Assert.assertNotNull(m);
+				Assert.assertEquals("system1", s.getSourceId());
 				
 			}
 		}

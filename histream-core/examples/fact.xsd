@@ -45,9 +45,9 @@
 
 	<xs:complexType name="factType">
 		<xs:sequence>
-			<xs:element name="source" type="sourceType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="value" type="valueType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="modifier" type="modifierType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="source" type="sourceType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute type="xs:string" name="patient" />
 		<xs:attribute type="xs:string" name="encounter" />

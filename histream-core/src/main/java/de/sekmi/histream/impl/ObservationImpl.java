@@ -1,5 +1,6 @@
 package de.sekmi.histream.impl;
 
+
 /*
  * #%L
  * histream
@@ -33,6 +34,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Modifier;
@@ -49,7 +52,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
  */
 @XmlRootElement(name="fact")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder={"abstractValue","modifierList"})
+@XmlType(propOrder={"abstractValue","modifierList","source"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
 public class ObservationImpl implements Observation{
 	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
@@ -273,7 +276,25 @@ public class ObservationImpl implements Observation{
 		
 	}
 
+	private static class SourceAdapter extends XmlAdapter<ExternalSourceImpl, ExternalSourceType>{
+
+		@Override
+		public ExternalSourceType unmarshal(ExternalSourceImpl v) throws Exception {
+			return v;
+		}
+
+		@Override
+		public ExternalSourceImpl marshal(ExternalSourceType v) throws Exception {
+			if( v == null )return null;
+			else if( v instanceof ExternalSourceImpl )return (ExternalSourceImpl)v;
+			else return new ExternalSourceImpl(v.getSourceId(), v.getSourceTimestamp());
+		}
+
+	}
+
 	@Override
+	@XmlElement
+	@XmlJavaTypeAdapter(SourceAdapter.class)
 	public ExternalSourceType getSource() {
 		return source;
 	}
