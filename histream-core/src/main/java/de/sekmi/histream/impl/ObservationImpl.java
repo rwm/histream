@@ -309,7 +309,7 @@ public class ObservationImpl implements Observation, Cloneable{
 	public ObservationImpl clone(){
 		ObservationImpl clone = new ObservationImpl(this.factory);
 		clone.conceptId = this.conceptId;
-		clone.encounterId = this.conceptId;
+		clone.encounterId = this.encounterId;
 		clone.endTime = this.endTime;
 		clone.locationId = this.locationId;
 		clone.patientId = this.patientId;
