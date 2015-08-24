@@ -119,8 +119,7 @@ class XMLObservationParser extends AbstractObservationParser{
 		fact.setEncounterId(visitData.get("encounter"));
 		fact.setLocationId(atts.getValue("location"));
 		// set source information
-		fact.setSourceId(sourceId);
-		fact.setSourceTimestamp(sourceTimestamp);
+		fact.setSource(this);
 		
 		if( patient == null ){
 			// this is the first observation

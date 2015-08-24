@@ -116,9 +116,10 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		}
 		@Override
 		public void preprocess(Observation fact) throws SQLException {
-			if( !purgedSources.contains(fact.getSourceId()) ){
-				purgedSources.add(fact.getSourceId());
-				purgeSource(fact.getSourceId());
+			String sourceId = fact.getSource().getSourceId();
+			if( !purgedSources.contains(sourceId) ){
+				purgedSources.add(sourceId);
+				purgeSource(sourceId);
 			}
 			
 		}
@@ -362,8 +363,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		// location_cd
 		insertFact.setString(14, replaceNull(o.getLocationId(),nullLocationCd));
 		// download_date
-		insertFact.setTimestamp(15, Timestamp.from(o.getSourceTimestamp()));
-		insertFact.setString(16, o.getSourceId());
+		insertFact.setTimestamp(15, Timestamp.from(o.getSource().getSourceTimestamp()));
+		insertFact.setString(16, o.getSource().getSourceId());
 		
 		insertFact.executeUpdate();
 		

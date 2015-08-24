@@ -39,6 +39,7 @@ import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.ExternalSourceType;
 
 /**
  * Implementation of {@link Observation}.
@@ -50,7 +51,7 @@ import de.sekmi.histream.Value;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder={"abstractValue","modifierList"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
-public class ObservationImpl extends ExternalSourceImpl implements Observation{
+public class ObservationImpl implements Observation{
 	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
 	@XmlTransient
 	protected ObservationFactoryImpl factory;
@@ -79,6 +80,8 @@ public class ObservationImpl extends ExternalSourceImpl implements Observation{
 	@XmlAttribute(name="end")
 	protected DateTimeAccuracy endTime;
 
+	// TODO make compatible with JAXB
+	protected ExternalSourceType source;
 	/**
 	 * Modifiers
 	 */
@@ -268,6 +271,16 @@ public class ObservationImpl extends ExternalSourceImpl implements Observation{
 		this.modifiers = null;
 		// TODO notify extensions of concept change
 		
+	}
+
+	@Override
+	public ExternalSourceType getSource() {
+		return source;
+	}
+
+	@Override
+	public void setSource(ExternalSourceType source) {
+		this.source = source;
 	}
 
 	

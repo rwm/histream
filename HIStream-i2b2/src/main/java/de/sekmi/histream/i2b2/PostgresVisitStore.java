@@ -568,7 +568,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	}
 	@Override
 	public I2b2Visit createInstance(Observation fact) {
-		return getOrCreateInstance(fact.getEncounterId(), fact.getExtension(I2b2Patient.class), fact);
+		return getOrCreateInstance(fact.getEncounterId(), fact.getExtension(I2b2Patient.class), fact.getSource());
 	}
 
 	@Override

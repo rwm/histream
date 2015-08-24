@@ -54,7 +54,7 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 
 	@Override
 	public VisitImpl createInstance(Observation observation) {
-		VisitImpl visit = createInstance(observation.getEncounterId(), observation.getExtension(Patient.class), observation);
+		VisitImpl visit = createInstance(observation.getEncounterId(), observation.getExtension(Patient.class), observation.getSource());
 		//visit.setId();
 		//visit.setPatientId(observation.getPatientId());
 		//visit.setSourceId(observation.getSourceId());

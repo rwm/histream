@@ -337,8 +337,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		patientAccessor.set(fact, currentPatient);
 		visitAccessor.set(fact, currentVisit);
 		// set other fields
-		fact.setSourceId(sourceId);
-		fact.setSourceTimestamp(sourceTimestamp);
+		fact.setSource(this);
 		
 		fact.setValue( parseValue(record) );
 		if( record.getEndDate() != null ){

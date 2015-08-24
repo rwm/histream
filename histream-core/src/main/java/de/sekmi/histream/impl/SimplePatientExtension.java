@@ -50,7 +50,7 @@ public class SimplePatientExtension implements Extension<PatientImpl>{
 
 	@Override
 	public PatientImpl createInstance(Observation observation) {
-		PatientImpl patient = createInstance(observation.getPatientId(), observation);
+		PatientImpl patient = createInstance(observation.getPatientId(), observation.getSource());
 		return patient;
 	}
 

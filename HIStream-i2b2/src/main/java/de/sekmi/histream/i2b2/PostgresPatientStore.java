@@ -621,7 +621,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	
 	@Override
 	public I2b2Patient createInstance(Observation fact) {
-		return getOrCreateInstance(fact.getPatientId(), fact);		
+		return getOrCreateInstance(fact.getPatientId(), fact.getSource());		
 	}
 
 	@Override

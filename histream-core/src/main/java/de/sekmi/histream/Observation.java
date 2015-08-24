@@ -34,7 +34,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
  * @author Raphael
  *
  */
-public interface Observation extends ConceptValuePair, ExternalSourceType{
+public interface Observation extends ConceptValuePair{
 	String getPatientId();
 	String getEncounterId();
 	String getProviderId();
@@ -42,6 +42,9 @@ public interface Observation extends ConceptValuePair, ExternalSourceType{
 	
 	@Override 
 	String getConceptId();
+	
+	public ExternalSourceType getSource();
+	public void setSource(ExternalSourceType source);
 	
 	/**
 	 * Replace the concept id. All modifiers will be removed from the observation.
