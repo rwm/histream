@@ -30,13 +30,12 @@ import java.time.Instant;
  *
  */
 public interface ExternalSourceType {
-
 	/** 
 	 * Get the point in time, when exactly the contained information left it's source.
 	 * @return source timestamp
 	 */
 	Instant getSourceTimestamp();
-	
+
 	/**
 	 * Set the point in time, when the contained information left it's source.
 	 * @param sourceTimestamp source timestamp
@@ -47,6 +46,10 @@ public interface ExternalSourceType {
 	 * @return source id 
 	 */
 	String getSourceId();
+	/**
+	 * Set source system id
+	 * @param sourceSystemId source system id
+	 */
 	void setSourceId(String sourceSystemId);
-	
+
 }
