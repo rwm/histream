@@ -42,11 +42,11 @@ public class Meta {
 			break;
 		case ObservationSupplier.META_SOURCE_ID:
 			if( source == null )source = new ExternalSourceImpl();
-			source.sourceId = value;
+			source.setSourceId(value);
 			break;
 		case ObservationSupplier.META_SOURCE_TIMESTAMP:
 			if( source == null )source = new ExternalSourceImpl();
-			source.sourceTimestamp = javax.xml.bind.DatatypeConverter.parseDateTime(value).toInstant();
+			source.setSourceTimestamp(javax.xml.bind.DatatypeConverter.parseDateTime(value).toInstant());
 			break;
 		}
 	}
