@@ -44,6 +44,7 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.ext.Patient.Sex;
@@ -93,6 +94,10 @@ public class FileObservationProviderTest {
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-01T10:30:00"), v.getStartTime());
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00"), v.getEndTime());
 				// TODO test visit information
+				
+				// test source
+				ExternalSourceType s = o.getSource();
+				Assert.assertNotNull(s);
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:mins", o.getConceptId());

@@ -23,20 +23,22 @@ import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
 
-public class JAXBObservationSupplier extends AbstractObservationParser implements ObservationSupplier {
+public class JAXBObservationSupplier  implements ObservationSupplier {
 	static final String DOCUMENT_ROOT = "eav-data";
 	static final String PATIENT_ELEMENT = "patient";
 	static final String ENCOUNTER_ELEMENT = "encounter";
 	static final String FACT_WRAPPER = "facts";
 	
-	
+	private ObservationFactory factory;
 	private ExtensionAccessor<Patient> patientAccessor;
 	private ExtensionAccessor<Visit> visitAccessor;
 	private Patient currentPatient;
 	private Visit currentVisit;
+	private Meta meta;
 	
 	private Unmarshaller unmarshaller;
 	private XMLStreamReader reader;
@@ -61,7 +63,7 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		this.factory = factory;
 		this.patientData = new HashMap<>();
 		this.visitData = new HashMap<>();
-		unmarshaller = JAXBContext.newInstance(ObservationImpl.class).createUnmarshaller();
+		unmarshaller = JAXBContext.newInstance(ObservationImpl.class,Meta.class).createUnmarshaller();
 		// TODO: set schema
 		//unmarshaller.setSchema(schema);
 		this.reader = reader;
@@ -85,37 +87,10 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		reader.nextTag();
 	}
 	
-	private void readMeta()throws XMLStreamException{
+	private void readMeta()throws XMLStreamException, JAXBException{
 		if( !reader.isStartElement() || !reader.getLocalName().equals("meta") )return;
+		this.meta = (Meta)unmarshaller.unmarshal(reader);
 		
-		// read meta
-		reader.nextTag();
-		if( reader.getLocalName().equals("etl") ){
-			String etlStrategy = reader.getAttributeValue(null, "strategy");
-			// TODO use constants for etl.strategy, etc.
-			if( etlStrategy != null )setMeta(ObservationSupplier.META_ETL_STRATEGY, etlStrategy);
-			reader.nextTag();
-			// should be end element
-			reader.nextTag();
-		}
-		if( reader.getLocalName().equals("source") ){
-			String sourceTimestamp = reader.getAttributeValue(null, "timestamp");
-			setMeta(ObservationSupplier.META_SOURCE_TIMESTAMP, sourceTimestamp);
-			String sourceId = reader.getAttributeValue(null, "id");
-			setMeta(ObservationSupplier.META_SOURCE_ID, sourceId);
-			// will be set automatically by setMeta
-			//setSourceId(sourceId);
-			//setSourceTimestamp(parseSourceTimestamp(sourceTimestamp));
-			
-			reader.nextTag();
-			// should be end element
-			reader.nextTag();
-		}
-
-		// skip to end of meta
-		while( !reader.isEndElement() || !reader.getLocalName().equals("meta") ){
-			reader.next();
-		}
 		reader.nextTag();
 	}
 
@@ -138,7 +113,7 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 			reader.nextTag();
 		}
 		// register with extension
-		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)this);
+		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)meta.source);
 		// TODO set patient data
 		if( patientData.containsKey("birthdate") ){
 			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("birthdate")));
@@ -182,7 +157,7 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		// TODO assert at <facts>
 		reader.nextTag();
 		
-		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)this);
+		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)meta.source);
 		currentVisit.setStartTime(encounterStart);
 		currentVisit.setEndTime(encounterEnd);
 		currentVisit.setLocationId(visitData.get("location"));
@@ -233,12 +208,22 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 		ObservationImpl fact;
 		try {
 			fact = (ObservationImpl)unmarshaller.unmarshal(reader);
-			// TODO: set factory
 		} catch (JAXBException e) {
 			throw new XMLStreamException( e);
 		}
 		if( fact.getPatientId() != null && !fact.getPatientId().equals(patientId) ){
 			throw new XMLStreamException("Fact patid differs from patient id", reader.getLocation());
+		}
+		
+		if( fact.getSource() == null ){
+			fact.setSource(meta.source);
+		}else{
+			if( fact.getSource().getSourceId() == null && meta.source.getSourceId() != null ){
+				fact.getSource().setSourceId(meta.source.getSourceId());
+			}
+			if( fact.getSource().getSourceTimestamp() == null && meta.source.getSourceTimestamp() != null ){
+				fact.getSource().setSourceTimestamp(meta.source.getSourceTimestamp());
+			}
 		}
 		
 		fact.setPatientId(patientId);
@@ -271,5 +256,9 @@ public class JAXBObservationSupplier extends AbstractObservationParser implement
 	@Override
 	public void close() throws XMLStreamException {
 		reader.close();
+	}
+	@Override
+	public String getMeta(String key) {
+		return meta.get(key);
 	}
 }

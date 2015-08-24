@@ -63,4 +63,19 @@ public class Meta {
 			target.setMeta(key, value);
 		}
 	}
+
+	public String get(String key) {
+		switch( key ){
+		case ObservationSupplier.META_ETL_STRATEGY:
+			return this.etlStrategy;
+		case ObservationSupplier.META_SOURCE_ID:
+			if( source == null )return null;
+			else return source.getSourceId();
+		case ObservationSupplier.META_SOURCE_TIMESTAMP:
+			if( source == null )return null;
+			else if( source.getSourceTimestamp() == null )return null;
+			else return source.getSourceTimestamp().toString();
+		}
+		return null;
+	}
 }

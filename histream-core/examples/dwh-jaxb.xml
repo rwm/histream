@@ -24,7 +24,7 @@
 	Encounter-Start liegen -->
 	<meta>
 		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
-		<etl strategy="replace-visit" />
+		<etl-strategy>replace-visit</etl-strategy>
 		<source timestamp="2015-04-21T08:58:00" id="test"/>
 		
 		<!-- weitere metadaten nötig? wertebereich, datentypen, ontologie, ...? -->
