@@ -40,7 +40,7 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 	private boolean writeFormatted;
 	private int formattingDepth;
 	private Meta meta;
-
+	
 	private XMLWriter() throws JAXBException{
 		this.marshaller = JAXBContext.newInstance(ObservationImpl.class, Meta.class).createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
@@ -213,9 +213,8 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 				// same encounter as previous fact
 				// nothing to do
 			}
-			// TODO clone observation, remove patient/encounter/source information as it is contained in wrappers
 			formatIndent();
-			marshalFactWithContext(observation, thisPatient, thisVisit, null);
+			marshalFactWithContext(observation, thisPatient, thisVisit, meta.source);
 			formatNewline();
 			
 		} catch (JAXBException | XMLStreamException e ) {
@@ -236,28 +235,11 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 	 * @throws JAXBException errors during marshal operation
 	 */
 	public void marshalFactWithContext(Observation fact, Patient patient, Visit visit, ExternalSourceType source) throws ObservationException, JAXBException{
+		// clone observation, remove patient/encounter/source information as it is contained in wrappers
 		ObservationImpl o = (ObservationImpl)fact;
-		String e = o.getEncounterId();
-		String p = o.getPatientId();
-
-		if( patient.getId().equals(p) ){
-			o.setPatientId(null);
-		}else{
-			p = null;
-		}
-
-		if( visit.getId().equals(e) ){
-			o.setEncounterId(null);
-		}else{
-			e = null;
-		}
-		marshaller.marshal(fact, writer);
-		if( p != null ){
-			o.setPatientId(p);
-		}
-		if( e != null ){
-			o.setEncounterId(e);
-		}
+		o = o.clone();
+		o.removeContext(patient.getId(), visit.getId(), source);
+		marshaller.marshal(o, writer);
 	}
 
 	@Override

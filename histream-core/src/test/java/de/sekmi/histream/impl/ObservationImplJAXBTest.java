@@ -58,12 +58,13 @@ public class ObservationImplJAXBTest {
 		ObservationImpl o = new ObservationImpl(of);
 		o.conceptId = "C"+index;
 		o.patientId = "P"+index;
+		o.encounterId = "E"+index;
 		o.startTime = new DateTimeAccuracy(2015,1,1,index);
 		switch( index ){
 		case 0:
 			// string value
 			o.setValue(new StringValue("strval"));
-			o.setSource(new ExternalSourceImpl("source1",Instant.now()));
+			o.setSource(new ExternalSourceImpl("source1",Instant.parse("2000-01-01T00:00:00Z")));
 			break;
 		case 1:
 			// numeric value without modifiers
@@ -175,6 +176,19 @@ public class ObservationImplJAXBTest {
 		for( int i=0; i<EXAMPLE_FACT_FILES.length; i++ ){
 			validator.validate(new StreamSource(EXAMPLE_FACT_FILES[i]));
 		}
+	}
+	
+	@Test
+	public void testRemoveContext(){
+		ObservationImpl o = createObservation(0);
+		o.removeContext("P0", "E0", new ExternalSourceImpl("source1", Instant.now()));
+		Assert.assertNull(o.patientId);
+		Assert.assertNull(o.encounterId);
+		Assert.assertNull(o.getSource().getSourceId());
+
+		o = createObservation(0);
+		o.removeContext(null, null, new ExternalSourceImpl("source1", Instant.parse("2000-01-01T00:00:00Z")));
+		Assert.assertNull(o.getSource());
 	}
 	/*
 	@Test

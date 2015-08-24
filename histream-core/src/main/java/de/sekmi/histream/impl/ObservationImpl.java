@@ -54,7 +54,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder={"abstractValue","modifierList","source"})
 @XmlSeeAlso({StringValue.class,NumericValue.class})
-public class ObservationImpl implements Observation{
+public class ObservationImpl implements Observation, Cloneable{
 	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
 	@XmlTransient
 	protected ObservationFactoryImpl factory;
@@ -305,5 +305,51 @@ public class ObservationImpl implements Observation{
 	}
 
 	
+	@Override
+	public ObservationImpl clone(){
+		ObservationImpl clone = new ObservationImpl(this.factory);
+		clone.conceptId = this.conceptId;
+		clone.encounterId = this.conceptId;
+		clone.endTime = this.endTime;
+		clone.locationId = this.locationId;
+		clone.patientId = this.patientId;
+		clone.providerId = this.providerId;
+		clone.startTime = this.startTime;
+		clone.value = this.value; // is immutable?
+		clone.extensions = this.extensions.clone();
+		if( this.modifiers != null ){
+			clone.modifiers = new ArrayList<>(this.modifiers);
+		}
+		if( this.source != null ){
+			clone.source = new ExternalSourceImpl(this.source.getSourceId(), this.source.getSourceTimestamp());
+		}
+		return clone;
+	}
+	
+	/**
+	 * Removes information from this observation which is already contained in the provided context
+	 * @param patientId patient context
+	 * @param encounterId encounter context
+	 * @param source source context
+	 */
+	public void removeContext(String patientId, String encounterId, ExternalSourceType source){
+		if( this.patientId != null && patientId != null && this.patientId.equals(patientId) ){
+			this.patientId = null;
+		}
+		if( this.encounterId != null && encounterId != null && this.encounterId.equals(encounterId) ){
+			this.encounterId = null;
+		}
+		if( this.source != null && source != null ){
+			ExternalSourceImpl s = new ExternalSourceImpl(this.source.getSourceId(), this.source.getSourceTimestamp());
+			if( s.getSourceId() != null && source.getSourceId() != null && s.getSourceId().equals(source.getSourceId()) ){
+				s.setSourceId(null);
+			}
+			if( s.getSourceTimestamp() != null && source.getSourceTimestamp() != null && s.getSourceTimestamp().equals(source.getSourceTimestamp()) ){
+				s.setSourceTimestamp(null);
+			}
+			if( s.getSourceId() == null && s.getSourceTimestamp() == null )s = null;
+			this.source = s;
+		}
+	}
 	
 }
