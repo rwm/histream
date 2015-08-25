@@ -8,11 +8,10 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-
+import javax.xml.transform.Result;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
@@ -41,13 +40,23 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 	private int formattingDepth;
 	private Meta meta;
 	
-	private XMLWriter() throws JAXBException{
-		this.marshaller = JAXBContext.newInstance(ObservationImpl.class, Meta.class).createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+	private XMLWriter() throws XMLStreamException{
+		try {
+			this.marshaller = JAXBContext.newInstance(ObservationImpl.class, Meta.class).createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+		} catch (JAXBException e) {
+			throw new XMLStreamException(e);
+		}
 		this.writeFormatted = true;
 		this.meta = new Meta();
 	}
-	public XMLWriter(OutputStream output) throws JAXBException, XMLStreamException, FactoryConfigurationError{
+	/**
+	 * Constructor to write XML to an {@link OutputStream}.
+	 * 
+	 * @param output output stream
+	 * @throws XMLStreamException initialisation error
+	 */
+	public XMLWriter(OutputStream output) throws XMLStreamException{
 		this();
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
@@ -55,6 +64,18 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 		this.writer = factory.createXMLStreamWriter(output);
 	}
 
+	/**
+	 * Constructor to write XML to a {@link Result}
+	 * @param result result to receive XML stream events
+	 * @throws XMLStreamException initialisation error
+	 */
+	public XMLWriter(Result result)throws XMLStreamException{
+		this();
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
+		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+		this.writer = factory.createXMLStreamWriter(result);
+	}
 	private void writeStartDocument() throws XMLStreamException, JAXBException{
 		writer.setDefaultNamespace(NAMESPACE);
 		writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
