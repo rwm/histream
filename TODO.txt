@@ -13,3 +13,7 @@ de.sekmi.histream.hl7
 
 Deploy site to sourceforge via mvn site:deploy
 https://maven.apache.org/plugins/maven-site-plugin/examples/site-deploy-to-sourceforge.net.html
+
+
+Update version number across sub modules:
+mvn release:update-versions -DautoVersionSubmodules=true

@@ -6,19 +6,19 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>distribution</artifactId>
-	<version>0.2-alpha</version>
+	<version>0.3-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.2-alpha</version>
+		<version>0.3-SNAPSHOT</version>
 	</parent>
   
 	<dependencies>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.2-alpha</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

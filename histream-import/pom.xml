@@ -4,12 +4,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-import</artifactId>
-	<version>0.2-alpha</version>
+	<version>0.3-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.2-alpha</version>
+		<version>0.3-SNAPSHOT</version>
 	</parent>
 	
 	<properties>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.2-alpha</version>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

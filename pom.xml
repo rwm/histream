@@ -5,14 +5,16 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
-	<version>0.2-alpha</version>
+	<version>0.3-SNAPSHOT</version>
   
 	
   	<inceptionYear>2013</inceptionYear>
   	<organization>
   		<name>R.W.Majeed</name>
   	</organization>
-  	
+	<scm>
+		<developerConnection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</developerConnection>
+	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
