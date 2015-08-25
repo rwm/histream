@@ -1,10 +1,13 @@
 package de.sekmi.histream.etl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.bind.JAXB;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
@@ -64,6 +67,9 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	
 	private DataSource ds;
 	
+	public ETLObservationSupplier(File configuration, ObservationFactory factory) throws IOException, ParseException{
+		this(JAXB.unmarshal(configuration, DataSource.class), factory);
+	}
 	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
 		this.ds = ds;
 		
