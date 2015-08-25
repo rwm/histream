@@ -30,7 +30,8 @@ import de.sekmi.histream.ontology.ValueRestriction;
 /**
  * Import ontology data into i2b2.
  * <p>
- * Use the methods in the following order: {@link #openDatabase(Map)}, {@link #loadOntology(Class, Map)}, {@link #processOntology()}, {@link #close
+ * Use the methods in the following order: 
+ * constructor {@link #Import(Map)}, {@link #setOntology(Ontology)}, {@link #processOntology()}, {@link #close()}
  *
  * @author Raphael
  *
@@ -68,8 +69,8 @@ public class Import implements AutoCloseable{
 	 * Any other parameters starting with {@code jdbc.} are also passed to {@link DriverManager#getConnection(String, Properties)}.
 	 * <p>
 	 * More parameters: {@code ont.language} and {@code ont.scheme}.
-	 * @throws ClassNotFoundException
-	 * @throws SQLException
+	 * @throws ClassNotFoundException if database driver not found
+	 * @throws SQLException for SQL errors
 	 */
 	public Import(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		openDatabase(props);

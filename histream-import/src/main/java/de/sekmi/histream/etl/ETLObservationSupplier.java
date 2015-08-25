@@ -84,6 +84,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			// open all tables
 			wr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
+				@SuppressWarnings("resource")
 				RecordSupplier<WideRow> s = t.open(factory, sourceId);
 				queue.addFactTable(s);
 				wr.add(s);

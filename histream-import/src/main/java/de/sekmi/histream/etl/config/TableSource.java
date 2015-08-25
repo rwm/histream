@@ -2,7 +2,6 @@ package de.sekmi.histream.etl.config;
 
 
 import java.io.IOException;
-import java.time.Instant;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,8 +17,8 @@ import de.sekmi.histream.etl.RowSupplier;
 public abstract class TableSource{
 	/**
 	 * 
-	 * @return
-	 * @throws IOException
+	 * @return row supplier
+	 * @throws IOException IO errors during row supplier construction
 	 */
 	public abstract RowSupplier rows() throws IOException;
 

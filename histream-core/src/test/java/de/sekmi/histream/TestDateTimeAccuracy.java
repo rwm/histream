@@ -1,7 +1,6 @@
 package de.sekmi.histream;
 
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -26,7 +25,7 @@ public class TestDateTimeAccuracy {
 	public void testFormatExceedsText(){
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.u[ H[:m[:s]]]");
 		formatter.withResolverStyle(ResolverStyle.STRICT);
-		DateTimeFormatterBuilder b = new DateTimeFormatterBuilder();
+		//DateTimeFormatterBuilder b = new DateTimeFormatterBuilder();
 		DateTimeAccuracy a;
 		a = DateTimeAccuracy.parse(formatter, "01.02.2003");
 		Assert.assertEquals(ChronoUnit.DAYS,a.getAccuracy());
