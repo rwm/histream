@@ -181,14 +181,15 @@ public class ObservationImplJAXBTest {
 	@Test
 	public void testRemoveContext(){
 		ObservationImpl o = createObservation(0);
-		o.removeContext("P0", "E0", new ExternalSourceImpl("source1", Instant.now()));
+		o.removeContext("P0", "E0", null, new ExternalSourceImpl("source1", Instant.now()));
 		Assert.assertNull(o.patientId);
 		Assert.assertNull(o.encounterId);
 		Assert.assertNull(o.getSource().getSourceId());
 
 		o = createObservation(0);
-		o.removeContext(null, null, new ExternalSourceImpl("source1", Instant.parse("2000-01-01T00:00:00Z")));
+		o.removeContext(null, null, o.getStartTime(), new ExternalSourceImpl("source1", Instant.parse("2000-01-01T00:00:00Z")));
 		Assert.assertNull(o.getSource());
+		Assert.assertNull(o.getStartTime());
 	}
 	
 	@Test

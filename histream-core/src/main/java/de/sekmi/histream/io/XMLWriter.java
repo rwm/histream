@@ -238,7 +238,7 @@ public class XMLWriter extends AbstractObservationHandler implements Closeable {
 		// clone observation, remove patient/encounter/source information as it is contained in wrappers
 		ObservationImpl o = (ObservationImpl)fact;
 		o = o.clone();
-		o.removeContext(patient.getId(), visit.getId(), source);
+		o.removeContext(patient.getId(), visit.getId(), visit.getStartTime(), source);
 		marshaller.marshal(o, writer);
 	}
 

@@ -332,12 +332,15 @@ public class ObservationImpl implements Observation, Cloneable{
 	 * @param encounterId encounter context
 	 * @param source source context
 	 */
-	public void removeContext(String patientId, String encounterId, ExternalSourceType source){
+	public void removeContext(String patientId, String encounterId, DateTimeAccuracy startTime, ExternalSourceType source){
 		if( this.patientId != null && patientId != null && this.patientId.equals(patientId) ){
 			this.patientId = null;
 		}
 		if( this.encounterId != null && encounterId != null && this.encounterId.equals(encounterId) ){
 			this.encounterId = null;
+		}
+		if( this.startTime != null && startTime != null && this.startTime.equals(startTime) ){
+			this.startTime = null;
 		}
 		if( this.source != null && source != null ){
 			ExternalSourceImpl s = new ExternalSourceImpl(this.source.getSourceId(), this.source.getSourceTimestamp());
