@@ -46,6 +46,7 @@ public interface Extension<T>{
 	 * <p>
 	 * Some extensions do not support independent instances. In this case, all
 	 * calls to this method will result in an {@link UnsupportedOperationException}.
+	 * @param args arguments for the static instance. Usually id and additional contexts.
 	 * @return new instance 
 	 * @throws UnsupportedOperationException if instance creation without {@link Observation} is not possible.
 	 * @throws IllegalArgumentException if given arguments are unsuitable to instantiate/identify this type.

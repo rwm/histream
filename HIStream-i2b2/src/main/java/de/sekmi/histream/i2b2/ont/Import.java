@@ -58,7 +58,7 @@ public class Import implements AutoCloseable{
 	
 	/**
 	 * Connect to the i2b2 database.
-	 * The current implementation supports only Postgres databases for i2b2 versions >= 1.7.05(?)
+	 * The current implementation supports only Postgres databases for i2b2 versions &gt;= 1.7.05(?)
 	 * <p>
 	 * Two connections are established: One for access to the metadata schema, the second for access to concept_dimension in the data schema.
 	 * Connection arguments start with {@code meta.jdbc.} or {@code data.jdbc.}.

@@ -121,6 +121,7 @@ public class StoredExtensionType implements IdExtensionType, ExternalSourceType{
 	 * Get an iterator over all cached instances marked as dirty.
 	 * Calling the {@link Iterator#remove()} method will clear the
 	 * dirty flag for the current element (previously returned by next).
+	 * @param <T> extension type
 	 * 
 	 * @param allElements enumerator over all types, dirty or not
 	 * @return iterator which returns only dirty type instances.

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,7 @@ public class Store implements Ontology, Plugin {
 	 * Configuration keys have the form {@code rdf.baseURI}, {@code rdf.file.1}, {@code rdf.format.1}.
 	 * rdf.file is mandatory, other parameters are optional.
 	 * <p>
-	 * {@code rdf.baseURI} specifies a URI to resolve any relative URIs that are in the data against. See {@link #Store(Collection, String)}.
+	 * {@code rdf.baseURI} specifies a URI to resolve any relative URIs that are in the data against. See {@link #Store(Iterable, String)}.
 	 * <p>
 	 * {@code rdf.skosScheme} can specify the skos:ConceptScheme to find top concepts and unique notations
 	 *  

@@ -15,6 +15,7 @@ import de.sekmi.histream.etl.ParseException;
  * A column does not need a name, if it has a constant-value assigned.
  * 
  * @author marap1
+ * @param <T> column type
  *
  */
 @XmlTransient
@@ -85,6 +86,7 @@ public abstract class Column<T> {
 	 * 
 	 * @param value input value. e.g. from text table column
 	 * @return output type representing the input value
+	 * @throws ParseException on errors with regular expressions
 	 */
 	public Object preprocessValue(Object value)throws ParseException{
 		if( constantValue != null ){

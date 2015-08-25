@@ -22,7 +22,7 @@ import de.sekmi.histream.ext.Visit;
  *
  * <p>Algorithm</p>
  * <ol>
- *  <li>read first patient and first visit. -> currentPatient, 
+ *  <li>read first patient and first visit. -&gt; currentPatient, 
  *  currentVisit</li>
  *  
  *  <li>For each concept table (including patient and visit tables):

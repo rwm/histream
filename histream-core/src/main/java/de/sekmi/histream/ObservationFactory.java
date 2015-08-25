@@ -48,6 +48,7 @@ public interface ObservationFactory {
 	 * Extensions can be accessed through either via {@link Observation#getExtension(Class)}
 	 * or via an {@link ExtensionAccessor}. The latter method is faster, because no hash
 	 * lookup of the extensionType needs to be performed.
+	 * @param <T> extension type
 	 * 
 	 * @param extensionType type to get an accessor for
 	 * @return extension accessor or null if the extension is not available

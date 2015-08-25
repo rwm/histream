@@ -330,6 +330,7 @@ public class ObservationImpl implements Observation, Cloneable{
 	 * Removes information from this observation which is already contained in the provided context
 	 * @param patientId patient context
 	 * @param encounterId encounter context
+	 * @param startTime start time
 	 * @param source source context
 	 */
 	public void removeContext(String patientId, String encounterId, DateTimeAccuracy startTime, ExternalSourceType source){

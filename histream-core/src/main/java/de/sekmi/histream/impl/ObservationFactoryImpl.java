@@ -70,6 +70,7 @@ public class ObservationFactoryImpl implements ObservationFactory{
 	 * Get the extension type instance for a given observation. Returns a cached
 	 * object, if the instance was already requested before. Otherwise, a new
 	 * instance is generated with the help of the extension.
+	 * @param <T> extension type
 	 * 
 	 * @param observation observation for which the extension type is requested.
 	 * @param extensionType extension type to request. E.g. the type supplied to the subclass of Extension. 
