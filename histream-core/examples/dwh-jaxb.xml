@@ -53,8 +53,8 @@
 				<fact concept="T:type:str"><value xsi:type="string">abc123</value></fact>
 				<fact concept="T:type:int"><value xsi:type="numeric">123</value></fact>
 				<!-- value attributes can be used in elements fact and value -->
-				<fact concept="T:type:dec"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
-				<fact concept="T:full" start="2010" end="2011" location="T:LOC"><value xsi:type="numeric" unit="mm" flag="A">123.456</value></fact>
+				<fact concept="T:type:dec"><value xsi:type="numeric" unit="mm">123.456</value></fact>
+				<fact concept="T:full" start="2010" end="2011" location="T:LOC"><value xsi:type="numeric" unit="mm">123.456</value></fact>
 				<!-- 
 				<fact concept="T:type:enum" type="xsi:integer">1</fact>
 					-->
@@ -64,7 +64,7 @@
 					<value xsi:type="string">groupvalue</value>
 					<modifier code="T:mod:1"/>
 					<modifier code="T:mod:2"><value xsi:type="string">def456</value></modifier>
-					<modifier code="T:mod:3"><value xsi:type="numeric" unit="mm" flag="A">78.9</value></modifier>
+					<modifier code="T:mod:3"><value xsi:type="numeric" unit="mm">78.9</value></modifier>
 				</fact>
 				<!--  group without value -->
 				<fact concept="T:group:2">
