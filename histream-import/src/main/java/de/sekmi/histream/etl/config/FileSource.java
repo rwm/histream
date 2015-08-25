@@ -8,11 +8,13 @@ import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.etl.FileRowSupplier;
 import de.sekmi.histream.etl.RowSupplier;
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name="plain-file")
 public class FileSource extends TableSource{
 	@XmlElement
 	URL url;

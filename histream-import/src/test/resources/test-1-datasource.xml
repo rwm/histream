@@ -4,25 +4,9 @@
 		<id>test-1</id>
 		<etl-strategy>replace-source</etl-strategy>
 	</meta>
-	<!-- erstmal weglassen -->
-	<transformations>
-		<xml-source url="xxxx.xml">
-			<transform with="a.xslt" to="lala.txt" />
-			<transform with="b.xslt" to="dddd.txt" />
-		</xml-source>
-	</transformations>
-
-	<!-- 
-	<value-mappings>
-		<map id="geschlecht">
-			<value from="M" to="M" />
-			<value from="W" to="F" /> 
-		</map>
-	</value-mappings>
-	 -->
 	 
 	<patient-table>
-        <source xsi:type="fileSource">
+        <source xsi:type="plain-file">
             <url>file:src/test/resources/test-1-patients.txt</url>
             <separator>\t</separator>
         </source>
@@ -39,7 +23,7 @@
 	</patient-table>
 	<!-- optional -->
 	<visit-table>
-        <source xsi:type="fileSource">
+        <source xsi:type="plain-file">
             <url>file:src/test/resources/test-1-visits.txt</url>
             <type>text/csv</type>
 			<separator>\t</separator>
@@ -61,7 +45,7 @@
 	</visit-table>
 	
 	<wide-table>
-        <source xsi:type="fileSource">
+        <source xsi:type="plain-file">
             <url>file:src/test/resources/test-1-widetable.txt</url>
 			<separator>\t</separator>
         </source>
