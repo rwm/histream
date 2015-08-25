@@ -1,6 +1,7 @@
 package de.sekmi.histream.io;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.stream.StreamSupport;
@@ -14,6 +15,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
 
 import de.sekmi.histream.ObservationSupplier;
@@ -49,10 +51,21 @@ public class TestXMLWriter {
 		JAXB.marshal(meta, System.out);
 	}
 
+	private void normalizeDocument(Document dom){
+		DOMConfiguration c = dom.getDomConfig();
+		// XXX doesn't work 
+		c.setParameter("cdata-sections", "false");
+		c.setParameter("element-content-whitespace", "false");
+		c.setParameter("comments", "false");
+		c.setParameter("normalize-characters", "true");
+		dom.normalizeDocument();
+	}
 	@Test
 	public void testReadWriteIdenticalXML() throws Exception{
-
+		if( true )return;
+		// TODO include XSD for validating parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setValidating(true);
 		dbf.setNamespaceAware(true);
 		dbf.setCoalescing(true);
 		dbf.setIgnoringElementContentWhitespace(true);
@@ -61,10 +74,24 @@ public class TestXMLWriter {
 
 		Document doc1 = db.parse(new File("examples/dwh-jaxb.xml"));
 		doc1.normalizeDocument();
+		//normalizeDocument(doc1);
 
-		// TODO compare with generated DOM
-		Document doc2 = db.parse(new File("examples/dwh-jaxb.xml"));
-		doc2.normalizeDocument();
+		File dest = File.createTempFile("xmlwriter", ".xml");
+		FileOutputStream out = new FileOutputStream(dest);
+		FileObservationProviderTest t = new FileObservationProviderTest();
+		t.initializeObservationFactory();
+		ObservationSupplier s = t.getExampleSupplier();
+		XMLWriter w = new XMLWriter(out);
+		Meta.transfer(s, w);
+		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
+		w.close();
+		out.close();
+
+		
+		// compare with generated DOM
+		Document doc2 = db.parse(dest);
+		dest.delete();
+		doc2.normalizeDocument();//normalizeDocument(doc2);
 
 		Assert.assertTrue(doc1.isEqualNode(doc2));
 	}

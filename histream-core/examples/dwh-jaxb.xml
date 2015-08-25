@@ -25,13 +25,13 @@
 	<meta>
 		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
 		<etl-strategy>replace-visit</etl-strategy>
-		<source timestamp="2015-04-21T08:58:00" id="test"/>
+		<source timestamp="2015-04-21T06:58:00Z" id="test"/>
 		
 		<!-- weitere metadaten nötig? wertebereich, datentypen, ontologie, ...? -->
 	</meta>
-	<patient id="XX12345">
+	<patient id="XX12345"><!--
 		<surname>Dampf</surname>
-		<given-name>A</given-name>
+		<given-name>A</given-name> -->
 		<gender>Female</gender>
 		<birthdate>2001-01-01</birthdate>
 		<deathdate>2020</deathdate>
@@ -39,8 +39,8 @@
 			<start>2014-01-01T10:30:00</start>
 			<end>2014-01-05T10:30:00</end>
 			<location>Zuhause</location>
-			<!-- TODO inpatient/outpatient -->
-			<provider>xxxa</provider>
+			<!-- TODO inpatient/outpatient 
+			<provider>xxxa</provider>-->
 			<facts>
 				<fact concept="T:date:secs" start="2014-09-07T10:40:03"/>
 				<fact concept="T:date:mins" start="2014-09-07T10:40"/>
