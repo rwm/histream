@@ -17,7 +17,7 @@
 	</scm>
 	<distributionManagement>
 		<repository>
-			<id>local</id>
+			<id>local-releases</id>
 			<url>file:../releases</url>
 		</repository>
 	</distributionManagement>
