@@ -41,11 +41,14 @@ public class TestDateTimeAccuracy {
 	}
 	@Test
 	public void testParseToString(){
-		final String str = "2001-03-04T05:06:07";
-		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601(str);
+		final String[] str = new String[]{"2001-03-04T10:16:07", "2001-03-04T10:16:00"};
+		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601(str[0]);
 		Assert.assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
-		assertFieldValues(a, new int[]{2001,3,4,5,6,7});
-		Assert.assertEquals(str, a.toPartialIso8601());
+		assertFieldValues(a, new int[]{2001,3,4,10,16,7});
+		for( String s : str ){
+			a = DateTimeAccuracy.parsePartialIso8601(s);
+			Assert.assertEquals(s, a.toPartialIso8601());
+		}
 	}
 	
 	@Test

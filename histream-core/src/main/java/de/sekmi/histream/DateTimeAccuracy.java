@@ -150,8 +150,11 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 */
 	private void appendWithZeroPrefix(StringBuilder builder, TemporalField field, int digits){
 		int v = dateTime.get(field);
-		for(int i=digits; i>1 && v<(10^(i-1)); i--){
+		int pow = 1;
+		for( int i=1; i<digits; i++ )pow *= 10;
+		while( v < pow && pow > 1 ){
 			builder.append('0');
+			pow /= 10;
 		}
 		builder.append(v);
 	}

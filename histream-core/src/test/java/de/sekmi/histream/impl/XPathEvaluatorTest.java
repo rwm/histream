@@ -33,7 +33,7 @@ public class XPathEvaluatorTest {
 		Observation o = s.get();
 		//System.out.println("XXX:"+eval.evaluateToString("translate(fact/@start,'-:T','')", o));
 		//System.out.println(XPathEvaluator.toXMLString(o));
-		String[] trueExpressions = new String[]{"f:fact/@patient", "f:fact/@concept", "f:fact/@start", "number(translate(f:fact/@start,'-:T',''))=201409070104003"};
+		String[] trueExpressions = new String[]{"f:fact/@patient", "f:fact/@concept", "f:fact/@start", "number(translate(f:fact/@start,'-:T',''))=20140907104003"};
 		for( String expr : trueExpressions ){
 			Assert.assertEquals(expr, true, eval.test(expr, o));
 		}
