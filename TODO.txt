@@ -17,3 +17,13 @@ https://maven.apache.org/plugins/maven-site-plugin/examples/site-deploy-to-sourc
 
 Update version number across sub modules:
 mvn release:update-versions -DautoVersionSubmodules=true
+
+For a release
+mvn release:prepare -DautoVersionSubmodules=true
+mvn release:perform
+
+
+To cancel the release: mvn release:rollback
+And delete git tags:
+git tag -d release01 
+git push origin :refs/tags/release01
