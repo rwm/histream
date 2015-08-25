@@ -43,7 +43,7 @@
 		<module>histream-import</module>
 		<module>distribution</module>
 	</modules>
-	<build>
+	<build>		
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -54,6 +54,19 @@
 						<source>1.8</source>
 						<target>1.8</target>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.4</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -94,8 +107,25 @@
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.5.4</version>
 				</plugin>
+				<plugin>
+					<!-- only needed for working with eclipse -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>2.10</version>
+					<configuration>
+						<downloadSources>true</downloadSources>
+						<downloadJavadocs>true</downloadJavadocs>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 	<reporting>
 		<plugins>
