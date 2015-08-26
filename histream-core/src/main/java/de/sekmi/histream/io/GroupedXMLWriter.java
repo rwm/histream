@@ -97,8 +97,6 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			writer.setDefaultNamespace(NAMESPACE);
 			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			writer.writeStartDocument();
-			formatNewline();
-	
 			writer.writeStartElement(NAMESPACE, JAXBObservationSupplier.DOCUMENT_ROOT);
 			writer.writeDefaultNamespace(NAMESPACE);
 			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
