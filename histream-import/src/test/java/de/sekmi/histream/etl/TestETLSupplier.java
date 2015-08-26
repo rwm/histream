@@ -22,7 +22,7 @@ import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
 import de.sekmi.histream.io.AbstractObservationParser;
-import de.sekmi.histream.io.XMLWriter;
+import de.sekmi.histream.io.GroupedXMLWriter;
 
 public class TestETLSupplier {
 	private DataSource ds;
@@ -47,7 +47,7 @@ public class TestETLSupplier {
 	
 	@Test
 	public void testXMLConversion() throws Exception{
-		XMLWriter w = new XMLWriter(System.out);
+		GroupedXMLWriter w = new GroupedXMLWriter(System.out);
 		// transfer meta information
 		Meta.transfer(os, w);
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(os), false).forEach(w);

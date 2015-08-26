@@ -49,7 +49,7 @@ public class TestXMLWriter {
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
-		XMLWriter w = new XMLWriter(debugLog);
+		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
 		Meta.transfer(s, w);
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
 		w.close();
@@ -105,7 +105,7 @@ public class TestXMLWriter {
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
-		XMLWriter w = new XMLWriter(out);
+		GroupedXMLWriter w = new GroupedXMLWriter(out);
 		Meta.transfer(s, w);
 		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
 		s.close();
