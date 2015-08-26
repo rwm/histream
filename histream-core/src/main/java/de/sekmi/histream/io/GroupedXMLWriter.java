@@ -28,7 +28,6 @@ import de.sekmi.histream.impl.ObservationImpl;
  */
 public class GroupedXMLWriter extends GroupedObservationHandler{
 	private static final String NAMESPACE = "http://sekmi.de/histream/ns/eav-data";
-	private boolean hasContent;
 	private Marshaller marshaller;
 	private boolean writeFormatted;
 	private int formattingDepth;
@@ -92,12 +91,11 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	
 	@Override
 	protected void beginStream() throws ObservationException{
-		hasContent = false;
 		try {
 			writer.setDefaultNamespace(NAMESPACE);
 			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			writer.writeStartDocument();
-			writer.writeStartElement(NAMESPACE, JAXBObservationSupplier.DOCUMENT_ROOT);
+			writer.writeStartElement(JAXBObservationSupplier.DOCUMENT_ROOT);
 			writer.writeDefaultNamespace(NAMESPACE);
 			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			formatNewline();
@@ -198,7 +196,6 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	}
 	@Override
 	protected void beginPatient(Patient patient) throws ObservationException{
-		hasContent = true;
 		try{
 			formatIndent();
 			writer.writeStartElement(JAXBObservationSupplier.PATIENT_ELEMENT);
@@ -262,16 +259,6 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	@Override
 	protected void endStream() throws ObservationException{
 		try {
-			if( hasContent ){
-				// at least one fact processed
-				// end facts, encounter, patient
-				for( int i=0; i<3; i++){
-					formatPop();
-						formatIndent();
-					writer.writeEndElement();
-					formatNewline();
-				}
-			}
 			writer.writeEndDocument(); // automatically closes root element
 		} catch (XMLStreamException e) {
 			throw new ObservationException(e);

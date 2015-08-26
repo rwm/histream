@@ -37,7 +37,10 @@ public abstract class GroupedObservationHandler implements ObservationHandler, A
 	protected abstract void endEncounter(Visit visit)throws ObservationException;
 	protected abstract void onObservation(Observation observation)throws ObservationException;
 	
-	protected void endStream()throws ObservationException{
+	protected abstract void endStream()throws ObservationException;
+	
+	@Override
+	public void close(){
 		if( prevVisit != null ){
 			try {
 				endEncounter(prevVisit);
@@ -54,10 +57,6 @@ public abstract class GroupedObservationHandler implements ObservationHandler, A
 			}
 			prevPatient = null;
 		}
-	}
-	
-	@Override
-	public void close(){
 		try {
 			endStream();
 		} catch (ObservationException e) {
