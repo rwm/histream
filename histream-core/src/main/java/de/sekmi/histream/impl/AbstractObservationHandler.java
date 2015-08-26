@@ -35,6 +35,7 @@ public abstract class AbstractObservationHandler implements ObservationHandler{
 		try {
 			acceptOrException(observation);
 		} catch (ObservationException e) {
+			e.setObservation(observation);
 			reportError(e);
 		} // don't catch runtime exceptions
 	}

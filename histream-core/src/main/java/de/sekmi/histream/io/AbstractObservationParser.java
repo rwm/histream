@@ -81,6 +81,11 @@ public class AbstractObservationParser implements ExternalSourceType{
 		this.factory = factory;
 	}
 	
+	/**
+	 * TODO move method to ObservationSupplier
+	 * @param supplier
+	 * @return
+	 */
 	public static Spliterator<Observation> nonNullSpliterator(Supplier<Observation> supplier){
 		return new NonNullSpliterator(supplier);
 	}

@@ -32,12 +32,27 @@ public class ObservationException extends Exception{
 	
 	private Observation fact;
 	
+	public ObservationException(Throwable cause){
+		super(cause);
+	}
+	public ObservationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	@Deprecated
 	public ObservationException(Observation fact, Throwable cause){
 		super(cause);
 		this.fact = fact;
 	}
+	@Deprecated
 	public ObservationException(String message, Observation fact, Throwable cause){
 		super(message, cause);
+		this.fact = fact;
+	}
+	/**
+	 * Set the observation associated with this exception
+	 * @param fact associated observation
+	 */
+	public void setObservation(Observation fact){
 		this.fact = fact;
 	}
 	/**
