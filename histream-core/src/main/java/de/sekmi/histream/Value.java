@@ -73,11 +73,17 @@ public interface Value {
 		/** 
 		 * Numeric value 
 		 */
-		Numeric/*, 
+		Numeric,/*, 
 		/**
 		 * Numeric enumeration value (needs lookup table)
 		 */
 		//NumericEnum
+		
+		// TODO implement
+		/**
+		 * Reference to external resource (URL or URN)
+		 */
+		//Resource
 	}
 
 	/**
