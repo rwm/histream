@@ -83,8 +83,8 @@ public class AbstractObservationParser implements ExternalSourceType{
 	
 	/**
 	 * TODO move method to ObservationSupplier
-	 * @param supplier
-	 * @return
+	 * @param supplier observation supplier
+	 * @return spliterator
 	 */
 	public static Spliterator<Observation> nonNullSpliterator(Supplier<Observation> supplier){
 		return new NonNullSpliterator(supplier);
