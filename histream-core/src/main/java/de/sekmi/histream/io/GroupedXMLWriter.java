@@ -6,6 +6,7 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -22,12 +23,13 @@ import de.sekmi.histream.impl.ObservationImpl;
 
 /**
  * Writes observations to a single XML file. Observations must be grouped by patient and encounter.
+ * TODO fix duplicate namespace prefixes with JAXB marshaller
  * 
  * @author Raphael
  *
  */
 public class GroupedXMLWriter extends GroupedObservationHandler{
-	private static final String NAMESPACE = "http://sekmi.de/histream/ns/eav-data";
+	public static final String NAMESPACE = ObservationImpl.XML_NAMESPACE;//"http://sekmi.de/histream/ns/eav-data";
 	private Marshaller marshaller;
 	private boolean writeFormatted;
 	private int formattingDepth;
@@ -87,20 +89,26 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	 */
 	public void setFormatted(boolean formattedOutput){
 		this.writeFormatted = formattedOutput;
+		try {
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		} catch (PropertyException e) {
+		}
 	}
 	
 	@Override
 	protected void beginStream() throws ObservationException{
 		try {
-			writer.setDefaultNamespace(NAMESPACE);
-			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+			//writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
 			writer.writeStartDocument();
-			writer.writeStartElement(JAXBObservationSupplier.DOCUMENT_ROOT);
+			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,JAXBObservationSupplier.DOCUMENT_ROOT,NAMESPACE);
+			writer.setDefaultNamespace(NAMESPACE);
 			writer.writeDefaultNamespace(NAMESPACE);
+			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			formatNewline();
 			formatPush();
-			
+			// doesn't work for DOM writers
+			//Objects.requireNonNull(writer.getPrefix(NAMESPACE));
 			formatIndent();
 			marshaller.marshal(meta, writer);
 			formatNewline();
