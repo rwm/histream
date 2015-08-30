@@ -29,7 +29,8 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static class IDAT extends IdatColumns{
-		StringColumn firstname;
+		@XmlElement(name="given-name")
+		StringColumn givenName;
 		StringColumn surname;
 		DateTimeColumn birthdate;
 		DateTimeColumn deathdate;
@@ -42,7 +43,7 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 		ColumnMap map = new ColumnMap(headers);
 		
 		map.registerColumn(idat.patientId);
-		map.registerColumn(idat.firstname);
+		map.registerColumn(idat.givenName);
 		map.registerColumn(idat.surname);
 		map.registerColumn(idat.birthdate);
 		map.registerColumn(idat.deathdate);
@@ -56,7 +57,8 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		PatientRow patient = new PatientRow();
 		patient.setId(idat.patientId.valueOf(map, row));
-		patient.setNames(idat.firstname.valueOf(map, row), idat.surname.valueOf(map, row));
+		patient.setGivenName(idat.givenName.valueOf(map, row));
+		patient.setSurname(idat.surname.valueOf(map, row));
 		patient.setBirthDate(idat.birthdate.valueOf(map, row));
 		patient.setDeathDate(idat.deathdate.valueOf(map, row));
 		// concepts

@@ -45,6 +45,12 @@ public interface Patient extends IdExtensionType, ExternalSourceType{
 	Sex getSex();
 	void setSex(Sex sex);
 	
+	String getSurname();
+	void setSurname(String surname);
+	
+	String getGivenName();
+	void setGivenName(String givenName);
+	
 	public enum Sex{
 		Female, Male
 	}

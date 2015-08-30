@@ -35,6 +35,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	private DateTimeAccuracy birthDate;
 	private DateTimeAccuracy deathDate;
 	private Sex sex;
+	private String surname, givenName;
 	
 	public PatientImpl(){
 		
@@ -76,6 +77,26 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	@Override
 	public void setSex(Sex sex) {
 		this.sex = sex;
+	}
+
+	@Override
+	public String getSurname() {
+		return surname;
+	}
+
+	@Override
+	public void setSurname(String surname) {
+		this.surname = surname;
+	}
+
+	@Override
+	public String getGivenName() {
+		return givenName;
+	}
+
+	@Override
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
 	}
 
 

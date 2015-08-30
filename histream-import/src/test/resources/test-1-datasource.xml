@@ -12,7 +12,7 @@
         </source>
 		<idat>
 			<patient-id>patid</patient-id>
-			<firstname>vorname</firstname>
+			<given-name>vorname</given-name>
 			<surname>nachname</surname>
 			<birthdate format="d.M.u" na="">geburtsdatum</birthdate>
 			<deathdate format="d.M.u" na="">verstorben</deathdate>

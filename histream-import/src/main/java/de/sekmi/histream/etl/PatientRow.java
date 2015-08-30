@@ -14,19 +14,13 @@ import de.sekmi.histream.impl.PatientImpl;
  *
  */
 public class PatientRow extends PatientImpl implements FactRow{
-	String firstname;
-	String lastname;
 	// TODO concepts
-	List<Observation> facts;
-	
+	private List<Observation> facts;
 
-	public void setNames(String first, String last){
-		this.firstname = first;
-		this.lastname = last;
+	public PatientRow(){
 		this.facts = new ArrayList<>();
 	}
-
-
+	
 	@Override
 	public List<Observation> getFacts() {
 		return facts;

@@ -86,6 +86,8 @@ public class FactGroupingQueue{
 		currentPatientInstance.setBirthDate(currentPatient.getBirthDate());
 		currentPatientInstance.setDeathDate(currentPatient.getDeathDate());
 		currentPatientInstance.setSex(currentPatient.getSex());
+		currentPatientInstance.setSurname(currentPatient.getSurname());
+		currentPatientInstance.setGivenName(currentPatient.getGivenName());
 		// TODO sync patient with extension factory / add fields
 		
 		addFactsToWorkQueue(currentPatient);

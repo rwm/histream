@@ -84,6 +84,8 @@ public class TestETLSupplier {
 		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11"), p.getDeathDate());
 
 		// TODO verify other patient information
+		Assert.assertEquals("v1", p.getGivenName());
+		Assert.assertEquals("n1", p.getSurname());
 
 	}
 	@Test

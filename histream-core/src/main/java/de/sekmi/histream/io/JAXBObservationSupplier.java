@@ -124,6 +124,13 @@ public class JAXBObservationSupplier  implements ObservationSupplier {
 		if( patientData.containsKey("gender") ){
 			currentPatient.setSex(Sex.valueOf(patientData.get("gender")));
 		}
+		if( patientData.containsKey("surname") ){
+			currentPatient.setSurname(patientData.get("surname"));
+		}
+		if( patientData.containsKey("given-name") ){
+			currentPatient.setGivenName(patientData.get("given-name"));
+		}
+		
 	}
 	/**
 	 * Reads encounter element with content. 

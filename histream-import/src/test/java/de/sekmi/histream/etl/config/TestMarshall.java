@@ -30,6 +30,9 @@ public class TestMarshall {
 			Assert.assertEquals("patid",ds.patientTable.idat.patientId.name);
 			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.name);
 			Assert.assertEquals("geschlecht",ds.patientTable.idat.gender.name);
+			Assert.assertEquals("vorname",ds.patientTable.idat.givenName.name);
+			Assert.assertEquals("nachname",ds.patientTable.idat.surname.name);
+			
 			// visit table
 			Assert.assertNotNull(ds.visitTable);
 			Assert.assertNotNull(ds.visitTable.source);

@@ -212,9 +212,26 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			formatPush();
 			
 			// TODO: how write dedicated source information
-			// write surname
+
 			// write given name
-			
+			if( patient.getGivenName() != null ){
+				formatIndent();
+				writer.writeStartElement("given-name");
+				writer.writeCharacters(patient.getGivenName());
+				writer.writeEndElement();
+				formatNewline();
+			}
+
+			// write surname
+			if( patient.getSurname() != null ){
+				formatIndent();
+				writer.writeStartElement("surname");
+				writer.writeCharacters(patient.getSurname());
+				writer.writeEndElement();
+				formatNewline();
+			}
+
+
 			// gender
 			if( patient.getSex() != null ){
 				formatIndent();

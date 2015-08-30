@@ -280,10 +280,10 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			currentPatient.setSex(sex);
 			break;
 		case PatientNames:
-			// TODO
+			currentPatient.setGivenName(record.getValue());
 			break;
 		case PatientSurname:
-			// TODO
+			currentPatient.setSurname(record.getValue());
 			break;
 		case Visit:
 			lazyCreateVisit(record.getVisitID(), record.getPatID());

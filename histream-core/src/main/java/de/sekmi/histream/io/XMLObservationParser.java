@@ -168,7 +168,9 @@ class XMLObservationParser extends AbstractObservationParser{
 				patient.setBirthDate(birthDate);
 				patient.setDeathDate(deathDate);
 				patient.setSex(sex);
-				// TODO set name, surname, etc.
+				// set names, surname, etc.
+				patient.setGivenName(visitData.get("names"));
+				patient.setSurname(visitData.get("surname"));
 			}
 		}else{
 			fact.setExtension(Patient.class, patient);			
