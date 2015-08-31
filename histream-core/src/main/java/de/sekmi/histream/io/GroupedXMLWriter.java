@@ -267,10 +267,8 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	 * Marshal a fact without writing context information from patient, visit and source.
 	 *
 	 * @param fact fact
-	 * @param patient patient context
 	 * @param visit visit context
 	 * @param source source context
-	 * @throws ObservationException for errors in fact
 	 * @throws JAXBException errors during marshal operation
 	 */
 	private void marshalFactWithContext(Observation fact, Visit visit, ExternalSourceType source) throws JAXBException{
