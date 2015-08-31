@@ -1,5 +1,14 @@
 package de.sekmi.histream.etl;
 
+/**
+ * Error condition during parsing of input tables. 
+ * 
+ * E.g. when a column header reference in the configuration
+ * does not appear in the respective table.
+ * 
+ * @author Raphael
+ *
+ */
 public class ParseException extends Exception {
 	/**
 	 * 

@@ -13,28 +13,48 @@ import javax.xml.bind.annotation.XmlType;
 import de.sekmi.histream.etl.FileRowSupplier;
 import de.sekmi.histream.etl.RowSupplier;
 
+/**
+ * Table source reading plain text tables
+ * 
+ * @author Raphael
+ *
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="plain-file")
 public class FileSource extends TableSource{
+	/**
+	 * Location of the table file. 
+	 * A relative location might be specified which 
+	 * will be resolved against {@link Meta#getLocation()}.
+	 */
 	@XmlElement
-	URL url;
+	String url;
 	
+	/**
+	 * File encoding is not used yet.
+	 */
 	@XmlElement
 	String encoding;
 	
+	/**
+	 * Regular expression pattern for the field separator. e.g. {@code \t} 
+	 * The specified string will be processed with {@link Pattern#compile(String)}.
+	 */
 	@XmlElement
 	String separator;
 	
 	private FileSource(){
 	}
-	public FileSource(String url, String separator) throws MalformedURLException{
+	public FileSource(String urlSpec, String separator) throws MalformedURLException{
 		this();
-		this.url = new URL(url);
+		this.url = urlSpec;
 		this.separator = separator;
 	}
 	@Override
-	public RowSupplier rows() throws IOException {
-		return new FileRowSupplier(url, Pattern.compile(separator));
+	public RowSupplier rows(Meta meta) throws IOException {
+		URL base = meta.getLocation();
+		URL source = (base == null)?new URL(url):new URL(base, url);
+		return new FileRowSupplier(source, Pattern.compile(separator));
 	}
 
 }

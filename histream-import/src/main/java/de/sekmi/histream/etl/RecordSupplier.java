@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.Table;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.impl.ExternalSourceImpl;
@@ -16,12 +17,12 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 	private ObservationFactory factory;
 	private ExternalSourceType source;
 	
-	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory, String sourceId)throws ParseException{
+	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory, Meta meta)throws ParseException{
 		this.rows = rows;
 		this.table = table;
 		this.map = table.getColumnMap(rows.getHeaders());
 		this.factory = factory;
-		this.source = new ExternalSourceImpl(sourceId, rows.getTimestamp());
+		this.source = new ExternalSourceImpl(meta.getSourceId(), rows.getTimestamp());
 	}
 	
 	public final ExternalSourceType getSource(){ return this.source;}

@@ -16,10 +16,13 @@ import de.sekmi.histream.etl.RowSupplier;
 @XmlSeeAlso({FileSource.class, SQLSource.class})
 public abstract class TableSource{
 	/**
+	 * Open a row supplier which provides rows. 
+	 * This is a resource which must be closed.
 	 * 
+	 * @param meta meta information
 	 * @return row supplier
 	 * @throws IOException IO errors during row supplier construction
 	 */
-	public abstract RowSupplier rows() throws IOException;
+	public abstract RowSupplier rows(Meta meta) throws IOException;
 
 }

@@ -26,7 +26,7 @@ public class FileRowSupplier extends RowSupplier {
 		// TODO: check whether needed to close underlying InputStream
 		
 		// load headers
-		String line = in.readLine();		
+		String line = in.readLine();
 		this.headers = fieldSeparatorPattern.split(line);
 
 		determineFileTimestamp(location);

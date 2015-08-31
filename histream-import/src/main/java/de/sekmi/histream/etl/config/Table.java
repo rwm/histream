@@ -54,8 +54,8 @@ public abstract class Table<T extends FactRow> {
 	
 	public abstract T fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException;
 	
-	public RecordSupplier<T> open(ObservationFactory factory, String sourceId) throws IOException, ParseException{
-		return new RecordSupplier<>(source.rows(), this, factory, sourceId);
+	public RecordSupplier<T> open(ObservationFactory factory, Meta meta) throws IOException, ParseException{
+		return new RecordSupplier<>(source.rows(meta), this, factory, meta);
 	}
 
 

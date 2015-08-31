@@ -7,7 +7,7 @@
 	 
 	<patient-table>
         <source xsi:type="plain-file">
-            <url>file:src/test/resources/test-1-patients.txt</url>
+            <url>test-1-patients.txt</url>
             <separator>\t</separator>
         </source>
 		<idat>
@@ -24,7 +24,7 @@
 	<!-- optional -->
 	<visit-table>
         <source xsi:type="plain-file">
-            <url>file:src/test/resources/test-1-visits.txt</url>
+            <url>test-1-visits.txt</url>
             <type>text/csv</type>
 			<separator>\t</separator>
         </source>
@@ -46,7 +46,7 @@
 	
 	<wide-table>
         <source xsi:type="plain-file">
-            <url>file:src/test/resources/test-1-widetable.txt</url>
+            <url>test-1-widetable.txt</url>
 			<separator>\t</separator>
         </source>
 		<idat>

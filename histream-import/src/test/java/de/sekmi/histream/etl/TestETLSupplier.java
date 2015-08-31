@@ -1,10 +1,7 @@
 package de.sekmi.histream.etl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.stream.StreamSupport;
-
-import javax.xml.bind.JAXB;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -13,36 +10,23 @@ import org.junit.Test;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.Meta;
-import de.sekmi.histream.impl.ObservationFactoryImpl;
-import de.sekmi.histream.impl.SimplePatientExtension;
-import de.sekmi.histream.impl.SimpleVisitExtension;
 import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.GroupedXMLWriter;
 
 public class TestETLSupplier {
-	private DataSource ds;
-	private ObservationFactory of ;
 	private ETLObservationSupplier os;
 	
 	@Before
 	public void loadConfiguration() throws IOException, ParseException{
-		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.xml") ){
-			ds = JAXB.unmarshal(in, DataSource.class);
-		}
-		of = new ObservationFactoryImpl();
-		of.registerExtension(new SimplePatientExtension());
-		of.registerExtension(new SimpleVisitExtension());
-		os = new ETLObservationSupplier(ds,of);
+		os = ETLObservationSupplier.load(getClass().getResource("/test-1-datasource.xml"));
 	}
 
 	@After
 	public void freeResources() throws IOException{
-		os.close();		
+		if( os != null )os.close();		
 	}
 	
 	@Test

@@ -20,7 +20,7 @@ public class SQLSource extends TableSource {
 		this.connectString = connectString;
 	}
 	@Override
-	public RowSupplier rows() {
+	public RowSupplier rows(Meta meta) {
 		// TODO Auto-generated method stub
 		return null;
 	}

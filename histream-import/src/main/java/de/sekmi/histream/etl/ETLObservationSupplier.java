@@ -1,8 +1,8 @@
 package de.sekmi.histream.etl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,11 +13,15 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.config.DataSource;
+import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.PatientTable;
 import de.sekmi.histream.etl.config.VisitTable;
 import de.sekmi.histream.etl.config.WideTable;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.ObservationFactoryImpl;
+import de.sekmi.histream.impl.SimplePatientExtension;
+import de.sekmi.histream.impl.SimpleVisitExtension;
 
 /**
  * Supplier for observations which are loaded from arbitrary
@@ -67,10 +71,45 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	
 	private DataSource ds;
 	
-	public ETLObservationSupplier(File configuration, ObservationFactory factory) throws IOException, ParseException{
-		this(JAXB.unmarshal(configuration, DataSource.class), factory);
+	/**
+	 * Build a new observation supplier with the supplied configuration file.
+	 * Relative URLs within the configuration are resolved against the provided configuration url.
+	 * 
+	 * @param configuration location configuration file
+	 * @param factory observation factory
+	 * @return observation supplier
+	 * 
+	 * @throws IOException error reading configuration. The error might be caused by a {@link ParseException}.
+	 * 
+	 */
+	public static ETLObservationSupplier load(URL configuration, ObservationFactory factory) throws IOException{
+		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
+		ds.getMeta().setLocation(configuration);
+		return new ETLObservationSupplier(ds, factory);
 	}
-	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
+	
+	/**
+	 * Same as {@link #load(URL, ObservationFactory)} with using a default observation factory.
+	 * The default observation factory will only support Patient and Visit extensions.
+	 * 
+	 * @param configuration configuration URL
+	 * @return observation factory
+	 * @throws IOException error reading configuration
+	 */
+	public static ETLObservationSupplier load(URL configuration) throws IOException{
+		ObservationFactory of = new ObservationFactoryImpl();
+		of.registerExtension(new SimplePatientExtension());
+		of.registerExtension(new SimpleVisitExtension());
+		return load(configuration, of);
+	}
+	/**
+	 * Construct a new observation supplier directly from a {@link DataSource}.
+	 * 
+	 * @param ds data source
+	 * @param factory observation factory
+	 * @throws IOException error reading configuration
+	 */
+	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException {
 		this.ds = ds;
 		
 		pt = ds.getPatientTable();
@@ -78,11 +117,12 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		wt = ds.getWideTables();
 		// TODO long tables
 
-		String sourceId = ds.getMeta().getSourceId();
+		Meta meta = ds.getMeta();
 		// in case of exception, make sure already opened suppliers are closed
+		IOException error = null;
 		try{
-			pr = pt.open(factory, sourceId);
-			vr = vt.open(factory, sourceId);
+			pr = pt.open(factory, meta);
+			vr = vt.open(factory, meta);
 			queue = new FactGroupingQueue(pr, vr, 
 					factory.getExtensionAccessor(Patient.class), 
 					factory.getExtensionAccessor(Visit.class));
@@ -91,19 +131,28 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			wr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
 				@SuppressWarnings("resource")
-				RecordSupplier<WideRow> s = t.open(factory, sourceId);
+				RecordSupplier<WideRow> s = t.open(factory, meta);
 				queue.addFactTable(s);
 				wr.add(s);
 			}
 			queue.prepare();
 			
-		}catch( IOException | UncheckedIOException | ParseException | UncheckedParseException e ){
+		}catch( UncheckedIOException e ){
+			error = e.getCause();
+		}catch( UncheckedParseException e ){
+			error = new IOException(e.getCause());
+		}catch( ParseException e ){
+			error = new IOException(e);
+		}catch( IOException e ){
+			error = e;
+		}
+		if( error != null ){
 			try{
 				this.close();
 			}catch( IOException f ){
-				e.addSuppressed(f);
+				error.addSuppressed(f);
 			}
-			throw e;
+			throw error;
 		}
 	}
 	

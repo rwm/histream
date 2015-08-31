@@ -1,8 +1,8 @@
 package de.sekmi.histream.etl.config;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.temporal.ChronoField;
 
 import javax.xml.bind.JAXB;
@@ -29,15 +29,15 @@ public class TestReadTables {
 	
 	@Before
 	public void loadConfiguration() throws IOException{
-		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.xml") ){
-			ds = JAXB.unmarshal(in, DataSource.class);
-		}
+		URL url = getClass().getResource("/test-1-datasource.xml");
+		ds = JAXB.unmarshal(url, DataSource.class);
+		ds.getMeta().setLocation(url);
 		of = new ObservationFactoryImpl();
 	}
 	
 	@Test
 	public void testReadPatients() throws IOException, ParseException{
-		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of,ds.getMeta().getSourceId()) ){
+		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of,ds.getMeta()) ){
 			PatientRow r = s.get();
 			Assert.assertEquals("p1", r.getId());
 			Assert.assertEquals(2003, r.getBirthDate().get(ChronoField.YEAR));
@@ -46,7 +46,7 @@ public class TestReadTables {
 	}
 	@Test
 	public void testReadVisits() throws IOException, ParseException{
-		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of,ds.getMeta().getSourceId()) ){
+		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of,ds.getMeta()) ){
 			VisitRow r = s.get();
 			Assert.assertEquals("v1", r.getId());
 			Assert.assertEquals(2013, r.getStartTime().get(ChronoField.YEAR));
@@ -55,7 +55,7 @@ public class TestReadTables {
 	}
 	@Test
 	public void testReadWideTable() throws IOException, ParseException{
-		try( RecordSupplier<WideRow> s = ds.wideTables[0].open(of,ds.getMeta().getSourceId()) ){
+		try( RecordSupplier<WideRow> s = ds.wideTables[0].open(of,ds.getMeta()) ){
 			WideRow r = s.get();
 			Assert.assertNotNull(r);
 			Assert.assertTrue(r.getFacts().size() > 0);

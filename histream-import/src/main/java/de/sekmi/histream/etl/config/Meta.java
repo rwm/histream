@@ -1,7 +1,16 @@
 package de.sekmi.histream.etl.config;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.net.URL;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ * Meta information.
+ * 
+ * @author Raphael
+ *
+ */
 public class Meta {
 	@XmlElement
 	String id;
@@ -9,6 +18,9 @@ public class Meta {
 	@XmlElement(name="etl-strategy")
 	String etlStrategy;
 
+	@XmlTransient
+	private URL location;
+	
 	protected Meta(){
 	}
 
@@ -22,6 +34,13 @@ public class Meta {
 
 	public String getETLStrategy(){
 		return etlStrategy;
+	}
+	
+	public URL getLocation(){
+		return location;
+	}
+	public void setLocation(URL location){
+		this.location = location;
 	}
 
 }
