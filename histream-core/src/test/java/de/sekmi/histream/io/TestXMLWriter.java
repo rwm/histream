@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
-import java.util.stream.StreamSupport;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
@@ -145,8 +144,7 @@ public class TestXMLWriter {
 		ObservationSupplier s = t.getExampleSupplier();
 		Document doc = createDocument();
 		GroupedXMLWriter w = new GroupedXMLWriter(new DOMResult(doc));
-		Meta.transfer(s, w);
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
+		Streams.transfer(s, w);
 		w.close();
 		s.close();
 
@@ -159,8 +157,7 @@ public class TestXMLWriter {
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
 		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
-		Meta.transfer(s, w);
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
+		Streams.transfer(s, w);
 		w.close();
 		s.close();
 	}
@@ -215,8 +212,7 @@ public class TestXMLWriter {
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
 		GroupedXMLWriter w = new GroupedXMLWriter(out);
-		Meta.transfer(s, w);
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(s), false).forEach(w);
+		Streams.transfer(s, w);
 		s.close();
 		w.close();
 		out.close();

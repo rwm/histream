@@ -29,6 +29,7 @@ public abstract class GroupedObservationHandler implements ObservationHandler, A
 
 	/**
 	 * Called when the first observation is encountered
+	 * @throws ObservationException to report errors
 	 */
 	protected abstract void beginStream()throws ObservationException;
 	protected abstract void beginPatient(Patient patient)throws ObservationException;

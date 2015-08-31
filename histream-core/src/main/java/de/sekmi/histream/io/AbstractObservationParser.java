@@ -80,49 +80,6 @@ public class AbstractObservationParser implements ExternalSourceType{
 	public void setObservationFactory(ObservationFactory factory){
 		this.factory = factory;
 	}
-	
-	/**
-	 * TODO move method to ObservationSupplier
-	 * @param supplier observation supplier
-	 * @return spliterator
-	 */
-	public static Spliterator<Observation> nonNullSpliterator(Supplier<Observation> supplier){
-		return new NonNullSpliterator(supplier);
-	}
-	public static Stream<Observation> nonNullStream(Supplier<Observation> supplier){
-		return StreamSupport.stream(new NonNullSpliterator(supplier), false);
-	}
-	
-	private static class NonNullSpliterator implements Spliterator<Observation>{
-		private Supplier<Observation> supplier;
-		
-		public NonNullSpliterator(Supplier<Observation> supplier) {
-			this.supplier = supplier;
-		}
-		@Override
-		public boolean tryAdvance(Consumer<? super Observation> action) {
-			Observation o = supplier.get();
-			if( o == null )return false;
-			action.accept(o);
-			return true;
-		}
-
-		@Override
-		public Spliterator<Observation> trySplit() {
-			return null;
-		}
-
-		@Override
-		public long estimateSize() {
-			return Long.MAX_VALUE;
-		}
-
-		@Override
-		public int characteristics() {
-			return Spliterator.NONNULL | Spliterator.IMMUTABLE;
-		}
-		
-	}
 
 	@Override
 	public Instant getSourceTimestamp() {

@@ -48,8 +48,8 @@ import de.sekmi.histream.conf.Configuration;
 import de.sekmi.histream.conf.PluginConfig;
 import de.sekmi.histream.conf.PluginRef;
 import de.sekmi.histream.impl.AbstractObservationHandler;
-import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FileObservationSupplierFactory;
+import de.sekmi.histream.io.Streams;
 
 public class RunConfiguration implements Closeable{
 	private static final Logger log = Logger.getLogger(RunConfiguration.class.getName());
@@ -128,7 +128,7 @@ public class RunConfiguration implements Closeable{
 		for( ObservationHandler h : destinationHandlers ){
 			h.setMeta("etl.strategy", provider.getMeta("etl.strategy"));
 		}
-		AbstractObservationParser.nonNullStream(provider).forEach(destinationChain);
+		Streams.nonNullStream(provider).forEach(destinationChain);
 	}
 	
 	public ObservationSupplier providerForFile(File file){

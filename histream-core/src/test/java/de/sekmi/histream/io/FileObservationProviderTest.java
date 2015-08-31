@@ -28,7 +28,6 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
 import java.math.BigDecimal;
 
 import javax.xml.bind.JAXBException;
@@ -54,7 +53,6 @@ import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
 import de.sekmi.histream.impl.TestObservationHandler;
-import de.sekmi.histream.io.AbstractObservationParser;
 import de.sekmi.histream.io.FlatObservationSupplier;
 import de.sekmi.histream.io.XMLObservationSupplier;
 
@@ -208,7 +206,7 @@ public class FileObservationProviderTest {
 	}
 
 	public void validateExample(Supplier<Observation> supplier){
-		StreamSupport.stream(AbstractObservationParser.nonNullSpliterator(supplier), false).forEach(handler);		
+		Streams.nonNullStream(supplier).forEach(handler);		
 	}
 	
 	@After
