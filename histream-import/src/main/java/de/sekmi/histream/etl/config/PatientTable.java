@@ -1,6 +1,5 @@
 package de.sekmi.histream.etl.config;
 
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -42,12 +41,30 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
 		
+		// need patientId at minimum
+		if( idat.patientId == null ){
+			throw new ParseException("datasource/patient-table/idat/patient-id column not specified");
+		}
 		map.registerColumn(idat.patientId);
-		map.registerColumn(idat.givenName);
-		map.registerColumn(idat.surname);
-		map.registerColumn(idat.birthdate);
-		map.registerColumn(idat.deathdate);
-		map.registerColumn(idat.gender);
+		
+		// other columns are optional
+		if( idat.givenName != null ){
+			map.registerColumn(idat.givenName);
+		}
+		if( idat.surname != null ){
+			map.registerColumn(idat.surname);
+		}
+		if( idat.birthdate != null ){
+			map.registerColumn(idat.birthdate);
+		}
+		if( idat.deathdate != null ){
+			map.registerColumn(idat.deathdate);
+		}
+		if( idat.gender != null ){
+			map.registerColumn(idat.gender);
+		}
+		// make sure all headers are specified in configuration
+		Table.validateAllHeaders(headers, map, idat.ignore);
 		
 		return map;
 	}

@@ -79,10 +79,11 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * @param factory observation factory
 	 * @return observation supplier
 	 * 
-	 * @throws IOException error reading configuration. The error might be caused by a {@link ParseException}.
+	 * @throws IOException error reading configuration or data tables.
+	 * @throws ParseException configuration error
 	 * 
 	 */
-	public static ETLObservationSupplier load(URL configuration, ObservationFactory factory) throws IOException{
+	public static ETLObservationSupplier load(URL configuration, ObservationFactory factory) throws IOException, ParseException{
 		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
 		ds.getMeta().setLocation(configuration);
 		return new ETLObservationSupplier(ds, factory);
@@ -94,9 +95,10 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * 
 	 * @param configuration configuration URL
 	 * @return observation factory
-	 * @throws IOException error reading configuration
+	 * @throws IOException error reading configuration or table data
+	 * @throws ParseException configuration error
 	 */
-	public static ETLObservationSupplier load(URL configuration) throws IOException{
+	public static ETLObservationSupplier load(URL configuration) throws IOException, ParseException{
 		ObservationFactory of = new ObservationFactoryImpl();
 		of.registerExtension(new SimplePatientExtension());
 		of.registerExtension(new SimpleVisitExtension());
@@ -107,9 +109,10 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * 
 	 * @param ds data source
 	 * @param factory observation factory
-	 * @throws IOException error reading configuration
+	 * @throws IOException error reading configuration or table data
+	 * @throws ParseException configuration error
 	 */
-	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException {
+	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
 		this.ds = ds;
 		
 		pt = ds.getPatientTable();
@@ -119,7 +122,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 
 		Meta meta = ds.getMeta();
 		// in case of exception, make sure already opened suppliers are closed
-		IOException error = null;
+		Exception error = null;
 		try{
 			pr = pt.open(factory, meta);
 			vr = vt.open(factory, meta);
@@ -130,7 +133,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			// open all tables
 			wr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
-				@SuppressWarnings("resource")
+				//@SuppressWarnings("resource")
 				RecordSupplier<WideRow> s = t.open(factory, meta);
 				queue.addFactTable(s);
 				wr.add(s);
@@ -140,9 +143,9 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		}catch( UncheckedIOException e ){
 			error = e.getCause();
 		}catch( UncheckedParseException e ){
-			error = new IOException(e.getCause());
+			error = e.getCause();
 		}catch( ParseException e ){
-			error = new IOException(e);
+			error = e;
 		}catch( IOException e ){
 			error = e;
 		}
@@ -152,7 +155,11 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			}catch( IOException f ){
 				error.addSuppressed(f);
 			}
-			throw error;
+			if( error instanceof ParseException ){
+				throw (ParseException)error;
+			}else{
+				throw (IOException)error;
+			}
 		}
 	}
 	

@@ -52,6 +52,33 @@ public abstract class Table<T extends FactRow> {
 		}
 	}
 	
+	/**
+	 * Make sure all columns are either registered in the column map or specified in an 'ignore' element.
+	 * Otherwise, a {@link ParseException} is thrown.
+	 * 
+	 * @param headers table headers
+	 * @param map column map
+	 * @param ignored ignored columns
+	 * @throws ParseException thrown for the first header which is neither in the map nor in ignored columns
+	 */
+	protected static void validateAllHeaders(String[] headers, ColumnMap map, Column<?>[] ignored) throws ParseException{
+		// for each header
+		for( int i=0; i<headers.length; i++ ){
+			// check if in map
+			if( map.isRegistered(headers[i]) )continue;
+			// not registered in map
+			// check if listed in ignore element
+			int j=0;
+			for( j=0; j<ignored.length; j++ ){
+				if( headers[i].equals(ignored[j].getName()) )break;
+			}
+			if( j == ignored.length ){
+				// unassigned column
+				throw new ParseException("Header not specified in configuration: "+headers[i]);
+			}
+		}
+	}
+	
 	public abstract T fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException;
 	
 	public RecordSupplier<T> open(ObservationFactory factory, Meta meta) throws IOException, ParseException{
