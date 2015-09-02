@@ -5,4 +5,8 @@ import javax.xml.bind.annotation.XmlElement;
 public class DataTableIdat extends IdatColumns {
 	@XmlElement(name="visit-id")
 	StringColumn visitId;
+	/**
+	 * Ignored columns
+	 */
+	Column<?>[] ignore;
 }

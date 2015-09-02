@@ -22,11 +22,24 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 	@Override
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
+
+		if( idat.patientId == null ){
+			throw new ParseException("datasource/wide-table/idat/patient-id column not specified");
+		}
+		if( idat.visitId == null ){
+			throw new ParseException("datasource/wide-table/idat/visit-id column not specified");
+		}
+
 		map.registerColumn(idat.patientId);
 		map.registerColumn(idat.visitId);
+		
 		for( Concept c : concepts ){
 			mapRegisterConcept(map, c);
 		}
+
+		// TODO allow option/parameter to force column checking for data tables
+		//validateAllHeaders(headers, map, idat.ignore);
+
 		return map;
 	}
 

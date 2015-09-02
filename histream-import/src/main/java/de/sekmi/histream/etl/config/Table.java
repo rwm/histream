@@ -66,15 +66,19 @@ public abstract class Table<T extends FactRow> {
 		for( int i=0; i<headers.length; i++ ){
 			// check if in map
 			if( map.isRegistered(headers[i]) )continue;
+			
 			// not registered in map
 			// check if listed in ignore element
 			int j=0;
+			if( ignored == null ){
+				ignored = new Column<?>[]{};
+			}
 			for( j=0; j<ignored.length; j++ ){
 				if( headers[i].equals(ignored[j].getName()) )break;
 			}
 			if( j == ignored.length ){
 				// unassigned column
-				throw new ParseException("Header not specified in configuration: "+headers[i]);
+				throw new ParseException("Table data header missing in configuration: "+headers[i]);
 			}
 		}
 	}

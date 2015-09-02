@@ -35,18 +35,32 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 	@Override
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
 		ColumnMap map = new ColumnMap(headers);
-		
+
+		if( idat.patientId == null ){
+			throw new ParseException("datasource/visit-table/idat/patient-id column not specified");
+		}
+		if( idat.visitId == null ){
+			throw new ParseException("datasource/visit-table/idat/visit-id column not specified");
+		}
+
 		map.registerColumn(idat.patientId);
 		map.registerColumn(idat.visitId);
-		map.registerColumn(idat.start);
-		map.registerColumn(idat.end);
+		if( idat.start != null ){
+			map.registerColumn(idat.start);			
+		}
+		if( idat.end != null ){
+			map.registerColumn(idat.end);
+		}
 		if( idat.location != null ){
 			map.registerColumn(idat.location);
 		}
 		for( Concept c : concepts ){
 			mapRegisterConcept(map, c);
 		}
-		
+
+		// make sure all columns are specified
+		validateAllHeaders(headers, map, idat.ignore);
+
 		return map;
 	}
 
