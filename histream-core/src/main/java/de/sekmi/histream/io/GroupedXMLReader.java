@@ -27,7 +27,7 @@ import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
 
-public class JAXBObservationSupplier  implements ObservationSupplier {
+public class GroupedXMLReader  implements ObservationSupplier {
 	static final String DOCUMENT_ROOT = "eav-data";
 	static final String PATIENT_ELEMENT = "patient";
 	static final String ENCOUNTER_ELEMENT = "encounter";
@@ -55,10 +55,10 @@ public class JAXBObservationSupplier  implements ObservationSupplier {
 	
 	
 	
-	public JAXBObservationSupplier(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
+	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
-	public JAXBObservationSupplier(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
+	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
 		super();
 		this.factory = factory;
 		this.patientData = new HashMap<>();

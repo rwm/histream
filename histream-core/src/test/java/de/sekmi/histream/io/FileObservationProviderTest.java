@@ -199,7 +199,7 @@ public class FileObservationProviderTest {
 	
 	public ObservationSupplier getExampleSupplier(String path) throws IOException{
 		try {
-			return new JAXBObservationSupplier(factory, new FileInputStream(path));
+			return new GroupedXMLReader(factory, new FileInputStream(path));
 		} catch (XMLStreamException | FactoryConfigurationError | JAXBException e) {
 			throw new IOException(e);
 		}
@@ -223,7 +223,7 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testJAXBReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError, JAXBException  {
-		JAXBObservationSupplier xos = new JAXBObservationSupplier(factory, new FileInputStream("examples/dwh-jaxb.xml"));
+		GroupedXMLReader xos = new GroupedXMLReader(factory, new FileInputStream("examples/dwh-jaxb.xml"));
 		validateExample(xos);
 		xos.close();
 	}

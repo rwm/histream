@@ -100,7 +100,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		try {
 			//writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
 			writer.writeStartDocument();
-			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,JAXBObservationSupplier.DOCUMENT_ROOT,NAMESPACE);
+			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.DOCUMENT_ROOT,NAMESPACE);
 			writer.setDefaultNamespace(NAMESPACE);
 			writer.writeDefaultNamespace(NAMESPACE);
 			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
@@ -139,7 +139,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	protected void beginEncounter(Visit visit)throws ObservationException{
 		try {
 			formatIndent();
-			writer.writeStartElement(JAXBObservationSupplier.ENCOUNTER_ELEMENT);
+			writer.writeStartElement(GroupedXMLReader.ENCOUNTER_ELEMENT);
 			writer.writeAttribute("id", visit.getId());
 			formatNewline();
 			formatPush();
@@ -169,7 +169,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	
 			// TODO more data
 			formatIndent();
-			writer.writeStartElement(JAXBObservationSupplier.FACT_WRAPPER);
+			writer.writeStartElement(GroupedXMLReader.FACT_WRAPPER);
 			formatNewline();
 			formatPush();
 		} catch (XMLStreamException e) {
@@ -206,7 +206,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	protected void beginPatient(Patient patient) throws ObservationException{
 		try{
 			formatIndent();
-			writer.writeStartElement(JAXBObservationSupplier.PATIENT_ELEMENT);
+			writer.writeStartElement(GroupedXMLReader.PATIENT_ELEMENT);
 			writer.writeAttribute("id", patient.getId());
 			formatNewline();
 			formatPush();
