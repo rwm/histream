@@ -27,6 +27,13 @@ import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
 
+/**
+ * Read grouped observations from XML
+ * 
+ * @see GroupedXMLWriter
+ * @author Raphael
+ *
+ */
 public class GroupedXMLReader  implements ObservationSupplier {
 	static final String DOCUMENT_ROOT = "eav-data";
 	static final String PATIENT_ELEMENT = "patient";
@@ -39,22 +46,19 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	private Patient currentPatient;
 	private Visit currentVisit;
 	private Meta meta;
-	
+
 	private Unmarshaller unmarshaller;
 	private XMLStreamReader reader;
 	// patient data
 	private String patientId;
 	private Map<String,String> patientData;
-	
+
 	// encounter data
 	private String encounterId;
 	private DateTimeAccuracy encounterStart;
 	private DateTimeAccuracy encounterEnd;
 	private Map<String,String> visitData;
-	
-	
-	
-	
+
 	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
