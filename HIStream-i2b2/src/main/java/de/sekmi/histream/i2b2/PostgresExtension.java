@@ -42,7 +42,7 @@ import de.sekmi.histream.Plugin;
  *
  * @param <T> extension instance type
  */
-abstract class PostgresExtension<T> implements Extension<T>, Plugin {
+public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 	private static final int defaultFetchSize = 10000;
 	private static final String driver = "org.postgresql.Driver";
 	protected Map<String,String> config;
@@ -52,14 +52,35 @@ abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 		this.config = configuration;
 	}
 	
-	public static Connection getConnection(Map<String,String> props) throws SQLException, ClassNotFoundException{
+	private static Connection getConnection(Map<String,String> props) throws SQLException, ClassNotFoundException{
 		Class.forName(driver);
 		Properties jdbcProps = new Properties();
 		// TODO put only properties relevant to jdbc
 		jdbcProps.putAll(props);
 		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), jdbcProps);
-
 	}
+
+	public static Connection getConnection(Properties props) throws SQLException, ClassNotFoundException{
+		Class.forName(driver);
+		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), props);
+	}
+
+	/**
+	 * Each key in src that starts with keyPrefix is copied (without the prefix) and its value to dest
+	 * @param src map containing key,value pairs
+	 * @param keyPrefix prefix to match src keys
+	 * @param dest destination properties
+	 */
+	public static void copyProperties(Map<String,String> src, String keyPrefix, Properties dest){
+		src.forEach( 
+				(key,value) -> {
+					if( key.startsWith(keyPrefix) ){
+						dest.put(key.substring(keyPrefix.length()), value);
+					}
+				} 
+		);
+	}
+
 	protected void open() throws ClassNotFoundException, SQLException{
 		db = getConnection(config);
 		prepareStatements();

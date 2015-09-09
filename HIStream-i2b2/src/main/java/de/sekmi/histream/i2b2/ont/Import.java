@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import de.sekmi.histream.Plugin;
+import de.sekmi.histream.i2b2.PostgresExtension;
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
@@ -382,21 +383,6 @@ public class Import implements AutoCloseable{
 		this.sourceTimestamp = new Timestamp(ontology.lastModified());
 	}
 
-	/**
-	 * Each key in src that starts with keyPrefix is copied (without the prefix) and its value to dest
-	 * @param src map containing key,value pairs
-	 * @param keyPrefix prefix to match src keys
-	 * @param dest destination properties
-	 */
-	private void copyProperties(Map<String,String> src, String keyPrefix, Properties dest){
-		src.forEach( 
-				(key,value) -> {
-					if( key.startsWith(keyPrefix) ){
-						dest.put(key.substring(keyPrefix.length()), value);
-					}
-				} 
-		);
-	}
 
 	private void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
@@ -404,22 +390,22 @@ public class Import implements AutoCloseable{
 		this.config = props;
 		sourceId = config.get("meta.sourcesystem_cd");
 
-		String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
+		//String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
 
 		Properties jdbc;
 		// use only properties relevant to JDBC
 		// meta connection
 		jdbc = new Properties();
-		copyProperties(config, "meta.jdbc.", jdbc);
-		copyProperties(config, "jdbc.", jdbc);
-		dbMeta = DriverManager.getConnection(connectString, jdbc);
+		PostgresExtension.copyProperties(config, "jdbc.", jdbc);
+		PostgresExtension.copyProperties(config, "meta.jdbc.", jdbc);
+		dbMeta = PostgresExtension.getConnection(jdbc);
 		dbMeta.setAutoCommit(true);
 
 		// data connection
 		jdbc = new Properties();
-		copyProperties(config, "data.jdbc.", jdbc);
-		copyProperties(config, "jdbc.", jdbc);
-		dbData = DriverManager.getConnection(connectString, jdbc);
+		PostgresExtension.copyProperties(config, "jdbc.", jdbc);
+		PostgresExtension.copyProperties(config, "data.jdbc.", jdbc);
+		dbData = PostgresExtension.getConnection(jdbc);
 		dbData.setAutoCommit(true);
 		
 		prepareStatements();

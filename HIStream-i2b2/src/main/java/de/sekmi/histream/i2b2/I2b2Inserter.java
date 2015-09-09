@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -172,7 +173,10 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	 * @throws ClassNotFoundException if database driver not found 
 	 */
 	private void open(Map<String,String> props)throws SQLException, ClassNotFoundException{
-		db = PostgresExtension.getConnection(props);
+		Properties jdbc = new Properties();
+		PostgresExtension.copyProperties(props, "jdbc", jdbc);
+		PostgresExtension.copyProperties(props, "data.jdbc", jdbc);
+		db = PostgresExtension.getConnection(jdbc);
 		db.setAutoCommit(false);
 		this.nullProviderId = props.get("nullProvider");
 		prepareStatements(props);
