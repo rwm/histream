@@ -33,7 +33,7 @@ public class DecryptingInputStream implements ReadableByteChannel {
 		
 		int version = buffer.getInt();
 		int ks = buffer.getShort();
-		if( version != EncryptingOutputStream.Version )throw new RuntimeException("Unsupported MDAT stream version "+version);
+		if( version != EncryptingOutputStream.Version )throw new IOException("Unsupported MDAT stream version "+version);
 		byte[] wrapped = new byte[ks];
 		buffer.get(wrapped);
 		buffer.compact();
