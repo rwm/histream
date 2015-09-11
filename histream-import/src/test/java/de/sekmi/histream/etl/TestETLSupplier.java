@@ -11,6 +11,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.io.GroupedXMLWriter;
 import de.sekmi.histream.io.Streams;
 
@@ -31,6 +32,7 @@ public class TestETLSupplier {
 	public void testXMLConversion() throws Exception{
 		GroupedXMLWriter w = new GroupedXMLWriter(System.out);
 		// transfer meta information
+		Meta.transfer(os, w);
 		Streams.transfer(os, w);
 		w.close();
 	}

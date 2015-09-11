@@ -33,13 +33,16 @@ public class Streams {
 	}
 	
 	/**
-	 * Transfers meta information and all observations from source to target.
+	 * Transfers all observations from source to target.
+	 * Does not transfer any meta information.
+	 * <p>
+	 * For transferring meta information, 
+	 * see {@link Meta#transfer(ObservationSupplier, ObservationHandler)}
 	 * 
 	 * @param source observation source
 	 * @param target observation handler
 	 */
-	public static void transfer(ObservationSupplier source, ObservationHandler target){
-		Meta.transfer(source, target);
+	public static void transfer(Supplier<Observation> source, Consumer<Observation> target){
 		Streams.nonNullStream(source).forEach(target);
 	}
 	

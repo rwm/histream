@@ -144,6 +144,7 @@ public class TestXMLWriter {
 		ObservationSupplier s = t.getExampleSupplier();
 		Document doc = createDocument();
 		GroupedXMLWriter w = new GroupedXMLWriter(new DOMResult(doc));
+		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		w.close();
 		s.close();
@@ -157,6 +158,7 @@ public class TestXMLWriter {
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
 		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
+		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		w.close();
 		s.close();
@@ -212,6 +214,7 @@ public class TestXMLWriter {
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
 		GroupedXMLWriter w = new GroupedXMLWriter(out);
+		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		s.close();
 		w.close();
