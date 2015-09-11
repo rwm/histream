@@ -52,15 +52,15 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 		this.config = configuration;
 	}
 	
-	private static Connection getConnection(Map<String,String> props) throws SQLException, ClassNotFoundException{
-		Class.forName(driver);
-		Properties jdbcProps = new Properties();
-		// TODO put only properties relevant to jdbc
-		jdbcProps.putAll(props);
-		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), jdbcProps);
+	public static Connection getConnection(Map<String,String> props, String[]  prefixes) throws SQLException, ClassNotFoundException{
+		Properties jdbc = new Properties();
+		for( String prefix : prefixes ){
+			PostgresExtension.copyProperties(props, prefix, jdbc);			
+		}
+		return getConnection(jdbc);
 	}
 
-	public static Connection getConnection(Properties props) throws SQLException, ClassNotFoundException{
+	private static Connection getConnection(Properties props) throws SQLException, ClassNotFoundException{
 		Class.forName(driver);
 		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), props);
 	}
@@ -81,8 +81,8 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 		);
 	}
 
-	protected void open() throws ClassNotFoundException, SQLException{
-		db = getConnection(config);
+	protected void openDatabase(String[] propertyPrefixes) throws ClassNotFoundException, SQLException{
+		db = getConnection(config, propertyPrefixes);
 		prepareStatements();
 	}
 

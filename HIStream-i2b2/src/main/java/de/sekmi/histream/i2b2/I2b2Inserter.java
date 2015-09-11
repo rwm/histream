@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -43,7 +42,7 @@ import de.sekmi.histream.Value;
 import de.sekmi.histream.impl.AbstractObservationHandler;
 
 /**
- * Inserts observtions in to the i2b2 observation_fact table.
+ * Inserts observations in to the i2b2 observation_fact table.
  * <p>
  * Need to specify default provider id for i2b2 in property 'nullProvider'.
  * Null values in providerId will be be replaced with this value and stored in
@@ -173,12 +172,13 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	 * @throws ClassNotFoundException if database driver not found 
 	 */
 	private void open(Map<String,String> props)throws SQLException, ClassNotFoundException{
-		Properties jdbc = new Properties();
-		PostgresExtension.copyProperties(props, "jdbc", jdbc);
-		PostgresExtension.copyProperties(props, "data.jdbc", jdbc);
-		db = PostgresExtension.getConnection(jdbc);
+		db = PostgresExtension.getConnection(props, new String[]{"jdbc.","data.jdbc."});
 		db.setAutoCommit(false);
 		this.nullProviderId = props.get("nullProvider");
+		if( this.nullProviderId == null ){
+			log.warning("property 'nullProvider' missing, using '@' (may violate foreign keys)");
+			this.nullProviderId = "@";
+		}
 		prepareStatements(props);
 	}
 
@@ -415,8 +415,15 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 				throw new IllegalArgumentException("Unknown etl strategy "+value);
 			}
 		}else{
-			throw new IllegalArgumentException("Unknown meta key "+value);
+			throw new IllegalArgumentException("Unknown meta key "+key);
 		}
 	}
+	
+	public int getInsertCount(){
+		return insertCount;
+	}
 
+	public void resetInsertCount(){
+		this.insertCount = 0;
+	}
 }

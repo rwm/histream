@@ -391,21 +391,13 @@ public class Import implements AutoCloseable{
 		sourceId = config.get("meta.sourcesystem_cd");
 
 		//String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
-
-		Properties jdbc;
 		// use only properties relevant to JDBC
 		// meta connection
-		jdbc = new Properties();
-		PostgresExtension.copyProperties(config, "jdbc.", jdbc);
-		PostgresExtension.copyProperties(config, "meta.jdbc.", jdbc);
-		dbMeta = PostgresExtension.getConnection(jdbc);
+		dbMeta = PostgresExtension.getConnection(config,new String[]{"jdbc.","meta.jdbc."});
 		dbMeta.setAutoCommit(true);
 
 		// data connection
-		jdbc = new Properties();
-		PostgresExtension.copyProperties(config, "jdbc.", jdbc);
-		PostgresExtension.copyProperties(config, "data.jdbc.", jdbc);
-		dbData = PostgresExtension.getConnection(jdbc);
+		dbData = PostgresExtension.getConnection(config,new String[]{"jdbc.","data.jdbc."});
 		dbData.setAutoCommit(true);
 		
 		prepareStatements();

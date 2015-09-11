@@ -108,7 +108,12 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	 * Construct new postgres patient store. In addition to properties
 	 * needed by {@link PostgresExtension#PostgresExtension(Map)},
 	 * the following properties are needed: 
-	 * <p>projectId, 
+	 * <p>jdbc.{host|port|database} or data.jdbc.{host|port|database} to
+	 * construct the database URI.
+	 * Any other parameters under jdbc. or data.jdbc. are passed to the 
+	 * JDBC connect method.
+	 * 
+	 * <p>project, 
 	 * <p>Optional properties:
 	 * <p>
 	 * 	idSourceDefault ('HIVE'), idSourceSeparator (single char, ':')
@@ -128,7 +133,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
 		idCache = new Hashtable<>(1000);
-		open();
+		openDatabase(new String[]{"jdbc.","data.jdbc."});
+		loadMaxPatientNum();
+		batchLoad();
 	}
 	
 	private I2b2Patient getCached(int patient_num){
@@ -188,13 +195,6 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	public int size(){
 		return patientCache.size();
 	}
-	@Override
-	public void open()throws SQLException, ClassNotFoundException{
-		super.open();
-
-		loadMaxPatientNum();
-		batchLoad();
-	}
 	
 	private void batchLoad() throws SQLException{
 		try( ResultSet rs = selectAll.executeQuery() ){
@@ -210,8 +210,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			ArrayList<String> ids = new ArrayList<>(16);
 			int num = 0; // current patient number
 			while( rs.next() ){
-				if( num == 0 )num = rs.getInt(1);
-				else if( num != rs.getInt(1) ){
+				if( num == 0 ){  // first patient
+					num = rs.getInt(1);
+				}else if( num != rs.getInt(1) ){
 					// next patient
 					// cache ids for current patients
 					p = getCached(num);

@@ -87,14 +87,16 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		projectId = config.get("project");
 		idSourceDefault = "HIVE";
 		idSourceSeparator = ':';
-		open();
-	}
-	
-	@Override
-	protected void open()throws SQLException, ClassNotFoundException{
-		super.open();
-		// db is already opened by super.connect()
+		
+		openDatabase(new String[]{"jdbc.","data.jdbc."});
 		db.setAutoCommit(true);
+
+		loadMaxEncounterNum();
+		batchLoad();
+	}
+
+	@Override
+	protected void prepareStatements() throws SQLException {
 		// TODO: use prefix from configuration to specify tablespace
 		insert = db.prepareStatement("INSERT INTO visit_dimension(encounter_num, patient_num, import_date, download_date, sourcesystem_cd) VALUES(?,?,current_timestamp,?,?)");
 		insertMapping = db.prepareStatement("INSERT INTO encounter_mapping(encounter_num, encounter_ide, encounter_ide_source, patient_ide, patient_ide_source, encounter_ide_status, project_id, import_date, download_date, sourcesystem_cd) VALUES(?,?,?,?,?,'A','"+projectId+"',current_timestamp,?,?)");
@@ -106,12 +108,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		selectMappingsAll.setFetchSize(getFetchSize());
 
 		deleteSource = db.prepareStatement("DELETE FROM visit_dimension WHERE sourcesystem_cd=?");
-		deleteMapSource = db.prepareStatement("DELETE FROM encounter_mapping WHERE sourcesystem_cd=?");
-
-		loadMaxEncounterNum();
-		batchLoad();
+		deleteMapSource = db.prepareStatement("DELETE FROM encounter_mapping WHERE sourcesystem_cd=?");		
 	}
-	
+
 	public int size(){
 		return visitCache.size();
 	}
@@ -611,11 +610,6 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		loadMaxEncounterNum();
 	}
 
-	@Override
-	protected void prepareStatements() throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public I2b2Visit createInstance(Object... args) throws UnsupportedOperationException {
@@ -626,8 +620,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		{
 			throw new IllegalArgumentException("Need arguments String visitId, I2b2Patient patient, ExternalSourceType source");
 		}
-		// TODO: implement
-		throw new UnsupportedOperationException("TODO: implement");
+		return getOrCreateInstance((String)args[0], (I2b2Patient)args[1], (ExternalSourceType)args[2]);
 	}
 
 	@Override
