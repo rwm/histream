@@ -65,6 +65,7 @@ public interface Observation extends ConceptValuePair{
 	<T> T getExtension(Class<T> extensionType) throws IllegalArgumentException;
 	<T> void setExtension(Class<T> extensionType, T extension) throws IllegalArgumentException;
 	
+	void setPatientId(String patientId);
 	void setEncounterId(String encounterId);
 	void setLocationId(String locationId);
 	

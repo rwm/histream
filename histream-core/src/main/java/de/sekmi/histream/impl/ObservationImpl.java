@@ -115,6 +115,7 @@ public class ObservationImpl implements Observation, Cloneable{
 
 	@Override
 	public String getPatientId() {return patientId;}
+	@Override
 	public void setPatientId(String patientId){this.patientId = patientId;}
 
 	@Override
