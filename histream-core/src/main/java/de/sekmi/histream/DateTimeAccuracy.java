@@ -106,6 +106,11 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 
 	/**
 	 * Get the accuracy for the date time object.
+	 * <p>
+	 * Supported accuracy values are {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS},
+     * {@link ChronoUnit#DAYS}, {@link ChronoUnit#HOURS}, {@link ChronoUnit#MINUTES} and
+     * {@link ChronoUnit#SECONDS}
+     * <p>
 	 * @return accuracy
 	 */
 	public ChronoUnit getAccuracy(){return accuracy;}
