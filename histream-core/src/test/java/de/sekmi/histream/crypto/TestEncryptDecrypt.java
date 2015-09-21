@@ -32,7 +32,7 @@ public class TestEncryptDecrypt {
 	
 	public static void assertEqualFiles(Path expected, Path actual) throws IOException{
 		FileChannel e = FileChannel.open(expected, StandardOpenOption.READ);
-		FileChannel a = FileChannel.open(expected, StandardOpenOption.READ);
+		FileChannel a = FileChannel.open(actual, StandardOpenOption.READ);
 		int bufferSize = 1024*1024*10;
 		ByteBuffer eb = ByteBuffer.allocateDirect(bufferSize);
 		ByteBuffer ab = ByteBuffer.allocateDirect(bufferSize);
