@@ -26,7 +26,7 @@ public class DecryptingInputStream implements ReadableByteChannel {
 	public DecryptingInputStream(ReadableByteChannel in, String symmetricAlgorithm, int symmetricKeysize, String asymmetricCipher, Key asymmetricKey) throws GeneralSecurityException, IOException{
 		// use buffer
 		endOfStream = false;
-		buffer = ByteBuffer.allocate(1024*10);
+		buffer = ByteBuffer.allocate(1024*8);
 
 		in.read(buffer);
 		buffer.flip();
@@ -64,7 +64,7 @@ public class DecryptingInputStream implements ReadableByteChannel {
 	@Override
 	public int read(ByteBuffer dst) throws IOException {
 		if( endOfStream )
-			return 0; // nothing to do
+			return -1; // nothing to do
 		
 		int bytesRead=0;
 		if( buffer.hasRemaining() ){
@@ -74,9 +74,11 @@ public class DecryptingInputStream implements ReadableByteChannel {
 		try {
 			if( bytesRead == -1 ){
 				endOfStream = true;
-				return cipher.doFinal(buffer, dst);
+				bytesRead = cipher.doFinal(buffer, dst);
+				return bytesRead;
 			}else{
-				return cipher.update(buffer, dst);
+				bytesRead = cipher.update(buffer, dst);
+				return bytesRead;
 			}
 		} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException e) {
 			throw new IOException(e);

@@ -13,6 +13,13 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 
+/**
+ * Wraps a WritableByteChannel with encryption. 
+ * Closing the EncryptionOutputStream will close the underlying WritableByteChannel
+
+ * @author Raphael
+ *
+ */
 public class EncryptingOutputStream implements WritableByteChannel{
 	public static final int Version = 1;
 	private Cipher cipher;
@@ -58,9 +65,11 @@ public class EncryptingOutputStream implements WritableByteChannel{
 	}
 	@Override
 	public void close() throws IOException {
+		buffer.flip();
 		if( buffer.hasRemaining() ){
 			out.write(buffer);
 		}
+		buffer.compact();
 		try {
 			out.write(ByteBuffer.wrap(cipher.doFinal()));
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
@@ -70,13 +79,19 @@ public class EncryptingOutputStream implements WritableByteChannel{
 	}
 	@Override
 	public int write(ByteBuffer src) throws IOException {
+		int processed = 0;
 		try {
+			int pos = src.position();
 			cipher.update(src, buffer);
+			processed = src.position() - pos;
 		} catch (ShortBufferException e) {
 			throw new IOException(e);
-		} finally {
-			buffer.flip();
 		}
-		return out.write(buffer);
+		if( buffer.position() != 0 ){
+			buffer.flip();
+			out.write(buffer);
+			buffer.compact();
+		}
+		return processed;
 	}
 }
