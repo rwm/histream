@@ -22,6 +22,14 @@ public class PullTransformer extends AbstractTransformer implements Supplier<Obs
 		this.source = source;
 	}
 
+	/**
+	 * Execute this transformation after another transformation
+	 * @param previousTransformation previous transformation
+	 * @return composite transformer which executes this transformation after the specified previous transformation
+	 */
+	public PullTransformer andThen(Transformation previousTransformation){
+		return new PullTransformer(this, previousTransformation);
+	}
 	@Override
 	public Observation get() {
 		Observation ret;
