@@ -5,7 +5,7 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
-	<version>0.5-SNAPSHOT</version>
+	<version>0.6-SNAPSHOT</version>
   
 	
   	<inceptionYear>2013</inceptionYear>
@@ -116,6 +116,12 @@
 						<downloadSources>true</downloadSources>
 						<downloadJavadocs>true</downloadJavadocs>
 					</configuration>
+				</plugin>
+				<plugin>
+					<!-- forces newer version, old 2.3.2 contains bugs -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.2</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
