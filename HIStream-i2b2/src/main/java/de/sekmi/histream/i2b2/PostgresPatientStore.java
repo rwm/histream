@@ -54,7 +54,7 @@ import de.sekmi.histream.ext.PatientStore;
  * Patient cache which synchronizes with i2b2 patient_dimension and patient_mapping tables.
  * Required non-null columns are patient_num, update_date.
  * <p>
- * The method {@link #open()} will load all patients (relevant to the selected project)
+ * The method {@link #openDatabase(String[])} will load all patients (relevant to the selected project)
  * into a memory structure based on a Hashtable.
  * <p>
  * Some optional columns are used: vital_status_cd, birth_date, death_date, sex_cd, download_date, sourcesystem_cd
