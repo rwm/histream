@@ -5,7 +5,7 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.4</version>
   
 	
   	<inceptionYear>2013</inceptionYear>
@@ -14,7 +14,7 @@
   	</organization>
 	<scm>
 		<developerConnection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>histream-0.4</tag>
 	</scm>
 	<distributionManagement>
 		<repository>

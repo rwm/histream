@@ -4,12 +4,12 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-skos</artifactId>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.4</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.6-SNAPSHOT</version>
+		<version>0.4</version>
 	</parent>
   
 	<build>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.6-SNAPSHOT</version>
+			<version>0.4</version>
 		</dependency>
 		<!-- test dependencies -->
 		<dependency>
@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.6-SNAPSHOT</version>
+			<version>0.4</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
