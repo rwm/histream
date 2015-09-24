@@ -56,6 +56,7 @@
 		<!--<module>histream-hl7</module>-->
 		<module>histream-skos</module>
 		<module>histream-import</module>
+		<module>i2b2-integration-tests</module>
 		<module>distribution</module>
 	</modules>
 	<build>
@@ -154,6 +155,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
