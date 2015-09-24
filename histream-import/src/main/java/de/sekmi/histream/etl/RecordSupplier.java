@@ -40,10 +40,15 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 			// no more rows
 			return null;
 		}
+		
 		R p;
 		try {
 			p = table.fillRecord(map, row, factory);
 		} catch (ParseException e) {
+			if( e.getLocation() == null ){
+				// add location information
+				e.setLocation(rows.getLocation());
+			}
 			throw new UncheckedParseException(e);
 		}
 		// fill source information

@@ -29,6 +29,18 @@ public class TestETLSupplier {
 	}
 	
 	@Test
+	public void validateRequiredFactAttributes() throws Exception{
+		Observation fact = os.get();
+		while( fact != null ){
+			Assert.assertNotNull(fact.getPatientId());
+			Assert.assertNotNull(fact.getStartTime());
+			Assert.assertNotNull(fact.getConceptId());
+			
+			fact = os.get();
+		}
+	}
+	
+	@Test
 	public void testXMLConversion() throws Exception{
 		GroupedXMLWriter w = new GroupedXMLWriter(System.out);
 		// transfer meta information

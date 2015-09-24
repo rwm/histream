@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
@@ -47,6 +48,8 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		map.registerColumn(idat.visitId);
 		if( idat.start != null ){
 			map.registerColumn(idat.start);			
+		}else{
+			throw new ParseException("datasource/visit-table/idat/start column required");
 		}
 		if( idat.end != null ){
 			map.registerColumn(idat.end);
@@ -69,7 +72,13 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		VisitRow visit = new VisitRow();
 		visit.setId(idat.visitId.valueOf(map, row));
 		visit.setPatientId(idat.patientId.valueOf(map, row));
-		visit.setStartTime(idat.start.valueOf(map, row));
+		DateTimeAccuracy start = idat.start.valueOf(map, row);
+		if( start == null ){
+			// no start time specified for visit row
+			// any other way to retrieve a timestamp??
+			throw new ParseException("No start timestamp found for visit row, but needed for observation");
+		}
+		visit.setStartTime(start);
 		visit.setEndTime(idat.end.valueOf(map, row));
 		if( idat.location != null ){
 			visit.setLocationId(idat.location.valueOf(map, row));
