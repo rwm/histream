@@ -18,6 +18,13 @@ import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.skos.ConceptImpl;
 import de.sekmi.histream.ontology.skos.Store;
 
+/**
+ * Transform observations with rules specified in the RDF
+ * ontology.
+ * 
+ * @author R.W.Majeed
+ *
+ */
 public class RDFTransformation implements Transformation {
 
 	private ObservationFactory factory;
@@ -28,7 +35,17 @@ public class RDFTransformation implements Transformation {
 	private Engine engineXPath;
 	private Engine engineES;
 	
-	
+	/**
+	 * Creates a new transformation engine.
+	 * @param factory factory used to generate new facts
+	 * @param store ontology store
+	 * @param schema SKOS schema to use together with notation to locate ontology concepts. 
+	 * 	For notation, fact.getConceptId() is used. If set to {@code null}, behaves as 
+	 * 	if {@link Store#getConceptByNotation(String, org.openrdf.model.URI)} is called with a null schema. 
+	 * 
+	 * @param dropFactsWithoutRules if set to true, all facts without transformation rules are silently dropped.
+	 * @throws TransformationException errors during {@link XPathEvaluator} initialisation 
+	 */
 	public RDFTransformation(ObservationFactory factory, Store store, String schema, boolean dropFactsWithoutRules)throws TransformationException{
 		this.store = store;
 		this.factory = factory;
