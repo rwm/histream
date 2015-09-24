@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>HIStream : i2b2 integration tests</name>
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>i2b2-intregration-tests</artifactId>
@@ -11,24 +10,36 @@
 		<artifactId>histream</artifactId>
 		<version>0.5-SNAPSHOT</version>
 	</parent>
-  
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.18.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+
+	<name>HIStream : i2b2 integration tests</name>
+	<description>
+	By default, the integration tests are just packaged but not run.
+	To actually run the integration tests, use the profile 'run-its'
+	e.g. with 'mvn clean install -Prun-its'
+	</description>
+	
+	<profiles>
+		<profile>
+			<id>run-its</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>2.18.1</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>			
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
