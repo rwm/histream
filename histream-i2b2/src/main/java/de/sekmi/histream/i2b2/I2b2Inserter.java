@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -282,10 +283,10 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		try{
 			I2b2Visit visit = o.getExtension(I2b2Visit.class);
 			return visit.getNum();
-		}catch( IllegalArgumentException e ){
-			// i2b2 patient not available, try to parse the patient id as number
-			return Integer.parseInt(o.getPatientId());
-		}
+		}/*catch( IllegalArgumentException e ){
+			// i2b2 encounter not available, try to parse the encounter id as number
+			return Integer.parseInt(o.getEncounterId());
+		}*/finally{}
 	}
 
 	/**
@@ -311,6 +312,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.setString(3, o.getConceptId());
 		insertFact.setString(4, replaceNull(o.getProviderId(),nullProviderId));
 		// start_date
+		Objects.requireNonNull(o.getStartTime());
 		insertFact.setTimestamp(5, Timestamp.valueOf(o.getStartTime().getLocal()));
 		
 		insertFact.setString(6, (m==null)?nullModifierCd:m.getConceptId());
