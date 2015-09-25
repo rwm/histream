@@ -45,7 +45,11 @@ public interface ObservationSupplier extends Supplier<Observation>, AutoCloseabl
 	 * Timestamp when the source data was extracted/downloaded/queried
 	 */
 	public static final String META_SOURCE_TIMESTAMP = "source.timestamp";
-
+	
+	/**
+	 * Timestamp when the data has been uploaded
+	 */
+	public static final String META_UPLOAD_TIMESTAMP = "upload.timestamp";
 	/**
 	 * Strategy how to handle imported data. 
 	 *  {@code replace-source} will drop any previous imports 

@@ -1,0 +1,5 @@
+Validate exceptions
+-------------------
+test for specific errors in data files, 
+e.g. missing visit start timestamps in rows.
+To do so, add data files with errors to test/resources

@@ -58,6 +58,8 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	}
 	/**
 	 * Constructor to write XML to an {@link OutputStream}.
+	 * Calling {@link #close()} will NOT close the specified output stream. 
+	 * The stream must be closed separately.
 	 * 
 	 * @param output output stream
 	 * @throws XMLStreamException initialisation error
