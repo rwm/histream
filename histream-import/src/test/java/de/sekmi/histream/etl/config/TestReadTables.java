@@ -29,7 +29,7 @@ public class TestReadTables {
 	
 	@Before
 	public void loadConfiguration() throws IOException{
-		URL url = getClass().getResource("/test-1-datasource.xml");
+		URL url = getClass().getResource("/data/test-1-datasource.xml");
 		ds = JAXB.unmarshal(url, DataSource.class);
 		ds.getMeta().setLocation(url);
 		of = new ObservationFactoryImpl();

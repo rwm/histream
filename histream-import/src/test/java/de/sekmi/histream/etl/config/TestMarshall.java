@@ -17,7 +17,7 @@ public class TestMarshall {
 
 	@Test
 	public void testUnmarshall() throws IOException{
-		try( InputStream in = getClass().getResourceAsStream("/test-1-datasource.xml") ){
+		try( InputStream in = getClass().getResourceAsStream("/data/test-1-datasource.xml") ){
 			DataSource ds = JAXB.unmarshal(in, DataSource.class);
 			Assert.assertNotNull(ds.meta);
 			Assert.assertEquals("replace-source",ds.meta.etlStrategy);

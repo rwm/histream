@@ -30,7 +30,7 @@ public class ITImportData {
 		factory.registerExtension(patients);
 		factory.registerExtension(visits);
 
-		ObservationSupplier data = ETLObservationSupplier.load(ETLObservationSupplier.class.getResource("/test-1-datasource.xml"), factory);
+		ObservationSupplier data = ETLObservationSupplier.load(ETLObservationSupplier.class.getResource("/data/test-1-datasource.xml"), factory);
 		inserter.setMeta(ObservationSupplier.META_ETL_STRATEGY, data.getMeta(ObservationSupplier.META_ETL_STRATEGY));
 		Supplier<Observation> source = data;
 		// XXX test transformation later

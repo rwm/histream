@@ -21,7 +21,7 @@ public class TestETLSupplier {
 	
 	@Before
 	public void loadConfiguration() throws IOException, ParseException{
-		os = ETLObservationSupplier.load(getClass().getResource("/test-1-datasource.xml"));
+		os = ETLObservationSupplier.load(getClass().getResource("/data/test-1-datasource.xml"));
 	}
 
 	@After

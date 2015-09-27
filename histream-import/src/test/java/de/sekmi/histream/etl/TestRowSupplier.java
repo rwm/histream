@@ -9,7 +9,7 @@ public class TestRowSupplier {
 	
 	@Test
 	public void testLoadRows() throws IOException{
-		try( FileRowSupplier r = new FileRowSupplier(getClass().getResource("/test-1-patients.txt"), "\t") ){
+		try( FileRowSupplier r = new FileRowSupplier(getClass().getResource("/data/test-1-patients.txt"), "\t") ){
 			String[] h = r.getHeaders();
 			Assert.assertEquals("patid", h[0]);
 			Assert.assertEquals("nachname", h[2]);
