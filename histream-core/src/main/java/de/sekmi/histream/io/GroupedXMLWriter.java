@@ -173,7 +173,9 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// write source timestamp
 			ExternalSourceImpl es = visitSourceWithContext(visit, meta.source);
 			if( es != null )try {
+				formatIndent();
 				marshaller.marshal(es, writer);
+				formatNewline();
 			} catch (JAXBException e) {
 				throw new ObservationException(e);
 			}
@@ -272,7 +274,9 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// write source timestamp
 			ExternalSourceImpl es = patientSourceWithContext(patient,meta.source);
 			if( es != null )try {
+				formatIndent();
 				marshaller.marshal(es, writer);
+				formatNewline();
 			} catch (JAXBException e) {
 				throw new ObservationException(e);
 			}

@@ -119,8 +119,12 @@ public class GroupedXMLReader  implements ObservationSupplier {
 			patientData.put(reader.getLocalName(), reader.getElementText());
 			reader.nextTag();
 		}
+		
+		// read source information
+		ExternalSourceType es = readSource();
+		
 		// register with extension
-		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)meta.source);
+		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)es);
 		// TODO set patient data
 		if( patientData.containsKey("birthdate") ){
 			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("birthdate")));
@@ -137,22 +141,39 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("given-name") ){
 			currentPatient.setGivenName(patientData.get("given-name"));
 		}
+		
+	}
+	
+	/**
+	 * Read source element and amend with meta.source. Needed for patient and encounter.
+	 * @return source. Missing data is added from meta.
+	 * @throws XMLStreamException on errro
+	 */
+	private ExternalSourceType readSource() throws XMLStreamException{
+		ExternalSourceType es;
 		if( reader.getLocalName().equals("source") ){
-			ExternalSourceType es;
 			try {
-				es = (ExternalSourceType) unmarshaller.unmarshal(reader);
+				es = (ExternalSourceImpl) unmarshaller.unmarshal(reader);
 				if( reader.getEventType() != XMLStreamConstants.START_ELEMENT ){
 					reader.nextTag();
 				}
 			} catch (JAXBException e) {
 				throw new XMLStreamException("Unable to parse patient source", reader.getLocation(), e);
 			}
-			if( es.getSourceTimestamp() != null ){
-				currentPatient.setSourceTimestamp(es.getSourceTimestamp());
+			// add missing fields from meta
+			if( es.getSourceId() == null ){
+				es.setSourceId(meta.source.getSourceId());
 			}
+			if( es.getSourceTimestamp() == null ){
+				es.setSourceTimestamp(meta.source.getSourceTimestamp());
+			}
+		}else{
+			// use meta source
+			es = meta.source;
 		}
-		
+		return es;
 	}
+
 	/**
 	 * Reads encounter element with content. 
 	 * Precondition encounter start element. 
@@ -183,22 +204,12 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		}else{
 			encounterEnd = null;
 		}
-		ExternalSourceImpl es = null;
-		if( reader.getLocalName().equals("source") ){
-			try {
-				es = (ExternalSourceImpl) unmarshaller.unmarshal(reader);
-				if( reader.getEventType() != XMLStreamConstants.START_ELEMENT ){
-					reader.nextTag();
-				}
-			} catch (JAXBException e) {
-				throw new XMLStreamException("Unable to parse patient source", reader.getLocation(), e);
-			}
-		}		
+		ExternalSourceType es = readSource();
 		
 		// TODO assert at <facts>
 		reader.nextTag();
 
-		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)meta.source);
+		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)es);
 		currentVisit.setStartTime(encounterStart);
 		currentVisit.setEndTime(encounterEnd);
 		currentVisit.setLocationId(visitData.get("location"));

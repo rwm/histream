@@ -87,6 +87,8 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("A B", p.getGivenName());
 				Assert.assertEquals("Dampf", p.getSurname());
 				// TODO: test more patient information
+				// TODO test patient source timestamp different from meta source.
+				// TODO test patient source id automatically filled from meta
 
 				Visit v = o.getExtension(Visit.class);
 				Assert.assertNotNull("Visit extension required", v);
