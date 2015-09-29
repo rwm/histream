@@ -17,6 +17,7 @@ import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.GroupedObservationHandler;
 import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationImpl;
@@ -168,7 +169,14 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 				formatNewline();
 			}
 			// TODO implement provider
-	
+
+			// write source timestamp
+			ExternalSourceImpl es = visitSourceWithContext(visit, meta.source);
+			if( es != null )try {
+				marshaller.marshal(es, writer);
+			} catch (JAXBException e) {
+				throw new ObservationException(e);
+			}
 			// TODO more data
 			formatIndent();
 			writer.writeStartElement(GroupedXMLReader.FACT_WRAPPER);
@@ -260,11 +268,46 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 				writer.writeEndElement();
 				formatNewline();
 			}
+			
+			// write source timestamp
+			ExternalSourceImpl es = patientSourceWithContext(patient,meta.source);
+			if( es != null )try {
+				marshaller.marshal(es, writer);
+			} catch (JAXBException e) {
+				throw new ObservationException(e);
+			}
+			
+			
+			// TODO use external source for patient
 		}catch( XMLStreamException e ){
 			throw new ObservationException(e);
 		}
 	}
 	
+	private static ExternalSourceImpl patientSourceWithContext(Patient patient, ExternalSourceType context){
+		// TODO also write source id if different from meta
+		if( patient.getSourceTimestamp() != null 
+				&& (context == null
+					|| context.getSourceTimestamp() == null 
+					|| !patient.getSourceTimestamp().equals(context.getSourceTimestamp())) )
+		{
+			return new ExternalSourceImpl(null, patient.getSourceTimestamp());
+		}else{
+			return null;
+		}
+	}
+	private static ExternalSourceImpl visitSourceWithContext(Visit visit, ExternalSourceType context){
+		// TODO also write source id if different from meta
+		if( visit.getSourceTimestamp() != null 
+				&& (context == null
+					|| context.getSourceTimestamp() == null 
+					|| !visit.getSourceTimestamp().equals(context.getSourceTimestamp())) )
+		{
+			return new ExternalSourceImpl(null, visit.getSourceTimestamp());
+		}else{
+			return null;
+		}
+	}
 	/**
 	 * Marshal a fact without writing context information from patient, visit and source.
 	 *

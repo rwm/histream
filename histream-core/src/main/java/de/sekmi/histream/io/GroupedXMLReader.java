@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -23,6 +24,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
@@ -111,7 +113,8 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		patientData.clear();
 		reader.nextTag();
 		while( reader.isStartElement() 
-				&& !reader.getLocalName().equals(ENCOUNTER_ELEMENT) )
+				&& !reader.getLocalName().equals(ENCOUNTER_ELEMENT)
+				&& !reader.getLocalName().equals("source") )
 		{
 			patientData.put(reader.getLocalName(), reader.getElementText());
 			reader.nextTag();
@@ -134,6 +137,20 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("given-name") ){
 			currentPatient.setGivenName(patientData.get("given-name"));
 		}
+		if( reader.getLocalName().equals("source") ){
+			ExternalSourceType es;
+			try {
+				es = (ExternalSourceType) unmarshaller.unmarshal(reader);
+				if( reader.getEventType() != XMLStreamConstants.START_ELEMENT ){
+					reader.nextTag();
+				}
+			} catch (JAXBException e) {
+				throw new XMLStreamException("Unable to parse patient source", reader.getLocation(), e);
+			}
+			if( es.getSourceTimestamp() != null ){
+				currentPatient.setSourceTimestamp(es.getSourceTimestamp());
+			}
+		}
 		
 	}
 	/**
@@ -150,7 +167,8 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		encounterId = reader.getAttributeValue(null, "id");
 		reader.nextTag();
 		while( reader.isStartElement() 
-				&& !reader.getLocalName().equals(FACT_WRAPPER) )
+				&& !reader.getLocalName().equals(FACT_WRAPPER)
+				&& !reader.getLocalName().equals("source") )
 		{
 			visitData.put(reader.getLocalName(), reader.getElementText());
 			reader.nextTag();
@@ -165,13 +183,31 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		}else{
 			encounterEnd = null;
 		}
+		ExternalSourceImpl es = null;
+		if( reader.getLocalName().equals("source") ){
+			try {
+				es = (ExternalSourceImpl) unmarshaller.unmarshal(reader);
+				if( reader.getEventType() != XMLStreamConstants.START_ELEMENT ){
+					reader.nextTag();
+				}
+			} catch (JAXBException e) {
+				throw new XMLStreamException("Unable to parse patient source", reader.getLocation(), e);
+			}
+		}		
+		
 		// TODO assert at <facts>
 		reader.nextTag();
-		
+
 		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)meta.source);
 		currentVisit.setStartTime(encounterStart);
 		currentVisit.setEndTime(encounterEnd);
 		currentVisit.setLocationId(visitData.get("location"));
+		if( es != null ){
+			currentVisit.setSourceTimestamp(es.getSourceTimestamp());
+		}
+		
+
+
 		// TODO set other visit data: gender, provider, in/out status
 		visitData.get("provider");
 		

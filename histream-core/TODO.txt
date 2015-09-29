@@ -1,0 +1,6 @@
+Use GroupedXMLReader and GroupedXMLWriter write 
+external source information for patient.
+Currently, this information is lost (e.g when loading from Import)
+
+
+Write unit test to verify GroupedXMLWriter/Reader without meta_source meta_source_timestamp (=set to null)

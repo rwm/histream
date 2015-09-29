@@ -10,6 +10,7 @@ import org.junit.Test;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.Meta;
@@ -36,7 +37,14 @@ public class TestETLSupplier {
 			Assert.assertNotNull(fact.getPatientId());
 			Assert.assertNotNull(fact.getStartTime());
 			Assert.assertNotNull(fact.getConceptId());
-			
+
+			// source information
+			ExternalSourceType source = fact.getSource();
+			Assert.assertNotNull(source);
+			Assert.assertNotNull(source.getSourceId());
+			Assert.assertNotNull(source.getSourceTimestamp());
+
+			// next fact
 			fact = os.get();
 		}
 	}
