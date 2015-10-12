@@ -54,4 +54,14 @@ public abstract class AbstractValue implements Value{
 		if( !(o.flag == null && this.flag == null) && !(this.flag != null && this.flag.equals(o.flag)) )return false;
 		return true;
 	}
+	
+	@Override
+	public String toString(){
+		StringBuilder b = new StringBuilder();
+		b.append(getStringValue());
+		if( units != null ){
+			b.append(' ').append(units);
+		}
+		return b.toString();
+	}
 }
