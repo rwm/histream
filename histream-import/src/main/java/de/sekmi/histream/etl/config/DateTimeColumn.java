@@ -2,6 +2,7 @@ package de.sekmi.histream.etl.config;
 
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -20,7 +21,7 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	@XmlTransient
 	DateTimeFormatter formatter;
 	/**
-	 * Decimal format string for parsing via {@link DateTimeFormatter}
+	 * Format string for parsing via {@link DateTimeFormatter}
 	 * @see DateTimeFormatter#ofPattern(String)
 	 */
 	@XmlAttribute
@@ -50,7 +51,11 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 				throw new ParseException("format must be specified for DateTime fields if strings are parsed");
 			}
 			// TODO parse
-			return DateTimeAccuracy.parse(formatter,(String)value);
+			try{
+				return DateTimeAccuracy.parse(formatter,(String)value);
+			}catch( DateTimeParseException e ){
+				throw new ParseException("Unable to parse date: "+(String)value, e);
+			}
 		}else if( value instanceof Timestamp ){
 			// convert from timestamp
 			return null;
