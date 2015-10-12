@@ -59,6 +59,10 @@
 		dwh:modify	dwh:removeValue ;
 		dwh:otherwise	[dwh:target	:t3 ; dwh:modify dwh:removeValue]; # pulmonary arterial hypertension
 	] .
+# direct mapping via dwh:mapTo
+# rename dwh:mapFact to  dwh:mapWithRule
+
+:MapDirectly a dwh:Concept .
 
 
 
