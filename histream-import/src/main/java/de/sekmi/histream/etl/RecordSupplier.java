@@ -20,7 +20,13 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory, Meta meta)throws ParseException{
 		this.rows = rows;
 		this.table = table;
-		this.map = table.getColumnMap(rows.getHeaders());
+		try{
+			this.map = table.getColumnMap(rows.getHeaders());
+		}catch( ParseException e ){
+			// annotate with location
+			e.setLocation(rows.getLocation());
+			throw e;
+		}
 		this.factory = factory;
 		this.source = new ExternalSourceImpl(meta.getSourceId(), rows.getTimestamp());
 	}
