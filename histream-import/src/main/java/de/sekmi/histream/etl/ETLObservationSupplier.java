@@ -13,6 +13,7 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.config.DataSource;
+import de.sekmi.histream.etl.config.EavTable;
 import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.PatientTable;
 import de.sekmi.histream.etl.config.VisitTable;
@@ -62,10 +63,11 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	private PatientTable pt;
 	private VisitTable vt;
 	private List<WideTable> wt;
+	private List<EavTable> et;
 	
 	private RecordSupplier<PatientRow> pr;
 	private RecordSupplier<VisitRow> vr;
-	private List<RecordSupplier<WideRow>> wr;
+	private List<RecordSupplier<? extends FactRow>> fr;
 	
 	private FactGroupingQueue queue;
 	
@@ -118,6 +120,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		pt = ds.getPatientTable();
 		vt = ds.getVisitTable();
 		wt = ds.getWideTables();
+		et = ds.getEavTables();
 		// TODO long tables
 
 		Meta meta = ds.getMeta();
@@ -131,12 +134,17 @@ public class ETLObservationSupplier implements ObservationSupplier{
 					factory.getExtensionAccessor(Visit.class));
 
 			// open all tables
-			wr = new ArrayList<>(wt.size());
+			fr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
 				//@SuppressWarnings("resource")
 				RecordSupplier<WideRow> s = t.open(factory, meta);
 				queue.addFactTable(s);
-				wr.add(s);
+				fr.add(s);
+			}
+			for( EavTable t : et ){
+				RecordSupplier<EavRow> s = t.open(factory, meta);
+				queue.addFactTable(s);
+				fr.add(s);
 			}
 			queue.prepare();
 			
@@ -184,8 +192,8 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			}
 			vr=null;
 		}
-		if( wr != null ){
-			Iterator<RecordSupplier<WideRow>> i = wr.iterator();
+		if( fr != null ){
+			Iterator<RecordSupplier<? extends FactRow>> i = fr.iterator();
 			while( i.hasNext() ){
 				try{ i.next().close(); }
 				catch( IOException e ){ 

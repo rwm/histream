@@ -44,6 +44,9 @@ public class DataSource {
 	@XmlElement(name="wide-table")
 	WideTable[] wideTables;
 	
+	@XmlElement(name="eav-table")
+	EavTable[] eavTables;
+	
 	public Meta getMeta(){return meta;}
 	
 	public PatientTable getPatientTable(){
@@ -56,6 +59,10 @@ public class DataSource {
 	
 	public List<WideTable> getWideTables(){
 		return Arrays.asList(wideTables);
+	}
+	
+	public List<EavTable> getEavTables(){
+		return Arrays.asList(eavTables);
 	}
 	
 }

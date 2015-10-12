@@ -6,10 +6,10 @@
 	</meta>
 	 
 	<patient-table>
-        <source xsi:type="plain-file">
-            <url>test-1-patients.txt</url>
-            <separator>\t</separator>
-        </source>
+		<source xsi:type="plain-file">
+			<url>test-1-patients.txt</url>
+			<separator>\t</separator>
+		</source>
 		<idat>
 			<patient-id>patid</patient-id>
 			<given-name>vorname</given-name>
@@ -19,15 +19,18 @@
 			<gender>geschlecht</gender>
 			<ignore xsi:type="string">ignoriert1</ignore>
 			<ignore xsi:type="string">patfakt1</ignore>
-		</idat>		
+		</idat>
+		<!-- for MDAT in patient table, use the same patient-table also as
+		a visit table (visit date needed). the patient id can be re-used
+		as visit id, or a constant visit ID can be used. -->
 	</patient-table>
 	<!-- optional -->
 	<visit-table>
-        <source xsi:type="plain-file">
-            <url>test-1-visits.txt</url>
-            <type>text/csv</type>
+		<source xsi:type="plain-file">
+			<url>test-1-visits.txt</url>
+			<type>text/csv</type>
 			<separator>\t</separator>
-        </source>
+		</source>
 		<idat>
 			<patient-id>patid</patient-id>
 			<visit-id>fallnr</visit-id>
@@ -43,12 +46,11 @@
 			</concept>
 		</mdat>
 	</visit-table>
-	
 	<wide-table>
-        <source xsi:type="plain-file">
-            <url>test-1-widetable.txt</url>
+		<source xsi:type="plain-file">
+			<url>test-1-widetable.txt</url>
 			<separator>\t</separator>
-        </source>
+		</source>
 		<idat>
 			<patient-id>patid</patient-id>
 			<visit-id>fallnr</visit-id>
@@ -69,5 +71,26 @@
 		</mdat>
 
 	</wide-table>
+	<eav-table>
+		<source xsi:type="plain-file">
+			<url>test-1-eavtable.txt</url>
+			<separator>\t</separator>
+		</source>
+		<idat>
+			<patient-id>patid</patient-id>
+			<visit-id>event</visit-id>
+			<ignore xsi:type="string">locat</ignore>
+			<ignore xsi:type="string">user</ignore>
+		</idat>
+		<mdat>
+			<concept>param</concept>
+			<start format="u-M-d">start_ts</start>
+			<end format="u-M-d" na="@">end</end>
+			<!-- location -->
+			<type>type</type>
+			<value na="@">value</value>
+			<unit na="@">unit</unit>
+		</mdat>
+	</eav-table>
 
 </datasource>

@@ -90,6 +90,10 @@ public class TestMarshall {
 		s.wideTables[0].concepts[0].modifiers[0] = new Concept.Modifier("DOSE");
 		s.wideTables[0].concepts[0].modifiers[0].value = new StringColumn("dosis");
 
+		s.eavTables = new EavTable[1];
+		s.eavTables[0] = new EavTable();
+		s.eavTables[0].source = new FileSource("asdf.txt", "\\t");
+		
 		JAXB.marshal(s, System.out);
 
 	}

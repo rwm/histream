@@ -5,6 +5,13 @@ import java.util.List;
 
 import de.sekmi.histream.Observation;
 
+/**
+ * Wide fact row which. A single wide row
+ * may contain multiple facts.
+ * 
+ * @author R.W.Majeed
+ *
+ */
 public class WideRow implements FactRow{
 	private String patid;
 	private String visit;

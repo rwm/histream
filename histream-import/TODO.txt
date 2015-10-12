@@ -3,3 +3,8 @@ Validate exceptions
 test for specific errors in data files, 
 e.g. missing visit start timestamps in rows.
 To do so, add data files with errors to test/resources
+
+Import configuration
+--------------------
+Allow multiple visit tables with different IDs. Fact tables
+can choose which visit table to reference. e.g. <visit-id table="1">fallnr</visit-id>

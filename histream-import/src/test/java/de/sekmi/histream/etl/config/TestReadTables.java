@@ -12,6 +12,7 @@ import org.junit.Test;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.etl.EavRow;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.PatientRow;
 import de.sekmi.histream.etl.RecordSupplier;
@@ -63,6 +64,22 @@ public class TestReadTables {
 			Assert.assertEquals("natrium", o.getConceptId());
 			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 			Assert.assertEquals(BigDecimal.valueOf(124), o.getValue().getNumericValue());
+			ExternalSourceType e = o.getSource();
+			Assert.assertNotNull(e);
+			Assert.assertEquals("test-1", e.getSourceId());
+			
+		}
+	}
+	@Test
+	public void testReadEavTable() throws IOException, ParseException{
+		try( RecordSupplier<EavRow> s = ds.eavTables[0].open(of,ds.getMeta()) ){
+			EavRow r = s.get();
+			Assert.assertNotNull(r);
+			Assert.assertTrue(r.getFacts().size() > 0);
+			Observation o = r.getFacts().get(0);
+			Assert.assertEquals("f_eav_b", o.getConceptId());
+			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
+			Assert.assertEquals(BigDecimal.valueOf(3.9), o.getValue().getNumericValue());
 			ExternalSourceType e = o.getSource();
 			Assert.assertNotNull(e);
 			Assert.assertEquals("test-1", e.getSourceId());
