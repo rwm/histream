@@ -62,6 +62,15 @@ public abstract class Table<T extends FactRow> {
 	 * @throws ParseException thrown for the first header which is neither in the map nor in ignored columns
 	 */
 	protected static void validateAllHeaders(String[] headers, ColumnMap map, Column<?>[] ignored) throws ParseException{
+		// ignored missing?
+		if( ignored == null ){
+			// create empty array
+			ignored = new Column<?>[]{};
+		}else if( ignored.length == 1 && ignored[0].getName().equals("*") ){
+			// ignore all other columns, pass validation
+			return;
+		}
+
 		// for each header
 		for( int i=0; i<headers.length; i++ ){
 			// check if in map
@@ -70,15 +79,12 @@ public abstract class Table<T extends FactRow> {
 			// not registered in map
 			// check if listed in ignore element
 			int j=0;
-			if( ignored == null ){
-				ignored = new Column<?>[]{};
-			}
 			for( j=0; j<ignored.length; j++ ){
 				if( headers[i].equals(ignored[j].getName()) )break;
 			}
 			if( j == ignored.length ){
 				// unassigned column
-				throw new ParseException("Table data header missing in configuration: "+headers[i]);
+				throw new ParseException("Unconfigured header: "+headers[i]);
 			}
 		}
 	}
