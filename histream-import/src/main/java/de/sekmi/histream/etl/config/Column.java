@@ -73,6 +73,10 @@ public abstract class Column<T> {
 	@XmlValue
 	String name;
 	
+	/**
+	 * Column name to use for reading input values
+	 * @return column name
+	 */
 	public String getName(){return name;}
 	
 	public abstract T valueOf(Object input) throws ParseException;
