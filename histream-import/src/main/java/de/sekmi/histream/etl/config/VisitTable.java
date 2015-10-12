@@ -79,7 +79,10 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 			throw new ParseException("No start timestamp found for visit row, but needed for observation");
 		}
 		visit.setStartTime(start);
-		visit.setEndTime(idat.end.valueOf(map, row));
+		if( idat.end != null ){
+			visit.setEndTime(idat.end.valueOf(map, row));
+		}
+		
 		if( idat.location != null ){
 			visit.setLocationId(idat.location.valueOf(map, row));
 		}

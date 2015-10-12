@@ -58,11 +58,19 @@ public class DataSource {
 	}
 	
 	public List<WideTable> getWideTables(){
-		return Arrays.asList(wideTables);
+		if( wideTables != null ){
+			return Arrays.asList(wideTables);
+		}else{
+			return Arrays.asList();
+		}
 	}
 	
 	public List<EavTable> getEavTables(){
-		return Arrays.asList(eavTables);
+		if( eavTables != null ){
+			return Arrays.asList(eavTables);
+		}else{
+			return Arrays.asList();
+		}
 	}
 	
 }

@@ -77,7 +77,9 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 		patient.setGivenName(idat.givenName.valueOf(map, row));
 		patient.setSurname(idat.surname.valueOf(map, row));
 		patient.setBirthDate(idat.birthdate.valueOf(map, row));
-		patient.setDeathDate(idat.deathdate.valueOf(map, row));
+		if( idat.deathdate != null ){
+			patient.setDeathDate(idat.deathdate.valueOf(map, row));
+		}
 		// concepts
 		if( concepts != null ){
 			for( Concept c : concepts ){
