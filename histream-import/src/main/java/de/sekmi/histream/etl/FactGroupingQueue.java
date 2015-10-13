@@ -185,7 +185,9 @@ public class FactGroupingQueue{
 				currentVisitId = nextVisit.getVisitId();
 				visitChanged();
 				
+				// prefetch next visit
 				nextVisit = visitTable.get();
+				
 				tableIndex = 0;
 				// goto top
 				continue;
@@ -205,7 +207,7 @@ public class FactGroupingQueue{
 				// goto top
 				continue;
 			}
-		}while( factTables.size() > 0 || !workQueue.isEmpty() );
+		}while( factTables.size() > 0 || !workQueue.isEmpty() || nextVisit != null );
 		return null; // done
 	}
 	
