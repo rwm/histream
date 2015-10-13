@@ -1,6 +1,5 @@
 package de.sekmi.histream.etl;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,11 +7,11 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
-import java.util.regex.Pattern;
+
+import com.opencsv.CSVReader;
 
 public class FileRowSupplier extends RowSupplier {
-	private Pattern fieldSeparatorPattern;
-	private BufferedReader in;
+	private CSVReader in;
 	private String[] headers;
 	private URL url;
 	private int lineNo;
@@ -20,21 +19,22 @@ public class FileRowSupplier extends RowSupplier {
 	private Instant timestamp;
 
 	public FileRowSupplier(URL location, String fieldSeparator) throws IOException{
-		this(location, Pattern.compile(Pattern.quote(fieldSeparator)));
-	}
-
-	public FileRowSupplier(URL location, Pattern pattern) throws IOException{
-		this.fieldSeparatorPattern = pattern;
+		if( fieldSeparator.length() > 1 ){
+			if( fieldSeparator.equals("\\t") ){
+				fieldSeparator = "\t";
+			}else{
+				throw new IllegalArgumentException("Only single character or '\\t' allowed for separator");
+			}
+		}
 		this.url = location;
-		this.in = new BufferedReader(new InputStreamReader(location.openStream()));
+		this.in = new CSVReader(new InputStreamReader(location.openStream()),fieldSeparator.charAt(0));
+		
 		// TODO: check whether needed to close underlying InputStream
 		
 		// load headers
 		lineNo = 0; 
-		String line = in.readLine();
+		this.headers = in.readNext();
 		lineNo ++;
-		
-		this.headers = fieldSeparatorPattern.split(line);
 
 		determineFileTimestamp(location);
 	}
@@ -73,19 +73,14 @@ public class FileRowSupplier extends RowSupplier {
 
 	@Override
 	public Object[] get() {
-		String line;
+		
+		String[] fields;
 		try {
-			line = in.readLine();
+			fields = in.readNext();
 			lineNo ++;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		if( line == null ){
-			// end of file
-			return null;
-		}
-		
-		String[] fields = fieldSeparatorPattern.split(line);
 		return fields;
 	}
 

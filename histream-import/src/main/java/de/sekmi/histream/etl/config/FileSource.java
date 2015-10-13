@@ -14,9 +14,10 @@ import de.sekmi.histream.etl.FileRowSupplier;
 import de.sekmi.histream.etl.RowSupplier;
 
 /**
- * Table source reading plain text tables
+ * Table source reading plain text tables.
+ * TODO implement escape sequences and quoting OR use opencsv dependency
  * 
- * @author Raphael
+ * @author R.W.Majeed
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -43,6 +44,12 @@ public class FileSource extends TableSource{
 	@XmlElement
 	String separator;
 	
+	@XmlElement
+	String quote;
+	
+	@XmlElement
+	char escape;
+	
 	private FileSource(){
 	}
 	public FileSource(String urlSpec, String separator) throws MalformedURLException{
@@ -54,7 +61,7 @@ public class FileSource extends TableSource{
 	public RowSupplier rows(Meta meta) throws IOException {
 		URL base = meta.getLocation();
 		URL source = (base == null)?new URL(url):new URL(base, url);
-		return new FileRowSupplier(source, Pattern.compile(separator));
+		return new FileRowSupplier(source, separator);
 	}
 
 }
