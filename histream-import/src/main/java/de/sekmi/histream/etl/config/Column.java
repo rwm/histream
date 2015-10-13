@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlValue;
 
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ParseException;
@@ -25,7 +24,7 @@ public abstract class Column<T> {
 	}
 	public Column(String name){
 		this();
-		this.name = name;
+		this.column = name;
 	}
 	/**
 	 * If this string is found in the column data, the resulting value will be null.
@@ -70,14 +69,14 @@ public abstract class Column<T> {
 	/**
 	 * Column name to use for reading input values.
 	 */
-	@XmlValue
-	String name;
+	@XmlAttribute
+	String column;
 	
 	/**
 	 * Column name to use for reading input values
 	 * @return column name
 	 */
-	public String getName(){return name;}
+	public String getName(){return column;}
 	
 	public abstract T valueOf(Object input) throws ParseException;
 	
@@ -113,7 +112,7 @@ public abstract class Column<T> {
 	}
 	
 	public T valueOf(ColumnMap map, Object[] row) throws ParseException{
-		if( name.isEmpty() ){
+		if( column == null || column.isEmpty() ){
 			// use constant value if available
 			return valueOf(null);
 		}
@@ -130,8 +129,10 @@ public abstract class Column<T> {
 	}
 	
 	public void validate()throws ParseException{
-		if( name.isEmpty() && constantValue == null ){
+		if( column == null && constantValue == null ){
 			throw new ParseException("Empty column name only allowed if constant-value is specified");
+		}else if( column != null && column.isEmpty() ){
+			throw new ParseException("No empty column attribute allowed. Remove attribute for constant values");
 		}
 	}
 }

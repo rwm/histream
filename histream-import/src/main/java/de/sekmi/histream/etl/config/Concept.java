@@ -82,6 +82,10 @@ public class Concept{
 			// numeric
 			NumericValue v = new NumericValue((BigDecimal)value,unit);
 			o.setValue(v);
+		}else if( value instanceof Long ){
+			// numeric
+			NumericValue v = new NumericValue((Long)value,unit);
+			o.setValue(v);
 		}else{
 			throw new ParseException("Unsupported value type for concept id "+this.id+": "+value.getClass());
 		}

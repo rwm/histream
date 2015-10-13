@@ -27,33 +27,33 @@ public class TestMarshall {
 			Assert.assertNotNull(ds.patientTable.source);
 			Assert.assertEquals("\\t", ((FileSource)ds.patientTable.source).separator);
 			Assert.assertNotNull(ds.patientTable.idat);
-			Assert.assertEquals("patid",ds.patientTable.idat.patientId.name);
-			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.name);
-			Assert.assertEquals("geschlecht",ds.patientTable.idat.gender.name);
-			Assert.assertEquals("vorname",ds.patientTable.idat.givenName.name);
-			Assert.assertEquals("nachname",ds.patientTable.idat.surname.name);
+			Assert.assertEquals("patid",ds.patientTable.idat.patientId.column);
+			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.column);
+			Assert.assertEquals("geschlecht",ds.patientTable.idat.gender.column);
+			Assert.assertEquals("vorname",ds.patientTable.idat.givenName.column);
+			Assert.assertEquals("nachname",ds.patientTable.idat.surname.column);
 			
 			// visit table
 			Assert.assertNotNull(ds.visitTable);
 			Assert.assertNotNull(ds.visitTable.source);
 			Assert.assertNotNull(ds.visitTable.idat);
-			Assert.assertEquals("patid",ds.visitTable.idat.patientId.name);
-			Assert.assertEquals("fallnr",ds.visitTable.idat.visitId.name);
+			Assert.assertEquals("patid",ds.visitTable.idat.patientId.column);
+			Assert.assertEquals("fallnr",ds.visitTable.idat.visitId.column);
 			// wide table
 			Assert.assertNotNull(ds.wideTables);
 			Assert.assertEquals(1, ds.wideTables.length);
 			WideTable t = ds.wideTables[0];
 			Assert.assertNotNull(t);
 			Assert.assertNotNull(t.idat);
-			Assert.assertEquals("patid",t.idat.patientId.name);
-			Assert.assertEquals("fallnr",t.idat.visitId.name);
+			Assert.assertEquals("patid",t.idat.patientId.column);
+			Assert.assertEquals("fallnr",t.idat.visitId.column);
 			// concepts
 			Assert.assertNotNull(t.concepts);
 			Assert.assertTrue(t.concepts.length > 0);
 			Concept c = t.concepts[0];
 			Assert.assertNotNull(c);
 			Assert.assertEquals("natrium", c.id);
-			Assert.assertEquals("na", c.value.name);
+			Assert.assertEquals("na", c.value.column);
 			Assert.assertEquals("mmol/l", c.unit.constantValue);
 		}
 	}

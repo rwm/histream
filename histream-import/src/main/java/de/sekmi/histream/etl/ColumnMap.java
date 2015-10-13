@@ -42,7 +42,7 @@ public class ColumnMap{
 		Objects.requireNonNull(column);
 		column.validate(); // TODO: maybe call after unmarshal of column
 		
-		if( column.getName().isEmpty() ){
+		if( column.getName() == null || column.getName().isEmpty() ){
 			// no reference to column, probably constant value
 			// no need to register
 			return;
