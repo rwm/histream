@@ -18,9 +18,9 @@
 			<deathdate format="d.M.u" na="" column="verstorben"/>
 			<gender column="geschlecht">
 				<map>
-					<map if-value="W" set-value="F"/>
-					<map if-value="M" set-value="M"/>
-					<otherwise set-value=""/>
+					<if value="W" set-value="F"/>
+					<if value="M" set-value="M"/>
+					<otherwise set-value="" log-warning="Unexpected gender value"/>
 				</map>
 			</gender>
 			<ignore xsi:type="string" column="ignoriert1"/>
@@ -97,6 +97,16 @@
 			<value column="value" na="@"/>
 			<unit column="unit" na="@"/>
 		</mdat>
+		<eav-map>
+			<map concept="f_eav_x">
+				<if value="1" set-value="" set-concept="f_eav_x_1"/>
+				<!-- action inplace is default -->
+				<if value="0" set-value="" set-concept="f_eav_x_0" action="inplace" />
+				<!-- action drop will not produce any fact -->
+				<otherwise log-warning="Unexpected value" action="drop" />
+				<!-- action generate will produce a new concept with the given values -->
+			</map>
+		</eav-map>
 	</eav-table>
 
 </datasource>
