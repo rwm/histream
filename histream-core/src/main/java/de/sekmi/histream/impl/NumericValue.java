@@ -62,6 +62,9 @@ public class NumericValue extends AbstractValue {
 	public NumericValue(BigDecimal value, String units){
 		this(value, units, Operator.Equal);
 	}
+	public NumericValue(long value, String units){
+		this(new BigDecimal(value), units, Operator.Equal);
+	}
 	
 	public NumericValue(BigDecimal value, String units, Operator operator){
 		this.value = value;
