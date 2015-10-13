@@ -73,12 +73,15 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		visit.setId(idat.visitId.valueOf(map, row));
 		visit.setPatientId(idat.patientId.valueOf(map, row));
 		DateTimeAccuracy start = idat.start.valueOf(map, row);
-		if( start == null ){
+		if( start != null ){
+			visit.setStartTime(start);
+		}else{
 			// no start time specified for visit row
 			// any other way to retrieve a timestamp??
-			throw new ParseException("No start timestamp found for visit row, but needed for observation");
+			// ignore row
+			// TODO issue warning
+			return null;
 		}
-		visit.setStartTime(start);
 		if( idat.end != null ){
 			visit.setEndTime(idat.end.valueOf(map, row));
 		}
@@ -92,7 +95,11 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		if( concepts != null ){
 			for( Concept c : concepts ){
 				Observation o = c.createObservation(visit.getPatientId(), visit.getId(), factory, map, row);
-				visit.getFacts().add(o);
+				if( o == null ){
+					// observation ignored
+				}else{
+					visit.getFacts().add(o);
+				}
 			}
 		}
 		return visit;

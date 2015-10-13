@@ -40,28 +40,32 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 
 	@Override
 	public R get() {
-		Object[] row = rows.get();
-
-		if( row == null ){
-			// no more rows
-			return null;
-		}
-		
 		R p;
-		try {
-			p = table.fillRecord(map, row, factory);
-		} catch (ParseException e) {
-			if( e.getLocation() == null ){
-				// add location information
-				e.setLocation(rows.getLocation());
+		do{
+			Object[] row = rows.get();
+	
+			if( row == null ){
+				// no more rows
+				return null;
 			}
-			throw new UncheckedParseException(e);
-		}
+			
+			try {
+				p = table.fillRecord(map, row, factory);
+			} catch (ParseException e) {
+				if( e.getLocation() == null ){
+					// add location information
+					e.setLocation(rows.getLocation());
+				}
+				throw new UncheckedParseException(e);
+			}
+			// repeat if fillRecord decides to skip the record
+		}while( p == null );
+
 		// fill source information
 		for( Observation o : p.getFacts() ){
 			o.setSource(source);
 		}
-
+		
 		return p;
 	}
 }

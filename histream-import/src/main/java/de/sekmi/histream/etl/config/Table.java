@@ -89,6 +89,20 @@ public abstract class Table<T extends FactRow> {
 		}
 	}
 	
+	/**
+	 * Creates and fills a record from a table row.
+	 * <p>
+	 * The method can decide to ignore a row (and issue a warning)
+	 * e.g if certain criteria are not met or the configuration
+	 * requires some rows to be ignored. In this case, {@code null} is
+	 * returned.
+	 * 
+	 * @param map column map
+	 * @param row row data
+	 * @param factory observation factory
+	 * @return complete record or {@code null} if the row should be ignored
+	 * @throws ParseException for parse errors
+	 */
 	public abstract T fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException;
 	
 	public RecordSupplier<T> open(ObservationFactory factory, Meta meta) throws IOException, ParseException{
