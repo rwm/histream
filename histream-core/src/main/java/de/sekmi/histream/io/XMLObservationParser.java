@@ -137,10 +137,14 @@ class XMLObservationParser extends AbstractObservationParser{
 			if( visitData.containsKey("sex") ){
 				switch( visitData.get("sex").charAt(0) ){
 				case 'F':
-					sex = Sex.Female;
+					sex = Sex.female;
 					break;
 				case 'M':
-					sex = Sex.Male;
+					sex = Sex.male;
+					break;
+				case 'I':
+				case 'X':
+					sex = Sex.indeterminate;
 					break;
 				default:
 					// warning

@@ -83,7 +83,7 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("XX12345", p.getId());
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2001-01-01"), p.getBirthDate());
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2020"), p.getDeathDate());
-				Assert.assertEquals(Sex.Female, p.getSex());
+				Assert.assertEquals(Sex.female, p.getSex());
 				Assert.assertEquals("A B", p.getGivenName());
 				Assert.assertEquals("Dampf", p.getSurname());
 				// TODO: test more patient information

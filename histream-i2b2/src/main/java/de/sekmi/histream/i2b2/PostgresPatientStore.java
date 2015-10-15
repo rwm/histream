@@ -352,10 +352,12 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private static String getSexCd(Patient patient){
 		if( patient.getSex() == null )return null;
 		else switch( patient.getSex() ){
-		case Female:
+		case female:
 			return "F";
-		case Male:
+		case male:
 			return "M";
+		case indeterminate:
+			return "X";
 		default:
 			// XXX should not happen, warning
 			return null;
@@ -524,11 +526,16 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		if( sex_cd != null ){
 			switch( sex_cd.charAt(0) ){
 			case 'F':
-				sex = Sex.Female;
+				sex = Sex.female;
 				break;
 			case 'M':
-				sex = Sex.Male;
+				sex = Sex.male;
 				break;
+			case 'X':
+				sex = Sex.indeterminate;
+				break;
+			default:
+				sex_cd = null; // unknown
 			}
 		}
 		

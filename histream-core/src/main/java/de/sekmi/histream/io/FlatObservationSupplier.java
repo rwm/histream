@@ -268,11 +268,14 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			Patient.Sex sex;
 			switch( Character.toUpperCase(record.getValue().charAt(0)) ){
 			case 'F':
-			case 'W':
-				sex = Sex.Female;
+				sex = Sex.female;
 				break;
 			case 'M':
-				sex = Sex.Male;
+				sex = Sex.male;
+				break;
+			case 'I':
+			case 'X':
+				sex = Sex.indeterminate;
 				break;
 			default:
 				sex = null;
