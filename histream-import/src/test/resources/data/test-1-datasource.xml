@@ -4,7 +4,7 @@
 		<id>test-1</id>
 		<etl-strategy>replace-source</etl-strategy>
 	</meta>
-	 
+	
 	<patient-table>
 		<source xsi:type="plain-file">
 			<url>test-1-patients.txt</url>
@@ -17,9 +17,9 @@
 			<birthdate format="d.M.u" na="" column="geburtsdatum"/>
 			<deathdate format="d.M.u" na="" column="verstorben"/>
 			<gender column="geschlecht">
-				<map>
-					<if value="W" set-value="F"/>
-					<if value="M" set-value="M"/>
+				<map> <!-- maps a column -->
+					<case value="W" set-value="F"/>
+					<case value="M" set-value="M"/>
 					<otherwise set-value="" log-warning="Unexpected gender value"/>
 				</map>
 			</gender>
@@ -74,6 +74,16 @@
 				<value column="k" xsi:type="decimal"/>
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
 			</concept>
+			<concept id="enum1">
+				<value column="en" na="" xsi:type="string">
+					<map>
+						<case value="1" set-value="" set-concept="enum1_1"/>
+						<case value="2" set-value="" set-concept="enum1_2"/>
+						<otherwise action="drop-fact" />
+					</map>
+				</value>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+			</concept>
 		</mdat>
 
 	</wide-table>
@@ -97,16 +107,17 @@
 			<value column="value" na="@"/>
 			<unit column="unit" na="@"/>
 		</mdat>
-		<eav-map>
+		<apply-mapping>
+			<!-- for eav facts, the map always applies to the fact value -->
 			<map concept="f_eav_x">
-				<if value="1" set-value="" set-concept="f_eav_x_1"/>
+				<case value="1" set-value="" set-concept="f_eav_x_1"/>
 				<!-- action inplace is default -->
-				<if value="0" set-value="" set-concept="f_eav_x_0" action="inplace" />
+				<case value="0" set-value="" set-concept="f_eav_x_0" action="inplace" />
 				<!-- action drop will not produce any fact -->
-				<otherwise log-warning="Unexpected value" action="drop" />
+				<otherwise log-warning="Unexpected value" action="drop-fact" />
 				<!-- action generate will produce a new concept with the given values -->
 			</map>
-		</eav-map>
+		</apply-mapping>
 	</eav-table>
 
 </datasource>

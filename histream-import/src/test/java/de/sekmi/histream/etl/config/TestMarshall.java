@@ -30,6 +30,9 @@ public class TestMarshall {
 			Assert.assertEquals("patid",ds.patientTable.idat.patientId.column);
 			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.column);
 			Assert.assertEquals("geschlecht",ds.patientTable.idat.gender.column);
+			// check gender mapping
+			Assert.assertNotNull(ds.patientTable.idat.gender.map);
+			Assert.assertEquals(2,ds.patientTable.idat.gender.map.cases.length);
 			Assert.assertEquals("vorname",ds.patientTable.idat.givenName.column);
 			Assert.assertEquals("nachname",ds.patientTable.idat.surname.column);
 			

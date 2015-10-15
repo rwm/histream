@@ -3,6 +3,7 @@ package de.sekmi.histream.etl.config;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -40,12 +41,6 @@ public abstract class Column<T> {
 	String constantValue;
 	
 	/**
-	 * Regular expression which needs to match the input string
-	 */
-	@XmlAttribute(name="regex-match")
-	String regexMatch;
-	
-	/**
 	 * Replace the input value with the specified string or regular expression group from {@link #regexMatch}.
 	 * If not specified, the full input string is used (regardless of match region).
 	 */
@@ -53,24 +48,14 @@ public abstract class Column<T> {
 	String regexReplace;
 	
 	/**
-	 * Action to perform if the {@link #regexMatch} did not match the input string.
-	 * Either use NA (usually null) for the value, or drop the whole concept/fact.
-	 */
-	@XmlAttribute(name="regex-nomatch-action")
-	String regexNoMatchAction; // either na or drop
-	
-	/**
-	 * Report a warning if the {@link #regexMatch} did not match the input string.
-	 * Defaults to true.
-	 */
-	@XmlAttribute(name="regex-nomatch-warning")
-	Boolean regexNoMatchWarning;
-	
-	/**
 	 * Column name to use for reading input values.
 	 */
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	String column;
+	
+	
+	@XmlElement(required=false)
+	MapRules map;
 	
 	/**
 	 * Column name to use for reading input values
@@ -92,25 +77,37 @@ public abstract class Column<T> {
 	 * @throws ParseException on errors with regular expressions
 	 */
 	public Object preprocessValue(Object value)throws ParseException{
+		// use constant value if provided
 		if( constantValue != null ){
 			value = constantValue;
 		}
 		
+		// apply regular expression replacements
+		if( value != null && regexReplace != null ){
+			
+			value = applyRegexReplace((String)value);
+		}
+		
+		// apply map rules
+		if( map != null ){
+			// TODO apply map rules
+			// TODO find way to communicate warnings
+			// TODO find way to set action (inplace/drop/generate)
+		}
+		
+		// check for na result
 		if( na != null && value != null && na.equals(value) ){
 			value = null;
 		}
 		
-		if( value != null && regexMatch != null ){
-			if( !(value instanceof String) ){
-				throw new ParseException("regex-match can only be used on String, but found "+value.getClass().getName());
-			}
-			
-			value = applyRegularExpression((String)value);
-		}
-		
+
 		return value;
 	}
 	
+	private String applyRegexReplace(String value){
+		// TODO apply replace
+		return value;
+	}
 	public T valueOf(ColumnMap map, Object[] row) throws ParseException{
 		if( column == null || column.isEmpty() ){
 			// use constant value if available
@@ -121,11 +118,6 @@ public abstract class Column<T> {
 		Integer index = map.indexOf(this);
 		Objects.requireNonNull(index);
 		return this.valueOf(row[index]);
-	}
-
-	public String applyRegularExpression(String input){
-		// TODO: apply
-		return input;
 	}
 	
 	public void validate()throws ParseException{

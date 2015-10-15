@@ -32,6 +32,9 @@ public abstract class Table<T extends FactRow> {
 	 * @throws ParseException if headers could not be found/mapped
 	 */
 	protected void mapRegisterConcept(ColumnMap map, Concept c) throws ParseException{
+		if( c.start == null ){
+			throw new ParseException("Start timestamp undefined for concept '"+c.id+"'");
+		}
 		map.registerColumn(c.start);
 		if( c.end != null ){
 			map.registerColumn(c.end);
