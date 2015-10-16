@@ -15,9 +15,11 @@ public class StringColumn extends Column<String>{
 	}
 	@Override
 	public String valueOf(Object input) throws ParseException {
-		Object value = preprocessValue(input);
-		if( value != null )return value.toString();
-		else return null;
+		return input.toString();
+	}
+	@Override
+	public String valueFromString(String input) throws ParseException {
+		return input; // nothing to do
 	}
 	
 }

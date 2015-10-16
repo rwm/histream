@@ -59,6 +59,18 @@ public class Concept{
 		this.start = new DateTimeColumn(startColumn, format);
 	}
 	
+	/**
+	 * Create an observation for this concept with the given row data.
+	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
+	 * 
+	 * @param patid patient id
+	 * @param visit visit id
+	 * @param factory observation factory
+	 * @param map column map
+	 * @param row row data
+	 * @return fact
+	 * @throws ParseException parse 
+	 */
 	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
 		DateTimeAccuracy start = this.start.valueOf(map,row);
 		Observation o = factory.createObservation(patid, this.id, start);

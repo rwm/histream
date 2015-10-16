@@ -63,61 +63,90 @@ public abstract class Column<T> {
 	 */
 	public String getName(){return column;}
 	
-	public abstract T valueOf(Object input) throws ParseException;
+	/**
+	 * Create the column type value from a string representation.
+	 * This will be used for the {@code constant-value} attribute is present
+	 * and also to process data from string only sources like CSV or text tables.
+	 * <p>
+	 * The resulting type depends on the type attribute and can be one 
+	 * of Long, BigDecimal, String, DateTime or DateTimeAccuracy (for incomplete dates).
+	 * 
+	 * @param input string value e.g. from text table column. This parameter is guaranteed to be non null.
+	 * @return column output type representing the input value
+	 * @throws ParseException if the string could not be parsed to the resulting data type
+	 */
+	public abstract T valueFromString(String input)throws ParseException;
 	
 	/**
-	 * Convert a string input value to the output data type. The resulting type depends
-	 * on the type attribute and can be one of Long, BigDecimal, String, DateTime
-	 * or DateTimeAccuracy (for incomplete dates).
-	 * <p>
-	 * TODO: how to read SQL table data, which already contains types (e.g. sql.Integer)
+	 * Convert another data type to the column data type.
 	 * 
-	 * @param value input value. e.g. from text table column
-	 * @return output type representing the input value
-	 * @throws ParseException on errors with regular expressions
+	 * @param input input value e.g. from SQL result set. 
+	 * This parameter is guaranteed to be non null, since null values
+	 * are handled before this method is called. 
+	 * <p>
+	 * This parameter is also guaranteed not to be of String type,
+	 * since strings are handled via {@link #valueFromString(String)}
+	 * 
+	 * @return column data type
+	 * @throws ParseException if conversion of data types failed
 	 */
-	public Object preprocessValue(Object value)throws ParseException{
-		// use constant value if provided
-		if( constantValue != null ){
-			value = constantValue;
-		}
-		
-		// apply regular expression replacements
-		if( value != null && regexReplace != null ){
-			
-			value = applyRegexReplace((String)value);
-		}
-		
-		// apply map rules
-		if( map != null ){
-			// TODO apply map rules
-			// TODO find way to communicate warnings
-			// TODO find way to set action (inplace/drop/generate)
-		}
-		
-		// check for na result
-		if( na != null && value != null && na.equals(value) ){
-			value = null;
-		}
-		
-
-		return value;
-	}
+	public abstract T valueOf(Object input) throws ParseException;
 	
 	private String applyRegexReplace(String value){
 		// TODO apply replace
 		return value;
 	}
-	public T valueOf(ColumnMap map, Object[] row) throws ParseException{
-		if( column == null || column.isEmpty() ){
-			// use constant value if available
-			return valueOf(null);
+
+	public T valueOf(ColumnMap colMap, Object[] row) throws ParseException{
+		T ret;
+		// use constant value if available
+		if( constantValue != null ){
+			// check for NA
+			if( na != null && na.equals(constantValue) ){
+				ret = null; // will result in null value
+			}else{
+				ret = valueFromString(constantValue); // use constant value
+			}
+		}else if( column == null || column.isEmpty() ){
+			// no constant value and column undefined
+			// the column will always produce null values
+			ret = null;
+		}else{
+			// use actual row value
+			Objects.requireNonNull(colMap);
+			Objects.requireNonNull(row);
+			Integer index = colMap.indexOf(this);
+			Objects.requireNonNull(index);
+			Object rowval = row[index];
+			// string processing (na, regex-replace, mapping) only performed on string values
+			if( rowval == null ){
+				ret = null; // null value
+			}else if( rowval.getClass() == String.class ){
+				// non null string value
+				String val = (String)rowval;
+				// apply regular expression replacements
+				if( regexReplace != null ){
+					val = applyRegexReplace(val);
+				}
+				// TODO apply map rules
+				// check for NA
+				if( na != null && val != null && na.equals(val) ){
+					val = null;
+				}
+				// convert value
+				if( val != null ){
+					ret = valueFromString(val);
+				}else{
+					ret = null;
+				}
+			}else if( na != null || regexReplace != null || map != null ){
+				throw new ParseException("String operation (na/regexReplace/map) defined for column "+getName()+", but table provides type "+rowval.getClass().getName()+" instead of String");
+			}else{
+				// other non string value without string processing
+				ret = valueOf(rowval); // use value directly
+			}
 		}
-		Objects.requireNonNull(map);
-		Objects.requireNonNull(row);
-		Integer index = map.indexOf(this);
-		Objects.requireNonNull(index);
-		return this.valueOf(row[index]);
+		return ret;
 	}
 	
 	public void validate()throws ParseException{

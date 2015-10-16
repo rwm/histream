@@ -39,28 +39,28 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	
 	@Override
 	public DateTimeAccuracy valueOf(Object value) throws ParseException{
-		value = super.preprocessValue(value);
-		if( value == null ){
-			return null;
-		}else if( value instanceof String ){
-			// parse date according to format
-			if( formatter == null && format != null ){
-				formatter = DateTimeFormatter.ofPattern(format);
-			}
-			if( formatter == null ){
-				throw new ParseException("format must be specified for DateTime fields if strings are parsed");
-			}
-			// TODO parse
-			try{
-				return DateTimeAccuracy.parse(formatter,(String)value);
-			}catch( DateTimeParseException e ){
-				throw new ParseException("Unable to parse date: "+(String)value, e);
-			}
-		}else if( value instanceof Timestamp ){
+		if( value instanceof Timestamp ){
 			// convert from timestamp
 			return null;
 		}else{
 			throw new IllegalArgumentException("Don't know how to parse type "+value.getClass()+" to datetime");
+		}
+	}
+
+	@Override
+	public DateTimeAccuracy valueFromString(String input) throws ParseException {
+		// parse date according to format
+		if( formatter == null && format != null ){
+			formatter = DateTimeFormatter.ofPattern(format);
+		}
+		if( formatter == null ){
+			throw new ParseException("format must be specified for DateTime fields if strings are parsed");
+		}
+		// parse
+		try{
+			return DateTimeAccuracy.parse(formatter,input);
+		}catch( DateTimeParseException e ){
+			throw new ParseException("Unable to parse date: "+input, e);
 		}
 	}
 }

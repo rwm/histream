@@ -23,33 +23,33 @@ public class DecimalColumn extends Column<BigDecimal>{
 
 	@Override
 	public BigDecimal valueOf(Object input) throws ParseException {
-		Object value = preprocessValue(input);
-		if( value == null ){
-			return null;
-		}else if( value instanceof String ){
-			if( locale == null ){
-				// parse according to BigDecimal(String)
-				try{
-					return new BigDecimal((String)value);
-				}catch( NumberFormatException e ){
-					throw new ParseException("Unable to parse number: "+(String)value, e);
-				}
-			}else{
-				// use DecimalFormat for parsing
-				if( decimalFormat == null ){
-					decimalFormat = (DecimalFormat)NumberFormat.getNumberInstance(Locale.forLanguageTag(locale));
-					decimalFormat.setParseBigDecimal(true);
-				}
-				try {
-					return (BigDecimal)decimalFormat.parse((String)value);
-				} catch (java.text.ParseException e) {
-					throw new ParseException("Unable to parse number: "+(String)value, e);
-				}
-			}
-		}else if( value instanceof BigDecimal ){
-			return (BigDecimal)value;
+		if( input instanceof BigDecimal ){
+			return (BigDecimal)input;
 		}else{
-			throw new ParseException("Invalid type for decimal column: "+value.getClass().getName());
+			throw new ParseException("Invalid type for decimal column: "+input.getClass().getName());
+		}
+	}
+
+	@Override
+	public BigDecimal valueFromString(String input) throws ParseException {
+		if( locale == null ){
+			// parse according to BigDecimal(String)
+			try{
+				return new BigDecimal(input);
+			}catch( NumberFormatException e ){
+				throw new ParseException("Unable to parse number '"+input+"'", e);
+			}
+		}else{
+			// use DecimalFormat for parsing
+			if( decimalFormat == null ){
+				decimalFormat = (DecimalFormat)NumberFormat.getNumberInstance(Locale.forLanguageTag(locale));
+				decimalFormat.setParseBigDecimal(true);
+			}
+			try {
+				return (BigDecimal)decimalFormat.parse(input);
+			} catch (java.text.ParseException e) {
+				throw new ParseException("Unable to parse number '"+input+"'", e);
+			}
 		}
 	}
 
