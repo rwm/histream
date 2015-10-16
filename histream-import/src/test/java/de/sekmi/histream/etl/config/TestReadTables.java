@@ -84,6 +84,14 @@ public class TestReadTables {
 			Assert.assertNotNull(e);
 			Assert.assertEquals("test-1", e.getSourceId());
 			
+			// skip to last
+			for( EavRow n = s.get(); n!=null; n=s.get() ){
+				r = n;
+			}
+			Observation f = r.getFact();
+			// should be processed by virtual column map
+			Assert.assertEquals("f_eav_x_1", f.getConceptId());
+			Assert.assertNull(f.getValue());
 		}
 	}
 }

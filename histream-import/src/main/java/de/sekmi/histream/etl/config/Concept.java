@@ -11,6 +11,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
@@ -73,11 +74,21 @@ public class Concept{
 	 */
 	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
 		DateTimeAccuracy start = this.start.valueOf(map,row);
-		Observation o = factory.createObservation(patid, this.id, start);
+		String concept = this.id;
+		
+		MapFeedback mf = new MapFeedback();
+		Object value = this.value.valueOf(map, row, mf);
+		if( mf.isActionDrop() ){
+			return null; // ignore this fact
+		}
+		if( mf.hasConceptOverride() ){
+			concept = mf.getConceptOverride();
+		}
+		Observation o = factory.createObservation(patid, concept, start);
 		if( visit != null ){
 			o.setEncounterId(visit);
 		}
-		Object value = this.value.valueOf(map, row);
+
 		String unit = null;
 		if( this.unit != null ){
 			unit = this.unit.valueOf(map, row);

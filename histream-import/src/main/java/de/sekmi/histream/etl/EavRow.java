@@ -22,6 +22,9 @@ public class EavRow implements FactRow {
 	public List<Observation> getFacts() {
 		return Arrays.asList(fact);
 	}
+	public Observation getFact(){
+		return fact;
+	}
 
 	@Override
 	public String getPatientId() {return fact.getPatientId();}

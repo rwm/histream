@@ -1,18 +1,22 @@
 package de.sekmi.histream.etl.config;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.Value;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.EavRow;
+import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
@@ -24,6 +28,29 @@ public class EavTable extends Table<EavRow> {
 
 	@XmlElement
 	MDAT mdat;
+	
+	@XmlTransient
+	Map<String,Column<?>> virtualColumnMap;
+	
+	@XmlElementWrapper(name="virtual")
+	@XmlElement(name="value")
+	public void setVirtualValueColumns(Column<?>[] values){
+		if( values == null ){
+			virtualColumnMap = null;
+		}else{
+			virtualColumnMap = new HashMap<>();
+			for( Column<?> value : values ){
+				virtualColumnMap.put(value.column, value);
+			}
+		}
+	}
+	public Column<?>[] getVirtualValueColumns(){
+		if( virtualColumnMap == null ){
+			return null;
+		}else{
+			return virtualColumnMap.values().toArray(new Column<?>[virtualColumnMap.size()]);
+		}
+	}
 	
 	@XmlType(name="eav-mdat")
 	@XmlAccessorType(XmlAccessType.FIELD)
@@ -78,42 +105,80 @@ public class EavTable extends Table<EavRow> {
 		
 		return map;
 	}
+	
+	private Column<?> getVirtualColumn(String concept){
+		return virtualColumnMap.get(concept);
+	}
 
 	@Override
-	public EavRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
-		String patid = idat.patientId.valueOf(map, row);
-		DateTimeAccuracy start = mdat.start.valueOf(map,row);
-		String concept = mdat.concept.valueOf(map,row);
-		Observation fact = factory.createObservation(patid, concept, start);
-
-		String visit = idat.visitId.valueOf(map, row);
-		if( visit != null ){
-			fact.setEncounterId(visit);
-		}
-		String value = mdat.value.valueOf(map,row);
-		if( value != null ){
-			// generate/parse value
+	public EavRow fillRecord(ColumnMap colMap, Object[] row, ObservationFactory factory) throws ParseException {
+		String patid = idat.patientId.valueOf(colMap, row);
+		DateTimeAccuracy start = mdat.start.valueOf(colMap,row);
+		String concept = mdat.concept.valueOf(colMap,row);
+		String value = mdat.value.valueOf(colMap,row);
+		String unit = mdat.unit.valueOf(colMap,row);
+		Column<?> vcol = getVirtualColumn(concept);
+		Object vval;
+		if( vcol != null ){
+			// use virtual column for value processing
+			MapFeedback mf = new MapFeedback();
+			vval = vcol.valueOf(value, mf);
+			if( mf.hasConceptOverride() ){
+				concept = mf.getConceptOverride();
+			}
+			if( mf.isActionDrop() ){
+				return null; // ignore fact and row
+			}
+		}else if( value != null ){
+			// no virtual column provided, parse value directly
+			// use provided type info
 			String type = null;
 			if( mdat.type != null ){
-				type = mdat.type.valueOf(map,row);
+				type = mdat.type.valueOf(colMap,row);
 			}
-			Value factValue = null;
 			if( type == null ){
 				// for now, use string
 				// TODO determine type automatically from string representation
-				factValue = new StringValue(value);				
+				vval = value;		
 			}else if( type.equals(StringColumn.class.getAnnotation(XmlType.class).name()) ){
-				factValue = new StringValue(value);
-			}else if( type.equals(DecimalColumn.class.getAnnotation(XmlType.class).name())
-					|| type.equals(IntegerColumn.class.getAnnotation(XmlType.class).name()) ){
+				vval = value;
+			}else if( type.equals(DecimalColumn.class.getAnnotation(XmlType.class).name()) ){
 				try{
-					factValue = new NumericValue(new BigDecimal(value));
+					vval = new BigDecimal(value);
 				}catch( NumberFormatException e ){
 					throw new ParseException("Unable to parse number", e);
 				}
+			}else if( type.equals(IntegerColumn.class.getAnnotation(XmlType.class).name()) ){
+				try{
+					vval = Long.parseLong(value);
+				}catch( NumberFormatException e ){
+					throw new ParseException("Unable to parse integer", e);
+				}
+			}else{
+				throw new ParseException("Unsupported value type: "+type);
 			}
-			fact.setValue(factValue);
+		}else{
+			// null value
+			vval = null;
 		}
+
+		Observation fact = factory.createObservation(patid, concept, start);
+		String visit = idat.visitId.valueOf(colMap, row);
+		if( visit != null ){
+			fact.setEncounterId(visit);
+		}
+		if( vval != null ){
+			// convert native type to observation value
+			if( vval instanceof String ){
+				fact.setValue(new StringValue((String)vval));
+			}else if( vval instanceof BigDecimal ){
+				fact.setValue(new NumericValue((BigDecimal)vval,unit));
+			}else if( vval instanceof Long ){
+				fact.setValue(new NumericValue((Long)vval,unit));
+			}else{
+				throw new ParseException("Internal error: unsupported native value type: "+vval.getClass());
+			}
+		}// else fact without value
 		
 		return new EavRow(fact);
 	}

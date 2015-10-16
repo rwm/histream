@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.sekmi.histream.etl.ColumnMap;
+import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
 
 /**
@@ -93,11 +94,92 @@ public abstract class Column<T> {
 	public abstract T valueOf(Object input) throws ParseException;
 	
 	private String applyRegexReplace(String value){
-		// TODO apply replace
-		return value;
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+	
+	private void applyMapRules(String value, MapFeedback action){
+		boolean match = false;
+		Objects.requireNonNull(map.cases);
+		for( MapCase mc : map.cases ){
+			Objects.requireNonNull(mc.value);
+			if( mc.value.equals(value) ){
+				match = true;
+				if( mc.setValue != null ){
+					action.overrideValue(mc.setValue);
+				}
+				// TODO check action
+				if( mc.setConcept != null ){
+					action.overrideConcept(mc.setConcept);
+				}
+				break;
+			}
+		}
+		if( match == false && map.otherwise != null ){
+			if( map.otherwise.setValue != null ){
+				action.overrideValue(map.otherwise.setValue);
+			}
+			if( map.otherwise.setConcept != null ){
+				action.overrideConcept(map.otherwise.setConcept);
+			}
+			// TODO check action
+		}
 	}
 
+	/**
+	 * Process and return the column value from a table row without map rule processing.
+	 * This method behaves as if {@link #valueOf(ColumnMap, Object[], MapFeedback)} was called
+	 * with the last argument set to {@code null}.
+	 * 
+	 * @see #valueOf(Object)
+	 * @param colMap column map
+	 * @param row table row
+	 * @return value
+	 * @throws ParseException parse errors
+	 */
 	public T valueOf(ColumnMap colMap, Object[] row) throws ParseException{
+		return valueOf(colMap, row, null);
+	}
+	
+	private T processedValue(String val, MapFeedback mapFeedback) throws ParseException{
+		T ret;
+		// apply regular expression replacements
+		if( regexReplace != null ){
+			val = applyRegexReplace(val);
+		}
+		// apply map rules
+		if( map != null ){
+			if( mapFeedback == null ){
+				throw new ParseException("map element allowed for column "+getName());
+			}
+			applyMapRules(val, mapFeedback);
+			// use value override, if present
+			if( mapFeedback.getValueOverride() != null ){
+				val = mapFeedback.getValueOverride();
+			}
+		}
+		// check for NA
+		if( na != null && val != null && na.equals(val) ){
+			val = null;
+		}
+		// convert value
+		if( val != null ){
+			ret = valueFromString(val);
+		}else{
+			ret = null;
+		}
+		return ret;
+	}
+
+	/**
+	 * Process and return the column value from a table row.
+	 * 
+	 * @param colMap column map
+	 * @param row table row
+	 * @param mapFeedback map rule feedback, can be set to {@code null} if map rules forbidden for this column.
+	 * @return final column value
+	 * @throws ParseException parse errors
+	 */
+	public T valueOf(ColumnMap colMap, Object[] row, MapFeedback mapFeedback) throws ParseException{
 		T ret;
 		// use constant value if available
 		if( constantValue != null ){
@@ -111,8 +193,10 @@ public abstract class Column<T> {
 			// no constant value and column undefined
 			// the column will always produce null values
 			ret = null;
+			// this should not happen -> concept neither constant value nor column name
 		}else{
 			// use actual row value
+			// TODO merge with valueOf(Object,MapFeedback), but colmap lookup shall not occur for constant values
 			Objects.requireNonNull(colMap);
 			Objects.requireNonNull(row);
 			Integer index = colMap.indexOf(this);
@@ -121,30 +205,49 @@ public abstract class Column<T> {
 			// string processing (na, regex-replace, mapping) only performed on string values
 			if( rowval == null ){
 				ret = null; // null value
-			}else if( rowval.getClass() == String.class ){
+			}else if( rowval instanceof String ){
 				// non null string value
-				String val = (String)rowval;
-				// apply regular expression replacements
-				if( regexReplace != null ){
-					val = applyRegexReplace(val);
-				}
-				// TODO apply map rules
-				// check for NA
-				if( na != null && val != null && na.equals(val) ){
-					val = null;
-				}
-				// convert value
-				if( val != null ){
-					ret = valueFromString(val);
-				}else{
-					ret = null;
-				}
+				ret = processedValue((String)rowval, mapFeedback);
 			}else if( na != null || regexReplace != null || map != null ){
-				throw new ParseException("String operation (na/regexReplace/map) defined for column "+getName()+", but table provides type "+rowval.getClass().getName()+" instead of String");
+				throw new ParseException("String operation (na/regexReplace/map) defined for column "+getName()+", but table source provides type "+rowval.getClass().getName()+" instead of String");
 			}else{
 				// other non string value without string processing
 				ret = valueOf(rowval); // use value directly
 			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * Process and return the column value from a table row.
+	 * Same as {@link #valueOf(ColumnMap, Object[], MapFeedback)} but without
+	 * lookup with column map.
+	 * TODO merge both methods
+	 * 
+	 * @param rowval value from row
+	 * @param mapFeedback mapping feedback
+	 * @return processed value
+	 * @throws ParseException parse error
+	 */
+	public T valueOf(Object rowval, MapFeedback mapFeedback) throws ParseException{
+		T ret;
+		// use constant value if available
+		if( constantValue != null ){
+			// check for NA
+			if( na != null && na.equals(constantValue) ){
+				ret = null; // will result in null value
+			}else{
+				ret = valueFromString(constantValue); // use constant value
+			}
+		}else if( rowval == null ){
+			ret = null;
+		}else if( rowval instanceof String ){
+			ret = processedValue((String)rowval, mapFeedback);
+		}else if( na != null || regexReplace != null || map != null ){
+			throw new ParseException("String operation (na/regexReplace/map) defined for column "+getName()+", but table source provides type "+rowval.getClass().getName()+" instead of String");
+		}else{
+			// other non string value without string processing
+			ret = valueOf(rowval); // use value directly
 		}
 		return ret;
 	}

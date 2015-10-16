@@ -32,7 +32,8 @@ public class TestMarshall {
 			Assert.assertEquals("geschlecht",ds.patientTable.idat.gender.column);
 			// check gender mapping
 			Assert.assertNotNull(ds.patientTable.idat.gender.map);
-			Assert.assertEquals(2,ds.patientTable.idat.gender.map.cases.length);
+			Assert.assertEquals(3,ds.patientTable.idat.gender.map.cases.length);
+			Assert.assertEquals("W",ds.patientTable.idat.gender.map.cases[0].value);
 			Assert.assertEquals("vorname",ds.patientTable.idat.givenName.column);
 			Assert.assertEquals("nachname",ds.patientTable.idat.surname.column);
 			
@@ -58,6 +59,11 @@ public class TestMarshall {
 			Assert.assertEquals("natrium", c.id);
 			Assert.assertEquals("na", c.value.column);
 			Assert.assertEquals("mmol/l", c.unit.constantValue);
+			
+			// check eav
+			Assert.assertEquals(1, ds.eavTables.length);
+			Assert.assertNotNull(ds.eavTables[0].virtualColumnMap);
+			Assert.assertNotNull(ds.eavTables[0].virtualColumnMap.get("f_eav_x"));
 		}
 	}
 	@Test

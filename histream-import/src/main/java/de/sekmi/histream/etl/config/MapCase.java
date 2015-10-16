@@ -2,22 +2,24 @@ package de.sekmi.histream.etl.config;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class MapCase {
+	@XmlAttribute
 	String value;
 	
-	@XmlElement(name="set-value")
+	@XmlAttribute(name="set-value")
 	String setValue;
 	
-	@XmlElement(name="set-concept")
+	@XmlAttribute(name="set-concept")
 	String setConcept;
 	
 	// TODO use enum
+	@XmlAttribute
 	String action;
 	
-	@XmlElement(name="log-warning")
+	@XmlAttribute(name="log-warning")
 	String logWarning;
 	
 }

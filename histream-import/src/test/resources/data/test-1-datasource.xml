@@ -16,10 +16,11 @@
 			<surname column="nachname"/>
 			<birthdate format="d.M.u" na="" column="geburtsdatum"/>
 			<deathdate format="d.M.u" na="" column="verstorben"/>
-			<gender column="geschlecht">
+			<gender column="geschlecht" na="">
 				<map> <!-- maps a column -->
-					<case value="W" set-value="F"/>
-					<case value="M" set-value="M"/>
+					<case value="W" set-value="female"/>
+					<case value="M" set-value="male"/>
+					<case value="X" set-value="indeterminate"/>
 					<otherwise set-value="" log-warning="Unexpected gender value"/>
 				</map>
 			</gender>
@@ -107,17 +108,21 @@
 			<value column="value" na="@"/>
 			<unit column="unit" na="@"/>
 		</mdat>
-		<apply-mapping>
+		<!-- virtual value columns -->
+		<virtual>
 			<!-- for eav facts, the map always applies to the fact value -->
-			<map concept="f_eav_x">
-				<case value="1" set-value="" set-concept="f_eav_x_1"/>
-				<!-- action inplace is default -->
-				<case value="0" set-value="" set-concept="f_eav_x_0" action="inplace" />
-				<!-- action drop will not produce any fact -->
-				<otherwise log-warning="Unexpected value" action="drop-fact" />
-				<!-- action generate will produce a new concept with the given values -->
-			</map>
-		</apply-mapping>
+			<value column="f_eav_x" na="" xsi:type="string">
+				<map>
+					<case value="1" set-value="" set-concept="f_eav_x_1"/>
+					<!-- action inplace is default -->
+					<case value="0" set-value="" set-concept="f_eav_x_0"/>
+					<!-- action drop will not produce any fact -->
+					<otherwise log-warning="Unexpected value" action="drop-fact" />
+					<!-- action generate will produce a new concept with the given values -->
+				</map>
+			</value>
+			<!-- ... more value elements -->
+		</virtual>
 	</eav-table>
 
 </datasource>

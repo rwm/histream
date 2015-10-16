@@ -1,5 +1,7 @@
 package de.sekmi.histream.etl.config;
 
+import java.util.Arrays;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -9,8 +11,10 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
+import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
 import de.sekmi.histream.etl.PatientRow;
+import de.sekmi.histream.ext.Patient.Sex;
 
 /**
  * Patient table. Contains patient id and other identifying information.
@@ -73,12 +77,27 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	@Override
 	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		PatientRow patient = new PatientRow();
-		patient.setId(idat.patientId.valueOf(map, row));
-		patient.setGivenName(idat.givenName.valueOf(map, row));
-		patient.setSurname(idat.surname.valueOf(map, row));
-		patient.setBirthDate(idat.birthdate.valueOf(map, row));
+		patient.setId(idat.patientId.valueOf(map, row, null));
+		patient.setGivenName(idat.givenName.valueOf(map, row, null));
+		patient.setSurname(idat.surname.valueOf(map, row, null));
+		patient.setBirthDate(idat.birthdate.valueOf(map, row, null));
 		if( idat.deathdate != null ){
-			patient.setDeathDate(idat.deathdate.valueOf(map, row));
+			patient.setDeathDate(idat.deathdate.valueOf(map, row, null));
+		}
+		if( idat.gender != null ){
+			MapFeedback mf = new MapFeedback();
+			String genderCode = idat.gender.valueOf(map, row, mf);
+			if( mf.isActionDrop() || mf.getConceptOverride() != null ){
+				throw new ParseException("concept override or drop not allowed for patient gender");
+			}
+			// gender may omitted
+			if( genderCode != null ){
+				try{
+					patient.setSex(Sex.valueOf(genderCode));
+				}catch( IllegalArgumentException e ){
+					throw new ParseException("Unsupported gender value '"+genderCode+"'. Use one of "+Arrays.toString(Sex.values()));
+				}
+			}
 		}
 		// concepts
 		if( concepts != null ){
