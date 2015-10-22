@@ -56,7 +56,18 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	@Override
 	public void setBirthDate(DateTimeAccuracy dateTime){
 		// TODO compare and markDirty  if different (also in other setters)
+		if( this.birthDate == null && dateTime == null ){
+			// nothing to do
+			return;
+		}else if( birthDate != null && dateTime != null ){
+			// compare
+			if( birthDate.equals(dateTime) ){
+				// nothing to do
+				return;
+			}
+		}
 		this.birthDate = dateTime;
+		markDirty(true);
 	}
 
 	@Override
@@ -76,7 +87,13 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 
 	@Override
 	public void setSex(Sex sex) {
+		if( this.sex == null && sex == null ){
+			return; // nothing to do
+		}else if( this.sex != null && sex != null && this.sex.equals(sex) ){
+			return; // nothing to do
+		}
 		this.sex = sex;
+		markDirty(true);
 	}
 
 	@Override

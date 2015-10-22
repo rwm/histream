@@ -721,7 +721,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 				updateException(patient, e);
 			}
 		}
-		if( count != 0 )log.info("Updated "+count+" patients in database");
+		log.info("Updated "+count+" patients in database");
 	}
 
 	@Override

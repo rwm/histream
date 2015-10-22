@@ -141,6 +141,9 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("given-name") ){
 			currentPatient.setGivenName(patientData.get("given-name"));
 		}
+		if( es != null ){
+			currentPatient.setSourceTimestamp(es.getSourceTimestamp());
+		}
 		
 	}
 	
