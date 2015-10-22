@@ -30,6 +30,7 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		DateTimeColumn start;
 		DateTimeColumn end;
 		StringColumn location;
+		StringColumn provider;
 		// TODO inpatient/outpatient state
 		Column<?>[] ignore;
 	}
@@ -57,10 +58,20 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		if( idat.location != null ){
 			map.registerColumn(idat.location);
 		}
-		for( Concept c : concepts ){
-			mapRegisterConcept(map, c);
+		if( idat.provider != null ){
+			map.registerColumn(idat.provider);
 		}
-
+		// visit concepts are optional
+		if( concepts != null ){
+			for( Concept c : concepts ){
+				// if c.start not defined, use idat.start
+				if( c.start == null ){
+					c.start = idat.start;
+				}
+				mapRegisterConcept(map, c);
+			}
+		}
+		
 		// make sure all columns are specified
 		validateAllHeaders(headers, map, idat.ignore);
 
