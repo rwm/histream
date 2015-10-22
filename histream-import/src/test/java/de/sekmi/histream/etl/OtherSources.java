@@ -31,4 +31,24 @@ public class OtherSources {
 		os.close();
 		w.close();
 	}
+	@Test
+	public void testSource3() throws Exception{
+		URL url = Paths.get("../../../2015-06 DZL/Datenquellen/IPF/transform/datasource.xml").toUri().toURL();
+		ETLObservationSupplier os = ETLObservationSupplier.load(url);
+		GroupedXMLWriter w = new GroupedXMLWriter(System.out);
+		Meta.transfer(os, w);
+		Streams.transfer(os, w);
+		os.close();
+		w.close();
+	}
+	@Test
+	public void testSource4() throws Exception{
+		URL url = Paths.get("../../../2015-06 DZL/Datenquellen/Biobanken/Heidelberg/datasource.xml").toUri().toURL();
+		ETLObservationSupplier os = ETLObservationSupplier.load(url);
+		GroupedXMLWriter w = new GroupedXMLWriter(System.out);
+		Meta.transfer(os, w);
+		Streams.transfer(os, w);
+		os.close();
+		w.close();
+	}
 }
