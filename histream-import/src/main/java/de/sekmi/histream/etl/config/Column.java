@@ -107,9 +107,14 @@ public abstract class Column<T> {
 				if( mc.setValue != null ){
 					action.overrideValue(mc.setValue);
 				}
-				// TODO check action
+				// set concept
 				if( mc.setConcept != null ){
 					action.overrideConcept(mc.setConcept);
+				}
+				// check action
+				if( mc.action != null && mc.action.equals("drop-fact") ){
+					action.dropFact();
+					// TODO check after loading for illegal values or use enum
 				}
 				break;
 			}
@@ -121,7 +126,11 @@ public abstract class Column<T> {
 			if( map.otherwise.setConcept != null ){
 				action.overrideConcept(map.otherwise.setConcept);
 			}
-			// TODO check action
+			// check action
+			if( map.otherwise.action != null && map.otherwise.action.equals("drop-fact") ){
+				action.dropFact();
+				// TODO check after loading for illegal values or use enum
+			}
 		}
 	}
 
