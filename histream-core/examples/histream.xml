@@ -22,27 +22,27 @@
 	<plugins>
 		<!-- plugins are loaded in order of occurance -->
 		<plugin class="de.sekmi.histream.i2b2.PostgresPatientStore">
-			<property name="user">i2b2demodata</property>	
-			<property name="host">localhost</property>	
-			<property name="database">i2b2</property>	
-			<property name="port">15432</property>	
-			<property name="password"></property>	
+			<property name="jdbc.user">i2b2demodata</property>	
+			<property name="jdbc.host">localhost</property>	
+			<property name="jdbc.database">i2b2</property>	
+			<property name="jdbc.port">15432</property>	
+			<property name="jdbc.password"></property>	
 			<property name="project">demo</property>					
 		</plugin>
 		<plugin class="de.sekmi.histream.i2b2.PostgresVisitStore">
-			<property name="user">i2b2demodata</property>	
-			<property name="host">localhost</property>	
-			<property name="database">i2b2</property>	
-			<property name="port">15432</property>	
-			<property name="password"></property>	
+			<property name="jdbc.user">i2b2demodata</property>	
+			<property name="jdbc.host">localhost</property>	
+			<property name="jdbc.database">i2b2</property>	
+			<property name="jdbc.port">15432</property>	
+			<property name="jdbc.password"></property>	
 			<property name="project">demo</property>					
 		</plugin>
 		<plugin class="de.sekmi.histream.i2b2.I2b2Inserter">
-			<property name="user">i2b2demodata</property>	
-			<property name="host">localhost</property>	
-			<property name="database">i2b2</property>	
-			<property name="port">15432</property>	
-			<property name="password"></property>	
+			<property name="jdbc.user">i2b2demodata</property>	
+			<property name="jdbc.host">localhost</property>	
+			<property name="jdbc.database">i2b2</property>	
+			<property name="jdbc.port">15432</property>	
+			<property name="jdbc.password"></property>	
 			<property name="project">demo</property>					
 			<property name="nullProvider">LCS-I2B2:PROVIDERS</property>					
 		</plugin>

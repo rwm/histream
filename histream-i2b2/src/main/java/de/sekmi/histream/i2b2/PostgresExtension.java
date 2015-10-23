@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.sekmi.histream.DateTimeAccuracy;
@@ -62,7 +63,22 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 
 	private static Connection getConnection(Properties props) throws SQLException, ClassNotFoundException{
 		Class.forName(driver);
-		return DriverManager.getConnection("jdbc:postgresql://"+props.get("host")+":"+props.get("port")+"/"+props.get("database"), props);
+		StringBuilder sb = new StringBuilder("jdbc:postgresql://");
+		
+		if( props.get("host") == null ){
+			throw new IllegalArgumentException("host property missing for JDBC connection");
+		}else{
+			sb.append(props.get("host"));
+		}
+		if( props.get("port") != null ){
+			sb.append(':').append(props.get("port"));
+		}
+		if( !props.containsKey("database") ){
+			throw new IllegalArgumentException("database property missing for JDBC connection");
+		}
+		sb.append('/').append(props.getProperty("database"));
+		
+		return DriverManager.getConnection(sb.toString(), props);
 	}
 
 	/**

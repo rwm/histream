@@ -160,15 +160,17 @@ public class RunConfiguration implements Closeable{
 		return version;
 	}
 	public static void main(String args[])throws Exception{
+		
+		/*
 		if( System.console() == null ){
 			JOptionPane.showMessageDialog(null, "This program should be run with a console", "HIStream "+readVersion(), JOptionPane.WARNING_MESSAGE);
 			return;
-		}
+		}*/
 		// TODO check for file histream.xml
 		File xml = new File("histream.xml");
 		if( !xml.canRead() ){
 			System.err.println("Unable to find/read file histream.xml");
-			xml = new File("src/test/resources/histream.xml");
+			xml = new File("examples/histream.xml");
 			if( xml.canRead() )
 				System.err.println("Using src/test/resources/histream.xml");
 			else
