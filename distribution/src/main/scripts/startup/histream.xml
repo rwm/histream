@@ -47,9 +47,10 @@
 			<property name="nullProvider">LCS-I2B2:PROVIDERS</property>					
 		</plugin>
 		<!-- needed to parse XML files -->
-		<plugin class="de.sekmi.histream.io.XMLProviderFactory"/>
+		<plugin class="de.sekmi.histream.io.GroupedXMLProvider"/>
 		<!-- needed to parse flat text files -->
 		<plugin class="de.sekmi.histream.io.FlatProviderFactory"/>
+		
 		
 	</plugins>
 	<!-- source not needed, files are specified at command line -->
