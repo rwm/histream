@@ -22,6 +22,9 @@ package de.sekmi.histream;
 
 
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import de.sekmi.histream.io.Streams;
 
 /**
  * Supplier of observations.
@@ -67,6 +70,15 @@ public interface ObservationSupplier extends Supplier<Observation>, AutoCloseabl
 	 *  patient+visit combination occur in ascending order of start timestamp.
 	 */
 	public static final String META_ORDER_SORTED = "order.sorted";
+	
+	/**
+	 * Get a stream of observations. Stream will terminate on the first {@code null}
+	 * observation.
+	 * @return stream
+	 */
+	public default Stream<Observation> stream(){
+		return Streams.nonNullStream(this);
+	}
 	
 	/**
 	 * Retrieve meta information for this supply of observations.

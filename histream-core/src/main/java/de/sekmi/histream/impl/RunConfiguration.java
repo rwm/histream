@@ -35,8 +35,6 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
-
 import de.sekmi.histream.Extension;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
@@ -131,15 +129,21 @@ public class RunConfiguration implements Closeable{
 		Streams.nonNullStream(provider).forEach(destinationChain);
 	}
 	
-	public ObservationSupplier providerForFile(File file){
+	public ObservationSupplier providerForFile(File file)throws IOException{
 		ObservationSupplier p = null;
-		for( int i=0; i<fileFactories.length; i++ ){
-			try {
-				p = fileFactories[i].forFile(file, factory);
-				break;
-			} catch (IOException e) {
-				// unable to process file
-			}
+		// if only one file factory present, pass on exception
+		if( fileFactories.length == 1 ){
+			p = fileFactories[0].forFile(file, factory);
+		}else{
+			// multiple file factories, find one which doesn't give errors
+			for( int i=0; i<fileFactories.length; i++ ){
+				try {
+					p = fileFactories[i].forFile(file, factory);
+					break;
+				} catch (IOException e) {
+					// unable to process file
+				}
+			}			
 		}
 		return p;
 	}
@@ -205,7 +209,9 @@ public class RunConfiguration implements Closeable{
 					rc.processFile(p);
 					p.close();
 				}else{
-					System.err.println("Unable to find parser for file "+file);
+					System.err.println("ERROR: Unable to find parser for file "+file);
+					System.err.println("exceptions reported by all "+rc.fileFactories.length+" registered parsers");
+					System.err.println("for detailed errors, use only a single parser");
 				}
 			}
 			// files specified, run in batch mode
