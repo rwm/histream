@@ -99,24 +99,26 @@ public abstract class Column<T> {
 	
 	private void applyMapRules(String value, MapFeedback action){
 		boolean match = false;
-		Objects.requireNonNull(map.cases);
-		for( MapCase mc : map.cases ){
-			Objects.requireNonNull(mc.value);
-			if( mc.value.equals(value) ){
-				match = true;
-				if( mc.setValue != null ){
-					action.overrideValue(mc.setValue);
+		// no case may be present at all
+		if( map.cases != null ){
+			for( MapCase mc : map.cases ){
+				Objects.requireNonNull(mc.value);
+				if( mc.value.equals(value) ){
+					match = true;
+					if( mc.setValue != null ){
+						action.overrideValue(mc.setValue);
+					}
+					// set concept
+					if( mc.setConcept != null ){
+						action.overrideConcept(mc.setConcept);
+					}
+					// check action
+					if( mc.action != null && mc.action.equals("drop-fact") ){
+						action.dropFact();
+						// TODO check after loading for illegal values or use enum
+					}
+					break;
 				}
-				// set concept
-				if( mc.setConcept != null ){
-					action.overrideConcept(mc.setConcept);
-				}
-				// check action
-				if( mc.action != null && mc.action.equals("drop-fact") ){
-					action.dropFact();
-					// TODO check after loading for illegal values or use enum
-				}
-				break;
 			}
 		}
 		if( match == false && map.otherwise != null ){
