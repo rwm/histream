@@ -402,7 +402,12 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 
 	@Override
 	public void setMeta(String key, String value) {
+		Objects.requireNonNull(key);
 		if( key.equals("etl.strategy") ){
+			// use default strategy 'insert' for null values
+			if( value == null ){
+				value = "insert";
+			}
 			switch( value ){
 			case "replace-visit":
 				etlPreprocessor = new DistinctVisitPurge();

@@ -40,6 +40,7 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationHandler;
+import de.sekmi.histream.ObservationProvider;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Plugin;
 import de.sekmi.histream.conf.Configuration;
@@ -123,8 +124,11 @@ public class RunConfiguration implements Closeable{
 	}
 		
 	public void processFile(ObservationSupplier provider){
-		for( ObservationHandler h : destinationHandlers ){
-			h.setMeta("etl.strategy", provider.getMeta("etl.strategy"));
+		String etlStrategy = provider.getMeta(ObservationSupplier.META_ETL_STRATEGY);
+		if( etlStrategy != null ){
+			for( ObservationHandler h : destinationHandlers ){
+				h.setMeta(ObservationSupplier.META_ETL_STRATEGY, etlStrategy);
+			}			
 		}
 		Streams.nonNullStream(provider).forEach(destinationChain);
 	}
