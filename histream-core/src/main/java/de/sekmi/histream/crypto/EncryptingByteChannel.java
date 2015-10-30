@@ -20,16 +20,16 @@ import javax.crypto.ShortBufferException;
  * @author Raphael
  *
  */
-public class EncryptingOutputStream implements WritableByteChannel{
+public class EncryptingByteChannel implements WritableByteChannel{
 	public static final int Version = 1;
 	private Cipher cipher;
 	private WritableByteChannel out;
 	private ByteBuffer buffer;
 	
-	public EncryptingOutputStream(WritableByteChannel out, Key asymmetricKey) throws GeneralSecurityException, IOException{
+	public EncryptingByteChannel(WritableByteChannel out, Key asymmetricKey) throws GeneralSecurityException, IOException{
 		this(out, "AES",128,"RSA", asymmetricKey);
 	}
-	public EncryptingOutputStream(WritableByteChannel out, String symmetricAlgorithm, int symmetricKeysize, String asymmetricCipher, Key asymmetricKey) throws GeneralSecurityException, IOException{
+	public EncryptingByteChannel(WritableByteChannel out, String symmetricAlgorithm, int symmetricKeysize, String asymmetricCipher, Key asymmetricKey) throws GeneralSecurityException, IOException{
 		KeyGenerator kg = KeyGenerator.getInstance(symmetricAlgorithm);
 		//log.fine("Generating symmetric key "+symmetricAlgorithm+" with size "+symmetricKeysize);
 		kg.init( symmetricKeysize );

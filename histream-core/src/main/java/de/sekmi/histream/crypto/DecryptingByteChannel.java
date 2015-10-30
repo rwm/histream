@@ -14,16 +14,16 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 
-public class DecryptingInputStream implements ReadableByteChannel {
+public class DecryptingByteChannel implements ReadableByteChannel {
 	private Cipher cipher;
 	private ReadableByteChannel in;
 	private ByteBuffer buffer;
 	private boolean endOfStream;
 	
-	public DecryptingInputStream(ReadableByteChannel in, Key asymmetricKey) throws GeneralSecurityException, IOException{
+	public DecryptingByteChannel(ReadableByteChannel in, Key asymmetricKey) throws GeneralSecurityException, IOException{
 		this(in, "AES",128,"RSA", asymmetricKey);
 	}
-	public DecryptingInputStream(ReadableByteChannel in, String symmetricAlgorithm, int symmetricKeysize, String asymmetricCipher, Key asymmetricKey) throws GeneralSecurityException, IOException{
+	public DecryptingByteChannel(ReadableByteChannel in, String symmetricAlgorithm, int symmetricKeysize, String asymmetricCipher, Key asymmetricKey) throws GeneralSecurityException, IOException{
 		// use buffer
 		endOfStream = false;
 		buffer = ByteBuffer.allocate(1024*8);
@@ -33,7 +33,7 @@ public class DecryptingInputStream implements ReadableByteChannel {
 		
 		int version = buffer.getInt();
 		int ks = buffer.getShort();
-		if( version != EncryptingOutputStream.Version )throw new IOException("Unsupported MDAT stream version "+version);
+		if( version != EncryptingByteChannel.Version )throw new IOException("Unsupported MDAT stream version "+version);
 		byte[] wrapped = new byte[ks];
 		buffer.get(wrapped);
 		buffer.compact();
@@ -59,6 +59,7 @@ public class DecryptingInputStream implements ReadableByteChannel {
 
 	@Override
 	public void close() throws IOException {
+		in.close();
 	}
 
 	@Override
