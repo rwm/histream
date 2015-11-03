@@ -28,7 +28,6 @@ public class DecryptingInputStream extends InputStream {
 		// use buffer
 		endOfStream = false;
 		byte[] buf = new byte[1024*8];
-		outputBuffer = ByteBuffer.allocate(1024*8).compact();
 		int read = in.read(buf);
 		buffer = ByteBuffer.wrap(buf, 0, read);
 		int version = buffer.getInt();
@@ -36,7 +35,6 @@ public class DecryptingInputStream extends InputStream {
 		if( version != EncryptingByteChannel.Version )throw new IOException("Unsupported MDAT stream version "+version);
 		byte[] wrapped = new byte[ks];
 		buffer.get(wrapped);
-		buffer.compact();
 		
 		Cipher unwrap;
 		try {
@@ -48,6 +46,13 @@ public class DecryptingInputStream extends InputStream {
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
 			throw new IOException("Unable to unwrap symmetric key",e);
 		}
+		// decrypt remaining buffer
+		outputBuffer = ByteBuffer.allocate(1024*8);
+		cipher.update(buffer, outputBuffer);
+		// prepare buffer for writing
+		buffer.compact();
+		// prepare decrypted buffer for reading
+		outputBuffer.flip();
 
 		this.in = in;
 	}
@@ -62,14 +67,29 @@ public class DecryptingInputStream extends InputStream {
 	private int readAndDecrypt() throws IOException{
 		int bytesRead=0;
 		if( buffer.hasRemaining() ){
-			bytesRead = in.read(buffer.array(),buffer.position(),buffer.remaining());
+			// space available for reading data
+			int pos = buffer.position();
+			bytesRead = in.read(buffer.array(),buffer.arrayOffset()+pos,buffer.remaining());
+			// got some bytes?
+			if( bytesRead == -1 ){
+				// no more data
+				endOfStream = true;
+			}else{
+				// update position
+				buffer.position(pos+bytesRead);
+			}
 		}
 		outputBuffer.compact();
 		buffer.flip();
 		try {
-			if( bytesRead == -1 ){
-				endOfStream = true;
-				bytesRead = cipher.doFinal(buffer, outputBuffer);
+			if( endOfStream == true ){
+				if( buffer.hasRemaining() ){
+					bytesRead = cipher.doFinal(buffer, outputBuffer);
+				}else{
+					byte[] fin = cipher.doFinal(); 
+					outputBuffer.put(fin);
+					bytesRead = fin.length;
+				}
 			}else{
 				bytesRead = cipher.update(buffer, outputBuffer);
 			}
@@ -107,7 +127,7 @@ public class DecryptingInputStream extends InputStream {
 
 		// if empty, fill output buffer
 		readAndDecrypt();
-		return read(b);
+		return read(b, off, len);
 	}
 	@Override
 	public int available() throws IOException {

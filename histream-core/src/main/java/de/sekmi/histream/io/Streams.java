@@ -1,5 +1,11 @@
 package de.sekmi.histream.io;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -75,4 +81,38 @@ public class Streams {
 			return Spliterator.NONNULL | Spliterator.IMMUTABLE;
 		}
 	}
+	
+	public static long channelCopy(final ReadableByteChannel src, final WritableByteChannel dest)
+			throws IOException {
+		long count = 0;
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
+		while (src.read(buffer) != -1) {
+			// prepare the buffer to be drained
+			buffer.flip();
+			// write to the channel, may block
+			count += dest.write(buffer);
+			// If partial transfer, shift remainder down
+			// If buffer is empty, same as doing clear()
+			buffer.compact();
+		}
+		// EOF will leave buffer in fill state
+		buffer.flip();
+		// make sure the buffer is fully drained.
+		while (buffer.hasRemaining()) {
+			count += dest.write(buffer);
+		}
+		return count;
+	}
+	
+	public static long streamCopy(InputStream in, OutputStream out) throws IOException{
+		byte[] buffer = new byte[1024]; // Adjust if you want
+		long total = 0;
+		int bytesRead;
+		while ((bytesRead = in.read(buffer)) != -1) {
+			out.write(buffer, 0, bytesRead);
+			total += bytesRead;
+		}
+		return total;
+	}
+
 }

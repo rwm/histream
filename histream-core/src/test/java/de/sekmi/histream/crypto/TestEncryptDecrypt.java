@@ -20,6 +20,8 @@ import java.security.SecureRandom;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.sekmi.histream.io.Streams;
+
 import org.junit.Assert;
 
 public class TestEncryptDecrypt {
@@ -96,13 +98,6 @@ public class TestEncryptDecrypt {
 		Files.delete(dec);
 	}
 
-	public static void transfer(InputStream in, OutputStream out) throws IOException{
-		byte[] buffer = new byte[1024]; // Adjust if you want
-		int bytesRead;
-		while ((bytesRead = in.read(buffer)) != -1) {
-			out.write(buffer, 0, bytesRead);
-		}
-	}
 	@Test
 	public void testEncryptDecryptStreams() throws GeneralSecurityException, IOException{
 		
@@ -115,7 +110,7 @@ public class TestEncryptDecrypt {
 		OutputStream enc = new EncryptingOutputStream(out, keyPair.getPublic());
 		
 		InputStream in = Files.newInputStream(source);
-		transfer(in, enc);
+		Streams.streamCopy(in, enc);
 		in.close();
 		
 		enc.close();
@@ -125,7 +120,7 @@ public class TestEncryptDecrypt {
 		in = Files.newInputStream(temp, StandardOpenOption.READ);
 		InputStream decrypted = new DecryptingInputStream(in, keyPair.getPrivate());
 		out = Files.newOutputStream(dec, StandardOpenOption.WRITE);
-		transfer(decrypted, out);
+		Streams.streamCopy(decrypted, out);
 		in.close();
 		out.close();
 		decrypted.close();
