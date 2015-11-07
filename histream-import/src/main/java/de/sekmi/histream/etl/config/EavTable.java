@@ -167,6 +167,10 @@ public class EavTable extends Table<EavRow> {
 		if( visit != null ){
 			fact.setEncounterId(visit);
 		}
+		DateTimeAccuracy end = mdat.end.valueOf(colMap,row);
+		if( end != null ){
+			fact.setEndTime(end);
+		}
 		if( vval != null ){
 			// convert native type to observation value
 			if( vval instanceof String ){

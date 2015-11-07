@@ -92,6 +92,7 @@ public class TestReadTables {
 			// should be processed by virtual column map
 			Assert.assertEquals("f_eav_x_1", f.getConceptId());
 			Assert.assertNull(f.getValue());
+			Assert.assertNotNull(f.getEndTime());
 		}
 	}
 }

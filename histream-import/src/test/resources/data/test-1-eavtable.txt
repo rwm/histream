@@ -31,4 +31,4 @@ p3	v4	L1	u1	f_eav_i	2013-08-30	@	decimal	0.32	@
 p3	v4	L1	u1	f_eav_l	2013-08-30	@	decimal	1.1	@
 p3	v4	L1	u1	f_eav_v	2013-08-30	@	decimal	0.5	@
 p3	v4	L1	u1	f_eav_a	2013-08-30	@	decimal	12.0	@
-p3	v4	L1	u1	f_eav_x	2013-08-30	@	integer	1	@
+p3	v4	L1	u1	f_eav_x	2013-08-30	2013-08-31	integer	1	@
