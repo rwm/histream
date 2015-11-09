@@ -99,6 +99,18 @@ public abstract class Column<T> {
 	
 	private void applyMapRules(String value, MapFeedback action){
 		boolean match = false;
+		// always perform operations specified in the map element
+		// regardless of matching value
+		if( map.setConcept != null ){
+			action.overrideConcept(map.setConcept);
+		}
+		if( map.setValue != null ){
+			action.overrideValue(map.setValue);
+		}
+
+		// XXX TODO implement setUnit 
+
+		// iterate through listed cases
 		// no case may be present at all
 		if( map.cases != null ){
 			for( MapCase mc : map.cases ){
@@ -216,6 +228,8 @@ public abstract class Column<T> {
 			// string processing (na, regex-replace, mapping) only performed on string values
 			if( rowval == null ){
 				ret = null; // null value
+				// XXX FIXME allow map processing for null values
+				ret = processedValue((String)null, mapFeedback);
 			}else if( rowval instanceof String ){
 				// non null string value
 				ret = processedValue((String)rowval, mapFeedback);

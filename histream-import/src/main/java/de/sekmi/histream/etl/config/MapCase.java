@@ -5,15 +5,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class MapCase {
+public class MapCase extends MapReplace{
 	@XmlAttribute
 	String value;
-	
-	@XmlAttribute(name="set-value")
-	String setValue;
-	
-	@XmlAttribute(name="set-concept")
-	String setConcept;
 	
 	// TODO use enum
 	@XmlAttribute

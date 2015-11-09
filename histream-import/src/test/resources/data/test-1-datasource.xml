@@ -112,10 +112,10 @@
 		<virtual>
 			<!-- for eav facts, the map always applies to the fact value -->
 			<value column="f_eav_x" na="" xsi:type="string">
-				<map>
-					<case value="1" set-value="" set-concept="f_eav_x_1"/>
+				<map set-value="">
+					<case value="1" set-concept="f_eav_x_1"/>
 					<!-- action inplace is default -->
-					<case value="0" set-value="" set-concept="f_eav_x_0"/>
+					<case value="0" set-concept="f_eav_x_0"/>
 					<!-- action drop will not produce any fact -->
 					<otherwise log-warning="Unexpected value" action="drop-fact" />
 					<!-- action generate will produce a new concept with the given values -->
