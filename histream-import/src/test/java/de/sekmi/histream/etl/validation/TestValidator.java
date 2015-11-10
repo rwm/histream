@@ -1,5 +1,6 @@
 package de.sekmi.histream.etl.validation;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.sekmi.histream.ObservationSupplier;
@@ -14,7 +15,19 @@ public class TestValidator {
 		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-1-datasource.xml")) ){
 			Validator v = new Validator();
 			v.setErrorHandler(e -> {throw new RuntimeException(e);});
-			Streams.transfer(os, v);			
+			Streams.transfer(os, v);
 		}
+	}
+	@Test
+	public void validateData2() throws Exception{
+		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-2-datasource.xml")) ){
+			Validator v = new Validator();
+			v.setErrorHandler(e -> {throw new RuntimeException(e);});
+			Streams.transfer(os, v);
+		}catch( RuntimeException e ){
+			Assert.assertTrue(e.getCause() instanceof DuplicatePatientException);
+			return;
+		}
+		Assert.fail("Exception expected");
 	}
 }

@@ -43,7 +43,7 @@ public class Validator extends AbstractObservationHandler{
 			prevPatient = patid; // remember patient to suppress errors for the same patient
 
 			if( patients.contains(patid) ){
-				throw new ValidationException("Duplicate patient '"+patid+"'");
+				throw new DuplicatePatientException(patid);
 			}else{
 				patients.add(patid);
 			}			

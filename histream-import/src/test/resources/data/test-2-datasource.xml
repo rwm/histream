@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+	<meta>
+		<id>test-1</id>
+		<etl-strategy>replace-source</etl-strategy>
+	</meta>
+	
+	<patient-table>
+		<source xsi:type="plain-file">
+			<url>test-2-patients-duplicate.txt</url>
+			<separator>\t</separator>
+		</source>
+		<idat>
+			<patient-id column="patid"/>
+			<given-name column="vorname"/>
+			<surname column="nachname"/>
+			<birthdate format="d.M.u" na="" column="geburtsdatum"/>
+			<deathdate format="d.M.u" na="" column="verstorben"/>
+			<gender column="geschlecht" na="">
+				<map> <!-- maps a column -->
+					<case value="W" set-value="female"/>
+					<case value="M" set-value="male"/>
+					<case value="X" set-value="indeterminate"/>
+					<otherwise set-value="" log-warning="Unexpected gender value"/>
+				</map>
+			</gender>
+			<ignore xsi:type="string" column="ignoriert1"/>
+			<ignore xsi:type="string" column="patfakt1"/>
+		</idat>
+		<!-- for MDAT in patient table, use the same patient-table also as
+		a visit table (visit date needed). the patient id can be re-used
+		as visit id, or a constant visit ID can be used. -->
+	</patient-table>
+	<!-- optional -->
+	<visit-table>
+		<source xsi:type="plain-file">
+			<url>test-2-visits-duplicate.txt</url>
+			<type>text/csv</type>
+			<separator>\t</separator>
+		</source>
+		<idat>
+			<patient-id column="patid"/>
+			<visit-id column="fallnr"/>
+			<start column="start" format="d.M.u[ H[:m[:s]]]" na="" truncate-to="year"/>
+			<end column="end" format="d.M.u[ H[:m[:s]]]" na=""/>
+		</idat>
+		<mdat>
+			<!-- in/out code -->
+			<concept id="weight">
+				<value column="gewicht" xsi:type="string"/>
+				<!-- TODO: verify that na values are no allowed for concept start timestamps -->
+				<start column="start" format="d.M.u[ H[:m[:s]]]" na=""/>
+			</concept>
+		</mdat>
+	</visit-table>
+	<wide-table>
+		<source xsi:type="plain-file">
+			<url>test-1-widetable.txt</url>
+			<separator>\t</separator>
+		</source>
+		<idat>
+			<patient-id column="patid"/>
+			<visit-id column="fallnr"/>
+		</idat>
+		<mdat>
+			<concept id="natrium">
+				<value column="na" xsi:type="decimal"/>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+				<unit constant-value="mmol/l" />
+				<modifier id="other">
+					<value xsi:type="string" na="" constant-value=""/>
+				</modifier>
+			</concept>
+			<concept id="kalium">
+				<value column="k" xsi:type="decimal"/>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+			</concept>
+			<concept id="enum1">
+				<value column="en" na="" xsi:type="string">
+					<map>
+						<case value="1" set-value="" set-concept="enum1_1"/>
+						<case value="2" set-value="" set-concept="enum1_2"/>
+						<otherwise action="drop-fact" />
+					</map>
+				</value>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+			</concept>
+		</mdat>
+
+	</wide-table>
+	<eav-table>
+		<source xsi:type="plain-file">
+			<url>test-1-eavtable.txt</url>
+			<separator>\t</separator>
+		</source>
+		<idat>
+			<patient-id column="patid"/>
+			<visit-id column="event"/>
+			<ignore column="locat" xsi:type="string"/>
+			<ignore column="user" xsi:type="string"/>
+		</idat>
+		<mdat>
+			<concept column="param"/>
+			<start column="start_ts" format="u-M-d"/>
+			<end column="end" format="u-M-d" na="@"/>
+			<!-- location -->
+
+			<!-- if group is non-na, all following eav rows with the same group value
+			are considered facts in a single group. A group must contain a primary
+			concept and any number of modifiers. All rows within the group must have
+			the same patient,encounter and start timestamp. -->
+			<!-- <group column="group" na="@" /> -->
+
+			<type column="type"/>
+			<value column="value" na="@"/>
+			<unit column="unit" na="@"/>
+		</mdat>
+		<!-- virtual value columns -->
+		<virtual>
+			<!-- for eav facts, the map always applies to the fact value -->
+			<value column="f_eav_m" xsi:type="string">
+				<map set-concept="f_eav_m_m" />
+			</value>
+			<value column="f_eav_x" na="" xsi:type="string">
+				<map set-value="">
+					<case value="1" set-concept="f_eav_x_1"/>
+					<!-- action inplace is default -->
+					<case value="0" set-concept="f_eav_x_0"/>
+					<!-- action drop will not produce any fact -->
+					<otherwise log-warning="Unexpected value" action="drop-fact" />
+					<!-- action generate will produce a new concept with the given values -->
+				</map>
+			</value>
+			<!-- ... more value elements -->
+		</virtual>
+	</eav-table>
+
+</datasource>

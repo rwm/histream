@@ -68,7 +68,7 @@
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
 				<unit constant-value="mmol/l" />
 				<modifier id="other">
-					<value xsi:type="string" constant-value=""/>
+					<value xsi:type="string" na="" constant-value=""/>
 				</modifier>
 			</concept>
 			<concept id="kalium">
@@ -104,6 +104,13 @@
 			<start column="start_ts" format="u-M-d"/>
 			<end column="end" format="u-M-d" na="@"/>
 			<!-- location -->
+
+			<!-- if group is non-na, all following eav rows with the same group value
+			are considered facts in a single group. A group must contain a primary
+			concept and any number of modifiers. All rows within the group must have
+			the same patient,encounter and start timestamp. -->
+			<!-- <group column="group" na="@" /> -->
+
 			<type column="type"/>
 			<value column="value" na="@"/>
 			<unit column="unit" na="@"/>
