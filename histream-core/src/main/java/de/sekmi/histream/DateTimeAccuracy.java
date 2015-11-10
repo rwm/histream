@@ -299,6 +299,14 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	}
 	
 	@Override
+	public int hashCode() {
+		final int prime = 37;
+		int result = 1;
+		result = prime * result + ((accuracy == null) ? 0 : accuracy.hashCode());
+		result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+		return result;
+	}
+	@Override
 	public boolean equals(Object other){
 		Objects.requireNonNull(other);
 		if( other.getClass() != DateTimeAccuracy.class )return false;
@@ -306,6 +314,5 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		if( !o.accuracy.equals(this.accuracy) )return false;
 		return dateTime.equals(o.dateTime);
 	}
-	
-	// TODO implement hashCode
+
 }
