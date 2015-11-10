@@ -111,6 +111,9 @@
 		<!-- virtual value columns -->
 		<virtual>
 			<!-- for eav facts, the map always applies to the fact value -->
+			<value column="f_eav_m" xsi:type="string">
+				<map set-concept="f_eav_m_m" />
+			</value>
 			<value column="f_eav_x" na="" xsi:type="string">
 				<map set-value="">
 					<case value="1" set-concept="f_eav_x_1"/>

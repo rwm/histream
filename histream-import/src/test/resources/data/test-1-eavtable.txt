@@ -1,4 +1,5 @@
 patid	event	locat	user	param	start_ts	end	type	value	unit
+p1	v1	L1	u1	f_eav_m	2013-08-19	@	@	@	@
 p1	v1	L1	u1	f_eav_b	2013-08-19	@	decimal	3.9	@
 p1	v1	L1	u1	f_eav_c	2013-08-19	@	decimal	11.2	@
 p1	v1	L1	u1	f_eav_d	2013-08-19	@	decimal	66.0	@

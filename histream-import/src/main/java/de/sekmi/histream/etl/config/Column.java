@@ -226,11 +226,7 @@ public abstract class Column<T> {
 			Objects.requireNonNull(index);
 			Object rowval = row[index];
 			// string processing (na, regex-replace, mapping) only performed on string values
-			if( rowval == null ){
-				ret = null; // null value
-				// XXX FIXME allow map processing for null values
-				ret = processedValue((String)null, mapFeedback);
-			}else if( rowval instanceof String ){
+			if( rowval == null || rowval instanceof String ){
 				// non null string value
 				ret = processedValue((String)rowval, mapFeedback);
 			}else if( na != null || regexReplace != null || map != null ){
@@ -264,9 +260,7 @@ public abstract class Column<T> {
 			}else{
 				ret = valueFromString(constantValue); // use constant value
 			}
-		}else if( rowval == null ){
-			ret = null;
-		}else if( rowval instanceof String ){
+		}if( rowval == null || rowval instanceof String ){
 			ret = processedValue((String)rowval, mapFeedback);
 		}else if( na != null || regexReplace != null || map != null ){
 			throw new ParseException("String operation (na/regexReplace/map) defined for column "+getName()+", but table source provides type "+rowval.getClass().getName()+" instead of String");

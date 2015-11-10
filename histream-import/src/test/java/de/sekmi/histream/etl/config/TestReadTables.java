@@ -77,6 +77,11 @@ public class TestReadTables {
 			Assert.assertNotNull(r);
 			Assert.assertTrue(r.getFacts().size() > 0);
 			Observation o = r.getFacts().get(0);
+			// next fact without value. Verify mapped concept
+			Assert.assertEquals("f_eav_m_m", o.getConceptId());
+			
+			// next fact with numeric value
+			o = s.get().getFact();
 			Assert.assertEquals("f_eav_b", o.getConceptId());
 			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 			Assert.assertEquals(BigDecimal.valueOf(3.9), o.getValue().getNumericValue());
