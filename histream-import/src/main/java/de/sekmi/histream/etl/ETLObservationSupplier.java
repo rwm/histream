@@ -152,9 +152,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 			error = e.getCause();
 		}catch( UncheckedParseException e ){
 			error = e.getCause();
-		}catch( ParseException e ){
-			error = e;
-		}catch( IOException e ){
+		}catch( ParseException | IOException e ){
 			error = e;
 		}
 		if( error != null ){
