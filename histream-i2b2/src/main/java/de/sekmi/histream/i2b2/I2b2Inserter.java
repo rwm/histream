@@ -190,7 +190,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 			try{
 				etlPreprocessor.preprocess(o);
 			}catch( SQLException e ){
-				reportError(new ObservationException(o, e));
+				throw new ObservationException("ETL preprocessing failed", e);
 			}
 		}
 			
@@ -206,7 +206,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 			} catch (SQLException suppressed) {
 				e.addSuppressed(suppressed);
 			}
-			throw new ObservationException(o, e);
+			throw new ObservationException("Insert failed",e);
 		}
 		
 	}
