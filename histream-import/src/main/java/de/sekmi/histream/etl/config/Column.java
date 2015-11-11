@@ -278,4 +278,8 @@ public abstract class Column<T> {
 			throw new ParseException("No empty column attribute allowed. Remove attribute for constant values");
 		}
 	}
+	@Override
+	public String toString() {
+		return "Column["+column+"]";
+	}
 }
