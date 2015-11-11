@@ -43,7 +43,7 @@ public class Validator extends AbstractObservationHandler{
 			prevPatient = patid; // remember patient to suppress errors for the same patient
 
 			if( patients.contains(patid) ){
-				throw new DuplicatePatientException(patid);
+				throw new DuplicatePatientException(t);
 			}else{
 				patients.add(patid);
 			}			
@@ -54,7 +54,7 @@ public class Validator extends AbstractObservationHandler{
 				prevVisit = encid; // remember encounter to suppress errors for the same encounter
 
 				if( visits.contains(encid) ){
-					throw new ValidationException("Duplicate encounter '"+encid+"' for patient '"+patid+"'");
+					throw new DuplicateVisitException(t);
 				}else{
 					visits.add(encid);
 				}
@@ -64,7 +64,7 @@ public class Validator extends AbstractObservationHandler{
 			if( duplicateConceptCheck ){
 				StartPlusConcept spc = new StartPlusConcept(t);
 				if( concepts.contains(spc) ){
-					throw new ValidationException("Duplicate concept: patid="+patid+", visit="+encid+", concept="+t.getConceptId()+", start="+t.getStartTime());
+					throw new DuplicateConceptException(t);
 				}else{
 					concepts.add(spc);
 				}
