@@ -1,9 +1,10 @@
-package de.sekmi.histream.io;
+package de.sekmi.histream.io.transform;
 
 import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.io.AbstractTransformer;
 
 public class PushTransformer extends AbstractTransformer implements Consumer<Observation>{
 	private Consumer<Observation> target;

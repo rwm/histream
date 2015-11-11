@@ -7,6 +7,9 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
+import de.sekmi.histream.io.transform.PullTransformer;
+import de.sekmi.histream.io.transform.Transformation;
+
 
 public class TransformerTest {
 	@Test

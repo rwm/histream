@@ -1,4 +1,4 @@
-package de.sekmi.histream.io;
+package de.sekmi.histream.io.transform;
 
 import java.util.function.Consumer;
 

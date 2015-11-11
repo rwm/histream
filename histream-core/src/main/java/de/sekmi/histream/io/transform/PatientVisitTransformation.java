@@ -6,8 +6,6 @@ import java.util.function.Function;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
-import de.sekmi.histream.io.Transformation;
-import de.sekmi.histream.io.TransformationException;
 
 /**
  * Replace patient and visit information for each observation.

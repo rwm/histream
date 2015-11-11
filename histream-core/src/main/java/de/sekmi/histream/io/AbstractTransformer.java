@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.io.transform.Transformation;
 
 /**
  * Abstract transformation

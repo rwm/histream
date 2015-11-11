@@ -1,9 +1,10 @@
-package de.sekmi.histream.io;
+package de.sekmi.histream.io.transform;
 
 import java.io.UncheckedIOException;
 import java.util.function.Supplier;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.io.AbstractTransformer;
 
 /**
  * Perform transformation of {@link Observation}s for a {@link Supplier}.
@@ -24,11 +25,11 @@ public class PullTransformer extends AbstractTransformer implements Supplier<Obs
 
 	/**
 	 * Execute this transformation after another transformation
-	 * @param previousTransformation previous transformation
+	 * @param nextTransformation previous transformation
 	 * @return composite transformer which executes this transformation after the specified previous transformation
 	 */
-	public PullTransformer andThen(Transformation previousTransformation){
-		return new PullTransformer(this, previousTransformation);
+	public PullTransformer andThen(Transformation nextTransformation){
+		return new PullTransformer(this, nextTransformation);
 	}
 	@Override
 	public Observation get() {
