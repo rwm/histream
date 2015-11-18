@@ -29,17 +29,23 @@ import de.sekmi.histream.ObservationHandler;
 
 public abstract class AbstractObservationHandler implements ObservationHandler{
 	private Consumer<ObservationException> errorHandler;
+	private int errorCount;
 	
 	@Override
 	public final void accept(Observation observation) {
 		try {
 			acceptOrException(observation);
 		} catch (ObservationException e) {
+			errorCount ++;
 			e.setObservation(observation);
 			reportError(e);
 		} // don't catch runtime exceptions
 	}
 	
+	/**
+	 * Report observation exception
+	 * @param e exception
+	 */
 	protected void reportError(ObservationException e){
 		if( errorHandler != null )errorHandler.accept(e);
 		else throw new RuntimeException("Exception encountered, no error handler", e);		
@@ -58,4 +64,9 @@ public abstract class AbstractObservationHandler implements ObservationHandler{
 		this.errorHandler = handler;
 	}
 
+	/**
+	 * Get the number of errors encountered
+	 * @return error count
+	 */
+	public int getErrorCount(){ return errorCount;}
 }
