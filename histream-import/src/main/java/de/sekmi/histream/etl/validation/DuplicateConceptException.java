@@ -18,7 +18,7 @@ public class DuplicateConceptException extends ValidationException {
 	private static final long serialVersionUID = 1L;
 	
 	public DuplicateConceptException(Observation fact) {
-		super("Duplicate fact patient="+fact.getPatientId()+", visit="+fact.getEncounterId()+", start="+fact.getStartTime()+", concept="+fact.getConceptId());
+		super("Duplicate concept '"+fact.getConceptId()+"' for patient="+fact.getPatientId()+", visit="+fact.getEncounterId()+" at start="+fact.getStartTime());
 		setObservation(fact);
 	}
 }

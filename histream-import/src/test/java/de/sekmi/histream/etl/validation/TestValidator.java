@@ -10,10 +10,14 @@ import de.sekmi.histream.io.Streams;
 public class TestValidator {
 
 	
+	/**
+	 * Should validate successfully without exception
+	 * @throws Exception should not occur
+	 */
 	@Test
 	public void validateData1() throws Exception{
 		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-1-datasource.xml")) ){
-			Validator v = new Validator();
+			Validator v = new Validator(true,true);
 			v.setErrorHandler(e -> {throw new RuntimeException(e);});
 			Streams.transfer(os, v);
 		}
@@ -21,7 +25,7 @@ public class TestValidator {
 	@Test
 	public void validateData2() throws Exception{
 		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-2-datasource.xml")) ){
-			Validator v = new Validator();
+			Validator v = new Validator(true,true);
 			v.setErrorHandler(e -> {throw new RuntimeException(e);});
 			Streams.transfer(os, v);
 		}catch( RuntimeException e ){
