@@ -2,7 +2,7 @@ package com.opencsv;
 
 /**
  * Enumeration used to tell the CSVParser what to consider null.
- * <p/>
+ * <p>
  * EMPTY_SEPARATORS - two sequential separators are null.
  * EMPTY_QUOTES - two sequential quotes are null
  * BOTH - both are null
