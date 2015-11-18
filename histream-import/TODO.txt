@@ -1,8 +1,42 @@
+Allow interval values
+---------------------
+Parse interval values e.g. using ISO-31-11 notation
+like "[0,10]" or "]0,1]"
+Allow specification of interval separator (default ',')
+for columns supporting intervals.
+
 Validate exceptions
 -------------------
 test for specific errors in data files, 
 e.g. missing visit start timestamps in rows.
 To do so, add data files with errors to test/resources
+
+Test for correct order and grouping of ids (patient id in same order over all tables, 
+visit id in same order over all tables, id references all grouped together (e.g. not 1, 1, 1, 2, 3, 1)
+
+Automatic sorting of table data via temporary files. Proprietary sorted intermediate stream uses 
+protocol buffer encoding (by google: https://developers.google.com/protocol-buffers/docs/encoding ).
+
+string originalLocation;
+uint64 lastModified
+repeated string header;
+repeated message row{
+	string rowid;
+	repeated string field;
+}
+
+use MessageLite.parseDelimitedFrom and MessageLite.writeDelimitedTo to read/write rows iteratively.
+
+Additional column is stored with location information (e.g. row number for text tables or table primary key for SQL tables)
+Tempo
+TODO abstract table source via Path or URL,
+FileTableSource{
+	openInputStream, 
+	String getLocation,
+	FileTableSource getRelativeSource(String spec)
+	getLastModified(),
+	getHash()
+}
 
 Import configuration
 --------------------

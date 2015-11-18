@@ -47,6 +47,12 @@
 			<artifactId>histream-core</artifactId>
 			<version>0.6-SNAPSHOT</version>
 		</dependency>
+		<!-- add later for sorting data tables
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.6.1</version>
+		</dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
