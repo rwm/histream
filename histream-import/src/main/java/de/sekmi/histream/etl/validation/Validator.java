@@ -64,14 +64,18 @@ public class Validator extends AbstractObservationHandler implements Transformat
 		String patid = t.getPatientId();
 		String encid = t.getEncounterId();
 
+		// check if patient already known
 		if( prevPatient == null || !prevPatient.equals(patid) ){
-			// check if patient already known
-	
+			// new patient
+
 			// clear visit
 			visits.clear();
 			prevVisit = encid;
 			visits.add(encid);
 
+			// clear concepts
+			concepts.clear();
+			
 			prevPatient = patid; // remember patient to suppress errors for the same patient
 
 			if( patients.contains(patid) ){
@@ -90,6 +94,9 @@ public class Validator extends AbstractObservationHandler implements Transformat
 				}else{
 					visits.add(encid);
 				}
+				
+				// clear concepts
+				concepts.clear();
 			}
 
 			// check for duplicate non-repeating start+concept tuples
