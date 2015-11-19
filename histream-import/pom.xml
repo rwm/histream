@@ -4,12 +4,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-import</artifactId>
-	<version>0.6</version>
+	<version>0.7-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.6</version>
+		<version>0.7-SNAPSHOT</version>
 	</parent>
 	
 	<properties>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.6</version>
+			<version>0.7-SNAPSHOT</version>
 		</dependency>
 		<!-- add later for sorting data tables
 		<dependency>
