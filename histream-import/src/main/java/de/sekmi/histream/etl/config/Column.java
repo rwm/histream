@@ -42,8 +42,9 @@ public abstract class Column<T> {
 	String constantValue;
 	
 	/**
-	 * Replace the input value with the specified string or regular expression group from {@link #regexMatch}.
+	 * Replace the input value with the specified string or regular expression group.
 	 * If not specified, the full input string is used (regardless of match region).
+	 * TODO remove?
 	 */
 	@XmlAttribute(name="regex-replace")
 	String regexReplace;

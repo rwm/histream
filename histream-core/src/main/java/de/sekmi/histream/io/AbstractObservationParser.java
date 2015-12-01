@@ -24,13 +24,7 @@ package de.sekmi.histream.io;
 import java.time.Instant;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ext.ExternalSourceType;
 

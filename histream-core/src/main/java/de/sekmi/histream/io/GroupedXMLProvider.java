@@ -24,6 +24,7 @@ package de.sekmi.histream.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
@@ -46,9 +47,11 @@ public class GroupedXMLProvider implements FileObservationSupplierFactory, Plugi
 
 	@Override
 	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
+		InputStream in = new FileInputStream(file);
 		try {
-			return new GroupedXMLReader(factory, new FileInputStream(file));
+			return new GroupedXMLReader(factory, in);
 		} catch (JAXBException | XMLStreamException | FactoryConfigurationError e) {
+			in.close();
 			throw new IOException(e);
 		}
 	}

@@ -40,7 +40,6 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationHandler;
-import de.sekmi.histream.ObservationProvider;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Plugin;
 import de.sekmi.histream.conf.Configuration;

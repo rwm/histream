@@ -24,6 +24,7 @@ package de.sekmi.histream.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -33,6 +34,7 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Plugin;
 
+@Deprecated
 public class XMLProviderFactory implements FileObservationSupplierFactory, Plugin{
 
 	public XMLProviderFactory(Map<String,String> props) {
@@ -45,9 +47,11 @@ public class XMLProviderFactory implements FileObservationSupplierFactory, Plugi
 
 	@Override
 	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
+		InputStream in = new FileInputStream(file);
 		try {
-			return new XMLObservationSupplier(factory, new FileInputStream(file));
+			return new XMLObservationSupplier(factory, in);
 		} catch (XMLStreamException | FactoryConfigurationError e) {
+			in.close();
 			throw new IOException(e);
 		}
 	}
