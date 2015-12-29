@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -80,21 +82,46 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
 	
+	/**
+	 * Create a visit store using configuration settings.
+	 * The project id must be specified with the key {@code project}. 
+	 * JDBC connection configuration is specified with the key 
+	 * prefixes {@code jdbc.*} and {@code data.jdbc.*}
+	 * @param configuration key value pairs
+	 * @throws ClassNotFoundException database driver not found
+	 * @throws SQLException SQL exceptions
+	 */
 	public PostgresVisitStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
 		super(configuration);
+		this.projectId = config.get("project");
+		openDatabase(new String[]{"jdbc.","data.jdbc."});
+		initialize();
+	}
+
+	/**
+	 * Create a visit store using a {@link DataSource}.
+	 * The project id must be specified with the key {@code project}. 
+	 * @param ds data source for the connection
+	 * @param configuration configuration settings
+	 * @throws SQLException SQL error
+	 */
+	public PostgresVisitStore(DataSource ds, Map<String,String> configuration) throws SQLException{
+		super(configuration);
+		this.projectId = config.get("project");
+		openDatabase(ds);
+		initialize();
+	}
+	private void initialize() throws SQLException{
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
-		projectId = config.get("project");
 		idSourceDefault = "HIVE";
 		idSourceSeparator = ':';
 		
-		openDatabase(new String[]{"jdbc.","data.jdbc."});
 		db.setAutoCommit(true);
 
 		loadMaxEncounterNum();
 		batchLoad();
 	}
-
 	@Override
 	protected void prepareStatements() throws SQLException {
 		// TODO: use prefix from configuration to specify tablespace

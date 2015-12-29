@@ -34,6 +34,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
+
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
@@ -84,14 +86,13 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private int insertCount;
 	
 	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
-		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
-		this.nullLocationCd = "@"; // technically, null is allowed, but the demodata only uses '@'
-		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
-		// TODO nullBlob (technically null allowed, but '' is used in demodata)
-		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
-		this.nullValueTypeCd = "@"; // TODO check database
-		insertCount = 0;
-		open(config);
+		db = PostgresExtension.getConnection(config, new String[]{"jdbc.","data.jdbc."});
+		initialize(config);
+	}
+	
+	public I2b2Inserter(DataSource ds, Map<String,String> config) throws SQLException{
+		db = ds.getConnection();
+		initialize(config);
 	}
 	
 	
@@ -168,18 +169,23 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		
 	}
 	/**
-	 * Opens a database connection and prepares statements
+	 * Initialize the database connection
 	 * @throws SQLException if preparation/initialisation failed
-	 * @throws ClassNotFoundException if database driver not found 
 	 */
-	private void open(Map<String,String> props)throws SQLException, ClassNotFoundException{
-		db = PostgresExtension.getConnection(props, new String[]{"jdbc.","data.jdbc."});
-		db.setAutoCommit(false);
+	private void initialize(Map<String,String> props)throws SQLException{
+		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
+		this.nullLocationCd = "@"; // technically, null is allowed, but the demodata only uses '@'
+		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
+		// TODO nullBlob (technically null allowed, but '' is used in demodata)
+		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
+		this.nullValueTypeCd = "@"; // TODO check database
 		this.nullProviderId = props.get("nullProvider");
 		if( this.nullProviderId == null ){
 			log.warning("property 'nullProvider' missing, using '@' (may violate foreign keys)");
 			this.nullProviderId = "@";
 		}
+		insertCount = 0;
+		db.setAutoCommit(false);
 		prepareStatements(props);
 	}
 

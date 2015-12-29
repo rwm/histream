@@ -1,0 +1,2 @@
+Changelog
+i2b2 integration constructors also accept DataSource for database connections.

@@ -27,8 +27,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Extension;
@@ -97,8 +98,25 @@ public abstract class PostgresExtension<T> implements Extension<T>, Plugin {
 		);
 	}
 
+	/**
+	 * Open a database connection using configuration properties 
+	 * with the given prefixes.
+	 * @param propertyPrefixes prefix to the configuration properties
+	 * @throws ClassNotFoundException if the database driver could not be loaded
+	 * @throws SQLException any SQL exceptions
+	 */
 	protected void openDatabase(String[] propertyPrefixes) throws ClassNotFoundException, SQLException{
 		db = getConnection(config, propertyPrefixes);
+		prepareStatements();
+	}
+	
+	/**
+	 * Open a database connection using a data source
+	 * @param ds data source
+	 * @throws SQLException SQL exceptions
+	 */
+	protected void openDatabase(DataSource ds) throws SQLException{
+		db = ds.getConnection();
 		prepareStatements();
 	}
 

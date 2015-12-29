@@ -36,11 +36,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
-
-
-
+import javax.sql.DataSource;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
@@ -125,19 +121,33 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	public PostgresPatientStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
 		super(configuration);
 		this.projectId = config.get("project");
-		if( projectId == null ){
-			log.warning("property project is null, some things might fail");
-		}
+		openDatabase(new String[]{"jdbc.","data.jdbc."});
+		initialize();
+	}
+	
+
+	/**
+	 * Create a patient store using a {@link DataSource}.
+	 * The project id must be specified with the key {@code project}. 
+	 * @param ds data source for the connection
+	 * @param configuration configuration settings
+	 * @throws SQLException SQL error
+	 */
+	public PostgresPatientStore(DataSource ds, Map<String,String> configuration) throws SQLException{
+		super(configuration);
+		this.projectId = config.get("project");
+		openDatabase(ds);
+		initialize();
+	}
+	private void initialize() throws SQLException{
 		this.idSourceDefault = "HIVE";
 		this.idSourceSeparator = ':';
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
 		idCache = new Hashtable<>(1000);
-		openDatabase(new String[]{"jdbc.","data.jdbc."});
 		loadMaxPatientNum();
 		batchLoad();
 	}
-	
 	private I2b2Patient getCached(int patient_num){
 		return patientCache.get(patient_num);
 	}
@@ -167,6 +177,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	protected void prepareStatements()throws SQLException{
 
 		db.setAutoCommit(true);
+		if( projectId == null ){
+			log.warning("property project is null, some things might fail");
+		}
 		// TODO: use prefix from configuration to specify tablespace
 		insert = db.prepareStatement("INSERT INTO patient_dimension(patient_num, import_date, sourcesystem_cd) VALUES(?,current_timestamp,?)");
 		insertIde = db.prepareStatement("INSERT INTO patient_mapping(patient_ide, patient_ide_source, patient_num, patient_ide_status, project_id, import_date, download_date, sourcesystem_cd) values (?,?,?,?,'"+projectId+"',current_timestamp,?,?)");
