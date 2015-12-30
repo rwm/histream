@@ -49,6 +49,12 @@ public class ObservationFactoryImpl implements ObservationFactory{
 	public ObservationFactoryImpl() {
 		extensions = new Hashtable<>();
 	}	
+	public ObservationFactoryImpl(Extension<?>... extensions) {
+		this();
+		for( Extension<?> e : extensions ){
+			registerExtension(e);
+		}
+	}	
 	
 	@Override
 	public void registerExtension(Extension<?> extension) {
