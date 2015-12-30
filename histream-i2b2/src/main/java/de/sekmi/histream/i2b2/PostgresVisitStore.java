@@ -602,7 +602,15 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		return INSTANCE_TYPES;
 	}
 
-
+	/**
+	 * Find a visit. Does not create the visit if it doesn't exist.
+	 * @param id visit id/alias
+	 * @return visit or {@code null} if not found.
+	 */
+	public I2b2Visit findVisit(String id){
+		return idCache.get(id);
+	}
+	
 	// TODO unify method with PostgresVisitStore
 	@Override
 	public void deleteWhereSourceId(String sourceId) throws SQLException {
