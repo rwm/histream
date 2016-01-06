@@ -129,25 +129,29 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	/**
 	 * Deletes all observations with the given sourceId
 	 * @param sourceId source id
+	 * @return {@code true} if observations were found and deleted, {@code false} if no matching observations were found.
 	 * @throws SQLException if the DELETE statement failed
 	 */
-	public synchronized void purgeSource(String sourceId)throws SQLException{
+	public synchronized boolean purgeSource(String sourceId)throws SQLException{
 		deleteSource.setString(1, sourceId);
 		int rows = deleteSource.executeUpdate();
 		db.commit();
 		log.info("Deleted "+rows+" rows for sourcesystem_cd="+sourceId);
+		return 0 != rows;
 	}
 	
 	/**
 	 * Deletes all observations for the given encounter_num
 	 * @param encounter_num encounter number (e.g. observation_fact.encounter_num)
+	 * @return {@code true} if observations were found and deleted, {@code false} if no matching observations were found.
 	 * @throws SQLException if the DELETE statement failed.
 	 */
-	public synchronized void purgeVisit(int encounter_num) throws SQLException{
+	public synchronized boolean purgeVisit(int encounter_num) throws SQLException{
 		deleteVisit.setInt(1, encounter_num);
 		int rows = deleteVisit.executeUpdate();
 		db.commit();
 		log.info("Deleted "+rows+" rows for encounter_num="+encounter_num);
+		return 0 != rows;
 	}
 	private void prepareStatements(Map<String,String> props)throws SQLException{
 		// no value
