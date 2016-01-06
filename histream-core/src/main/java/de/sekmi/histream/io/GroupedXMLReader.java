@@ -61,9 +61,25 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	private DateTimeAccuracy encounterEnd;
 	private Map<String,String> visitData;
 
+	/**
+	 * The provided {@code input} is not closed by a call to {@link #close()}
+	 * 
+	 * @param factory
+	 * @param input
+	 * @throws JAXBException
+	 * @throws XMLStreamException
+	 * @throws FactoryConfigurationError
+	 */
 	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
+	/**
+	 * Construct a reader with a {@link XMLStreamReader}. The {@code reader} is closed when {@link #close()} is called.
+	 * @param factory
+	 * @param reader
+	 * @throws JAXBException
+	 * @throws XMLStreamException
+	 */
 	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
 		super();
 		this.factory = factory;
@@ -298,6 +314,10 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		}
 	}
 	
+	/**
+	 * Closes the {@link XMLStreamReader} which was used.
+	 * This does not close any {@link InputStream} provided in the constructor.
+	 */
 	@Override
 	public void close() throws XMLStreamException {
 		reader.close();
