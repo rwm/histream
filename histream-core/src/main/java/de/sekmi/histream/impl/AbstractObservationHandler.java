@@ -69,4 +69,11 @@ public abstract class AbstractObservationHandler implements ObservationHandler{
 	 * @return error count
 	 */
 	public int getErrorCount(){ return errorCount;}
+	
+	/**
+	 * Set the error count to zero.
+	 */
+	public void resetErrorCount(){
+		this.errorCount = 0;
+	}
 }
