@@ -23,10 +23,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
-import javax.xml.ws.Service;
-import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPBinding;
 
@@ -36,8 +33,9 @@ import javax.xml.ws.http.HTTPBinding;
  * @author Raphael
  *
  */
-@WebServiceProvider()
-@ServiceMode(value = Service.Mode.MESSAGE)
+//@WebServiceProvider()
+//@ServiceMode(value = Service.Mode.MESSAGE)
+//@BindingType(HTTPBinding.HTTP_BINDING)
 public class HiveServer implements Provider<Source>{
 	private ScriptEngineManager scriptManager;
 	private ScriptEngine scriptEngine;
