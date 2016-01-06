@@ -237,12 +237,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 
 		// load id mappings
 		try( ResultSet rs = selectMappingsAll.executeQuery() ){
-			int num = 0; // current patient number
+			int num = -1; // current patient number
 			ArrayList<String> ids = new ArrayList<>(16);
 			int primary=0; // primary alias index
 			
 			while( rs.next() ){
-				if( num == 0 )num = rs.getInt(1);
+				if( num == -1 )num = rs.getInt(1);
 				else if( num != rs.getInt(1) ){
 					// next encounter mapping
 					batchSetAliases(num, ids, primary);
@@ -259,8 +259,11 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 				}
 				ids.add(id);
 			}
-			// don't forget last encounter
-			batchSetAliases(num, ids, primary);
+
+			if( num != -1 ){
+				// don't forget last encounter
+				batchSetAliases(num, ids, primary);
+			}
 		}
 	}
 	/*

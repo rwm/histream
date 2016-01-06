@@ -161,12 +161,14 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		try( Statement s = db.createStatement() ){
 			String sql = "SELECT MAX(patient_num) FROM patient_dimension";
 			ResultSet rs = s.executeQuery(sql);
-			if( rs.next() ){
-				maxPatientNum = rs.getInt(1);
-			}else{
+			rs.next(); // statement will always return exactly one row
+			maxPatientNum = rs.getInt(1);
+			if( rs.wasNull() ){
 				// patient_dimension is empty
-				// start numbering patients with 1
-				maxPatientNum = 1;
+				maxPatientNum = 0;
+				// numbering will start with 1
+				// this is a bit redundant, since getInt()
+				// will also return 0 on NULL values
 			}
 			rs.close();
 		}
@@ -221,9 +223,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		try( ResultSet rs = selectAllIde.executeQuery() ){
 			I2b2Patient p;
 			ArrayList<String> ids = new ArrayList<>(16);
-			int num = 0; // current patient number
+			int num = -1; // current patient number
 			while( rs.next() ){
-				if( num == 0 ){  // first patient
+				if( num == -1 ){  // first patient
 					num = rs.getInt(1);
 				}else if( num != rs.getInt(1) ){
 					// next patient
@@ -257,17 +259,18 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 				}else // all other ids are aliases
 					ids.add(id);
 			}
-			// don't forget to process last num
-			p = getCached(num);
-			if( p == null ){
-				// found row in patient_mapping which 
-				// doesn't correspond to any row in patient_num
-				log.warning("No match for patient_num="+num+" in patient_dimension from encounter_mapping");
-			}else if( ids.size() > 0 ){
-				p.mergedIds = new String[ids.size()];
-				p.mergedIds = ids.toArray(p.mergedIds);
-			}
-			
+			if( num != -1 ){
+				// don't forget to process last num
+				p = getCached(num);
+				if( p == null ){
+					// found row in patient_mapping which 
+					// doesn't correspond to any row in patient_num
+					log.warning("No match for patient_num="+num+" in patient_dimension from encounter_mapping");
+				}else if( ids.size() > 0 ){
+					p.mergedIds = new String[ids.size()];
+					p.mergedIds = ids.toArray(p.mergedIds);
+				}
+			}			
 		}
 		
 		// fill idCache
