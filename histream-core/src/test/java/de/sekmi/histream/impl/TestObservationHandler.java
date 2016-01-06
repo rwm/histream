@@ -36,7 +36,7 @@ public class TestObservationHandler implements Consumer<Observation>{
 	private Tester[] tests;
 	private int count;
 	
-	public TestObservationHandler(Tester[] tests){
+	public TestObservationHandler(Tester... tests){
 		this.tests = tests;
 	}
 	
