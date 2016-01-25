@@ -64,21 +64,21 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	/**
 	 * The provided {@code input} is not closed by a call to {@link #close()}
 	 * 
-	 * @param factory
-	 * @param input
-	 * @throws JAXBException
-	 * @throws XMLStreamException
-	 * @throws FactoryConfigurationError
+	 * @param factory observation factory
+	 * @param input XML input
+	 * @throws JAXBException JAXB error
+	 * @throws XMLStreamException XML stream error
+	 * @throws FactoryConfigurationError other error
 	 */
 	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
 	}
 	/**
 	 * Construct a reader with a {@link XMLStreamReader}. The {@code reader} is closed when {@link #close()} is called.
-	 * @param factory
-	 * @param reader
-	 * @throws JAXBException
-	 * @throws XMLStreamException
+	 * @param factory observation factory
+	 * @param reader xml reader
+	 * @throws JAXBException jaxb error
+	 * @throws XMLStreamException stream error
 	 */
 	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
 		super();
@@ -94,6 +94,11 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		
 		readToRoot();
 		readMeta();
+
+		if( reader.isEndElement() ){
+			// no patient/encounter/facts
+			return;
+		}
 		readPatient();
 		readEncounter();
 	}

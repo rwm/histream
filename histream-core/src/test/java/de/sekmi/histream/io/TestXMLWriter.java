@@ -3,7 +3,10 @@ package de.sekmi.histream.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 
 import javax.xml.XMLConstants;
@@ -39,13 +42,13 @@ import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.Meta;
 
 public class TestXMLWriter {
-	private File debugFile;
+	private Path debugFile;
 	private OutputStream debugLog;
 	
 	@Before
 	public void setupLog() throws IOException{
 		// for debugging, set debugLog to System.out
-		debugFile = File.createTempFile("xmlwriterlog", ".xml");
+		debugFile = Files.createTempFile("xmlwriterlog", ".xml");
 		// debugLog = System.out
 		debugLog = System.out;//new FileOutputStream(debugFile);
 	}
@@ -53,7 +56,7 @@ public class TestXMLWriter {
 	public void cleanLog() throws IOException{
 		if( debugLog != System.out )debugLog.close();
 		if( debugFile != null )
-			debugFile.delete();
+			Files.delete(debugFile);
 	}
 	
 	private void printDocument(Document doc) throws TransformerException{
@@ -135,6 +138,32 @@ public class TestXMLWriter {
 		Assert.assertEquals(XMLConstants.DEFAULT_NS_PREFIX, pre);
 		*/
 		w.close();
+	}
+	
+	/**
+	 * GroupedXMLWriter and GroupedXMLReader should write/read metadata, even
+	 * if no facts are provided. In this case, the file contains only metadata.
+	 *
+	 * @throws Exception should not occur
+	 */
+	@Test
+	public void testWriteReadEmptyFile() throws Exception{
+		OutputStream out = Files.newOutputStream(debugFile);
+		GroupedXMLWriter w = new GroupedXMLWriter(out);
+		w.setMeta(ObservationSupplier.META_SOURCE_ID, "123");
+		w.close();
+		out.close();
+		
+		FileObservationProviderTest t = new FileObservationProviderTest();
+		t.initializeObservationFactory();
+
+		// read file
+		try( InputStream in = Files.newInputStream(debugFile) ){
+			GroupedXMLReader reader = new GroupedXMLReader(t.getFactory(), in);
+			Assert.assertEquals("123", reader.getMeta(ObservationSupplier.META_SOURCE_ID));
+			Assert.assertNull(reader.get());
+			reader.close();
+		}
 	}
 	@Test
 	public void testWriteDOM() throws Exception{
