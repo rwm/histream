@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
 	<meta>
-		<id>test-2</id>
+		<id>test-3</id>
 		<etl-strategy>replace-source</etl-strategy>
 	</meta>
 	
 	<patient-table>
 		<source xsi:type="plain-file">
-			<url>test-2-patients-duplicate.txt</url>
+			<url>test-3-patients-empty.txt</url>
 			<separator>\t</separator>
 		</source>
 		<idat>
@@ -34,7 +34,7 @@
 	<!-- optional -->
 	<visit-table>
 		<source xsi:type="plain-file">
-			<url>test-2-visits-duplicate.txt</url>
+			<url>test-3-visits-empty.txt</url>
 			<type>text/csv</type>
 			<separator>\t</separator>
 		</source>

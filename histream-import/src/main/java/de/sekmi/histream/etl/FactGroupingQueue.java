@@ -128,13 +128,25 @@ public class FactGroupingQueue{
 		tableIndex = 0;
 		
 		currentPatient = patientTable.get();
-		patientChanged();
-		
-		// for every patient, facts without visitId (=null) are parsed first
-		currentVisitId = null;		
-		visitChanged();
-		
-		nextVisit = visitTable.get();
+		if( currentPatient != null ){
+			// at least one patient row available
+			// prepare the queue
+			patientChanged();
+			
+			// for every patient, facts without visitId (=null) are parsed first
+			currentVisitId = null;		
+			visitChanged();
+			
+			nextVisit = visitTable.get();
+
+		}else{ // currentPatient == null
+			// patient table empty
+			// unable to provide any data
+			currentVisitId = null;
+			nextVisit = null;
+			// without patients, there can be no facts
+			factTables.clear(); // remove fact tables
+		}
 	}
 	
 	private void addFactsToWorkQueue(FactRow r){
@@ -151,7 +163,7 @@ public class FactGroupingQueue{
 			if( !workQueue.isEmpty() ){
 				return workQueue.remove();
 			}
-			
+
 			// queue is empty, try to find table with matching facts
 			while( tableIndex < factTables.size() ){
 				FactRow row = currentRows.get(tableIndex);

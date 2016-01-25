@@ -20,6 +20,9 @@ public class TestValidator {
 			Validator v = new Validator(true,true);
 			v.setErrorHandler(e -> {throw new RuntimeException(e);});
 			Streams.transfer(os, v);
+			for( int i=0; i<5; i++ ){
+				Assert.assertNull("Additional calls to get() should return null", os.get());
+			}			
 		}
 	}
 	@Test
@@ -33,5 +36,14 @@ public class TestValidator {
 			return;
 		}
 		Assert.fail("Exception expected");
+	}
+	@Test
+	public void validateData3() throws Exception{
+		// empty patient table
+		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-3-datasource.xml")) ){
+			Validator v = new Validator(true,true);
+			v.setErrorHandler(e -> {throw new RuntimeException(e);});
+			Streams.transfer(os, v);
+		}
 	}
 }
