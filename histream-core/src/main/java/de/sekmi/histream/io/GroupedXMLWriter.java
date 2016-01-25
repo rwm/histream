@@ -35,6 +35,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	private boolean writeFormatted;
 	private int formattingDepth;
 	private Meta meta;
+	private int observationCount;
 	
 	/**
 	 * Used to output XML
@@ -56,6 +57,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		}
 		this.writeFormatted = true;
 		this.meta = new Meta();
+		this.observationCount = 0;
 	}
 	/**
 	 * Constructor to write XML to an {@link OutputStream}.
@@ -338,6 +340,16 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	}
 	@Override
 	public void close(){
+		if( this.observationCount == 0 ){
+			// no observations, file is empty
+			// write meta data
+			try {
+				beginStream();
+			} catch (ObservationException e) {
+				reportError(e);
+			}
+			// endStream will be called by super.close()
+		}
 		super.close();
 		try {
 			if( writer != null ){
@@ -357,6 +369,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		} catch (JAXBException | XMLStreamException e) {
 			throw new ObservationException(e);
 		}
+		this.observationCount ++;
 	}
 
 }
