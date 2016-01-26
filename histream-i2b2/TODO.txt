@@ -2,3 +2,5 @@ Add flag to use direct patient numbers.
 All patientIds are numeric and are converted to integer. 
 These integer ids are used directly in the patient table.
 
+Periodic tasks:
+- Find and remove patient/encounter rows without any corresponding facts (can occur when facts are removed)
