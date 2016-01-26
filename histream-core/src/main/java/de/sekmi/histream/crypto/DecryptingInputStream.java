@@ -47,7 +47,7 @@ public class DecryptingInputStream extends InputStream {
 			throw new IOException("Unable to unwrap symmetric key",e);
 		}
 		// decrypt remaining buffer
-		outputBuffer = ByteBuffer.allocate(1024*8);
+		outputBuffer = ByteBuffer.allocate(1024*8*2);
 		cipher.update(buffer, outputBuffer);
 		// prepare buffer for writing
 		buffer.compact();
