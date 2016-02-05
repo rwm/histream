@@ -6,7 +6,7 @@
 	</meta>
 	
 	<patient-table>
-		<source xsi:type="plain-file">
+		<source xsi:type="csv-file">
 			<url>test-3-patients-empty.txt</url>
 			<separator>\t</separator>
 		</source>
@@ -33,7 +33,7 @@
 	</patient-table>
 	<!-- optional -->
 	<visit-table>
-		<source xsi:type="plain-file">
+		<source xsi:type="csv-file">
 			<url>test-3-visits-empty.txt</url>
 			<type>text/csv</type>
 			<separator>\t</separator>
@@ -54,7 +54,7 @@
 		</mdat>
 	</visit-table>
 	<wide-table>
-		<source xsi:type="plain-file">
+		<source xsi:type="csv-file">
 			<url>test-1-widetable.txt</url>
 			<separator>\t</separator>
 		</source>
@@ -89,7 +89,7 @@
 
 	</wide-table>
 	<eav-table>
-		<source xsi:type="plain-file">
+		<source xsi:type="csv-file">
 			<url>test-1-eavtable.txt</url>
 			<separator>\t</separator>
 		</source>

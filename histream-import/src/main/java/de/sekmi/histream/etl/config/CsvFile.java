@@ -21,8 +21,8 @@ import de.sekmi.histream.etl.RowSupplier;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name="plain-file")
-public class FileSource extends TableSource{
+@XmlType(name="csv-file")
+public class CsvFile extends TableSource{
 	/**
 	 * Location of the table file. 
 	 * A relative location might be specified which 
@@ -50,9 +50,9 @@ public class FileSource extends TableSource{
 	@XmlElement
 	char escape;
 	
-	private FileSource(){
+	private CsvFile(){
 	}
-	public FileSource(String urlSpec, String separator) throws MalformedURLException{
+	public CsvFile(String urlSpec, String separator) throws MalformedURLException{
 		this();
 		this.url = urlSpec;
 		this.separator = separator;

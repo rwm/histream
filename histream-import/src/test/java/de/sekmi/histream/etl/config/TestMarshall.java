@@ -25,7 +25,7 @@ public class TestMarshall {
 			// patient table
 			Assert.assertNotNull(ds.patientTable);
 			Assert.assertNotNull(ds.patientTable.source);
-			Assert.assertEquals("\\t", ((FileSource)ds.patientTable.source).separator);
+			Assert.assertEquals("\\t", ((CsvFile)ds.patientTable.source).separator);
 			Assert.assertNotNull(ds.patientTable.idat);
 			Assert.assertEquals("patid",ds.patientTable.idat.patientId.column);
 			Assert.assertEquals("geburtsdatum",ds.patientTable.idat.birthdate.column);
@@ -76,13 +76,13 @@ public class TestMarshall {
 		s.xmlSources[0].transform = new XmlSource.Transform[1];
 		s.xmlSources[0].transform[0] = new XmlSource.Transform("file:my.xsl","c:/to/file");
 		s.patientTable = new PatientTable();
-		FileSource fs = new FileSource("file:patient.source","text/csv");
+		CsvFile fs = new CsvFile("file:patient.source","text/csv");
 		fs.separator = "\\t";
 		s.patientTable.source = fs;
 		s.patientTable.idat = new PatientTable.IDAT();
 		s.patientTable.idat.patientId = new StringColumn("patid"); 
 		s.visitTable = new VisitTable();
-		s.visitTable.source = new FileSource("file:lala.txt", "text/plain");
+		s.visitTable.source = new CsvFile("file:lala.txt", "text/plain");
 		s.visitTable.idat = new VisitTable.IDAT();
 		s.visitTable.idat.patientId = new StringColumn("patid");
 		s.visitTable.idat.visitId = new StringColumn("visit");		
@@ -101,7 +101,7 @@ public class TestMarshall {
 
 		s.eavTables = new EavTable[1];
 		s.eavTables[0] = new EavTable();
-		s.eavTables[0].source = new FileSource("asdf.txt", "\\t");
+		s.eavTables[0].source = new CsvFile("asdf.txt", "\\t");
 		
 		JAXB.marshal(s, System.out);
 

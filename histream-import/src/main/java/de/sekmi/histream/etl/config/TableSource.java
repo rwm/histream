@@ -13,7 +13,7 @@ import de.sekmi.histream.etl.RowSupplier;
 @XmlTransient
 @XmlAccessorType(XmlAccessType.NONE)
 
-@XmlSeeAlso({FileSource.class, SQLSource.class})
+@XmlSeeAlso({CsvFile.class, SQLSource.class})
 public abstract class TableSource{
 	/**
 	 * Open a row supplier which provides rows. 
