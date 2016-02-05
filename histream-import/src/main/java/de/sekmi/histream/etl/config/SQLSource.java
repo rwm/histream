@@ -1,16 +1,18 @@
 package de.sekmi.histream.etl.config;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.etl.RowSupplier;
 
+@XmlType(name="sql-query")
 public class SQLSource extends TableSource {
 	@XmlElement
 	String jdbcDriver;
 	@XmlElement
 	String connectString;
 	@XmlElement
-	String sql;
+	String sqlSelect;
 	
 	private SQLSource() {
 	}
@@ -21,7 +23,6 @@ public class SQLSource extends TableSource {
 	}
 	@Override
 	public RowSupplier rows(Meta meta) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 }

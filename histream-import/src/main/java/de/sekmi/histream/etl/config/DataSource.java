@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * @author Raphael
  *
  */
-@XmlRootElement
+@XmlRootElement(name="datasource")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso({Column.class, StringColumn.class})
 public class DataSource {
