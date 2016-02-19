@@ -4,12 +4,12 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-i2b2</artifactId>
-	<version>0.7-SNAPSHOT</version>
+	<version>0.7</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.7-SNAPSHOT</version>
+		<version>0.7</version>
 	</parent>
   
 	<build>
@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.7-SNAPSHOT</version>
+			<version>0.7</version>
 		</dependency>
 	</dependencies>
 </project>
