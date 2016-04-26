@@ -293,10 +293,10 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		try{
 			I2b2Visit visit = o.getExtension(I2b2Visit.class);
 			return visit.getNum();
-		}/*catch( IllegalArgumentException e ){
+		}catch( IllegalArgumentException e ){
 			// i2b2 encounter not available, try to parse the encounter id as number
 			return Integer.parseInt(o.getEncounterId());
-		}*/finally{}
+		}//*/finally{}
 	}
 
 	/**
