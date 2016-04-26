@@ -9,11 +9,8 @@ de.sekmi.histream.i2b2.ont.Import
 
 de.sekmi.histream.hl7
 -> implement MLLP parsing
-
-
-Deploy site to sourceforge via mvn site:deploy
-https://maven.apache.org/plugins/maven-site-plugin/examples/site-deploy-to-sourceforge.net.html
-
+-> oru_r01 can be inserted directly into observation_fact. PID.id and encounter number is used
+without patient lookup. 
 
 Update version number across sub modules:
 mvn release:update-versions -DautoVersionSubmodules=true
