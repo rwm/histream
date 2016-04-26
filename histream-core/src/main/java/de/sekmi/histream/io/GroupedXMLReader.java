@@ -150,8 +150,13 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("birthdate") ){
 			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("birthdate")));
 		}
-		if( patientData.containsKey("deathdate") ){
-			currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("deathdate")));
+		if( patientData.containsKey("deceased") ){
+			// patient known to be deceased
+			currentPatient.setDeceased(true);
+			String date = patientData.get("deceased");
+			if( date != null ){
+				currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date));
+			}
 		}
 		if( patientData.containsKey("gender") ){
 			currentPatient.setSex(Sex.valueOf(patientData.get("gender")));

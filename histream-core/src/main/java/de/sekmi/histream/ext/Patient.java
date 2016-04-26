@@ -23,6 +23,12 @@ package de.sekmi.histream.ext;
 
 import de.sekmi.histream.DateTimeAccuracy;
 
+/**
+ * Interface for patient information.
+ * 
+ * @author R.W.Majeed
+ *
+ */
 public interface Patient extends IdExtensionType, ExternalSourceType{
 	/**
 	 * Birth date
@@ -32,11 +38,26 @@ public interface Patient extends IdExtensionType, ExternalSourceType{
 	void setBirthDate(DateTimeAccuracy birthDate);
 	
 	/**
-	 * Death date.
+	 * Death date. Note that the patient might be known deceased, 
+	 * even if a death date is not available. To find that out,
+	 * use {@link #getDeceased()}
+	 * 
 	 * @return death date if available, null otherwise
+	 * @see #getDeceased()
 	 */
 	DateTimeAccuracy getDeathDate();
 	void setDeathDate(DateTimeAccuracy deathDate);
+	
+	/**
+	 * Determine whether the patient is known to be deceased.
+	 * @return true/false or {@code null} if unknown
+	 */
+	Boolean getDeceased();
+	/**
+	 * Set the patient's vital status.
+	 * @param deceased true for known deceased, false for known living, null for unknown
+	 */
+	void setDeceased(Boolean deceased);
 	
 	/**
 	 * Get the patient's biological sex. 

@@ -36,7 +36,7 @@
 		<!-- Gender element can also be removed or left empty -->
 		<gender>female</gender>
 		<birthdate>2001-01-01</birthdate>
-		<deathdate>2020</deathdate>
+		<deceased>2020</deceased>
 		<source timestamp="2015-09-28T09:41:10Z"/>
 		<encounter id="XXE12345">
 			<start>2014-01-01T10:30:00</start>

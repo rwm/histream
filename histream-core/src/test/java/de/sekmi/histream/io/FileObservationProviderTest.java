@@ -54,7 +54,6 @@ import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
 import de.sekmi.histream.impl.TestObservationHandler;
 import de.sekmi.histream.io.FlatObservationSupplier;
-import de.sekmi.histream.io.XMLObservationSupplier;
 
 
 public class FileObservationProviderTest {
@@ -81,6 +80,7 @@ public class FileObservationProviderTest {
 				Patient p = o.getExtension(Patient.class);
 				Assert.assertNotNull("Patient extension required", p);
 				Assert.assertEquals("XX12345", p.getId());
+				Assert.assertEquals(Boolean.TRUE, p.getDeceased());
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2001-01-01"), p.getBirthDate());
 				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2020"), p.getDeathDate());
 				Assert.assertEquals(Sex.female, p.getSex());

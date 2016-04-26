@@ -36,6 +36,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	private DateTimeAccuracy deathDate;
 	private Sex sex;
 	private String surname, givenName;
+	private Boolean deceased;
 	
 	public PatientImpl(){
 		
@@ -45,7 +46,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 		setId(id);
 		this.sex = sex;
 		this.birthDate = birthDate;
-		this.deathDate = deathDate;
+		setDeathDate(deathDate);
 	}
 	
 	@Override
@@ -78,6 +79,10 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	@Override
 	public void setDeathDate(DateTimeAccuracy dateTime){
 		this.deathDate = dateTime;
+		// non null death date implies patient deceased
+		if( dateTime != null ){
+			this.deceased = true;
+		}
 	}
 
 	@Override
@@ -114,6 +119,16 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	@Override
 	public void setGivenName(String givenName) {
 		this.givenName = givenName;
+	}
+
+	@Override
+	public Boolean getDeceased() {
+		return deceased;
+	}
+
+	@Override
+	public void setDeceased(Boolean deceased) {
+		this.deceased = deceased;
 	}
 
 

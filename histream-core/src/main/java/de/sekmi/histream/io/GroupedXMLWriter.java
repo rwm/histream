@@ -265,10 +265,13 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 				formatNewline();
 			}
 			
-			if( patient.getDeathDate() != null ){
+			// deceased status / death date
+			if( patient.getDeceased() != null && patient.getDeceased() == true ){
 				formatIndent();
-				writer.writeStartElement("deathdate");
-				writer.writeCharacters(patient.getDeathDate().toPartialIso8601());
+				writer.writeStartElement("deceased");
+				if( patient.getDeathDate() != null ){
+					writer.writeCharacters(patient.getDeathDate().toPartialIso8601());
+				}
 				writer.writeEndElement();
 				formatNewline();
 			}
