@@ -1,7 +1,7 @@
 /**
  * Basic interfaces for HIStream
  * 
- * @author marap1
+ * @author R.W.Majeed
  *
  */
 package de.sekmi.histream;

@@ -1,5 +1,6 @@
 package de.sekmi.histream.etl.config;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +48,15 @@ public class DataSource {
 	@XmlElement(name="eav-table")
 	EavTable[] eavTables;
 	
+	/**
+	 * Scripts to execute for each visit. A script
+	 * can add or delete facts for the visit. If scripts
+	 * are provided, all facts need to be read for each visit
+	 * before the scripts are executed.
+	 */
+	@XmlElement(name="script", required=false)
+	Script[] scripts;
+	
 	public Meta getMeta(){return meta;}
 	
 	public PatientTable getPatientTable(){
@@ -73,4 +83,9 @@ public class DataSource {
 		}
 	}
 	
+	public static DataSource load(URL configuration){
+		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
+		ds.getMeta().setLocation(configuration);
+		return ds;
+	}
 }

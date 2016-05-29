@@ -135,4 +135,9 @@
 		</virtual>
 	</eav-table>
 
+	<script type="text/javascript"><![CDATA[ 
+	
+	]]>
+	</script>
+	<script type="text/javascript" charset="UTF-8" src="test-1-script.js"/>
 </datasource>
