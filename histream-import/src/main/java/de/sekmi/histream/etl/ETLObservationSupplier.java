@@ -18,8 +18,6 @@ import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.PatientTable;
 import de.sekmi.histream.etl.config.VisitTable;
 import de.sekmi.histream.etl.config.WideTable;
-import de.sekmi.histream.ext.Patient;
-import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
@@ -53,22 +51,22 @@ import de.sekmi.histream.impl.SimpleVisitExtension;
  *  <li>if queue empty (no more patient and visit) then 
  *  done.</li>
  * </ol> 
- *  
+ * <p>
+ * Processing is different, if there is a script to be executed for each visit: 
+ * the queue must collect all observations belonging to the same visit before 
+ * executing the script, as the script might remove or add observations to the visit.
+ * Therefore, the script delays observations until the script was executed.
+ * </p>
  * 
  * @author marap1
  *
  */
 public class ETLObservationSupplier implements ObservationSupplier{
-	
-	private PatientTable pt;
-	private VisitTable vt;
-	private List<WideTable> wt;
-	private List<EavTable> et;
-	
 	private RecordSupplier<PatientRow> pr;
 	private RecordSupplier<VisitRow> vr;
 	private List<RecordSupplier<? extends FactRow>> fr;
 	
+	private ExtensionSync sync;
 	private FactGroupingQueue queue;
 	
 	private DataSource ds;
@@ -86,11 +84,9 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * 
 	 */
 	public static ETLObservationSupplier load(URL configuration, ObservationFactory factory) throws IOException, ParseException{
-		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
-		ds.getMeta().setLocation(configuration);
-		return new ETLObservationSupplier(ds, factory);
+		return new ETLObservationSupplier(DataSource.load(configuration), factory);
 	}
-	
+		
 	/**
 	 * Same as {@link #load(URL, ObservationFactory)} with using a default observation factory.
 	 * The default observation factory will only support Patient and Visit extensions.
@@ -106,6 +102,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		of.registerExtension(new SimpleVisitExtension());
 		return load(configuration, of);
 	}
+	
 	/**
 	 * Construct a new observation supplier directly from a {@link DataSource}.
 	 * 
@@ -115,25 +112,37 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * @throws ParseException configuration error
 	 */
 	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
+		this(ds,factory,new FactGroupingQueue());
+	}
+	/**
+	 * Construct a new observation supplier directly from a {@link DataSource}.
+	 * 
+	 * @param ds data source
+	 * @param factory observation factory
+	 * @param queue queue for collecting facts from tables
+	 * @throws IOException error reading configuration or table data
+	 * @throws ParseException configuration error
+	 */
+	public ETLObservationSupplier(DataSource ds, ObservationFactory factory, FactGroupingQueue queue) throws IOException, ParseException {
 		this.ds = ds;
-		
-		pt = ds.getPatientTable();
-		vt = ds.getVisitTable();
-		wt = ds.getWideTables();
-		et = ds.getEavTables();
-		// TODO long tables
+		this.sync = new ExtensionSync(factory);
+		this.queue = queue;
 
 		Meta meta = ds.getMeta();
 		// in case of exception, make sure already opened suppliers are closed
 		Exception error = null;
 		try{
-			pr = pt.open(factory, meta);
-			vr = vt.open(factory, meta);
-			queue = new FactGroupingQueue(pr, vr, 
-					factory.getExtensionAccessor(Patient.class), 
-					factory.getExtensionAccessor(Visit.class));
+			pr = ds.getPatientTable().open(factory, meta);
+			vr = ds.getVisitTable().open(factory, meta);
+
+			// TODO: if there are scripts, use VisitScriptQueue
+			queue.setPatientTable(pr);
+			queue.setPatientLookup(sync);
+			queue.setVisitTable(vr);
+			queue.setVisitLookup(sync);
 
 			// open all tables
+			List<WideTable> wt = ds.getWideTables();
 			fr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
 				//@SuppressWarnings("resource")
@@ -141,6 +150,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 				queue.addFactTable(s);
 				fr.add(s);
 			}
+			List<EavTable> et = ds.getEavTables();
 			for( EavTable t : et ){
 				RecordSupplier<EavRow> s = t.open(factory, meta);
 				queue.addFactTable(s);
@@ -171,7 +181,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	
 	@Override
 	public Observation get() {
-		return queue.next();
+		return queue.get();
 	}
 
 	@Override

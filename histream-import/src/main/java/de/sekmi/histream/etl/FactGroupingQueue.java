@@ -5,29 +5,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.function.Supplier;
 
-import de.sekmi.histream.ExtensionAccessor;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
 /**
  * Algorithm:
- * Get first row from patient and visit.
- * Put first rows from each fact table in wait list
- * For each table, process all rows belonging to the current patient and visit
- * Try with next visit, repeat
- * Try with next patient, repeat
- * 
- * @author Raphael
+ * <ul>
+ *  <li>Get first row from patient and visit.</li>
+ *  <li>Put first rows from each fact table in wait list</li>
+ *  <li>For each table, process all rows belonging to the current patient and visit</li>
+ *  <li>Try with next visit, repeat</li>
+ *  <li>Try with next patient, repeat</li>
+ * </ul>
+ * <p>
+ * </p>
+ * @author R.W.Majeed
  *
  */
-public class FactGroupingQueue{
+public class FactGroupingQueue implements Supplier<Observation>{
 	private RecordSupplier<PatientRow> patientTable;
 	private RecordSupplier<VisitRow> visitTable;
-	private ExtensionAccessor<Patient> patientAccessor;
-	private ExtensionAccessor<Visit> visitAccessor;
-
+	private PatientLookup patientLookup;
+	private VisitLookup visitLookup;
+	
 	private List<RecordSupplier<? extends FactRow>> factTables;
 
 
@@ -62,54 +65,84 @@ public class FactGroupingQueue{
 	}
 
 
-	public FactGroupingQueue(RecordSupplier<PatientRow> patientTable, RecordSupplier<VisitRow>visitTable, ExtensionAccessor<Patient> patientAccessor, ExtensionAccessor<Visit> visitAccessor){
-		this.patientTable = patientTable;
-		Objects.requireNonNull(patientAccessor);
-		Objects.requireNonNull(visitAccessor);
-		this.patientAccessor = patientAccessor;
-		this.visitAccessor = visitAccessor;
-		this.visitTable = visitTable;
+	public FactGroupingQueue(){
 		this.factTables = new ArrayList<>();
 		this.workQueue = new ArrayDeque<>();
+	}
+	public void setPatientTable(RecordSupplier<PatientRow> patientTable){
+		this.patientTable = patientTable;
+	}
+	public void setVisitTable(RecordSupplier<VisitRow> visitTable){
+		this.visitTable = visitTable;		
 	}
 	public void addFactTable(RecordSupplier<? extends FactRow> supplier){
 		if( supplier == patientTable || supplier == visitTable )throw new IllegalArgumentException("Cannot add patient or visit table as fact table");
 		if( factTables.contains(supplier) )throw new IllegalArgumentException("Supplier already added");
 		factTables.add(supplier);
 	}
+
+	/**
+	 * Set a patient lookup provider. The lookup is performed for
+	 * each parsed patient before any visit or facts are parsed.
+	 * <p>
+	 * This can be used to synchronize the parsed patient with
+	 * external storage</p>
+	 * 
+	 * @param lookup patient lookup
+	 */
+	public void setPatientLookup(PatientLookup lookup){
+		this.patientLookup = lookup;
+	}
+	
+	/**
+	 * Set a visit lookup provider. The lookup is performed for
+	 * each parsed visit before any facts are parsed.
+	 * <p>
+	 * This can be used to synchronize the parsed visit data with
+	 * external storage</p>
+	 * 
+	 * @param lookup visit lookup
+	 */
+	public void setVisitLookup(VisitLookup lookup){
+		this.visitLookup = lookup;
+	}
 	
 	/**
 	 * Current patient changed: {@link #currentPatient}
 	 */
 	private void patientChanged(){
-		currentPatientInstance = patientAccessor.accessStatic(currentPatient.getPatientId(), patientTable.getSource());
-		currentPatientInstance.setBirthDate(currentPatient.getBirthDate());
-		currentPatientInstance.setDeathDate(currentPatient.getDeathDate());
-		currentPatientInstance.setSex(currentPatient.getSex());
-		currentPatientInstance.setSurname(currentPatient.getSurname());
-		currentPatientInstance.setGivenName(currentPatient.getGivenName());
-		// TODO sync patient with extension factory / add fields
-		
+		if( patientLookup != null ){
+			currentPatientInstance = patientLookup.lookupPatient(currentPatient, patientTable.getSource());
+		}else{
+			// no lookup, just use the data we have
+			currentPatientInstance = currentPatient;
+		}
 		addFactsToWorkQueue(currentPatient);
 	}
 
 	/**
 	 * Current visit changed. Current visit id is in {@link #currentVisitId}.
-	 * For facts without visit information, {@link #currentVisitId} may be null.
-	 * If {@link #currentVisitId} is not null, nextVisit will contain the current visit's information.
+	 * <p>
+	 *  For facts without visit information, {@link #currentVisitId} may be null.
+	 *  This will be the case once for every patient.
+	 *  If {@link #currentVisitId} is not null, nextVisit will contain the 
+	 *  current visit's information.
+	 * </p>
 	 */
 	private void visitChanged(){
 
 		if( currentVisitId == null ){
 			// set visit extension to null
+			currentVisitInstance = null;
 			// TODO later support facts without encounter
 		}else{
 			// sync visit with extension factory
-			currentVisitInstance = visitAccessor.accessStatic(currentVisitId, currentPatientInstance, visitTable.getSource());
-			currentVisitInstance.setStartTime(nextVisit.getStartTime());
-			currentVisitInstance.setEndTime(nextVisit.getEndTime());
-			currentVisitInstance.setLocationId(nextVisit.getLocationId());
-			currentVisitInstance.setStatus(nextVisit.getStatus());
+			if( visitLookup != null ){
+				// currentVisitId? == nextVisit.getId()??
+				currentVisitInstance = visitLookup.lookupVisit(currentPatientInstance, nextVisit, visitTable.getSource());				
+			}else{
+				currentVisitInstance = nextVisit;
+			}
 			
 			addFactsToWorkQueue(nextVisit);
 		}
@@ -119,6 +152,8 @@ public class FactGroupingQueue{
 	 * Load first row from each table, fill and sort the observation queue
 	 */
 	public void prepare(){
+		Objects.requireNonNull(patientTable);
+		Objects.requireNonNull(visitTable);
 		currentRows = new ArrayList<>(factTables.size());
 		// load first rows
 		for( RecordSupplier<? extends FactRow> s : factTables ){
@@ -135,7 +170,7 @@ public class FactGroupingQueue{
 			
 			// for every patient, facts without visitId (=null) are parsed first
 			currentVisitId = null;		
-			visitChanged();
+			visitChanged(); // maybe not needed, visit is already null
 			
 			nextVisit = visitTable.get();
 
@@ -152,13 +187,49 @@ public class FactGroupingQueue{
 	private void addFactsToWorkQueue(FactRow r){
 		for( Observation f : r.getFacts() ){
 			// set patient extension
-			patientAccessor.set(f, currentPatientInstance);
-			visitAccessor.set(f, currentVisitInstance);
+			patientLookup.assignPatient(f, currentPatientInstance);
+			visitLookup.assignVisit(f, currentVisitInstance);
 			workQueue.add(f);
 		}
 	}
 	
-	public Observation next(){
+	/**
+	 * Called after all facts for the current visit are processed.
+	 * <p>
+	 *  This will also be the case for the {@code null}-Visit which
+	 *  occurs once for each patient with the purpose to allow non-visit
+	 *  related facts to be included. In this case, {@link #getVisit()}
+	 *  will return {@code null}.
+	 * </p>
+	 */
+	protected void visitFinished(){
+		// nothing to do
+	}
+	/**
+	 * Get the current patient information. This will be a patient
+	 * object returned by {@link PatientLookup}.
+	 * <p>
+	 * This method is useful for subclasses which override {@link #visitFinished()}.
+	 * </p>
+	 * @return current patient.
+	 */
+	protected Patient getPatient(){
+		return currentPatientInstance;
+	}
+	/**
+	 * Get the current visit information. This will be a visit
+	 * object returned by {@link VisitLookup}.
+	 * <p>
+	 * This method is useful for subclasses which override {@link #visitFinished()}.
+	 * </p>
+	 * @return current visit.
+	 */
+	protected Visit getVisit(){
+		return currentVisitInstance;
+	}
+	
+	@Override
+	public Observation get(){
 		do{
 			if( !workQueue.isEmpty() ){
 				return workQueue.remove();
@@ -190,10 +261,12 @@ public class FactGroupingQueue{
 					tableIndex ++;
 				}
 			}
+			visitFinished();
 			// no more fitting facts in current prefetched rows
 			// try to get next visit for current patient
 			if( nextVisit != null && nextVisit.getPatientId().equals(currentPatient.getPatientId()) ){
-				// next visit also belongs to current patient, continue
+				// next visit also belongs to current patient, 
+				// continue with same patient id (but next visit)
 				currentVisitId = nextVisit.getVisitId();
 				visitChanged();
 				
