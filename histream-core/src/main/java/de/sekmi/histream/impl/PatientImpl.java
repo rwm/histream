@@ -130,6 +130,13 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	public void setDeceased(Boolean deceased) {
 		this.deceased = deceased;
 	}
+	
+
+	@Override
+	public String toString(){
+		return "Patient(id="+getId()+", dob="+getBirthDate()+")";
+	}
+
 
 
 }
