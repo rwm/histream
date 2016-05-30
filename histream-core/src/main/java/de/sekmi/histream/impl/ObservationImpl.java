@@ -387,5 +387,24 @@ public class ObservationImpl implements Observation, Cloneable{
 			this.startTime = startTime;
 		}
 	}
-	
+
+	@Override
+	public String toString(){
+		StringBuilder b = new StringBuilder(100);
+		b.append("Observation(");
+		b.append("pat=");
+		b.append(getPatientId());
+		b.append(", ");
+		b.append("eid=");
+		b.append(getEncounterId());
+		b.append(", ");
+		b.append("cid=");
+		b.append(getConceptId());
+		if( hasModifiers() ){
+			b.append(", nmod=");
+			b.append(getModifierCount());
+		}
+		b.append(")");
+		return b.toString();
+	}
 }
