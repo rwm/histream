@@ -76,13 +76,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private PreparedStatement insertFact;
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteVisit;
-	private String nullProviderId;
-	private String nullUnitCd;
-	private String nullLocationCd;
-	private String nullModifierCd;
-	private String nullValueFlagCd;
-	private String nullValueTypeCd;
 	private Preprocessor etlPreprocessor;
+	private DataDialect dialect;
 	private int insertCount;
 	
 	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
@@ -177,17 +172,14 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	 * @throws SQLException if preparation/initialisation failed
 	 */
 	private void initialize(Map<String,String> props)throws SQLException{
-		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
-		this.nullLocationCd = "@"; // technically, null is allowed, but the demodata only uses '@'
-		this.nullValueFlagCd = "@";// technically, null is allowed, but the demodata uses both '@' and ''
-		// TODO nullBlob (technically null allowed, but '' is used in demodata)
-		this.nullModifierCd = "@"; // null not allowed, @ is used in demodata
-		this.nullValueTypeCd = "@"; // TODO check database
-		this.nullProviderId = props.get("nullProvider");
-		if( this.nullProviderId == null ){
+		dialect = new DataDialect();
+		String nullProvider = props.get("nullProvider");
+		if( nullProvider == null ){
 			log.warning("property 'nullProvider' missing, using '@' (may violate foreign keys)");
-			this.nullProviderId = "@";
+			nullProvider = "@";
 		}
+		dialect.setDefaultProviderId(nullProvider);
+		
 		insertCount = 0;
 		db.setAutoCommit(false);
 		prepareStatements(props);
@@ -221,47 +213,6 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		
 	}
 	
-	private static String getI2b2Operator(Value value){
-		if( value.getOperator() == null )return "E";
-		String op;
-		switch( value.getOperator() ){
-		case Equal:
-			op = "E";
-			break;
-		case NotEqual:
-			op = "NE";
-			break;
-		case LessThan:
-			op = "L";
-			break;
-		case LessOrEqual:
-			op = "LE";
-			break;
-		case GreaterThan:
-			op = "G";
-			break;
-		case GreaterOrEqual:
-			op = "GE";
-			break;
-		default:
-			// TODO issue warning
-			op = "E";
-		}
-		return op;
-	}
-	
-	private static String getI2b2ValueFlagCd(Value value){
-		String flag;
-		if( value.getAbnormalFlag() == null )flag = null;
-		else switch( value.getAbnormalFlag() ){
-		case Abnormal:
-			flag = "A";
-			// TODO all flags
-		default:
-			flag = null;
-		}
-		return flag;
-	}
 	private int incrementInstanceNum(Observation o){
 		try{
 			I2b2Visit v = o.getExtension(I2b2Visit.class);
@@ -274,9 +225,6 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		}
 	}
 	
-	private static <T> T replaceNull(T value, T nullReplacement){
-		return (value==null)?nullReplacement:value;
-	}
 	
 	
 	private int getPatientNum(Observation o){
@@ -320,39 +268,39 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.setInt(1, getEncounterNum(o));
 		insertFact.setInt(2, getPatientNum(o));
 		insertFact.setString(3, o.getConceptId());
-		insertFact.setString(4, replaceNull(o.getProviderId(),nullProviderId));
+		insertFact.setString(4, dialect.encodeProviderId(o.getProviderId()));
 		// start_date
 		Objects.requireNonNull(o.getStartTime());
 		insertFact.setTimestamp(5, Timestamp.valueOf(o.getStartTime().getLocal()));
 		
-		insertFact.setString(6, (m==null)?nullModifierCd:m.getConceptId());
+		insertFact.setString(6, (m==null)?dialect.getNullModifierCd():m.getConceptId());
 		insertFact.setInt(7, instanceNum);
 
 		Value v = (m==null)?o.getValue():m.getValue();
 		if( v == null ){
 			// valtype_cd
-			insertFact.setString(8, nullValueTypeCd);
+			insertFact.setString(8, dialect.getNullValueTypeCd());
 			// tval_char
 			insertFact.setString(9, null);
 			// nval_num
 			insertFact.setBigDecimal(10, null);
 			// value_flag_cd
-			insertFact.setString(11, nullValueFlagCd);
+			insertFact.setString(11, dialect.getNullValueFlagCd());
 			// units_cd
-			insertFact.setString(12, nullUnitCd);
+			insertFact.setString(12, dialect.getNullUnitCd());
 		}else{
 			switch( v.getType() ){
 			case Numeric:
 				// valtype_cd
 				insertFact.setString(8, "N");
 				// tval_char
-				insertFact.setString(9, getI2b2Operator(v));
+				insertFact.setString(9, dialect.encodeOperator(v));
 				// nval_num
 				insertFact.setBigDecimal(10, v.getNumericValue());
 				// value_flag_cd
-				insertFact.setString(11, getI2b2ValueFlagCd(v));
+				insertFact.setString(11, dialect.encodeValueFlagCd(v));
 				// units_cd
-				insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
+				insertFact.setString(12, dialect.encodeUnitCd(v.getUnits()));
 				break;
 			case Text:
 				// valtype_cd
@@ -362,9 +310,9 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 				// nval_num
 				insertFact.setBigDecimal(10, null);
 				// value_flag_cd
-				insertFact.setString(11, getI2b2ValueFlagCd(v));
+				insertFact.setString(11, dialect.encodeValueFlagCd(v));
 				// units_cd
-				insertFact.setString(12, replaceNull(v.getUnits(),nullUnitCd));
+				insertFact.setString(12, dialect.encodeUnitCd(v.getUnits()));
 				break;
 			default:
 				throw new UnsupportedOperationException("Incomplete refactoring, unsupported value type "+v.getType());
@@ -377,7 +325,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 			insertFact.setTimestamp(13, Timestamp.valueOf(o.getEndTime().getLocal()));
 		}
 		// location_cd
-		insertFact.setString(14, replaceNull(o.getLocationId(),nullLocationCd));
+		insertFact.setString(14, dialect.encodeLocationCd(o.getLocationId()));
 		// download_date
 		insertFact.setTimestamp(15, Timestamp.from(o.getSource().getSourceTimestamp()));
 		insertFact.setString(16, o.getSource().getSourceId());
