@@ -26,8 +26,14 @@ public class TestExtractor implements DataSource{
 				e.dump();
 			}
 
-			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), null) ){
+			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), new String[]{"AKTIN:PLZ"}) ){
 		
+				e.stream().forEach(System.out::println);
+			}
+			System.out.println("-- now with wildcards");
+			ef.setFeature(I2b2ExtractorFactory.ALLOW_WILDCARD_CONCEPT_CODES, Boolean.TRUE);
+			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), new String[]{"ICD10GM:*","AKTIN:PLZ"}) ){
+				
 				e.stream().forEach(System.out::println);
 			}
 			

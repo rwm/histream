@@ -67,7 +67,7 @@ import de.sekmi.histream.impl.AbstractObservationHandler;
  * in the visit store (which caches visits anyways) and increase the instance_num only
  * for observations with modifiers.
  * 
- * @author marap1
+ * @author R.W.Majeed
  *
  */
 public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable, Plugin{
