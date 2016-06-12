@@ -92,6 +92,11 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 		}
 		
 	}
+	
+	private String escapeLikeString(String likeString){
+		// TODO escape _ and % with backslash
+		return likeString;
+	}
 	/**
 	 * Extract observations for given concept codes with 
 	 * {@code observation.start} between start_min and start_end.
@@ -100,7 +105,8 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 	 * and {@code of_idx_start_date} for {@code start_date}.
 	 * </p>
 	 * <p>
-	 * TODO integration test without concepts, with normal concepts, with wildcard concepts
+	 * TODO integration test without concepts, with normal concepts, 
+	 * with wildcard concepts, wildcard concepts with literal _ or % in id
 	 * </p>
 	 * 
 	 * @param start_min start date of returned observations must be greater than start_min
@@ -128,7 +134,7 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 					// TODO check if wildcards actually used (search for *)
 					ids = new String[concepts.length];
 					for( int i=0; i<ids.length; i++ ){
-						ids[i] = concepts[i].replace('*', '%');
+						ids[i] = escapeLikeString(concepts[i]).replace('*', '%');
 						if( false == ids[i].equals(concepts[i]) ){
 							wildcardCount ++;
 						}
