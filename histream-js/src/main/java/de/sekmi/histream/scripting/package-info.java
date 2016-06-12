@@ -4,4 +4,4 @@
  * @author R.W.Majeed
  *
  */
-package de.sekmi.histream.etl.scripting;
+package de.sekmi.histream.scripting;

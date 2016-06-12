@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>HIStream : Javascript support</name>
+
+	<groupId>de.sekmi.histream</groupId>
+	<artifactId>histream-js</artifactId>
+	<version>0.8-SNAPSHOT</version>
+
+	<parent>
+		<groupId>de.sekmi.histream</groupId>
+		<artifactId>histream</artifactId>
+		<version>0.8-SNAPSHOT</version>
+	</parent>
+  
+	<build>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-core</artifactId>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,2 @@
+Support for native JS objects?
+-> import jdk.nashorn.api.scripting.AbstractJSObject;

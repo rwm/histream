@@ -1,4 +1,8 @@
-package de.sekmi.histream.etl.scripting;
+package de.sekmi.histream.scripting;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -35,7 +39,10 @@ public class TestFacts {
 				factory.createObservation("P1", "C3", DateTimeAccuracy.parsePartialIso8601("2011-02-01"))				
 		};
 		Facts f = new Facts(factory, "P1", "V1", defaultStart);
+		List<Observation> list = new ArrayList<>();
+		Collections.addAll(list, facts);
 		
+		f.setObservations(list);
 		engine.put("facts", f);
 		engine.eval("facts.add('C4')");
 		
