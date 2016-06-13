@@ -1,4 +1,4 @@
-// concept ids of the facts which can be 
+﻿// concept ids of the facts which can be 
 // produced if the conditions are right
 this.produces = ["ASDF"];
 
