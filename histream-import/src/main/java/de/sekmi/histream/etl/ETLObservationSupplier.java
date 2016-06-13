@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.JAXB;
-
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.etl.config.EavTable;
 import de.sekmi.histream.etl.config.Meta;
-import de.sekmi.histream.etl.config.PatientTable;
-import de.sekmi.histream.etl.config.VisitTable;
 import de.sekmi.histream.etl.config.WideTable;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
@@ -112,7 +108,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * @throws ParseException configuration error
 	 */
 	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
-		this(ds,factory,new FactGroupingQueue());
+		this(ds,factory,ds.createFactQueue(factory));
 	}
 	/**
 	 * Construct a new observation supplier directly from a {@link DataSource}.
@@ -123,7 +119,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * @throws IOException error reading configuration or table data
 	 * @throws ParseException configuration error
 	 */
-	public ETLObservationSupplier(DataSource ds, ObservationFactory factory, FactGroupingQueue queue) throws IOException, ParseException {
+	protected ETLObservationSupplier(DataSource ds, ObservationFactory factory, FactGroupingQueue queue) throws IOException, ParseException {
 		this.ds = ds;
 		this.sync = new ExtensionSync(factory);
 		this.queue = queue;

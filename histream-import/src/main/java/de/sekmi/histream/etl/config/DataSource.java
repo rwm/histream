@@ -1,9 +1,11 @@
 package de.sekmi.histream.etl.config;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.script.ScriptException;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -11,6 +13,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
+
+import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.etl.FactGroupingQueue;
+import de.sekmi.histream.etl.ScriptProcessingQueue;
+import de.sekmi.histream.etl.VisitPostProcessorQueue;
 
 /**
  * Data source configuration.
@@ -87,5 +94,28 @@ public class DataSource {
 		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
 		ds.getMeta().setLocation(configuration);
 		return ds;
+	}
+
+	/**
+	 * If scripts are present, an instance of {@link ScriptProcessingQueue}
+	 * is returned. Otherwise an instance of {@link FactGroupingQueue}.
+	 * @return fact queue
+	 * @throws IOException 
+	 * @throws  
+	 */
+	public FactGroupingQueue createFactQueue(ObservationFactory factory) throws IOException{
+//		if( true ){
+//			// TODO debug problems with visitpostprocessorqueue
+//			return new VisitPostProcessorQueue() {
+//				@Override
+//				protected void postProcessVisit() {
+//				}
+//			};
+//		}
+		if( true || scripts == null || scripts.length == 0 ){
+			return new FactGroupingQueue();
+		}else{
+			return new ScriptProcessingQueue(scripts, meta.getLocation(), factory);
+		}
 	}
 }

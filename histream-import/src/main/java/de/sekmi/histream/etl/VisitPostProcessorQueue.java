@@ -75,7 +75,8 @@ public abstract class VisitPostProcessorQueue extends FactGroupingQueue {
 			// next fact
 			nextFact = super.get();
 		}
-		
+		// TODO visit can be processed, without having any facts left to return (either there were no facts in the visit or or postProcessing removed all facts)
+		// TODO maybe rename visitProcessed to visitProcessedNonempty
 		if( visitProcessed ){
 			if( !visitFacts.isEmpty() ){
 				// remove first

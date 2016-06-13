@@ -134,9 +134,11 @@
 			<!-- ... more value elements -->
 		</virtual>
 	</eav-table>
-
-	<script type="text/javascript"><![CDATA[ 
-	
+	<!-- scripts are run for each complete encounter in the order of occurrence -->
+	<script type="text/javascript"><![CDATA[
+		if( facts.get("natrium") && facts.get("kalium") ){
+			facts.add("nakl").value(1);
+		}
 	]]>
 	</script>
 	<script type="text/javascript" charset="UTF-8" src="test-1-script.js"/>

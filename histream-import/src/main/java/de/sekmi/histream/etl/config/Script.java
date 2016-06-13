@@ -1,6 +1,13 @@
 package de.sekmi.histream.etl.config;
 
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
@@ -27,4 +34,15 @@ public class Script {
 	
 	@XmlValue
 	public String content;
+	
+	public Reader openReader(URL baseURL) throws IOException{
+		if( content != null ){
+			return new StringReader(content);
+		}else if( src != null ){
+			URL url = new URL(baseURL, src);
+			return new InputStreamReader(url.openStream(), this.charset);
+		}else{
+			return null;
+		}
+	}
 }

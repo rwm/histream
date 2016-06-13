@@ -52,6 +52,12 @@
 			<artifactId>histream-core</artifactId>
 			<version>0.8-SNAPSHOT</version>
 		</dependency>
+		<!-- script support -->
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-js</artifactId>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
 		<!-- add later for sorting data tables
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
