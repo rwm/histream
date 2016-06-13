@@ -22,35 +22,56 @@ public class TestFacts {
 	ScriptEngineManager sem;
 	ObservationFactory factory;
 	ScriptEngine engine;
+	List<Observation> list;
+	DateTimeAccuracy defaultStart;
+	
 	@Before
-	public void setup(){
+	public void setup() throws ScriptException{
 		sem = new ScriptEngineManager();
 		engine = sem.getEngineByName("nashorn");
+		// enable strict mode
+		engine.eval("'use strict';");
 		factory = new ObservationFactoryImpl();
-		
-	}
 	
-	@Test
-	public void verifyAddFacts() throws ScriptException{
-		final DateTimeAccuracy defaultStart =  DateTimeAccuracy.parsePartialIso8601("2016");
+		defaultStart =  DateTimeAccuracy.parsePartialIso8601("2016");
 		Observation[] facts = new Observation[]{
 				factory.createObservation("P1", "C1", DateTimeAccuracy.parsePartialIso8601("2011")),
 				factory.createObservation("P1", "C2", DateTimeAccuracy.parsePartialIso8601("2011-02-01")),
 				factory.createObservation("P1", "C3", DateTimeAccuracy.parsePartialIso8601("2011-02-01"))				
 		};
-		Facts f = new Facts(factory, "P1", "V1", defaultStart);
-		List<Observation> list = new ArrayList<>();
+		this.list = new ArrayList<>();
 		Collections.addAll(list, facts);
-		
+	}
+	
+	@Test
+	public void verifyAddFacts() throws ScriptException{
+		Facts f = new Facts(factory, "P1", "V1", defaultStart);
 		f.setObservations(list);
 		engine.put("facts", f);
 		engine.eval("facts.add('C4')");
-		
+
 		// retrieve fact
 		Fact t = f.get("C4");
 		Assert.assertNotNull(t);
 		Assert.assertEquals(defaultStart, t.getObservation().getStartTime());
-		
-		
+	}
+	
+	
+	@Test
+	public void verifyHasFacts() throws ScriptException{
+		Facts f = new Facts(factory, "P1", "V1", defaultStart);
+		f.setObservations(list);
+		engine.put("facts", f);
+
+		Object ret;
+		// verify logical and with two existing facts
+		ret = engine.eval("Boolean(facts.get('C2') && facts.get('C3'))");
+		Assert.assertTrue( ret instanceof Boolean );
+		Assert.assertEquals(Boolean.TRUE, ret);
+
+		// should return false as C4 does not exist 
+		ret = engine.eval("Boolean(facts.get('C2') && facts.get('C4'))");
+		Assert.assertTrue( ret instanceof Boolean );
+		Assert.assertEquals(Boolean.FALSE, ret);
 	}
 }
