@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,13 +20,24 @@ import javax.script.ScriptException;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 
 
 public class EncounterScriptEngine {
 	private ScriptEngine engine;
-	private List<CompiledScript> scripts;
+	private List<Script> scripts;
 	private ObservationFactory factory;
 	
+	private static class Script{
+		CompiledScript script;
+		ExternalSourceType source;
+		
+		public Script(CompiledScript script, String sourceId, Instant timestamp){
+			this.script = script;
+			source = new ExternalSourceImpl(sourceId, timestamp);
+		}
+	}
 	public EncounterScriptEngine() throws javax.script.ScriptException {
 		this.engine = new ScriptEngineManager().getEngineByName("nashorn");
 		if( engine == null ){
@@ -39,19 +52,21 @@ public class EncounterScriptEngine {
 		scripts = new LinkedList<>();
 	}
 
-	public void addScript(String script) throws ScriptException{
-		scripts.add(((Compilable)engine).compile(script));
+	public void addScript(String script, String sourceId, Instant timestamp) throws ScriptException{
+		scripts.add(new Script(((Compilable)engine).compile(script), sourceId, timestamp));
 	}
-	public void addScript(URL location, String charset) throws ScriptException, IOException{
+	public void addScript(URL location, String charset, String sourceId) throws ScriptException, IOException{
+		URLConnection conn = location.openConnection();
+		Instant timestamp = Instant.ofEpochMilli(conn.getLastModified());
 		try(
-				InputStream in = location.openStream();
+				InputStream in = conn.getInputStream();
 				Reader reader = new InputStreamReader(in, charset)
 		){
-			addScript(reader);
+			addScript(reader, sourceId, timestamp);
 		}
 	}
-	public void addScript(Reader reader) throws ScriptException{
-		scripts.add(((Compilable)engine).compile(reader));	
+	public void addScript(Reader reader, String sourceId, Instant timestamp) throws ScriptException{
+		scripts.add(new Script(((Compilable)engine).compile(reader), sourceId, timestamp));	
 	}
 	
 	public void setObservationFactory(ObservationFactory factory){
@@ -62,8 +77,9 @@ public class EncounterScriptEngine {
 		f.setObservations(facts);
 		Bindings b = engine.createBindings();
 		b.put("facts", f);
-		for( CompiledScript script : scripts ){
-			script.eval(b);
+		for( Script script : scripts ){
+			f.setSource(script.source);
+			script.script.eval(b);
 		}
 		// TODO is there a way to add information which script threw an exception?
 	}

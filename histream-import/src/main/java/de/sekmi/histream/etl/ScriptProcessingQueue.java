@@ -8,13 +8,14 @@ import java.net.URL;
 import javax.script.ScriptException;
 
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.Script;
 import de.sekmi.histream.scripting.EncounterScriptEngine;
 
 public class ScriptProcessingQueue extends VisitPostProcessorQueue {
 	private EncounterScriptEngine engine;
 
-	public ScriptProcessingQueue(Script[] scripts, URL baseURL, ObservationFactory factory) throws IOException {
+	public ScriptProcessingQueue(Script[] scripts, Meta meta, ObservationFactory factory) throws IOException {
 		try {
 			engine = new EncounterScriptEngine();
 		} catch (ScriptException e) {
@@ -24,8 +25,8 @@ public class ScriptProcessingQueue extends VisitPostProcessorQueue {
 
 		// load scripts
 		for( int i=0; i<scripts.length; i++ ){
-			try( Reader r = scripts[i].openReader(baseURL) ){
-				engine.addScript(r);
+			try( Reader r = scripts[i].openReader(meta) ){
+				engine.addScript(r, meta.getSourceId(), scripts[i].getTimestamp(meta));
 			} catch (ScriptException e) {
 				throw new IOException("Script error in script "+i, e);
 			}

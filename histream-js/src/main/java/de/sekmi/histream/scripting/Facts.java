@@ -6,6 +6,7 @@ import java.util.List;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ext.ExternalSourceType;
 
 /**
  * Javascript compatible interface for manipulating a list of
@@ -21,6 +22,7 @@ public class Facts {
 	private List<Fact> facts;
 	private List<Observation> sourceList;
 	private ObservationFactory factory;
+	private ExternalSourceType source;
 
 	private String patientId;
 	private String encounterId;
@@ -38,7 +40,9 @@ public class Facts {
 		facts.clear();
 		observations.stream().map(o -> new Fact(o)).forEach(facts::add);
 	}
-	
+	public void setSource(ExternalSourceType source){
+		this.source = source;
+	}
 	public int size(){return facts.size();}
 	
 	public List<Fact> facts(){return facts;}
@@ -46,7 +50,12 @@ public class Facts {
 	
 	public Fact add(String conceptId){
 		Observation o = factory.createObservation(patientId, conceptId, defaultStartTime);
-		o.setEncounterId(encounterId);
+		if( encounterId != null ){
+			o.setEncounterId(encounterId);
+		}
+		if( source != null ){
+			o.setSource(source);
+		}
 		Fact f = new Fact(o);
 		sourceList.add(o);
 		facts.add(f);

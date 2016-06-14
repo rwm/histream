@@ -21,6 +21,9 @@ public class Meta {
 	@XmlTransient
 	private URL location;
 	
+	@XmlTransient
+	private Long lastModified;
+	
 	protected Meta(){
 	}
 
@@ -41,6 +44,13 @@ public class Meta {
 	}
 	public void setLocation(URL location){
 		this.location = location;
+	}
+
+	public void setLastModified(long lastModified) {
+		this.lastModified = lastModified;
+	}
+	public Long getLastModified(){
+		return this.lastModified;
 	}
 
 }

@@ -1,6 +1,7 @@
 package de.sekmi.histream.scripting;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,8 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 
 public class TestEncounterScriptEngine {
@@ -33,9 +36,10 @@ public class TestEncounterScriptEngine {
 		// prepare engine
 		EncounterScriptEngine e = new EncounterScriptEngine();
 		e.setObservationFactory(factory);
-		e.addScript(getClass().getResource("/postprocess-encounter-1.js"), "UTF-8");
+		e.addScript(getClass().getResource("/postprocess-encounter-1.js"), "UTF-8", "script1");
 
 		// run
+		ExternalSourceType source = new ExternalSourceImpl("script", Instant.now());
 		e.processEncounter("P1", "E1", DateTimeAccuracy.parsePartialIso8601("2011-02-01"), list);
 
 		// verify

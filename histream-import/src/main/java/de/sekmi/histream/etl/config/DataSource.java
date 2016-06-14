@@ -1,7 +1,9 @@
 package de.sekmi.histream.etl.config;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,8 +92,14 @@ public class DataSource {
 		}
 	}
 	
-	public static DataSource load(URL configuration){
-		DataSource ds = JAXB.unmarshal(configuration, DataSource.class);
+	public static DataSource load(URL configuration) throws IOException{
+		URLConnection conn = configuration.openConnection();
+		conn.connect();
+		DataSource ds;
+		try( InputStream in = conn.getInputStream() ){
+			ds = JAXB.unmarshal(configuration, DataSource.class);			
+		}
+		ds.getMeta().setLastModified(conn.getLastModified());
 		ds.getMeta().setLocation(configuration);
 		return ds;
 	}
@@ -112,10 +120,10 @@ public class DataSource {
 //				}
 //			};
 //		}
-		if( true || scripts == null || scripts.length == 0 ){
+		if( scripts == null || scripts.length == 0 ){
 			return new FactGroupingQueue();
 		}else{
-			return new ScriptProcessingQueue(scripts, meta.getLocation(), factory);
+			return new ScriptProcessingQueue(scripts, meta, factory);
 		}
 	}
 }
