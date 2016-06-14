@@ -139,7 +139,9 @@
 		if( facts.get("natrium") && facts.get("kalium") ){
 			facts.add("nakl").value(1);
 		}
+		facts.add("cnt").value(facts.size());
 	]]>
 	</script>
+	<!-- TODO check why second script does not work -->
 	<script type="text/javascript" charset="UTF-8" src="test-1-script.js"/>
 </datasource>

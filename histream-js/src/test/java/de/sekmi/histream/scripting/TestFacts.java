@@ -45,7 +45,7 @@ public class TestFacts {
 	
 	@Test
 	public void verifyAddFacts() throws ScriptException{
-		Facts f = new Facts(factory, "P1", "V1", defaultStart);
+		SimpleFacts f = new SimpleFacts(factory, "P1", "V1", defaultStart);
 		f.setObservations(list);
 		engine.put("facts", f);
 		engine.eval("facts.add('C4')");
@@ -59,7 +59,7 @@ public class TestFacts {
 	
 	@Test
 	public void verifyHasFacts() throws ScriptException{
-		Facts f = new Facts(factory, "P1", "V1", defaultStart);
+		SimpleFacts f = new SimpleFacts(factory, "P1", "V1", defaultStart);
 		f.setObservations(list);
 		engine.put("facts", f);
 

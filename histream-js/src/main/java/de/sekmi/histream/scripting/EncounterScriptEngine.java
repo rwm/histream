@@ -21,6 +21,8 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ExternalSourceImpl;
 
 
@@ -69,18 +71,30 @@ public class EncounterScriptEngine {
 		scripts.add(new Script(((Compilable)engine).compile(reader), sourceId, timestamp));	
 	}
 	
+	public int getScriptCount(){
+		return scripts.size();
+	}
+	
 	public void setObservationFactory(ObservationFactory factory){
 		this.factory = factory;
 	}
-	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException{
-		Facts f = new Facts(factory, patientId, encounterId, defaultStartTime);
-		f.setObservations(facts);
+	private void process(AbstractFacts facts) throws ScriptException{
 		Bindings b = engine.createBindings();
-		b.put("facts", f);
+		b.put("facts", facts);
 		for( Script script : scripts ){
-			f.setSource(script.source);
+			facts.setSource(script.source);
 			script.script.eval(b);
 		}
-		// TODO is there a way to add information which script threw an exception?
+		// TODO is there a way to add information which script threw an exception?		
+	}
+	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException{
+		SimpleFacts f = new SimpleFacts(factory, patientId, encounterId, defaultStartTime);
+		f.setObservations(facts);
+		process(f);
+	}
+	public void processEncounter(Patient patient, Visit visit, List<Observation> facts) throws ScriptException{
+		VisitExtensionFacts f = new VisitExtensionFacts(factory, patient, visit);
+		f.setObservations(facts);
+		process(f);
 	}
 }

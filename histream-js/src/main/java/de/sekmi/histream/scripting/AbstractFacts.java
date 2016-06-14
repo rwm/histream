@@ -3,7 +3,6 @@ package de.sekmi.histream.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -18,21 +17,14 @@ import de.sekmi.histream.ext.ExternalSourceType;
  * @author R.W.Majeed
  *
  */
-public class Facts {
-	private List<Fact> facts;
-	private List<Observation> sourceList;
-	private ObservationFactory factory;
-	private ExternalSourceType source;
+public abstract class AbstractFacts {
+	protected List<Fact> facts;
+	protected List<Observation> sourceList;
+	protected ObservationFactory factory;
+	protected ExternalSourceType source;
 
-	private String patientId;
-	private String encounterId;
-	private DateTimeAccuracy defaultStartTime;
-
-	public Facts(ObservationFactory factory, String patientId, String encounterId, DateTimeAccuracy defaultStartTime){
+	public AbstractFacts(ObservationFactory factory) {
 		this.factory = factory;
-		this.patientId = patientId;
-		this.encounterId = encounterId;
-		this.defaultStartTime = defaultStartTime;
 		this.facts = new ArrayList<>();
 	}
 	public void setObservations(List<Observation> observations){
@@ -46,21 +38,6 @@ public class Facts {
 	public int size(){return facts.size();}
 	
 	public List<Fact> facts(){return facts;}
-	
-	
-	public Fact add(String conceptId){
-		Observation o = factory.createObservation(patientId, conceptId, defaultStartTime);
-		if( encounterId != null ){
-			o.setEncounterId(encounterId);
-		}
-		if( source != null ){
-			o.setSource(source);
-		}
-		Fact f = new Fact(o);
-		sourceList.add(o);
-		facts.add(f);
-		return f;
-	}
 	public int firstIndexOf(String conceptId){
 		for( int i=0; i<facts.size(); i++ ){
 			if( conceptId.equals(facts.get(i).getConcept()) ){
@@ -92,4 +69,16 @@ public class Facts {
 			return facts.get(i);
 		}
 	}
+
+	protected abstract Observation create(String conceptId);
+	
+	public Fact add(String conceptId){
+		Observation o = create(conceptId);
+		o.setSource(source);
+		Fact f = new Fact(o);
+		sourceList.add(o);
+		facts.add(f);
+		return f;
+	}
+
 }

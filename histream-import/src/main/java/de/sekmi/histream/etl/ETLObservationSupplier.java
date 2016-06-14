@@ -98,7 +98,13 @@ public class ETLObservationSupplier implements ObservationSupplier{
 		of.registerExtension(new SimpleVisitExtension());
 		return load(configuration, of);
 	}
-	
+	/** 
+	 * Get the loaded configuration
+	 * @return configuration
+	 */
+	public DataSource getConfiguration(){
+		return ds;
+	}
 	/**
 	 * Construct a new observation supplier directly from a {@link DataSource}.
 	 * 

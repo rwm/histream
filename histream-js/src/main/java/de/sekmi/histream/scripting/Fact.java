@@ -29,12 +29,12 @@ public class Fact {
 		return this;
 	}
 	
-	public Value value(String value){
+	public StringValue value(String value){
 		if( value == null ){
 			observation.setValue(null);
 			return null;
 		}
-		Value v = new StringValue(value);
+		StringValue v = new StringValue(value);
 		observation.setValue(v);
 		return v;
 	}
@@ -45,12 +45,12 @@ public class Fact {
 	 * @param value value
 	 * @return value object
 	 */
-	public Value value(Double value){
+	public NumericValue value(Double value){
 		if( value == null ){
 			observation.setValue(null);
 			return null;
 		}
-		Value v = new NumericValue(new BigDecimal(value));
+		NumericValue v = new NumericValue(new BigDecimal(value));
 		observation.setValue(v);
 		return v;
 	}

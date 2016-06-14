@@ -38,11 +38,15 @@ public class ScriptProcessingQueue extends VisitPostProcessorQueue {
 			return; // don't want null visits
 		}
 		try {
-			engine.processEncounter(getPatient().getId(), getVisit().getId(), getVisit().getStartTime(), getVisitFacts());
+			engine.processEncounter(getPatient(), getVisit(), getVisitFacts());
 		} catch (ScriptException e) {
 			IOException io = new IOException("Error during script execution for patient="+getPatient().getId()+", visit="+getVisit().getId(), e);
 			throw new UncheckedIOException(io);
 		}
+	}
+	
+	public int getNumScripts(){
+		return engine.getScriptCount();
 	}
 
 }
