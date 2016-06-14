@@ -43,14 +43,14 @@ public class TestVisitPostProcessorQueue {
 	@Test
 	public void verifyFactCount(){
 		// process stream
-		os.stream().count();
+		long total = os.stream().count();
 		// verify counts
 		List<VisitCount> counts = v.getCounts();
 		
 		// print actual visit counts
-//		for( VisitCount i : v.getCounts() ){
-//			System.out.println(i.toString());
-//		}
+		for( VisitCount i : v.getCounts() ){
+			System.out.println(i.toString());
+		}
 		
 		assertPatientVisitCount(counts, 0, "p1", null, 0);
 		assertPatientVisitCount(counts, 1, "p1", "v1", 13);
@@ -60,5 +60,10 @@ public class TestVisitPostProcessorQueue {
 		assertPatientVisitCount(counts, 5, "p3", null, 0);
 		assertPatientVisitCount(counts, 6, "p3", "v4", 13);
 		Assert.assertEquals(7, counts.size());
+		
+		// compare total to sum of all counts
+		//int sum = counts.stream().map(v -> v.count).reduce(0, (a,b)->a+b);
+		int sum = counts.stream().mapToInt(v -> v.count).sum();
+		Assert.assertEquals(total, sum);
 	}
 }

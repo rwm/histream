@@ -235,6 +235,10 @@ public class FactGroupingQueue implements Supplier<Observation>{
 				return workQueue.remove();
 			}
 
+			if( currentPatient == null && currentVisitId == null ){
+				// no more facts
+				break;
+			}
 			// queue is empty, try to find table with matching facts
 			while( tableIndex < factTables.size() ){
 				FactRow row = currentRows.get(tableIndex);
@@ -282,7 +286,8 @@ public class FactGroupingQueue implements Supplier<Observation>{
 				currentPatient = patientTable.get();
 				if( currentPatient == null ){
 					// no more patients available and work queue empty
-					// we are done
+					// we are done 
+					// (during next call, currentVisitId and currentPatientId are null)
 					break;
 				}
 				patientChanged();

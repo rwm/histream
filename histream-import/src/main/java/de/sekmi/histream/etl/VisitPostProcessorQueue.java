@@ -1,7 +1,9 @@
 package de.sekmi.histream.etl;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import de.sekmi.histream.Observation;
 
@@ -19,21 +21,22 @@ import de.sekmi.histream.Observation;
 public abstract class VisitPostProcessorQueue extends FactGroupingQueue {
 
 	private List<Observation> visitFacts;
-	private boolean visitProcessed;
-	private Observation nextFact;
+	private Queue<Observation> processedQueue;
 	
 	public VisitPostProcessorQueue() {
 		super();
 		visitFacts = new ArrayList<>();
-		visitProcessed = false;
+		processedQueue = new LinkedList<>();
 	}
 	
 	@Override
 	protected void visitFinished(){
 		super.visitFinished();
 		postProcessVisit();
-		visitFacts.clear();
-		this.visitProcessed = true;
+		if( !visitFacts.isEmpty() ){
+			processedQueue.addAll(visitFacts);
+			visitFacts.clear();		
+		}
 	}
 	/**
 	 * Get the facts for the currently post-processed visit. The
@@ -59,38 +62,21 @@ public abstract class VisitPostProcessorQueue extends FactGroupingQueue {
 	
 	@Override
 	public Observation get(){
-		if( visitProcessed && !visitFacts.isEmpty() ){
-			return visitFacts.remove(0);
-		}
 		// collect facts for next visit
-		visitProcessed = false;
-		// on first call, we don't have any fact
-		if( nextFact == null ){
-			// load first fact
-			nextFact = super.get();				
-		}
-		// as long as we have a fact, collect it until visit is finished
-		while( nextFact != null && visitProcessed == false ){
-			visitFacts.add(nextFact);
-			// next fact
-			nextFact = super.get();
-		}
-		// TODO visit can be processed, without having any facts left to return (either there were no facts in the visit or or postProcessing removed all facts)
-		// TODO maybe rename visitProcessed to visitProcessedNonempty
-		if( visitProcessed ){
-			if( !visitFacts.isEmpty() ){
-				// remove first
-				return visitFacts.remove(0);
-			}else if( nextFact != null ){
-				// at least one more fact available for next visit.
-				return this.get(); // may be better to loop instead of recurse
-			}else{
-				// no more facts, we are done
-				return null;
+		while( processedQueue.isEmpty() ){
+			// add to visit queue
+			Observation next = super.get(); // super.get() will call visitFinished()
+			if( next == null ){
+				// no more observations.
+				break; // we are done.
 			}
+			visitFacts.add(next);
+		}
+		
+		if( !processedQueue.isEmpty() ){
+			return processedQueue.remove();
 		}else{
-			// should never be here.. TODO throw exception
-			throw new RuntimeException("Should never happen!");
+			return null;
 		}
 	}
 
