@@ -26,6 +26,13 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 
+/**
+ * Basic implementation of patient extension which 
+ * always creates new instances of {@link PatientImpl}.
+ * 
+ * @author R.W.Majeed
+ *
+ */
 public class SimplePatientExtension implements Extension<PatientImpl>{
 	private final static Class<?>[] TYPES = new Class<?>[]{Patient.class, PatientImpl.class};
 

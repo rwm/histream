@@ -62,6 +62,17 @@ public interface Observation extends ConceptValuePair{
 	void setStartTime(DateTimeAccuracy date);
 	
 	ObservationFactory getFactory();
+	/**
+	 * Access the extension for the given type.
+	 * This will also allocate and assign the extension to
+	 * the observation if this is the first time it is accessed
+	 * for this observation.
+	 * 
+	 * @param <T> Extension type
+	 * @param extensionType extension class.
+	 * @return extension object
+	 * @throws IllegalArgumentException
+	 */
 	<T> T getExtension(Class<T> extensionType) throws IllegalArgumentException;
 	<T> void setExtension(Class<T> extensionType, T extension) throws IllegalArgumentException;
 	
