@@ -2,9 +2,11 @@ package de.sekmi.histream.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.Instant;
 
 import javax.xml.XMLConstants;
@@ -38,8 +40,8 @@ import de.sekmi.histream.ext.ExternalSourceType;
 
 public class ObservationImplJAXBTest {
 	public static final File EXAMPLE_FACT_XSD = new File("examples/fact.xsd");
-	public static final File[] EXAMPLE_FACT_FILES = new File[]{
-			new File("examples/fact1.xml"),
+	public static final URL[] EXAMPLE_FACT_FILES = new URL[]{
+			ObservationImplJAXBTest.class.getResource("/fact1.xml"),
 	//		new File("examples/fact2.xml"),
 	};
 	
@@ -174,7 +176,9 @@ public class ObservationImplJAXBTest {
 
 	    // validate the DOM tree
 		for( int i=0; i<EXAMPLE_FACT_FILES.length; i++ ){
-			validator.validate(new StreamSource(EXAMPLE_FACT_FILES[i]));
+			try( InputStream in = EXAMPLE_FACT_FILES[i].openStream() ){
+				validator.validate(new StreamSource(in));				
+			}
 		}
 	}
 	
