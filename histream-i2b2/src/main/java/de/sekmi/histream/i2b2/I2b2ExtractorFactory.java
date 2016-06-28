@@ -17,7 +17,8 @@ import de.sekmi.histream.ObservationFactory;
  * <p>
  * Allows simple queries against the i2b2 observation_fact table
  * and retrieval of facts.
- * 
+ * </p>
+ * TODO add/use interface from histream-core
  * @author R.W.Majeed
  *
  */
