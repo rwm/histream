@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<export xmlns="http://sekmi.de/ns/histream/export">
+<export xmlns="http://sekmi.de/ns/histream/export-v1">
 <!-- 
 the export is a three step process:
 
@@ -26,12 +26,12 @@ to construct table data.
 		</group>
 	</concepts>
 	
-	<patient>
+	<patient-table>
 		<column header="pid" xpath="@id"/>
 		<column header="birthdate" xpath="birthdate"/>
 		<column header="gender" xpath="gender"/>
-	</patient>
-	<visit>
+	</patient-table>
+	<visit-table>
 		<!-- context for XPath expressions is each visit node -->
 		<!-- XMLNS for XPath is assumed to be  http://sekmi.de/histream/ns/eav-data -->
 		<column header="pid" xpath="../@id"/>
@@ -51,14 +51,14 @@ to construct table data.
 					6/mod=OPB -> tested non pathological
 					6/mod=PB -> tested pathological 
 			-->
-	</visit>
+	</visit-table>
 	<!-- export separate table for repeating elements -->
-	<table id="diag" class="diag">
+	<repeating-table id="diag" class="diag">
 		<!-- context for XPath expressions is each fact node -->
 		<column header="pid" xpath="patient-ref"/>
 		<column header="visit" xpath="visit-ref"/>
 		<column header="start" type="@start"/>
 		<column header="code" type="@concept"/>
 		<column header="primary" xpath="modifier[@code='fuehrend']/@code"/>
-	</table>
+	</repeating-table>
 </export>
