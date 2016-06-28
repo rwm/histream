@@ -17,12 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -40,6 +35,7 @@ import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.Meta;
+import de.sekmi.histream.xml.XMLUtils;
 
 public class TestXMLWriter {
 	private Path debugFile;
@@ -57,13 +53,6 @@ public class TestXMLWriter {
 		if( debugLog != System.out )debugLog.close();
 		if( debugFile != null )
 			Files.delete(debugFile);
-	}
-	
-	private void printDocument(Document doc) throws TransformerException{
-		DOMSource source = new DOMSource(doc);
-		Transformer t;
-		t = TransformerFactory.newInstance().newTransformer();
-		t.transform(source, new StreamResult(debugLog));
 	}
 	
 	private Document createDocument() throws ParserConfigurationException{
@@ -179,7 +168,7 @@ public class TestXMLWriter {
 		s.close();
 
 		doc.normalizeDocument();
-		printDocument(doc);
+		XMLUtils.printDOM(doc, debugLog);
 	}
 	@Test
 	public void testWriteStream() throws Exception{
