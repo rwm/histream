@@ -22,11 +22,33 @@ package de.sekmi.histream.io;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 
 public interface FileObservationSupplierFactory {
-	ObservationSupplier forFile(File file, ObservationFactory factory)throws IOException;
+	/**
+	 * Get an observation supplier for the given input stream.
+	 * <p>
+	 * The input stream will be wrapped and will be closed automatically
+	 * by the {@link ObservationSupplier#close()} method.
+	 * </p>
+	 * <p>
+	 *  If this method fails via a checked exception, the input stream will
+	 *  be closed.
+	 * </p>
+	 * @param in input stream
+	 * @param factory factory
+	 * @return observation supplier
+	 * @throws IOException error (will automatically close the input stream)
+	 */
+	ObservationSupplier forInputStream(InputStream in, ObservationFactory factory)throws IOException;
+
+	default ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
+		return forInputStream(new FileInputStream(file), factory);
+	}
+
 }

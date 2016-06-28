@@ -20,10 +20,8 @@ package de.sekmi.histream.io;
  * #L%
  */
 
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import de.sekmi.histream.ObservationFactory;
@@ -40,10 +38,9 @@ public class FlatProviderFactory implements FileObservationSupplierFactory, Plug
 		// don't need to close anything
 	}
 
-	@SuppressWarnings("resource")
 	@Override
-	public ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
-		return new FlatObservationSupplier(factory, new FileInputStream(file));
+	public ObservationSupplier forInputStream(InputStream in, ObservationFactory factory) throws IOException {
+		return new FlatObservationSupplier(factory, in);
 	}
 
 }

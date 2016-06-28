@@ -196,7 +196,11 @@ public class FileObservationProviderTest {
 		return factory;
 	}
 	public ObservationSupplier getExampleSupplier() throws IOException{
-		return getExampleSupplier("examples/dwh-jaxb.xml");
+		try {
+			return new GroupedXMLReader(factory, getClass().getResourceAsStream("/dwh.xml"));
+		} catch (XMLStreamException | FactoryConfigurationError | JAXBException e) {
+			throw new IOException(e);
+		}
 	}
 	
 	public ObservationSupplier getExampleSupplier(String path) throws IOException{
