@@ -11,7 +11,6 @@ import org.w3c.dom.Element;
 
 import de.sekmi.histream.export.FactClassAnnotator;
 import de.sekmi.histream.impl.ObservationImplJAXBTest;
-import de.sekmi.histream.xml.XMLUtils;
 
 public class TestFactClassAnnotator {
 
