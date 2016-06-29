@@ -7,11 +7,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ExportDescriptor {
 
 	@XmlElement
+	Concepts concepts;
+	
+	@XmlElement(name="patient-table")
 	PatientTable patient;
 	
-	@XmlElement
+	@XmlElement(name="visit-table")
 	VisitTable visit;
 	
-	@XmlElement(name="table")
-	FactTable[] tables;
+	@XmlElement(name="eav-table")
+	EavTable[] tables;
 }

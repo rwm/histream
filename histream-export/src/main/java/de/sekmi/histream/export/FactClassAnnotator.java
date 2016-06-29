@@ -66,4 +66,15 @@ public class FactClassAnnotator {
 			((Element)fact).setAttribute("class", clazz);
 		}
 	}
+	
+	public void annotateFactSiblings(Node first){
+		annotateFact(first);
+		Node next = first.getNextSibling();
+		while( next != null ){
+			if( next.getNodeType() == Node.ELEMENT_NODE && next.getLocalName().equals("fact") ){
+				annotateFact(next);
+			}
+			next = next.getNextSibling();
+		}
+	}
 }

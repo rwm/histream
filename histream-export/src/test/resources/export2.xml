@@ -18,14 +18,17 @@ to construct table data.
 -->
 	<concepts>
 		<group class="d_lab">
-			<concept id="LOINC:26436-6" />
-			<concept id="LOINC:26436-6:NEG" />
+			<concept notation="LOINC:26436-6" />
+			<concept notation="LOINC:26436-6:NEG" />
 		</group>
 		<group class="diag">
-			<concept wildcard="ICD10:*" />
+			<concept wildcard-notation="ICD10:*" />
+			<concept iri="http://data.dzl.de/ns/ont/xxx"/>
 		</group>
+		<concept notation="XYZ" />
 	</concepts>
-	
+
+
 	<patient-table>
 		<column header="pid" xpath="@id"/>
 		<column header="birthdate" xpath="birthdate"/>
@@ -53,12 +56,12 @@ to construct table data.
 			-->
 	</visit-table>
 	<!-- export separate table for repeating elements -->
-	<repeating-table id="diag" class="diag">
+	<eav-table id="diag" class="diag">
 		<!-- context for XPath expressions is each fact node -->
 		<column header="pid" xpath="patient-ref"/>
 		<column header="visit" xpath="visit-ref"/>
 		<column header="start" type="@start"/>
 		<column header="code" type="@concept"/>
 		<column header="primary" xpath="modifier[@code='fuehrend']/@code"/>
-	</repeating-table>
+	</eav-table>
 </export>

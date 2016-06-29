@@ -1,9 +1,6 @@
 package de.sekmi.histream.export.config;
 
-import javax.xml.bind.annotation.XmlElement;
 
-public class PatientTable {
+public class PatientTable extends AbstractTable{
 
-	@XmlElement(name="column")
-	AbstractColumn[] columns;
 }
