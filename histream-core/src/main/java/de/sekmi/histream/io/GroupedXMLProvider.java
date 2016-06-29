@@ -43,7 +43,7 @@ public class GroupedXMLProvider implements FileObservationSupplierFactory, Plugi
 	}
 
 	@Override
-	public ObservationSupplier forInputStream(InputStream in, ObservationFactory factory) throws IOException {
+	public ObservationSupplier createSupplier(InputStream in, ObservationFactory factory) throws IOException {
 		try {
 			return new GroupedXMLReader(factory, in);
 		} catch (JAXBException | XMLStreamException | FactoryConfigurationError e) {

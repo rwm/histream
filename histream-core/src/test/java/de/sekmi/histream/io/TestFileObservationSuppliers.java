@@ -25,7 +25,7 @@ public class TestFileObservationSuppliers {
 	@Test
 	public void verifyGroupedXmlSupplier() throws Exception{
 		GroupedXMLProvider p = new GroupedXMLProvider(null);
-		ObservationSupplier s = p.forFile(new File("examples/dwh-jaxb.xml"), factory);
+		ObservationSupplier s = p.createSupplier(getClass().getResourceAsStream("/dwh.xml"), factory);
 		Assert.assertTrue( s.stream().count() > 0 );
 		s.close();
 		p.close();
@@ -33,7 +33,7 @@ public class TestFileObservationSuppliers {
 	@Test
 	public void verifyFlatSupplier() throws Exception{
 		FlatProviderFactory p = new FlatProviderFactory(null);
-		ObservationSupplier s = p.forFile(new File("examples/dwh-flat.txt"), factory);
+		ObservationSupplier s = p.createSupplier(new File("examples/dwh-flat.txt"), factory);
 		Assert.assertTrue( s.stream().count() > 0 );
 		s.close();
 		p.close();

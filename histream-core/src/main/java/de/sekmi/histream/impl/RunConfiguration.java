@@ -136,12 +136,12 @@ public class RunConfiguration implements Closeable{
 		ObservationSupplier p = null;
 		// if only one file factory present, pass on exception
 		if( fileFactories.length == 1 ){
-			p = fileFactories[0].forFile(file, factory);
+			p = fileFactories[0].createSupplier(file, factory);
 		}else{
 			// multiple file factories, find one which doesn't give errors
 			for( int i=0; i<fileFactories.length; i++ ){
 				try {
-					p = fileFactories[i].forFile(file, factory);
+					p = fileFactories[i].createSupplier(file, factory);
 					break;
 				} catch (IOException e) {
 					// unable to process file

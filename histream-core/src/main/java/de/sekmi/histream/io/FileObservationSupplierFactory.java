@@ -45,10 +45,10 @@ public interface FileObservationSupplierFactory {
 	 * @return observation supplier
 	 * @throws IOException error (will automatically close the input stream)
 	 */
-	ObservationSupplier forInputStream(InputStream in, ObservationFactory factory)throws IOException;
+	ObservationSupplier createSupplier(InputStream in, ObservationFactory factory)throws IOException;
 
-	default ObservationSupplier forFile(File file, ObservationFactory factory) throws IOException {
-		return forInputStream(new FileInputStream(file), factory);
+	default ObservationSupplier createSupplier(File file, ObservationFactory factory) throws IOException {
+		return createSupplier(new FileInputStream(file), factory);
 	}
 
 }

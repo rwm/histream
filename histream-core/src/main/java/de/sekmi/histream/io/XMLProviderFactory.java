@@ -44,7 +44,7 @@ public class XMLProviderFactory implements FileObservationSupplierFactory, Plugi
 	}
 
 	@Override
-	public ObservationSupplier forInputStream(InputStream in, ObservationFactory factory) throws IOException {
+	public ObservationSupplier createSupplier(InputStream in, ObservationFactory factory) throws IOException {
 		try {
 			return new XMLObservationSupplier(factory, in);
 		} catch (XMLStreamException | FactoryConfigurationError e) {

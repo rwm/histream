@@ -39,7 +39,7 @@ public class FlatProviderFactory implements FileObservationSupplierFactory, Plug
 	}
 
 	@Override
-	public ObservationSupplier forInputStream(InputStream in, ObservationFactory factory) throws IOException {
+	public ObservationSupplier createSupplier(InputStream in, ObservationFactory factory) throws IOException {
 		return new FlatObservationSupplier(factory, in);
 	}
 
