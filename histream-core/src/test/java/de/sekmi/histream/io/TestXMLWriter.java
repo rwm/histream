@@ -222,7 +222,10 @@ public class TestXMLWriter {
 		dbf.setIgnoringComments(true);
 		DocumentBuilder db = dbf.newDocumentBuilder();
 
-		Document doc1 = db.parse(new File("examples/dwh-jaxb.xml"));
+		Document doc1 = null;
+		try( InputStream in = getClass().getResourceAsStream("/dwh.xml") ){
+			doc1 = db.parse(in);
+		}
 		doc1.normalizeDocument();
 		removeEmptyText(doc1);
 

@@ -40,17 +40,13 @@
 			<location>Zuhause</location>
 			<!-- TODO inpatient/outpatient -->
 			<provider>xxxa</provider>
-			<facts>
-	
-				<!-- test parsing of data types -->
-				<fact concept="source1"><value xsi:type="string">1</value></fact>
-				<fact concept="source1"><value xsi:type="string">2</value></fact>
-				<fact concept="source2"><value xsi:type="string">1</value></fact>
-				<fact concept="source3"><value xsi:type="string">1</value></fact>
-				<fact concept="source3"><value xsi:type="string">2</value></fact>
-				<fact concept="source3"><value xsi:type="string">99</value></fact>
-
-			</facts>
+			<!-- test parsing of data types -->
+			<fact concept="source1"><value xsi:type="string">1</value></fact>
+			<fact concept="source1"><value xsi:type="string">2</value></fact>
+			<fact concept="source2"><value xsi:type="string">1</value></fact>
+			<fact concept="source3"><value xsi:type="string">1</value></fact>
+			<fact concept="source3"><value xsi:type="string">2</value></fact>
+			<fact concept="source3"><value xsi:type="string">99</value></fact>
 		</encounter>
 	</patient>
 	<!-- weitere zeitstempel -->

@@ -68,7 +68,7 @@ public class TestEncryptDecrypt {
 	@Test
 	public void testEncryptDecryptChannels() throws GeneralSecurityException, IOException{
 		
-		Path source = Paths.get("examples/dwh-jaxb.xml");
+		Path source = Paths.get("src/test/resources/dwh.xml");
 		Path temp = Files.createTempFile("encrypted", ".enc");
 		Path dec = Files.createTempFile("decrypted", ".xml");
 
@@ -101,7 +101,7 @@ public class TestEncryptDecrypt {
 	@Test
 	public void testEncryptDecryptStreams() throws GeneralSecurityException, IOException{
 		
-		Path source = Paths.get("examples/dwh-jaxb.xml");
+		Path source = Paths.get("src/test/resources/dwh.xml");
 		Path temp = Files.createTempFile("encrypted", ".enc");
 		Path dec = Files.createTempFile("decrypted", ".xml");
 

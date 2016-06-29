@@ -182,10 +182,10 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 				throw new ObservationException(e);
 			}
 			// TODO more data
-			formatIndent();
-			writer.writeStartElement(GroupedXMLReader.FACT_WRAPPER);
-			formatNewline();
-			formatPush();
+//			formatIndent();
+//			writer.writeStartElement(GroupedXMLReader.FACT_WRAPPER);
+//			formatNewline();
+//			formatPush();
 		} catch (XMLStreamException e) {
 			throw new ObservationException(e);
 		}
@@ -194,10 +194,10 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	protected void endEncounter(Visit visit) throws ObservationException{
 		formatPop();
 		try {
-			formatIndent();
-			writer.writeEndElement(); // fact wrapper
-			formatNewline();
-			formatPop();
+//			formatIndent();
+//			writer.writeEndElement(); // fact wrapper
+//			formatNewline();
+//			formatPop();
 			formatIndent();
 			writer.writeEndElement(); // encounter
 			formatNewline();

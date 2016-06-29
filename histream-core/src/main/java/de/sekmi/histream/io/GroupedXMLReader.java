@@ -40,7 +40,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	static final String DOCUMENT_ROOT = "eav-data";
 	static final String PATIENT_ELEMENT = "patient";
 	static final String ENCOUNTER_ELEMENT = "encounter";
-	static final String FACT_WRAPPER = "facts";
+	static final String FACT_ELEMENT = "fact";
 	
 	private ObservationFactory factory;
 	private ExtensionAccessor<Patient> patientAccessor;
@@ -217,7 +217,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		encounterId = reader.getAttributeValue(null, "id");
 		reader.nextTag();
 		while( reader.isStartElement() 
-				&& !reader.getLocalName().equals(FACT_WRAPPER)
+				&& !reader.getLocalName().equals(FACT_ELEMENT)
 				&& !reader.getLocalName().equals("source") )
 		{
 			visitData.put(reader.getLocalName(), reader.getElementText());
@@ -236,7 +236,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		ExternalSourceType es = readSource();
 		
 		// TODO assert at <facts>
-		reader.nextTag();
+		//reader.nextTag();
 
 		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)es);
 		currentVisit.setStartTime(encounterStart);
@@ -259,9 +259,10 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		// </facts> might occur after previous call to readObservation()
 		while( reader.isEndElement() ){
 			switch( reader.getLocalName() ){
-			case FACT_WRAPPER:
+			/*case FACT_WRAPPER:
 				// end of facts
 				reader.nextTag();
+				*/
 				// fall through to end of visit, 
 				// XXX this doesn't work, if facts are allowed outside of encounter (e.g. directly under patient)
 			case ENCOUNTER_ELEMENT:

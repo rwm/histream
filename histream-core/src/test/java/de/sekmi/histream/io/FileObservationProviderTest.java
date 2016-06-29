@@ -229,7 +229,7 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testJAXBReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError, JAXBException  {
-		GroupedXMLReader xos = new GroupedXMLReader(factory, new FileInputStream("examples/dwh-jaxb.xml"));
+		GroupedXMLReader xos = new GroupedXMLReader(factory, getClass().getResourceAsStream("/dwh.xml"));
 		validateExample(xos);
 		xos.close();
 	}
