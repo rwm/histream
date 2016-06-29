@@ -6,11 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import de.sekmi.histream.ObservationException;
+import de.sekmi.histream.ObservationExtractor;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.ObservationSupplier;
 
 /**
  * Extract observations from i2b2.
@@ -22,7 +28,7 @@ import de.sekmi.histream.ObservationFactory;
  * @author R.W.Majeed
  *
  */
-public class I2b2ExtractorFactory implements AutoCloseable {
+public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor {
 	private static final Logger log = Logger.getLogger(I2b2ExtractorFactory.class.getName());
 
 	private DataSource ds;
@@ -78,16 +84,16 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 		// de.sekmi.histream.i2b2.extractor.project
 	}
 	
-	private void createTemporaryConceptTable(Connection dbc, String[] concepts) throws SQLException{
+	private void createTemporaryConceptTable(Connection dbc, Iterable<String> concepts) throws SQLException{
 		try( Statement s = dbc.createStatement() ){
 			s.executeUpdate("CREATE TEMPORARY TABLE temp_concepts(concept VARCHAR(255) PRIMARY KEY)");			
 		}
 		try( PreparedStatement ps 
 				= dbc.prepareStatement("INSERT INTO temp_concepts(concept) VALUES(?)") ){
-			for( int i=0; i<concepts.length; i++ ){
+			for( String concept : concepts ){
 				ps.clearParameters();
 				ps.clearWarnings();
-				ps.setString(1, concepts[i]);
+				ps.setString(1, concept);
 				ps.executeUpdate();
 			}
 		}
@@ -112,12 +118,12 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 	 * 
 	 * @param start_min start date of returned observations must be greater than start_min
 	 * @param start_max start date of returned observations must be less than start_max
-	 * @param concepts concept ids to extract
+	 * @param notations concept ids to extract
 	 * @return extractor
 	 * @throws SQLException error
 	 */
 	//@SuppressWarnings("resource")
-	public I2b2Extractor extract(Timestamp start_min, Timestamp start_max, String[] concepts) throws SQLException{
+	public I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
 		// TODO move connection and prepared statement to I2b2Extractor
 		Connection dbc = ds.getConnection();
 		PreparedStatement ps = null;
@@ -127,19 +133,20 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 			StringBuilder b = new StringBuilder(600);
 			b.append("SELECT ");
 			b.append(SELECT_PARAMETERS+" FROM "+SELECT_TABLE+" ");
-			if( concepts != null ){
-				log.info("Temporary table created for "+concepts.length+" concept ids");
-				String[] ids = concepts;
+			if( notations != null ){
+				log.info("Creating temporary table for concept ids");
+				Iterable<String> ids = notations;
 				int wildcardCount = 0;
 				if( allowWildcardConceptCodes ){
 					// TODO check if wildcards actually used (search for *)
-					ids = new String[concepts.length];
-					for( int i=0; i<ids.length; i++ ){
-						ids[i] = escapeLikeString(concepts[i]).replace('*', '%');
-						if( false == ids[i].equals(concepts[i]) ){
+					List<String>escaped = new ArrayList<>();
+					for( String id : ids ){
+						String es = escapeLikeString(id).replace('*', '%');
+						if( false == es.equals(id) ){
 							wildcardCount ++;
 						}
 					}
+					ids = escaped;
 					// TODO add check for overlapping wildcard concepts (e.g. A* and AB*)
 				}
 				createTemporaryConceptTable(dbc, ids);
@@ -174,5 +181,13 @@ public class I2b2ExtractorFactory implements AutoCloseable {
 	@Override
 	public void close() throws SQLException {
 
+	}
+	@Override
+	public ObservationSupplier extract(Instant start_min, Instant start_max, Iterable<String> notations) throws ObservationException{
+		try {
+			return extract(Timestamp.from(start_min), Timestamp.from(start_max), notations);
+		} catch (SQLException e) {
+			throw new ObservationException(e);
+		}
 	}
 }

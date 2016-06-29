@@ -2,11 +2,11 @@ package de.sekmi.histream.i2b2;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -26,13 +26,13 @@ public class TestExtractor implements DataSource{
 				e.dump();
 			}
 
-			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), new String[]{"AKTIN:PLZ"}) ){
+			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), Arrays.asList("AKTIN:PLZ")) ){
 		
 				e.stream().forEach(System.out::println);
 			}
 			System.out.println("-- now with wildcards");
 			ef.setFeature(I2b2ExtractorFactory.ALLOW_WILDCARD_CONCEPT_CODES, Boolean.TRUE);
-			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), new String[]{"ICD10GM:*","AKTIN:PLZ"}) ){
+			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), Arrays.asList("ICD10GM:*","AKTIN:PLZ") ) ){
 				
 				e.stream().forEach(System.out::println);
 			}
