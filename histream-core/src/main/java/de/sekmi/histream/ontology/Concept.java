@@ -43,7 +43,7 @@ public interface Concept {
 	
 	/**
 	 * Get id identifying this concept which is unique to the ontology
-	 * For RDF, this will be the rdf:about URI which can have abbreviated namespace prefix.
+	 * For RDF, this will be the rdf:about IRI which can have abbreviated namespace prefix.
 	 * @return unique id
 	 */
 	String getID();

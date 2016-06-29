@@ -467,5 +467,21 @@ public class Store implements Ontology, Plugin {
 			throw new SKOSException(r, "dwh:mapFact must contain one of dwh:condition, dwh:choose, dwh:value");
 		}
 	}
+	@Override
+	public Concept getConceptById(String id) throws OntologyException {
+		URI uri = repo.getValueFactory().createURI(id);
+		RepositoryResult<Statement> s = null;
+		ConceptImpl ci = null;
+		try{
+			s = rc.getStatements(uri, RDF.TYPE, SKOS.CONCEPT, false);
+			if( s.hasNext() ){
+				ci = new ConceptImpl(this, s.next().getSubject());
+			}
+			s.close();
+		} catch (RepositoryException e) {
+			throw new OntologyException(e);
+		}
+		return ci;
+	}
 }
 

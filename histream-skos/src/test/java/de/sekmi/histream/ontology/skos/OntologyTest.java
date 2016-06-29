@@ -124,6 +124,16 @@ public class OntologyTest {
 		Assert.assertEquals("Description_de", c.getDescription(Locale.GERMAN));
 	}
 	
+	@Test
+	public void verifyGetByIRI() throws OntologyException{
+
+		Concept c = store.getConceptById("http://sekmi.de/histream/skos/tests#OtherSub");
+		Assert.assertNotNull(c);
+		String[] n = c.getNotations();
+		Assert.assertNotNull(n);
+		Assert.assertEquals(1,n.length);
+		Assert.assertEquals("other",n[0]);
+	}
 	@After
 	public void closeOntology() throws IOException{
 		store.close();
