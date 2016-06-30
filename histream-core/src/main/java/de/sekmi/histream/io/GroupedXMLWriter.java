@@ -73,6 +73,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
 		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		this.writer = factory.createXMLStreamWriter(output);
+		
 	}
 
 	/**
@@ -84,6 +85,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		this();
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
+		// this does not work with the DOM stream writer
 		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		this.writer = factory.createXMLStreamWriter(result);
 	}
@@ -103,12 +105,14 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	@Override
 	protected void beginStream() throws ObservationException{
 		try {
-			//writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
 			writer.writeStartDocument();
-			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.DOCUMENT_ROOT,NAMESPACE);
+// this will write duplicate xmlns for the stream writer
+//			writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
 			writer.setDefaultNamespace(NAMESPACE);
-			writer.writeDefaultNamespace(NAMESPACE);
+			// NamespaceContext is not supported by DOM stream writer
+			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.DOCUMENT_ROOT,NAMESPACE);
 			writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+			writer.writeDefaultNamespace(NAMESPACE);
 			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 			formatNewline();
 			formatPush();
@@ -144,13 +148,20 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	protected void beginEncounter(Visit visit)throws ObservationException{
 		try {
 			formatIndent();
-			writer.writeStartElement(GroupedXMLReader.ENCOUNTER_ELEMENT);
+			// TODO write elements with namespaces -> ObservationImpl.XML_NAMESPACE, 
+			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.ENCOUNTER_ELEMENT,NAMESPACE);
+			writer.setDefaultNamespace(NAMESPACE);
+//			writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
+			writer.writeDefaultNamespace(NAMESPACE);
+			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+//			writer.writeStartElement(GroupedXMLReader.ENCOUNTER_ELEMENT);
 			writer.writeAttribute("id", visit.getId());
 			formatNewline();
 			formatPush();
 	
 			if( visit.getStartTime() != null ){
 				formatIndent();
+//				writer.writeStartElement("","start",NAMESPACE);
 				writer.writeStartElement("start");
 				writer.writeCharacters(visit.getStartTime().toPartialIso8601());
 				writer.writeEndElement();
