@@ -152,7 +152,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.ENCOUNTER_ELEMENT,NAMESPACE);
 			writer.setDefaultNamespace(NAMESPACE);
 //			writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, NAMESPACE);
-			writer.writeDefaultNamespace(NAMESPACE);
+//			writer.writeDefaultNamespace(NAMESPACE);
 			writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 //			writer.writeStartElement(GroupedXMLReader.ENCOUNTER_ELEMENT);
 			writer.writeAttribute("id", visit.getId());
@@ -161,22 +161,21 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	
 			if( visit.getStartTime() != null ){
 				formatIndent();
-//				writer.writeStartElement("","start",NAMESPACE);
-				writer.writeStartElement("start");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"start",NAMESPACE);
 				writer.writeCharacters(visit.getStartTime().toPartialIso8601());
 				writer.writeEndElement();
 				formatNewline();
 			}
 			if( visit.getEndTime() != null ){
 				formatIndent();
-				writer.writeStartElement("end");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"end",NAMESPACE);
 				writer.writeCharacters(visit.getEndTime().toPartialIso8601());
 				writer.writeEndElement();
 				formatNewline();
 			}
 			if( visit.getLocationId() != null ){
 				formatIndent();
-				writer.writeStartElement("location");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"location",NAMESPACE);
 				writer.writeCharacters(visit.getLocationId());
 				writer.writeEndElement();
 				formatNewline();
@@ -231,7 +230,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	protected void beginPatient(Patient patient) throws ObservationException{
 		try{
 			formatIndent();
-			writer.writeStartElement(GroupedXMLReader.PATIENT_ELEMENT);
+			writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,GroupedXMLReader.PATIENT_ELEMENT,NAMESPACE);
 			writer.writeAttribute("id", patient.getId());
 			formatNewline();
 			formatPush();
@@ -241,7 +240,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// write given name
 			if( patient.getGivenName() != null ){
 				formatIndent();
-				writer.writeStartElement("given-name");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"given-name",NAMESPACE);
 				writer.writeCharacters(patient.getGivenName());
 				writer.writeEndElement();
 				formatNewline();
@@ -250,7 +249,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// write surname
 			if( patient.getSurname() != null ){
 				formatIndent();
-				writer.writeStartElement("surname");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"surname",NAMESPACE);
 				writer.writeCharacters(patient.getSurname());
 				writer.writeEndElement();
 				formatNewline();
@@ -260,7 +259,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// gender
 			if( patient.getSex() != null ){
 				formatIndent();
-				writer.writeStartElement("gender");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"gender",NAMESPACE);
 				// TODO use acronym/special value
 				writer.writeCharacters(patient.getSex().name());
 				writer.writeEndElement();
@@ -270,7 +269,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// birth date
 			if( patient.getBirthDate() != null ){
 				formatIndent();
-				writer.writeStartElement("birthdate");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"birthdate",NAMESPACE);
 				writer.writeCharacters(patient.getBirthDate().toPartialIso8601());
 				writer.writeEndElement();
 				formatNewline();
@@ -279,7 +278,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			// deceased status / death date
 			if( patient.getDeceased() != null && patient.getDeceased() == true ){
 				formatIndent();
-				writer.writeStartElement("deceased");
+				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"deceased",NAMESPACE);
 				if( patient.getDeathDate() != null ){
 					writer.writeCharacters(patient.getDeathDate().toPartialIso8601());
 				}

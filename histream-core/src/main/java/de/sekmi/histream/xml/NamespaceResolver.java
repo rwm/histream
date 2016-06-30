@@ -8,13 +8,27 @@ import javax.xml.namespace.NamespaceContext;
 
 import de.sekmi.histream.impl.ObservationImpl;
 
+/**
+ * Namespace context e.g. for XPath evaluations.
+ * Supports {@value ObservationImpl#XML_NAMESPACE} with default prefix
+ * and second prefix {@value NamespaceResolver#DEFAULT_EAV_PREFIX}.
+ * XXX a future implementation may allow changing the second prefix
+ * <p>
+ * Also {@code xml} and {@code xsi} prefixes.
+ * </p>
+ * @author R.W.Majeed
+ *
+ */
 public class NamespaceResolver implements NamespaceContext{
+	public static final String DEFAULT_EAV_PREFIX = "eav";
+	// XXX maybe make the second prefix 'eav' changeable with a constructor
+	
 	@Override
 	public Iterator<?> getPrefixes(String namespaceURI) {
 		String prefix = getPrefix(namespaceURI);
 		if( prefix == null )return Arrays.asList().iterator();
 		else if( namespaceURI.equals(ObservationImpl.XML_NAMESPACE) ){
-			return Arrays.asList(prefix,"f").iterator();
+			return Arrays.asList(prefix, DEFAULT_EAV_PREFIX).iterator();
 		}else return Arrays.asList(prefix).iterator();
 	}
 	
@@ -37,7 +51,7 @@ public class NamespaceResolver implements NamespaceContext{
 	public String getNamespaceURI(String prefix) {
 		switch( prefix ){
 		case XMLConstants.DEFAULT_NS_PREFIX:
-		case "f":
+		case DEFAULT_EAV_PREFIX:
 			return ObservationImpl.XML_NAMESPACE;
 		case "xsi":
 			return XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
