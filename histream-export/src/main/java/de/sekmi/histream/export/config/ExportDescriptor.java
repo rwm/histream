@@ -1,9 +1,13 @@
 package de.sekmi.histream.export.config;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name="export")
+@XmlAccessorType(XmlAccessType.NONE)
 public class ExportDescriptor {
 
 	@XmlElement
@@ -17,4 +21,14 @@ public class ExportDescriptor {
 	
 	@XmlElement(name="eav-table")
 	EavTable[] tables;
+
+
+	public PatientTable getPatientTable(){
+		return patient;
+	}
+
+
+	public AbstractTable getVisitTable() {
+		return visit;
+	}
 }

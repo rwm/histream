@@ -13,4 +13,9 @@ public class EavTable extends AbstractTable{
 	@XmlIDREF
 	@XmlAttribute(name="class")
 	ConceptGroup clazz;
+
+	@Override
+	public String getId() {
+		return id;
+	}
 }

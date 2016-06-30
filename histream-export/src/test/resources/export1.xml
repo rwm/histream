@@ -4,11 +4,20 @@
         <group class="diag">
             <concept wildcard-notation="ICD10:*"/>
         </group>
-        <concept notation="ABC"/>
+        <concept notation="T:full"/>
         <concept wildcard-notation="CEDIS:*"/>
     </concepts>
     <patient-table>
         <column header="pid" xpath="@id"/>
         <column header="dob" xpath="birthdate"/>
+        <column header="sex" xpath="gender"/>
     </patient-table>
+    <visit-table>
+		<column header="vid" xpath="@id"/>
+		<column header="start" xpath="start"/>
+		<column header="f_start" xpath="fact[@concept='T:full']/@start"/>
+		<column header="f_end" xpath="fact[@concept='T:full']/@end"/>
+		<column header="f_loc" xpath="fact[@concept='T:full']/@location"/>
+		<column header="f_val" xpath="fact[@concept='T:full']/value"/>
+    </visit-table>
 </ns2:export>

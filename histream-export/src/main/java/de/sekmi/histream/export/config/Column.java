@@ -36,4 +36,11 @@ public class Column {
 	// constructor for JAXB
 	protected Column(){
 	}
+	
+	public String getXPath(){
+		return xpath;
+	}
+	public String getHeader(){
+		return header;
+	}
 }
