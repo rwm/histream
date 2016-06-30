@@ -10,6 +10,7 @@ import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.export.config.ExportDescriptor;
 import de.sekmi.histream.export.config.ExportException;
 import de.sekmi.histream.io.Streams;
+import de.sekmi.histream.xml.NamespaceResolver;
 
 public class TableExportFactory {
 	private ExportDescriptor desc;
@@ -19,7 +20,7 @@ public class TableExportFactory {
 	public TableExportFactory(ExportDescriptor desc){
 		this.desc = desc;
 		factory = XPathFactory.newInstance();
-		ns = new DwhNamespaceResolver();
+		ns = new NamespaceResolver();
 	}
 	
 	private XPath createXPath(){

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:export xmlns:ns2="http://sekmi.de/ns/histream/export-v1">
+<export xmlns="http://sekmi.de/ns/histream/export-v1"
+			xmlns:eav="http://sekmi.de/histream/ns/eav-data">
     <concepts>
         <group class="diag">
             <concept wildcard-notation="ICD10:*"/>
@@ -9,15 +10,16 @@
     </concepts>
     <patient-table>
         <column header="pid" xpath="@id"/>
-        <column header="dob" xpath="birthdate"/>
-        <column header="sex" xpath="gender"/>
+        <column header="dob" xpath="eav:birthdate"/>
+        <column header="sex" xpath="eav:gender"/>
+        <column header="modified" xpath="eav:source/@timestamp"/>
     </patient-table>
     <visit-table>
 		<column header="vid" xpath="@id"/>
-		<column header="start" xpath="start"/>
-		<column header="f_start" xpath="fact[@concept='T:full']/@start"/>
-		<column header="f_end" xpath="fact[@concept='T:full']/@end"/>
-		<column header="f_loc" xpath="fact[@concept='T:full']/@location"/>
-		<column header="f_val" xpath="fact[@concept='T:full']/value"/>
+		<column header="start" xpath="eav:start"/>
+		<column header="f_start" xpath="eav:fact[@concept='T:full']/@start"/>
+		<column header="f_end" xpath="eav:fact[@concept='T:full']/@end"/>
+		<column header="f_loc" xpath="eav:fact[@concept='T:full']/@location"/>
+		<column header="f_val" xpath="eav:fact[@concept='T:full']/eav:value"/>
     </visit-table>
-</ns2:export>
+</export>

@@ -13,7 +13,9 @@ import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ext.Patient;
@@ -38,26 +40,31 @@ public abstract class VisitFragmentParser extends GroupedXMLWriter {
 		setDOMWriter(doc);
 	}
 	
+	private void fixNamespaces(DocumentFragment fragment){
+		//fragment.setPrefix(null);
+		// cannot do this
+	}
+	
 	private void setDOMWriter(Node node) throws XMLStreamException{
 		Result result = new DOMResult(node);
 		writer = factory.createXMLStreamWriter(result);
 		
 		// XXX need this?
-		writer.setDefaultNamespace(ObservationImpl.XML_NAMESPACE);
-		writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, ObservationImpl.XML_NAMESPACE);
-		writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+		//writer.setDefaultNamespace(ObservationImpl.XML_NAMESPACE);
+		//writer.setPrefix(XMLConstants.DEFAULT_NS_PREFIX, ObservationImpl.XML_NAMESPACE);
+		//writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		
 	}
 	private void createDocument() throws ParserConfigurationException{
 		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-		f.setNamespaceAware(true);
 		f.setIgnoringComments(true);
 		f.setCoalescing(true);
 		f.setIgnoringElementContentWhitespace(true);
+		f.setNamespaceAware(true);
 		DocumentBuilder builder = f.newDocumentBuilder();
 		doc = builder.newDocument();
-//		doc.getDomConfig().setParameter("namespaces", true);
-//		doc.getDomConfig().setParameter("namespace-declarations", true);
+		doc.getDomConfig().setParameter("namespaces", true);
+		doc.getDomConfig().setParameter("namespace-declarations", true);
 		//return doc;
 	}
 
@@ -79,6 +86,7 @@ public abstract class VisitFragmentParser extends GroupedXMLWriter {
 	protected void beginPatient(Patient patient) throws ObservationException {
 		// write patient info to patient fragment
 		currentPatient = doc.createDocumentFragment();
+
 		try {
 			setDOMWriter(currentPatient);
 		} catch (XMLStreamException e) {
@@ -91,6 +99,7 @@ public abstract class VisitFragmentParser extends GroupedXMLWriter {
 	protected void beginEncounter(Visit visit) throws ObservationException {
 		if( firstVisit == false ){
 			// patient fragment was parsed
+			fixNamespaces(currentPatient);
 			patientFragment(currentPatient.getFirstChild());
 			firstVisit = true;
 		}
@@ -112,6 +121,7 @@ public abstract class VisitFragmentParser extends GroupedXMLWriter {
 		super.endEncounter(visit);
 		// encounter is finished
 		// fragment should contain exactly one node -> the visit
+		fixNamespaces(currentVisit);
 		Node node = currentVisit.getFirstChild();
 		Objects.requireNonNull(node);
 		visitFragment(currentVisit.getFirstChild());

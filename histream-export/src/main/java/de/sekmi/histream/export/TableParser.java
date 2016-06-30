@@ -3,6 +3,7 @@ package de.sekmi.histream.export;
 import java.io.IOException;
 import java.util.Objects;
 
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
