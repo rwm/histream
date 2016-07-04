@@ -74,7 +74,13 @@
 			<fact concept="T:group:2">
 				<modifier code="T:mod:1"/>
 			</fact>
-		</encounter>	
+			<!-- TODO resource reference value type (e.g. reference to biomaterial id, image reference, etc.)
+			<fact concept="T:resource">
+				<value xsi:type="resource" ns="psn">234231xxx</value>
+				<modifier code="imgref"><value xsi:type="resource">msk23232l</value></modifier>				
+			</fact>
+			-->
+		</encounter>
 	</patient>
 	
 </eav-data>

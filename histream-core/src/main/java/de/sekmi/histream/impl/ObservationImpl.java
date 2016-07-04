@@ -53,7 +53,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
 @XmlRootElement(name="fact")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder={"abstractValue","modifierList","source"})
-@XmlSeeAlso({StringValue.class,NumericValue.class})
+@XmlSeeAlso({StringValue.class,NumericValue.class,ResourceValue.class})
 public class ObservationImpl implements Observation, Cloneable{
 	public static final String XML_NAMESPACE="http://sekmi.de/histream/ns/eav-data";
 	@XmlTransient
