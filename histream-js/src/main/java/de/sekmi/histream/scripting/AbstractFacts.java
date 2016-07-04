@@ -13,7 +13,7 @@ import de.sekmi.histream.ext.ExternalSourceType;
  * <p>
  * Use {@link #setObservations(List)} to specify the list
  * of observations. The provided list is edited in place.
- * </>
+ * </p>
  * @author R.W.Majeed
  *
  */

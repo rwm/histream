@@ -107,9 +107,9 @@ public class DataSource {
 	/**
 	 * If scripts are present, an instance of {@link ScriptProcessingQueue}
 	 * is returned. Otherwise an instance of {@link FactGroupingQueue}.
+	 * @param factory factory
 	 * @return fact queue
-	 * @throws IOException 
-	 * @throws  
+	 * @throws IOException error
 	 */
 	public FactGroupingQueue createFactQueue(ObservationFactory factory) throws IOException{
 //		if( true ){

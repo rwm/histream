@@ -32,7 +32,7 @@ public abstract class InferenceFactory {
 	 * This is mainly useful for generating a list of concept ids for
 	 * a database query.
 	 * </p>
-	 * @param concepts
+	 * @param concepts concepts
 	 * @return iterator of concepts which replaces inferred concepts
 	 *  with their corresponding dependencies.
 	 */

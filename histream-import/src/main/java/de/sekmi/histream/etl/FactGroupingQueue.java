@@ -20,8 +20,6 @@ import de.sekmi.histream.ext.Visit;
  *  <li>Try with next visit, repeat</li>
  *  <li>Try with next patient, repeat</li>
  * </ul>
- * <p>
- * </p>
  * @author R.W.Majeed
  *
  */
