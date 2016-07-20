@@ -123,7 +123,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	 * @throws SQLException error
 	 */
 	//@SuppressWarnings("resource")
-	public I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
+	protected I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
 		// TODO move connection and prepared statement to I2b2Extractor
 		Connection dbc = ds.getConnection();
 		PreparedStatement ps = null;
@@ -138,10 +138,10 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 				Iterable<String> ids = notations;
 				int wildcardCount = 0;
 				if( allowWildcardConceptCodes ){
-					// TODO check if wildcards actually used (search for *)
 					List<String>escaped = new ArrayList<>();
 					for( String id : ids ){
 						String es = escapeLikeString(id).replace('*', '%');
+						// check if wildcards actually used
 						if( false == es.equals(id) ){
 							wildcardCount ++;
 						}

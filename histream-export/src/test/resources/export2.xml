@@ -22,6 +22,7 @@ to construct table data.
 			<concept notation="LOINC:26436-6:NEG" />
 		</group>
 		<group class="diag">
+			<!-- wildcard-notation only supported until ontology IRI queries are -->
 			<concept wildcard-notation="ICD10:*" />
 			<concept iri="http://data.dzl.de/ns/ont/xxx"/>
 		</group>
@@ -44,8 +45,8 @@ to construct table data.
 		<column header="start" xpath="eav:start"/>
 		<!-- What is better? -->
 		<!-- (a) First column, then concepts with value -->
-		<column header="diagnostik_labort_ts" xpath="eav:fact[@class='d_lab']/@start"/>
-		<column header="diagnostik_labort" xpath="eav:fact[@class='d_lab']/@concept"/>
+		<column header="diagnostik_labor_ts" xpath="eav:fact[@class='d_lab']/@start"/>
+		<column header="diagnostik_labor" xpath="eav:fact[@class='d_lab']/@concept"/>
 		<!-- (b) first concepts then columns with value -->
 		<column header="diagnostik_labort_ts" xpath="eav:fact[@class='d_lab']/@start"/>
 		<column header="diagnostik_labort" xpath="eav:fact[@class='d_lab']/eav:modifier[@code='OPB' or @code='PB']/@code"/>
@@ -64,4 +65,20 @@ to construct table data.
 		<column header="code" type="@concept"/>
 		<column header="primary" xpath="eav:modifier[@code='fuehrend']/@code"/>
 	</eav-table>
+	<!-- ... more eav-table -->
+	<!-- 
+	<aggregate id="gender-count" table-ref="patient" by="gender">
+		<function name="count" column="gender"/>
+	</aggregate>
+	<aggregate id="latest-visit" table-ref="visit">
+		<column name="latest" ref="start" function="max"/>
+		<function name="count" column="start"/>
+		<function name="count" column="diagnostik_labor" na="remove"/>
+	</aggregate> 
+	<aggregate-table id="diag-count" table-ref="diag" by="code">
+		<column name="count" function="count" ref="start"/>
+	</aggregate-table>
+	XXX how indicate that a table is only for aggregation and should be removed after processing?
+	Aggregate tables can reference other aggregate tables
+	-->
 </export>
