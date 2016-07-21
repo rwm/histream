@@ -20,7 +20,7 @@ import freemarker.template.TemplateException;
 
 @Singleton
 @Path("/i2b2/services/PMService")
-public class PMService {
+public class PMService extends AbstractService{
 	private static final Logger log = Logger.getLogger(PMService.class.getName());
 
 	@Inject
@@ -55,5 +55,10 @@ public class PMService {
 		}
 		
 		return Response.ok(w.toString()).build();
+	}
+	@Override
+	public String getVersion() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

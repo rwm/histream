@@ -1,16 +1,16 @@
-    <message_header>
+    <message_header xmlns="http://www.i2b2.org/xsd/hive/msg/1.1/">
         <i2b2_version_compatible>1.1</i2b2_version_compatible>
         <hl7_version_compatible>2.4</hl7_version_compatible>
         <sending_application>
-            <application_name>Workplace Cell</application_name>
-            <application_version>1.700</application_version>
+            <application_name>${service_name}</application_name>
+            <application_version>${service_version}</application_version>
         </sending_application>
         <sending_facility>
             <facility_name>i2b2 Hive</facility_name>
         </sending_facility>
         <receiving_application>
-            <application_name>i2b2 Ontology</application_name>
-            <application_version>1.6</application_version>
+            <application_name>${client_name}</application_name>
+            <application_version>${client_version}</application_version>
         </receiving_application>
         <receiving_facility>
             <facility_name>i2b2 Hive</facility_name>

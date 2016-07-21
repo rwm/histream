@@ -23,6 +23,15 @@ public interface SessionManager {
 	public Session accessSession(String sessionId);
 	
 	public Session createSession(String userId);
+	public void deleteSession(String sessionId);
+	
+
+	/**
+	 * Get the timeout duration in milliseconds. Sessions
+	 * last accessed longer than this will be discarded.
+	 * @return timeout in milliseconds
+	 */
+	public long getTimeoutMillis();
 	/**
 	 * Iterate over all sessions. The remove() operation should
 	 * be supported by the iterators.

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -30,6 +29,16 @@ public class TestAbstractService extends AbstractService{
 		
 		Document resp = createResponse(b, el);
 		XMLUtils.printDOM(resp, System.out);
+	}
+	
+	@Test
+	public void parse_PM_request() throws Exception{
+		DocumentBuilder b = newDocumentBuilder();
+		Document dom = parseRequest(b, getClass().getResourceAsStream("/pm_request_test.xml"));
+		HiveRequest hr = parseRequest(dom);
+		assertEquals("i2b2 Project Management", hr.clientName);
+		assertEquals("1.6", hr.clientVersion);
+		assertEquals("8b5M3z5lb2nU1g6Zq2QSm", hr.messageId);
 	}
 
 	@Override

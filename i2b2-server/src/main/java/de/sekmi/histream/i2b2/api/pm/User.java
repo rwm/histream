@@ -9,4 +9,5 @@ public interface User extends Principal{
 	Iterable<Project> getProjects();
 	// check password
 	boolean hasPassword(char[] password);
+	void setPassword(char[] newPassword);
 }
