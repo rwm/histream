@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>HIStream : i2b2 server emulation</name>
+	<name>HIStream : li2b2 : server</name>
 	<packaging>war</packaging>
 
 	<description>
@@ -12,13 +12,13 @@
 	emulated server.
 	</description>
 
-	<groupId>de.sekmi.histream</groupId>
-	<artifactId>i2b2-server</artifactId>
+	<groupId>de.sekmi.histream.li2b2</groupId>
+	<artifactId>li2b2-server</artifactId>
 	<version>0.8-SNAPSHOT</version>
 
 	<parent>
-		<groupId>de.sekmi.histream</groupId>
-		<artifactId>histream</artifactId>
+		<groupId>de.sekmi.histream.li2b2</groupId>
+		<artifactId>pom</artifactId>
 		<version>0.8-SNAPSHOT</version>
 	</parent>
 
