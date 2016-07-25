@@ -70,7 +70,7 @@ public interface Observation extends ConceptValuePair{
 	 * @param <T> Extension type
 	 * @param extensionType extension class.
 	 * @return extension object
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException extension type not available
 	 */
 	<T> T getExtension(Class<T> extensionType) throws IllegalArgumentException;
 	<T> void setExtension(Class<T> extensionType, T extension) throws IllegalArgumentException;
