@@ -4,12 +4,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-js</artifactId>
-	<version>0.8-SNAPSHOT</version>
+	<version>0.8</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.8-SNAPSHOT</version>
+		<version>0.8</version>
 	</parent>
   
 	<build>
@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.8-SNAPSHOT</version>
+			<version>0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
