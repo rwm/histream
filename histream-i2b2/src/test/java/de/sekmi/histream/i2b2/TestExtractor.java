@@ -86,7 +86,7 @@ public class TestExtractor implements DataSource{
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		final int defaultFetchSize = 10000;
+		//final int defaultFetchSize = 10000;
 		final String driver = "org.postgresql.Driver";
 		final String uri = "jdbc:postgresql://localhost:15432/i2b2";
 		try {
