@@ -59,7 +59,6 @@
 		<module>histream-import</module>
 		<module>histream-export</module>
 		<module>histream-js</module>
-		<module>i2b2-server</module>
 		<module>i2b2-integration-tests</module>
 		<module>distribution</module>
 	</modules>
