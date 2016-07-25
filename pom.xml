@@ -101,7 +101,7 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.6</version>
 					<configuration>
-						<autoVersionSubModules>false</autoVersionSubModules>
+						<autoVersionSubmodules>false</autoVersionSubmodules>
 					</configuration>
 				</plugin>
 				<plugin>
