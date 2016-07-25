@@ -4,12 +4,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-import</artifactId>
-	<version>0.8</version>
+	<version>0.9-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.8</version>
+		<version>0.9-SNAPSHOT</version>
 	</parent>
 	
 	<properties>
@@ -50,13 +50,13 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.8</version>
+			<version>0.9-SNAPSHOT</version>
 		</dependency>
 		<!-- script support -->
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-js</artifactId>
-			<version>0.8</version>
+			<version>0.9-SNAPSHOT</version>
 		</dependency>
 		<!-- add later for sorting data tables
 		<dependency>
