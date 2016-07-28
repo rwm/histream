@@ -39,8 +39,11 @@ public class ExportDescriptor {
 	}
 
 
-	public AbstractTable getVisitTable() {
+	public VisitTable getVisitTable() {
 		return visit;
+	}
+	public EavTable[] getEAVTables(){
+		return tables;
 	}
 	/**
 	 * Parse an XML document containing the
