@@ -61,4 +61,8 @@ public class ExportDescriptor {
 	public static ExportDescriptor parse(InputStream xml){
 		return JAXB.unmarshal(xml, ExportDescriptor.class);		
 	}
+	
+	public Iterable<Concept> allConcepts(){
+		return concepts.allConcepts();
+	}
 }

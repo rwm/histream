@@ -4,6 +4,15 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
+/**
+ * Iterate over objects which are contained in {@link Iterable}s each contained in other indirect
+ * objects. Simply put, iterable over iterable, extracting the iterable from the indirect objects.
+ * 
+ * @author R.W.Majeed
+ *
+ * @param <T> desired type which will be should be iterated over
+ * @param <U> indirect type which contains iterators to the desired type
+ */
 class IterableIterable<T,U> implements Iterable<T>{
 
 	Function<U, Iterator<T>> extractor;

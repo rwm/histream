@@ -28,4 +28,13 @@ public class Concept {
 		c.notation = notation;
 		return c;	
 	}
+	public String getIRI(){
+		return iri;
+	}
+	public String getNotation(){
+		return notation;
+	}
+	public String getWildcardNotation(){
+		return wildcardNotation;
+	}
 }
