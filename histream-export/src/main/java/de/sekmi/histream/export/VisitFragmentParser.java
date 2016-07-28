@@ -19,7 +19,7 @@ import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.io.GroupedXMLWriter;
 
-public abstract class VisitFragmentParser extends GroupedXMLWriter {
+abstract class VisitFragmentParser extends GroupedXMLWriter {
 	private XMLOutputFactory factory;
 	private Document doc;
 	private DocumentFragment currentPatient;

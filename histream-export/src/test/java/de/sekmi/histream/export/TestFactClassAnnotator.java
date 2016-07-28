@@ -1,4 +1,4 @@
-package de.sekmi.histream.export.config;
+package de.sekmi.histream.export;
 
 import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;

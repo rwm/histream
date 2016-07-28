@@ -1,10 +1,22 @@
 package de.sekmi.histream.export.config;
 
+import java.io.InputStream;
+
+import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.Source;
 
+/**
+ * Export descriptor. Usually, this is specified
+ * by an XML document and parsed via {@link #parse(Source)}
+ * or using JAXB.
+ * 
+ * @author R.W.Majeed
+ *
+ */
 @XmlRootElement(name="export")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ExportDescriptor {
@@ -29,5 +41,24 @@ public class ExportDescriptor {
 
 	public AbstractTable getVisitTable() {
 		return visit;
+	}
+	/**
+	 * Parse an XML document containing the
+	 * export descriptor data.
+	 * 
+	 * @param source XML source
+	 * @return export descriptor instance
+	 */
+	public static ExportDescriptor parse(Source source){
+		return JAXB.unmarshal(source, ExportDescriptor.class);
+	}
+	/**
+	 * Parse an XML document containing the
+	 * export descriptor data.
+	 * @param xml XML input stream
+	 * @return export descriptor instance
+	 */
+	public static ExportDescriptor parse(InputStream xml){
+		return JAXB.unmarshal(xml, ExportDescriptor.class);		
 	}
 }

@@ -22,7 +22,7 @@ import de.sekmi.histream.export.config.ExportException;
  * @author R.W.Majeed
  *
  */
-public class FragmentExporter extends VisitFragmentParser {
+class FragmentExporter extends VisitFragmentParser {
 
 	TableParser patientParser;
 	TableParser visitParser;

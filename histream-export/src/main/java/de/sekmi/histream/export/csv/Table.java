@@ -11,13 +11,13 @@ import java.nio.file.StandardOpenOption;
 import de.sekmi.histream.export.TableWriter;
 
 class Table implements TableWriter{
-	private final CSVExport export;
+	private final CSVWriter export;
 	private PrintWriter out;
 	/**
 	 * @param csvWriter
 	 * @throws IOException 
 	 */
-	Table(CSVExport csvWriter, String filename) throws IOException {
+	Table(CSVWriter csvWriter, String filename) throws IOException {
 		export = csvWriter;
 		Path file = export.getDirectory().resolve(filename);
 		OutputStream os = Files.newOutputStream(file, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);

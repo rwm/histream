@@ -7,14 +7,14 @@ import java.nio.file.Path;
 import de.sekmi.histream.export.ExportWriter;
 import de.sekmi.histream.export.TableWriter;
 
-public class CSVExport implements ExportWriter{
+public class CSVWriter implements ExportWriter{
 
 	private char fieldSeparator;
 	private Charset charset;
 	private Path directory;
 	private String filenameExtension;
 	
-	public CSVExport(Path directory, char fieldSeparator){
+	public CSVWriter(Path directory, char fieldSeparator){
 		this.charset = Charset.forName("UTF-8");
 		this.directory = directory;
 		this.fieldSeparator = fieldSeparator;

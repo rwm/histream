@@ -14,7 +14,7 @@ import org.w3c.dom.Node;
  * @author R.W.Majeed
  *
  */
-public class FactClassAnnotator {
+class FactClassAnnotator {
 	private Map<String, String> conceptMap;
 	private List<WildcardRule> wildcardRules;
 	
