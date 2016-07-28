@@ -14,10 +14,19 @@ public class CSVWriter implements ExportWriter{
 	private Path directory;
 	private String filenameExtension;
 	
-	public CSVWriter(Path directory, char fieldSeparator){
+	/**
+	 * Create a CSV writer which creates table files
+	 * in the specified directory.
+	 * @param directory directory where the table files should be created
+	 * @param fieldSeparator field separator character.
+	 * @param fileSuffix file name suffix (e.g. {@code .csv})
+	 */
+	public CSVWriter(Path directory, char fieldSeparator, String fileSuffix){
 		this.charset = Charset.forName("UTF-8");
 		this.directory = directory;
 		this.fieldSeparator = fieldSeparator;
+		this.filenameExtension = fileSuffix;
+		
 	}
 
 	public Charset getCharset(){
@@ -32,6 +41,15 @@ public class CSVWriter implements ExportWriter{
 	
 	private String fileWithExtension(String name){
 		return name+filenameExtension;
+	}
+
+	/**
+	 * Set the file name extension for table files (e.g. {@code .csv}).
+	 * The extension is appended to table names to produce file names.
+	 * @param suffix file name suffix (usually beginning with a dot)
+	 */
+	public void setFileExtension(String suffix){
+		this.filenameExtension = suffix;
 	}
 	/**
 	 * Escape data before it is written to the output file.
