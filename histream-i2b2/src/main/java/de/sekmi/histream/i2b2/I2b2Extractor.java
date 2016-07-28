@@ -10,6 +10,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 
 /**
  * Retrieves observations from i2b2. See {@link I2b2ExtractorFactory}.
@@ -83,6 +84,8 @@ public class I2b2Extractor implements ObservationSupplier {
 		String lid;
 		Timestamp start;
 		Timestamp end;
+		Timestamp source_ts;
+		String source_cd;
 	}
 	private Row loadRow() throws SQLException{
 		Row row = new Row();
@@ -98,6 +101,9 @@ public class I2b2Extractor implements ObservationSupplier {
 		row.lid = factory.dialect.decodeLocationCd(rs.getString(7)); // location id
 		row.start = rs.getTimestamp(8);
 		row.end = rs.getTimestamp(9);
+		// need source
+		row.source_ts = rs.getTimestamp(15);
+		row.source_cd = rs.getString(16);
 		return row;
 	}
 	private Value createValue(Row row){
@@ -114,6 +120,8 @@ public class I2b2Extractor implements ObservationSupplier {
 		if( row.lid != null ){
 			o.setLocationId(row.lid);
 		}
+		// TODO try to cache external source if same as previous
+		o.setSource(new ExternalSourceImpl(row.source_cd, row.source_ts.toInstant()));
 		// TODO more properties
 		return o;
 	}
