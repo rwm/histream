@@ -3,7 +3,6 @@ package de.sekmi.histream.export;
 import java.io.IOException;
 import java.util.Objects;
 
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -26,7 +25,7 @@ public class TableParser implements AutoCloseable{
 	private XPathExpression[] xpaths;
 	private TableWriter writer;
 
-	public TableParser(AbstractTable table, TableWriter writer, XPath xpath) throws ExportException{
+	public TableParser(AbstractTable table, TableWriter writer, XPath xpath) throws ExportException, IOException{
 		this.table = table;
 		this.writer = writer;
 		this.xpath = xpath;
@@ -48,16 +47,12 @@ public class TableParser implements AutoCloseable{
 		}
 	}
 	
-	private void writeHeaders(){
+	private void writeHeaders()throws IOException{
 		writer.header(table.getHeaders());
 	}
 	
-	public void writeRow(Node node) throws ExportException{
-		try {
-			writer.row(valuesForFragment(node));
-		} catch (IOException e) {
-			throw new ExportException("Unable to write row", e);
-		}
+	public void writeRow(Node node) throws ExportException, IOException{
+		writer.row(valuesForFragment(node));
 	}
 	private String[] valuesForFragment(Node node) throws ExportException{
 		Column[] columns = table.getColumns();

@@ -1,5 +1,7 @@
 package de.sekmi.histream.export.config;
 
+import java.io.IOException;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -33,7 +35,7 @@ public abstract class AbstractTable {
 		return columns;
 	}
 	
-	public TableParser createParser(TableWriter writer, XPath xpath) throws ExportException{
+	public TableParser createParser(TableWriter writer, XPath xpath) throws ExportException, IOException{
 		return new TableParser(this, writer, xpath);
 	}
 

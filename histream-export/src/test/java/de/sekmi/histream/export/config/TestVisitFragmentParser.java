@@ -21,7 +21,7 @@ public class TestVisitFragmentParser {
 	public void verifyVisitFragmentContent() throws Exception{
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
-		final Node visitNode = null;
+		//final Node visitNode = null;
 		try( ObservationSupplier s = t.getExampleSupplier() ){
 			VisitFragmentSupplier sup = new VisitFragmentSupplier(s);
 			Node n = sup.get();

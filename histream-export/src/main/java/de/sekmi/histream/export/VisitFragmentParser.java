@@ -2,7 +2,6 @@ package de.sekmi.histream.export;
 
 import java.util.Objects;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,14 +12,11 @@ import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
-import de.sekmi.histream.impl.ObservationImpl;
 import de.sekmi.histream.io.GroupedXMLWriter;
 
 public abstract class VisitFragmentParser extends GroupedXMLWriter {
