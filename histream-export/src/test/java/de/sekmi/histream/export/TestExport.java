@@ -1,26 +1,60 @@
 package de.sekmi.histream.export;
 
-import javax.xml.bind.JAXB;
+import java.io.IOException;
+import java.io.InputStream;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.export.ExceptionCausingWriter.WhenToThrow;
+import de.sekmi.histream.export.ExceptionCausingWriter.WhereToThrow;
 import de.sekmi.histream.export.config.ExportDescriptor;
 import de.sekmi.histream.io.FileObservationProviderTest;
 
 public class TestExport {
 
+	private ExportDescriptor descriptor;
+	private TableExport export;
+
+	@Before
+	public void initialize() throws Exception{
+		try( InputStream in = getClass().getResourceAsStream("/export1.xml") ){
+			descriptor = ExportDescriptor.parse(in);
+		}
+		export = new TableExport(descriptor);
+
+	}
 	@Test
 	public void verifyExport() throws Exception{
-		ExportDescriptor d = JAXB.unmarshal(getClass().getResourceAsStream("/export1.xml"), ExportDescriptor.class);
 		MemoryExportWriter m = new MemoryExportWriter();
-		TableExportFactory e = new TableExportFactory(d);
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
 		try( ObservationSupplier s = t.getExampleSupplier() ){
-			e.export(s, m);
+			export.export(s, m);
 		}
 		m.dump();
 		// TODO something wrong with namespaces in xpath/dom
+	}
+
+	/**
+	 * IOExceptions occurring during stream operations should
+	 * be unwrapped and directly passed through to the export
+	 * call.
+	 * 
+	 * @throws Exception unexpected failure
+	 */
+	@Test
+	public void expectIOExceptionPassThrough() throws Exception{
+		ExceptionCausingWriter w = new ExceptionCausingWriter(WhereToThrow.VisitTable, WhenToThrow.CloseTable);
+		FileObservationProviderTest t = new FileObservationProviderTest();
+		t.initializeObservationFactory();
+		try( ObservationSupplier s = t.getExampleSupplier() ){
+			export.export(s, w);
+			Assert.fail("IOException should have been thrown");
+		}catch( IOException e ){
+			// success
+		}
 	}
 }
