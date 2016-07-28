@@ -71,7 +71,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 			}
 		}
 	}
-	public PreparedStatement prepareStatement(Connection dbc, String sql) throws SQLException{
+	private PreparedStatement prepareStatement(Connection dbc, String sql) throws SQLException{
 		PreparedStatement s = dbc.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		if( fetchSize != null ){
 			s.setFetchSize(fetchSize);
@@ -123,12 +123,11 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	 * @throws SQLException error
 	 */
 	//@SuppressWarnings("resource")
-	protected I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
+	public I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
 		// TODO move connection and prepared statement to I2b2Extractor
-		Connection dbc = ds.getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		try{
+		try( Connection dbc = ds.getConnection() ){
 			dbc.setAutoCommit(false);
 			StringBuilder b = new StringBuilder(600);
 			b.append("SELECT ");
@@ -166,6 +165,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 			rs = ps.executeQuery();
 			return new I2b2Extractor(this, dbc, rs);
 		}catch( SQLException e ){
+			// XXX maybe we don't need to do this, since the connection is closed anyway
 			// clean up
 			if( rs != null ){
 				rs.close();
@@ -173,7 +173,6 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 			if( ps != null ){
 				ps.close();
 			}
-			dbc.close();
 			throw e;
 		}
 	}
