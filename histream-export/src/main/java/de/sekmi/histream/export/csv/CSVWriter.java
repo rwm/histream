@@ -61,8 +61,8 @@ public class CSVWriter implements ExportWriter{
 		return fieldSeparator;
 	}
 	
-	private String fileWithExtension(String name){
-		return name+getFileExtension();
+	public String fileNameForTable(String tableName){
+		return tableName+getFileExtension();
 	}
 
 	/**
@@ -97,17 +97,17 @@ public class CSVWriter implements ExportWriter{
 	}
 	@Override
 	public TableWriter openPatientTable() throws IOException {
-		return new Table(this, fileWithExtension(patientTableName));
+		return new Table(this, fileNameForTable(patientTableName));
 	}
 
 	@Override
 	public TableWriter openVisitTable() throws IOException {
-		return new Table(this, fileWithExtension(visitTableName));
+		return new Table(this, fileNameForTable(visitTableName));
 	}
 
 	@Override
 	public TableWriter openEAVTable(String id) throws IOException {
-		return new Table(this, fileWithExtension(id));
+		return new Table(this, fileNameForTable(id));
 	}
 
 	@Override
