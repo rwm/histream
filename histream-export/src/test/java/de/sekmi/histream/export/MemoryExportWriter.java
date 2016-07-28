@@ -77,4 +77,8 @@ public class MemoryExportWriter implements ExportWriter{
 			System.out.println();
 		}
 	}
+
+	@Override
+	public void close(){
+	}
 }

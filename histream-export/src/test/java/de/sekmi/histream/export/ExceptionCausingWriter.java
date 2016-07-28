@@ -16,10 +16,10 @@ public class ExceptionCausingWriter implements ExportWriter{
 	private WhereToThrow where;
 
 	protected enum WhenToThrow{
-		Open, WriteHeader, WriteRow, CloseTable
+		OpenTable, WriteHeader, WriteRow, CloseTable
 	}
 	protected enum WhereToThrow{
-		PatientTable, VisitTable, EAVTable
+		PatientTable, VisitTable, EAVTable, CloseWriter
 	}
 
 	public ExceptionCausingWriter(WhereToThrow where, WhenToThrow when) {
@@ -55,20 +55,27 @@ public class ExceptionCausingWriter implements ExportWriter{
 	}
 	@Override
 	public TableWriter openPatientTable() throws IOException {
-		throwIf(WhereToThrow.PatientTable,WhenToThrow.Open);
+		throwIf(WhereToThrow.PatientTable,WhenToThrow.OpenTable);
 		return new ExceptionThrowingTable(WhereToThrow.PatientTable);
 	}
 
 	@Override
 	public TableWriter openVisitTable() throws IOException {
-		throwIf(WhereToThrow.VisitTable,WhenToThrow.Open);
+		throwIf(WhereToThrow.VisitTable,WhenToThrow.OpenTable);
 		return new ExceptionThrowingTable(WhereToThrow.VisitTable);
 	}
 
 	@Override
 	public TableWriter openEAVTable(String id) throws IOException {
-		throwIf(WhereToThrow.EAVTable,WhenToThrow.Open);
+		throwIf(WhereToThrow.EAVTable,WhenToThrow.OpenTable);
 		return new ExceptionThrowingTable(WhereToThrow.EAVTable);
+	}
+
+	@Override
+	public void close() throws IOException {
+		if( where == WhereToThrow.CloseWriter ){
+			throw exceptions.get();
+		}
 	}
 
 }

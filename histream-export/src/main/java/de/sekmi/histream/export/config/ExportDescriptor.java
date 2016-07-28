@@ -61,8 +61,15 @@ public class ExportDescriptor {
 	public static ExportDescriptor parse(InputStream xml){
 		return JAXB.unmarshal(xml, ExportDescriptor.class);		
 	}
-	
+
+	/**
+	 * Get all concepts used for the export. This
+	 * may contain duplicate concepts.
+	 * 
+	 * @return all concepts
+	 */
 	public Iterable<Concept> allConcepts(){
 		return concepts.allConcepts();
 	}
+
 }
