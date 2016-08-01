@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
 
+import de.sekmi.histream.export.TableExport;
+
 /**
  * Export descriptor. Usually, this is specified
  * by an XML document and parsed via {@link #parse(Source)}
@@ -75,4 +77,7 @@ public class ExportDescriptor {
 		return concepts.allConcepts();
 	}
 
+	public TableExport newExport(){
+		return new TableExport(this);
+	}
 }
