@@ -1,16 +1,23 @@
 package de.sekmi.histream.i2b2;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.logging.Logger;
 
+import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ExternalSourceImpl;
+import de.sekmi.histream.impl.NumericValue;
+import de.sekmi.histream.impl.StringValue;
 
 /**
  * Retrieves observations from i2b2. See {@link I2b2ExtractorFactory}.
@@ -18,6 +25,7 @@ import de.sekmi.histream.impl.ExternalSourceImpl;
  *
  */
 public class I2b2Extractor implements ObservationSupplier {
+	private static final Logger log = Logger.getLogger(I2b2Extractor.class.getName());
 
 	private I2b2ExtractorFactory factory;
 	private Connection dbc;
@@ -74,8 +82,8 @@ public class I2b2Extractor implements ObservationSupplier {
 	}
 	
 	private static class Row{
-		String pid;
-		String eid;
+		int pid;
+		int eid;
 		Integer inst;
 		/** concept id */
 		String cid;
@@ -86,11 +94,16 @@ public class I2b2Extractor implements ObservationSupplier {
 		Timestamp end;
 		Timestamp source_ts;
 		String source_cd;
+		String vt;
+		String vc;
+		BigDecimal vn;
+		AbnormalFlag vf;
+		String vu;
 	}
 	private Row loadRow() throws SQLException{
 		Row row = new Row();
-		row.pid = rs.getObject(1).toString(); // patient id
-		row.eid = rs.getObject(2).toString(); // encounter id
+		row.pid = rs.getInt(1); // patient num
+		row.eid = rs.getInt(2); // encounter num
 		row.inst = rs.getInt(3);
 		if( rs.wasNull() ){
 			row.inst = null;
@@ -101,18 +114,71 @@ public class I2b2Extractor implements ObservationSupplier {
 		row.lid = factory.dialect.decodeLocationCd(rs.getString(7)); // location id
 		row.start = rs.getTimestamp(8);
 		row.end = rs.getTimestamp(9);
+		// value
+		row.vt = factory.dialect.decodeValueTypeCd(rs.getString(10));
+		row.vc = rs.getString(11);
+		row.vn = rs.getBigDecimal(12);
+		row.vf = factory.dialect.decodeValueFlagCd(rs.getString(13));
+		row.vu = factory.dialect.decodeUnitCd(rs.getString(14));
+	
 		// need source
 		row.source_ts = rs.getTimestamp(15);
 		row.source_cd = rs.getString(16);
 		return row;
 	}
 	private Value createValue(Row row){
-		// TODO create value
-		return null;
+		if( row.vt == null ){
+			return null; // no value
+		}else if( row.vt.equals("T") ){
+			StringValue v = new StringValue(row.vc);
+			v.setAbnormalFlag(row.vf);
+			return v;
+		}else if( row.vt.equals("N") ){
+			NumericValue v = new NumericValue(row.vn, row.vu);
+			v.setAbnormalFlag(row.vf);
+			return v;
+		}else{
+			log.severe("Ignoring unsupported value type '"+row.vt+"' for concept "+row.cid);
+			return null;
+		}
 	}
 	private Observation createObservation(Row row){
-		Observation o = factory.getObservationFactory().createObservation(row.pid, row.cid, new DateTimeAccuracy(row.start.toLocalDateTime()));
-		o.setEncounterId(row.eid);
+		// map/lookup patient_num -> Patient, encounter_num -> Visit
+		Patient patient = null;
+		String patientId = null;
+		if( factory.lookupPatientNum != null ){
+			patient = factory.lookupPatientNum.apply(row.pid);
+			if( patient == null ){
+				log.severe("Unable to find patient with patient_num="+row.pid);
+			}
+		}
+		if( patient != null ){
+			patientId = patient.getId();
+		}else{
+			patientId = Integer.toString(row.pid);
+		}
+	
+		
+		Observation o = factory.getObservationFactory().createObservation(patientId, row.cid, new DateTimeAccuracy(row.start.toLocalDateTime()));
+		if( patient != null ){
+			o.setExtension(Patient.class, patient);
+		}
+		// parse visit
+		Visit visit = null;
+		if( factory.lookupVisitNum != null ){
+			visit = factory.lookupVisitNum.apply(row.eid);
+			if( visit == null ){
+				log.severe("Unable to find visit with encounter_num="+row.eid);
+			}
+		}
+		if( visit != null ){
+			o.setEncounterId(visit.getId());
+			o.setExtension(Visit.class, visit);
+		}else{
+			o.setEncounterId(Integer.toString(row.eid));
+		}
+
+		
 		if( row.end != null ){
 			o.setEndTime(new DateTimeAccuracy(row.end.toLocalDateTime()));
 		}
@@ -126,8 +192,10 @@ public class I2b2Extractor implements ObservationSupplier {
 		return o;
 	}
 	private boolean isModifier(Row fact, Row modifier){
-		return( fact.pid.equals(modifier.pid)
-				&& fact.eid.equals(modifier.eid) 
+		return( fact.pid == modifier.pid
+				&& fact.eid == modifier.eid
+				&& fact.inst != null // not needed for i2b2, but other tables (e.g.HIStream) may allow NULL instance num)
+				&& modifier.inst != null
 				&& fact.inst.equals(modifier.inst)
 				&& modifier.mid != null );
 	}

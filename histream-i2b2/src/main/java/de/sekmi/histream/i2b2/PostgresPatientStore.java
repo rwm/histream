@@ -152,6 +152,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		return patientCache.get(patient_num);
 	}
 	
+	public I2b2Patient lookupPatientNum(Integer patient_num){
+		return patientCache.get(patient_num);
+	}
+	
 	private I2b2Patient getCached(String patient_id){
 		return idCache.get(patient_id);
 	}

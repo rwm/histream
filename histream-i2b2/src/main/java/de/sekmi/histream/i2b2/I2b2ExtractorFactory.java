@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -17,6 +18,8 @@ import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationExtractor;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 
 /**
  * Extract observations from i2b2.
@@ -25,6 +28,7 @@ import de.sekmi.histream.ObservationSupplier;
  * and retrieval of facts.
  * </p>
  * TODO add/use interface from histream-core
+ * XXX TODO allow to map patient_num -> Patient and encounter_num -> Encounter, this must be done before the extension is accessed
  * @author R.W.Majeed
  *
  */
@@ -37,6 +41,8 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	private ObservationFactory observationFactory;
 	private boolean allowWildcardConceptCodes;
 	
+	Function<Integer,? extends Patient> lookupPatientNum;
+	Function<Integer,? extends Visit> lookupVisitNum;
 	/**
 	 * Boolean feature whether to allow wildcard concept keys. 
 	 * <p>
@@ -62,6 +68,12 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 		return observationFactory;
 	}
 	
+	public void setPatientLookup(Function<Integer, ? extends Patient> lookup){
+		this.lookupPatientNum = lookup;		
+	}
+	public void setVisitLookup(Function<Integer, ? extends Visit> lookup){
+		this.lookupVisitNum = lookup;
+	}
 	public void setFeature(String feature, Object value){
 		if( feature.equals(ALLOW_WILDCARD_CONCEPT_CODES) ){
 			if( value instanceof Boolean ){
@@ -144,6 +156,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 						if( false == es.equals(id) ){
 							wildcardCount ++;
 						}
+						escaped.add(es);
 					}
 					ids = escaped;
 					// TODO add check for overlapping wildcard concepts (e.g. A* and AB*)

@@ -158,6 +158,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		log.info("MAX(encounter_num) = "+maxEncounterNum);
 	}
 
+	public I2b2Visit lookupEncounterNum(Integer encounter_num){
+		return visitCache.get(encounter_num);
+	}
 	public void loadMaxInstanceNums() throws SQLException{
 		// TODO maybe better to load only encounters+max instance_num for current project -> join with encounter_mapping
 		

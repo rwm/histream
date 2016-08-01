@@ -86,6 +86,12 @@ public class DataDialect {
 	public String encodeUnitCd(String unitCd){
 		return encodeNull(unitCd, getNullUnitCd());
 	}
+	public String decodeUnitCd(String rowValue){
+		return decodeNull(rowValue, nullUnitCd);
+	}
+	public String decodeValueTypeCd(String rowValue){
+		return decodeNull(rowValue, nullValueTypeCd);
+	}
 	public String encodeProviderId(String providerId){
 		return encodeNull(providerId, getDefaultProviderId());
 	}
