@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.sekmi.histream.Observation;
@@ -21,7 +22,7 @@ public class VisitFragmentSupplier implements Supplier<Node> {
 		this.supplier = supplier;
 		this.parser = new VisitFragmentParser() {
 			@Override
-			protected void visitFragment(Node visit) {
+			protected void visitFragment(Element visit) {
 				VisitFragmentSupplier.this.visit = visit;
 			}
 		};

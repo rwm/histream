@@ -6,7 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPath;
 
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.export.config.ExportDescriptor;
@@ -26,6 +26,7 @@ class FragmentExporter extends VisitFragmentParser {
 
 	TableParser patientParser;
 	TableParser visitParser;
+	private Element currentPatient;
 	
 	protected FragmentExporter(XPath xpath, ExportDescriptor desc, ExportWriter writer) throws ExportException, XMLStreamException, ParserConfigurationException {
 		super();
@@ -39,7 +40,8 @@ class FragmentExporter extends VisitFragmentParser {
 	}
 
 	@Override
-	protected void patientFragment(Node patient) throws ObservationException {
+	protected void patientFragment(Element patient) throws ObservationException {
+		currentPatient = patient;
 		try {
 			patientParser.writeRow(patient);
 		} catch (ExportException | IOException e) {
@@ -48,11 +50,18 @@ class FragmentExporter extends VisitFragmentParser {
 	}
 
 	@Override
-	protected void visitFragment(Node visit) throws ObservationException {
+	protected void visitFragment(Element visit) throws ObservationException {
+		// move visit to patient
+		// this allows XPath expressions to access the patient via
+		// the parent element. E.g. '../@id' to get the patient id
+		currentPatient.appendChild(visit);
 		try {
 			visitParser.writeRow(visit);
 		} catch (ExportException | IOException e) {
 			throw new ObservationException(e);
+		} finally {
+			// remove visit from patient
+			currentPatient.removeChild(visit);
 		}
 		// TODO check for repeating concepts and write to separate parsers
 	}

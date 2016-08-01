@@ -15,6 +15,7 @@
         <column header="modified" xpath="eav:source/@timestamp"/>
     </patient-table>
     <visit-table>
+        <column header="pid" xpath="../@id"/>
 		<column header="vid" xpath="@id"/>
 		<column header="start" xpath="eav:start"/>
 		<column header="f_start" xpath="eav:fact[@concept='T:full']/@start"/>

@@ -12,6 +12,7 @@ import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.sekmi.histream.ObservationException;
@@ -74,7 +75,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 		}else{
 			// No visit for patient.
 			// process patient fragment anyway
-			patientFragment(currentPatient.getFirstChild());
+			patientFragment((Element)currentPatient.getFirstChild());
 		}
 	}
 
@@ -96,7 +97,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 		if( firstVisit == false ){
 			// patient fragment was parsed
 			fixNamespaces(currentPatient);
-			patientFragment(currentPatient.getFirstChild());
+			patientFragment((Element)currentPatient.getFirstChild());
 			firstVisit = true;
 		}
 
@@ -120,7 +121,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 		fixNamespaces(currentVisit);
 		Node node = currentVisit.getFirstChild();
 		Objects.requireNonNull(node);
-		visitFragment(currentVisit.getFirstChild());
+		visitFragment((Element)currentVisit.getFirstChild());
 	}
 	/**
 	 * Called after each patient fragment was parsed.
@@ -129,7 +130,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 	 * @param patient patient node
 	 * @throws ObservationException error
 	 */
-	protected void patientFragment(Node patient)throws ObservationException{
+	protected void patientFragment(Element patient)throws ObservationException{
 		
 	}
 	/**
@@ -139,5 +140,5 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 	 * @param visit visit node
 	 * @throws ObservationException error
 	 */
-	protected abstract void visitFragment(Node visit) throws ObservationException;
+	protected abstract void visitFragment(Element visit) throws ObservationException;
 }
