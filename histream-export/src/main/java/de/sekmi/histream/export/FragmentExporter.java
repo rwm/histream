@@ -7,7 +7,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPath;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.export.config.Concept;
