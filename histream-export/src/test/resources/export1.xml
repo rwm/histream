@@ -2,8 +2,8 @@
 <export xmlns="http://sekmi.de/ns/histream/export-v1"
 			xmlns:eav="http://sekmi.de/histream/ns/eav-data">
     <concepts>
-        <group class="diag">
-            <concept wildcard-notation="ICD10:*"/>
+        <group class="testclass">
+            <concept wildcard-notation="T:date:yea*"/>
         </group>
         <concept notation="T:full"/>
         <concept wildcard-notation="CEDIS:*"/>
@@ -18,6 +18,7 @@
         <column header="pid" xpath="../@id"/>
 		<column header="vid" xpath="@id"/>
 		<column header="start" xpath="eav:start"/>
+		<column header="byclass" xpath="eav:fact[@class='testclass']/@concept"/>
 		<column header="f_start" xpath="eav:fact[@concept='T:full']/@start"/>
 		<column header="f_end" xpath="eav:fact[@concept='T:full']/@end"/>
 		<column header="f_loc" xpath="eav:fact[@concept='T:full']/@location"/>

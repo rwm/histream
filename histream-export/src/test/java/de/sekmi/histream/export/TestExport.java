@@ -34,6 +34,8 @@ public class TestExport {
 		try( ObservationSupplier s = t.getExampleSupplier() ){
 			export.export(s, m);
 		}
+		// verify class lookup
+		Assert.assertEquals("T:date:year", m.get(MemoryExportWriter.VISIT_TABLE, "byclass", 0));
 		m.dump();
 		// TODO something wrong with namespaces in xpath/dom
 	}
