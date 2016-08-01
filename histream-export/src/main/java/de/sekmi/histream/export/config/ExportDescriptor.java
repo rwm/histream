@@ -70,11 +70,23 @@ public class ExportDescriptor {
 	/**
 	 * Get all concepts used for the export. This
 	 * may contain duplicate concepts.
+	 * <p>
+	 * The returned iterator will iterate through all concepts
+	 * contained in groups followed by all ungrouped concepts.
+	 * </p>
 	 * 
 	 * @return all concepts
 	 */
 	public Iterable<Concept> allConcepts(){
 		return concepts.allConcepts();
+	}
+	/**
+	 * Get the {@link Concepts} object which contains concept groups and
+	 * ungrouped concepts.
+	 * @return concepts
+	 */
+	public Concepts getConcepts(){
+		return concepts;
 	}
 
 	public TableExport newExport(){

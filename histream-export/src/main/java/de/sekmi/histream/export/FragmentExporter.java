@@ -7,8 +7,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPath;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import de.sekmi.histream.ObservationException;
+import de.sekmi.histream.export.config.Concept;
+import de.sekmi.histream.export.config.ConceptGroup;
 import de.sekmi.histream.export.config.ExportDescriptor;
 import de.sekmi.histream.export.config.ExportException;
 
@@ -27,6 +30,7 @@ class FragmentExporter extends VisitFragmentParser {
 	TableParser patientParser;
 	TableParser visitParser;
 	private Element currentPatient;
+	private FactClassAnnotator factAnnotator;
 	
 	protected FragmentExporter(XPath xpath, ExportDescriptor desc, ExportWriter writer) throws ExportException, XMLStreamException, ParserConfigurationException {
 		super();
@@ -36,6 +40,28 @@ class FragmentExporter extends VisitFragmentParser {
 			visitParser = desc.getVisitTable().createParser(writer.openVisitTable(), xpath);
 		} catch (IOException e) {
 			throw new ExportException("Unable to open table for writing", e);
+		}
+		// initialise annotator
+		factAnnotator = new FactClassAnnotator();
+		for( ConceptGroup group : desc.getConcepts().getGroups() ){
+			String clazz = group.getClazz();
+			for( Concept concept : group.getConcepts() ){
+				String s = concept.getNotation();
+				if( s != null ){
+					factAnnotator.addMapRule(s, clazz);
+					continue;
+				}
+				s = concept.getWildcardNotation();
+				if( s != null ){
+					if( s.indexOf('*') < s.length()-1 ){
+						throw new ExportException("Wildcard notation '"+s+"' must contain exactly one * at the end");
+					}
+					factAnnotator.addWildcardRule(s.substring(0, s.length()-1), clazz);
+					continue;
+				}
+				
+				throw new ExportException("Group concepts must have one of 'notation' or 'wildcard-notation' defined. Concept IRI not supported yet");
+			}
 		}
 	}
 
@@ -51,6 +77,8 @@ class FragmentExporter extends VisitFragmentParser {
 
 	@Override
 	protected void visitFragment(Element visit) throws ObservationException {
+		// annotate facts with class attribute
+		factAnnotator.annotateFacts(visit.getChildNodes());
 		// move visit to patient
 		// this allows XPath expressions to access the patient via
 		// the parent element. E.g. '../@id' to get the patient id

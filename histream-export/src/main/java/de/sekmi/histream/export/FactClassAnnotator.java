@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Annotates DOM fact objects with a {@code @class} attribute.
@@ -67,6 +68,20 @@ class FactClassAnnotator {
 		}
 	}
 	
+	/**
+	 * Annotates all elements with local name 'fact' contained
+	 * in the provided node list. Other nodes are ignored.
+	 * @param facts node list containing 'fact' elements (among other nodes)
+	 */
+	public void annotateFacts(NodeList facts){
+		for( int i=0; i<facts.getLength(); i++ ){
+			Node next = facts.item(i);
+			if( next.getNodeType() == Node.ELEMENT_NODE && next.getLocalName().equals("fact") ){
+				annotateFact(next);
+			}
+		}
+	}
+
 	public void annotateFactSiblings(Node first){
 		annotateFact(first);
 		Node next = first.getNextSibling();

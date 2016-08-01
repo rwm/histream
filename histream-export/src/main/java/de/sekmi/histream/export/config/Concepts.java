@@ -17,4 +17,11 @@ public class Concepts {
 	Iterable<Concept> allConcepts(){
 		return new IterableIterable<Concept,ConceptGroup>(groups, group -> group.concepts.iterator(), concepts);
 	}
+	
+	public List<ConceptGroup> getGroups(){
+		return groups;
+	}
+	public List<Concept> ungroupedConcepts(){
+		return concepts;
+	}
 }
