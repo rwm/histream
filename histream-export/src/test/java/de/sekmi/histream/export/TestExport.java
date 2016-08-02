@@ -13,6 +13,9 @@ import de.sekmi.histream.export.ExceptionCausingWriter.WhereToThrow;
 import de.sekmi.histream.export.config.ExportDescriptor;
 import de.sekmi.histream.io.FileObservationProviderTest;
 
+// TODO expectExceptionForOverlappingGroups
+// TODO expectExceptionForDuplicateConcepts
+
 public class TestExport {
 
 	private ExportDescriptor descriptor;

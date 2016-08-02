@@ -57,10 +57,10 @@ to construct table data.
 			-->
 	</visit-table>
 	<!-- export separate table for repeating elements -->
-	<eav-table id="diag" class="diag">
+	<eav-table id="diag" xpath="eav:fact[@class='diag']">
 		<!-- context for XPath expressions is each fact node -->
-		<column header="pid" xpath="patient-ref"/>
-		<column header="visit" xpath="visit-ref"/>
+		<column header="pid" xpath="../../@id"/>
+		<column header="visit" xpath="../@id"/>
 		<column header="start" type="@start"/>
 		<column header="code" type="@concept"/>
 		<column header="primary" xpath="eav:modifier[@code='fuehrend']/@code"/>

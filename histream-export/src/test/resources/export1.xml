@@ -28,12 +28,13 @@
 		<column header="f_loc" xpath="eav:fact[@concept='T:full']/@location"/>
 		<column header="f_val" xpath="eav:fact[@concept='T:full']/eav:value"/>
     </visit-table>
+    <!-- eav-table/@xpath uses visit context. Enter expression to select desired fact elements -->
 	<eav-table id="eavtabletest" xpath="eav:fact[@class='testeav']">
-		<!-- context for XPath expressions is each fact node -->
+		<!-- context for column/@xpath expression is each fact node -->
 		<column header="pid" xpath="../../@id"/>
 		<column header="visit" xpath="../@id"/>
 		<column header="code" xpath="@concept"/>
 		<column header="start" xpath="@start"/>
 	</eav-table>
-
+	<!-- more eav-table allowed -->
 </export>
