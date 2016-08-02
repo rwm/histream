@@ -52,7 +52,7 @@ public class TestMarshal {
 		ExportDescriptor e;
 		// first example
 		e = JAXB.unmarshal(getClass().getResourceAsStream("/export1.xml"), ExportDescriptor.class);
-		Assert.assertEquals(3, StreamSupport.stream(e.concepts.allConcepts().spliterator(), false).count());
+		Assert.assertEquals(4, StreamSupport.stream(e.concepts.allConcepts().spliterator(), false).count());
 		// second example
 		e = JAXB.unmarshal(getClass().getResourceAsStream("/export2.xml"), ExportDescriptor.class);
 		Assert.assertEquals(5, StreamSupport.stream(e.concepts.allConcepts().spliterator(), false).count());

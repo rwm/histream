@@ -3,7 +3,11 @@
 			xmlns:eav="http://sekmi.de/histream/ns/eav-data">
     <concepts>
         <group class="testclass">
-            <concept wildcard-notation="T:date:yea*"/>
+            <concept wildcard-notation="T:type:st*"/>
+        </group>
+        <group class="testeav">
+        	<!-- will cause problems if wildcards are overlapping -->
+        	<concept wildcard-notation="T:date:*"/>
         </group>
         <concept notation="T:full"/>
         <concept wildcard-notation="CEDIS:*"/>
@@ -24,4 +28,12 @@
 		<column header="f_loc" xpath="eav:fact[@concept='T:full']/@location"/>
 		<column header="f_val" xpath="eav:fact[@concept='T:full']/eav:value"/>
     </visit-table>
+	<eav-table id="eavtabletest" xpath="eav:fact[@class='testeav']">
+		<!-- context for XPath expressions is each fact node -->
+		<column header="pid" xpath="../../@id"/>
+		<column header="visit" xpath="../@id"/>
+		<column header="code" xpath="@concept"/>
+		<column header="start" xpath="@start"/>
+	</eav-table>
+
 </export>

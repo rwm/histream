@@ -118,6 +118,13 @@ public class MemoryExportWriter implements ExportWriter{
 		}
 		return t.rows.get(row)[index];
 	}
+	public int rowCount(String table) throws IndexOutOfBoundsException{
+		MemoryTable t = tables.get(table);
+		if( t == null ){
+			throw new IndexOutOfBoundsException("Non-existing table "+table);
+		}
+		return t.rows.size();
+	}
 	@Override
 	public void close(){
 	}
