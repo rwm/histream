@@ -31,6 +31,7 @@
     <!-- eav-table/@xpath uses visit context. Enter expression to select desired fact elements -->
 	<eav-table id="eavtabletest" xpath="eav:fact[@class='testeav']">
 		<!-- context for column/@xpath expression is each fact node -->
+
 		<column header="pid" xpath="../../@id"/>
 		<column header="visit" xpath="../@id"/>
 		<column header="code" xpath="@concept"/>
