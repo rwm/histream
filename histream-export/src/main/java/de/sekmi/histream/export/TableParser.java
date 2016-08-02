@@ -35,6 +35,9 @@ public class TableParser implements AutoCloseable{
 		writeHeaders();
 	}
 
+	protected AbstractTable getTable(){
+		return table;
+	}
 	private void compileXPaths() throws ExportException{
 		Column[] columns = table.getColumns();
 		xpaths = new XPathExpression[columns.length];
@@ -51,9 +54,10 @@ public class TableParser implements AutoCloseable{
 		writer.header(table.getHeaders());
 	}
 	
-	public void writeRow(Node node) throws ExportException, IOException{
+	public void processNode(Node node) throws ExportException, IOException{
 		writer.row(valuesForFragment(node));
 	}
+
 	private String[] valuesForFragment(Node node) throws ExportException{
 		Column[] columns = table.getColumns();
 		String[] values = new String[columns.length];
