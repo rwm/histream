@@ -2,6 +2,8 @@ package de.sekmi.histream.export;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.NamespaceContext;
@@ -12,6 +14,7 @@ import javax.xml.xpath.XPathFactory;
 
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.export.config.Concept;
 import de.sekmi.histream.export.config.ExportDescriptor;
 import de.sekmi.histream.export.config.ExportException;
 import de.sekmi.histream.io.Streams;
@@ -55,6 +58,55 @@ public class TableExport {
 		xpath.setNamespaceContext(ns);
 		return xpath;
 	}
+
+	/**
+	 * Make sure, that any intersection between groups are empty.
+	 * Overlapping group means concepts would get multiple classes
+	 * assigned, which is not supported at this time.
+	 *
+	 * @throws ExportException if there are overlapping concepts
+	 */
+	private void requireDisjointConcepts() throws ExportException{
+		// easier: require unique concepts and no overlapping wildcards
+		List<String> prefixes = new ArrayList<>();
+		List<String> notations = new ArrayList<>();
+		for( Concept concept : desc.allConcepts() ){
+			String s = concept.getNotation();
+			if( s != null ){
+				notations.add(s);
+			}
+			s = concept.getWildcardNotation();
+			if( s != null ){
+				// wildcard must end with *
+				if( s.indexOf('*') != s.length()-1 ){
+					throw new ExportException("Illegal wildcard notation: "+s);
+				}
+				prefixes.add(s.substring(0,s.length()-1));
+			}
+		}
+		// make sure prefixes do not overlap
+		// a can overlap b only, if  a.length <= b.length
+		// sort prefixes by length
+		prefixes.sort( (a,b) -> a.length() - b.length() );
+		for( int i=0; i<prefixes.size(); i++ ){
+			String a = prefixes.get(i);
+			for( int j=i+1; j<prefixes.size(); j++ ){
+				String b = prefixes.get(j);
+				if( b.startsWith(a) ){
+					throw new ExportException("Illegal overlapping of wildcard notations '"+a+"*' and '"+b+"*");
+				}
+			}
+		}
+		// check if prefix matches any notations
+		for( String prefix : prefixes ){
+			for( String notation : notations ){
+				if( notation.startsWith(prefix) ){
+					throw new ExportException("Concepts not unique: wildcard '"+prefix+"*' matches notation '"+notation+"'");
+				}
+			}
+		}
+		// TODO check for unique notations
+	}
 	/**
 	 * Export all observations by the given supplier to the specified {@link ExportWriter}.
 	 * <p>
@@ -68,6 +120,7 @@ public class TableExport {
 	 * @throws IOException IO exception
 	 */
 	public void export(ObservationSupplier supplier, ExportWriter writer) throws ExportException, IOException{
+		requireDisjointConcepts();
 		try( FragmentExporter e = new FragmentExporter(createXPath(), desc, writer) ){
 			e.setErrorHandler(new ExportErrorHandler());
 			Streams.transfer(supplier, e);
