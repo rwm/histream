@@ -1,6 +1,7 @@
 package de.sekmi.histream.export;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -18,6 +19,7 @@ public class EavTableParser extends TableParser {
 	
 	public EavTableParser(EavTable table, TableWriter writer, XPath xpath) throws ExportException, IOException {
 		super(table, writer, xpath);
+		Objects.requireNonNull(table.getXPath(), "xpath expression required for eav-table[id='"+table.getId()+"']/@xpath");
 		try {
 			factSelector = xpath.compile(table.getXPath());
 		} catch (XPathExpressionException e) {
