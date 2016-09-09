@@ -13,7 +13,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -42,21 +45,32 @@ public class Import implements AutoCloseable{
 	private Ontology ontology;
 	private Connection dbMeta;
 	private Connection dbData;
-	private Map<String,String> config;
+	//private Map<String,String> config;
 	private Locale locale;
 	
 	private PreparedStatement insertMeta;
 	private PreparedStatement insertAccess;
 	private PreparedStatement insertConcept;
-	
+
+	// statistics
 	private int insertMetaCount;
 	private int insertAccessCount;
 	private int insertConceptCount;
-	
+	private int deleteMetaCount;
+	private int deleteAccessCount;
+	private int deleteConceptCount;
+
 	private String sourceId;
-	private String scheme;
+	private String ontScheme;
 	private Timestamp sourceTimestamp;
-	
+	// configuration
+	private String metaBase;
+	private String metaTable;
+	private String metaAccess;
+	private String dataConceptTable;
+
+	private Consumer<String> warningHandler;
+
 	/**
 	 * Connect to the i2b2 database.
 	 * The current implementation supports only Postgres databases for i2b2 versions &gt;= 1.7.05(?)
@@ -75,12 +89,33 @@ public class Import implements AutoCloseable{
 	 */
 	public Import(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		openDatabase(props);
+		readConfiguration(props);
+		prepareStatements();
+		warningHandler = log::warning;
 	}
-	
-	private String getMetaTable(){return config.get("meta.table");}
-	private String getAccessTable(){return config.get("meta.access");}
-	private String getConceptTable(){return config.get("data.concept.table");}
-	
+
+	public Import(Connection dbMeta, Connection dbData, Map<String,String> props) throws SQLException{
+		this.dbMeta = dbMeta;
+		this.dbData = dbData;
+		readConfiguration(props);
+		prepareStatements();
+		warningHandler = log::warning;
+	}
+
+	private String getMetaTable(){return metaTable;}
+	private String getAccessTable(){return metaAccess;}
+	private String getConceptTable(){return dataConceptTable;}
+
+	public int getInsertMetaCount(){return this.insertMetaCount;}
+	public int getDeleteMetaCount(){return this.deleteMetaCount;}
+	public int getInsertConceptCount(){return this.insertConceptCount;}
+	public int getDeleteConceptCount(){return this.deleteConceptCount;}
+	public int getInsertAccessCount(){return this.insertAccessCount;}
+	public int getDeleteAccessCount(){return this.deleteAccessCount;}
+
+	private void showWarning(String warning){
+		warningHandler.accept(warning);
+	}
 	private void prepareStatements() throws SQLException{
 		insertMeta = dbMeta.prepareStatement("INSERT INTO "+getMetaTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
 		String access_table_name = getMetaTable();
@@ -92,33 +127,26 @@ public class Import implements AutoCloseable{
 		insertAccess = dbMeta.prepareStatement("INSERT INTO "+getAccessTable()+"(c_table_cd,c_table_name,c_protected_access,c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_facttablecolumn,c_dimtablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip)VALUES(?,'"+access_table_name+"','N',?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?)");
 		insertConcept = dbData.prepareStatement("INSERT INTO "+getConceptTable()+"(concept_path,concept_cd,name_char,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,current_timestamp,?,current_timestamp,?)");
 	}
-	
-	private void deleteFromDatabase() throws SQLException{
-		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
-		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
-		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
-		int count;
-		
-		deleteConcepts.setString(1, sourceId);
-		count = deleteConcepts.executeUpdate();
-		System.out.println("Deleted "+count+" rows from "+getConceptTable());
-		deleteConcepts.close();
 
-		deleteAccess.setString(1, sourceId+"%");
-		count = deleteAccess.executeUpdate();
-		System.out.println("Deleted "+count+" rows from "+getAccessTable());
-		deleteAccess.close();
-
-		deleteOnt.setString(1, sourceId);
-		count = deleteOnt.executeUpdate();
-		System.out.println("Deleted "+count+" rows from "+getMetaTable());
-		deleteOnt.close();
-
+	public void setWarningHandler(Consumer<String> warningHandler){
+		this.warningHandler = warningHandler;
 	}
-	
-	public void processOntology() throws SQLException, OntologyException{
-		deleteFromDatabase();
+	private void readConfiguration(Map<String,String> config){
+		// i2b2 output configuration
+		// parse base path
+		this.metaBase = config.get("meta.basepath"); // optional
 
+		this.sourceId = config.get("meta.sourcesystem_cd");
+		// tables
+		this.metaTable = config.get("meta.table");
+		this.metaAccess = config.get("meta.access");
+		
+		this.dataConceptTable = config.get("data.concept.table");
+
+		Objects.requireNonNull(metaTable, "Need configuration: meta.table");
+		Objects.requireNonNull(metaAccess, "Need configuration: meta.access");
+		Objects.requireNonNull(dataConceptTable, "Need configuration: data.concept.table");
+		// ontology configuration
 		// parse language for locale
 		if( config.get("ont.language") == null ){
 			locale = Locale.getDefault();
@@ -126,12 +154,35 @@ public class Import implements AutoCloseable{
 			locale = Locale.forLanguageTag(config.get("ont.language"));
 		}
 		// parse scheme
-		if( config.get("ont.language") != null ){
-			this.scheme = config.get("ont.scheme");
+		if( config.get("ont.scheme") != null ){
+			this.ontScheme = config.get("ont.scheme");
 		}
+	}
+	private void deleteFromDatabase() throws SQLException{
+		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
+		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
+		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
 		
-		// parse base path
-		String base = config.get("meta.basepath");
+		deleteConcepts.setString(1, sourceId);
+		this.deleteConceptCount = deleteConcepts.executeUpdate();
+//		System.out.println("Deleted "+deleteConceptCount+" rows from "+getConceptTable());
+		deleteConcepts.close();
+
+		deleteAccess.setString(1, sourceId+"%");
+		this.deleteAccessCount = deleteAccess.executeUpdate();
+//		System.out.println("Deleted "+deleteAccessCount+" rows from "+getAccessTable());
+		deleteAccess.close();
+
+		deleteOnt.setString(1, sourceId);
+		this.deleteMetaCount = deleteOnt.executeUpdate();
+//		System.out.println("Deleted "+deleteMetaCount+" rows from "+getMetaTable());
+		deleteOnt.close();
+	}
+	
+	public void processOntology() throws SQLException, OntologyException{
+		deleteFromDatabase();
+		
+		String base = metaBase;
 		int base_level;
 		if( base != null && !base.equals("\\") ){
 			String[] baseParts = base.split("\\\\");
@@ -143,16 +194,16 @@ public class Import implements AutoCloseable{
 			base_level = 0;
 		}
 		
-		Concept[] concepts = ontology.getTopConcepts(this.scheme);
+		Concept[] concepts = ontology.getTopConcepts(this.ontScheme);
 
 
 		for( Concept c : concepts ){
 			insertMeta(base_level, base, c, true);
 		}
 		
-		System.out.println("Inserted "+insertConceptCount+" rows to "+getConceptTable());
-		System.out.println("Inserted "+insertAccessCount+" rows to "+getAccessTable());
-		System.out.println("Inserted "+insertMetaCount+" rows to "+getMetaTable());
+//		System.out.println("Inserted "+insertConceptCount+" rows to "+getConceptTable());
+//		System.out.println("Inserted "+insertAccessCount+" rows to "+getAccessTable());
+//		System.out.println("Inserted "+insertMetaCount+" rows to "+getMetaTable());
 	}
 	private void insertConceptDimension(String path, String name, String concept_cd) throws SQLException{
 		insertConcept.setString(1, path);
@@ -261,7 +312,7 @@ public class Import implements AutoCloseable{
 			if( label == null ){
 				// concept does not have a label
 				label = concept.getID();
-				log.warning("Missing prefLabel for concept "+concept+" substituted with ID");
+				showWarning("Missing prefLabel for concept "+concept+" substituted with ID");
 			}
 		}
 		
@@ -301,7 +352,7 @@ public class Import implements AutoCloseable{
 			// just use the first notation and log warning
 			insertMeta.setString(5, "FA");
 			insertMeta.setString(6, conceptIds[0]);
-			log.warning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
+			showWarning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
 		}
 
 		// c_basecode
@@ -386,21 +437,16 @@ public class Import implements AutoCloseable{
 
 	private void openDatabase(Map<String,String> props) throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
-		
-		this.config = props;
-		sourceId = config.get("meta.sourcesystem_cd");
 
 		//String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
 		// use only properties relevant to JDBC
 		// meta connection
-		dbMeta = PostgresExtension.getConnection(config,new String[]{"jdbc.","meta.jdbc."});
+		dbMeta = PostgresExtension.getConnection(props,new String[]{"jdbc.","meta.jdbc."});
 		dbMeta.setAutoCommit(true);
 
 		// data connection
-		dbData = PostgresExtension.getConnection(config,new String[]{"jdbc.","data.jdbc."});
+		dbData = PostgresExtension.getConnection(props,new String[]{"jdbc.","data.jdbc."});
 		dbData.setAutoCommit(true);
-		
-		prepareStatements();
 	}
 	
 	
@@ -410,14 +456,12 @@ public class Import implements AutoCloseable{
 		try {
 			dbMeta.close();
 		} catch (SQLException e) {
-			System.out.println("Error closing database connection");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error closing database connection", e);
 		}
 		try {
 			dbData.close();
 		} catch (SQLException e) {
-			System.out.println("Error closing database connection");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error closing database connection", e);
 		}
 		// don't close ontology, must be closed by caller
 		/*
