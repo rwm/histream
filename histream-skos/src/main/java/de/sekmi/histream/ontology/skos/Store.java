@@ -81,6 +81,35 @@ public class Store implements Ontology, Plugin {
 			this.scheme = repo.getValueFactory().createURI(conf.get("rdf.skosScheme")); 
 		}
 	}
+
+	/**
+	 * Initialise the SKOS ontology with the specified files.
+	 * @param files TURTLE RDF files
+	 * @param baseURI base URI to resolve relative URIs within the RDF files. can be {@code null}.
+	 * @param scheme SKOS scheme URI to find top concepts and unique notations. Can be {@code null}.
+	 * @throws RepositoryException repository errors
+	 * @throws IOException failure to read the specified files
+	 */
+	public Store(List<File> files, String baseURI, String scheme) throws RepositoryException, IOException{
+		initializeRepo(files, null, baseURI);
+		if( scheme != null ){
+			this.scheme = repo.getValueFactory().createURI(scheme);
+		}
+	}
+
+	public Store(Iterable<File> files, String baseURI) throws RepositoryException, IOException{
+		initializeRepo(files,null, baseURI);
+	}
+	public Store(Iterable<URL> urls) throws RepositoryException, IOException{
+		// TODO: clean implementation
+		initializeRepo(null, urls, null);
+	}
+	
+
+	public Store(File file) throws RepositoryException, IOException{
+		this(Arrays.asList(new File[]{file}), (String)null);
+	}
+
 	/**
 	 * Infer inverse relations. 
 	 * The first predicate is searched. For each found statement the inverse predicate is added if it didn't exist previously. 
@@ -145,19 +174,6 @@ public class Store implements Ontology, Plugin {
 	    	log.fine("Inferred "+inferred+" statements.");
 	    }
 	    
-	}
-
-	public Store(Iterable<File> files, String baseURI) throws RepositoryException, IOException{
-		initializeRepo(files,null, baseURI);
-	}
-	public Store(Iterable<URL> urls) throws RepositoryException, IOException{
-		// TODO: clean implementation
-		initializeRepo(null, urls, null);
-	}
-	
-
-	public Store(File file) throws RepositoryException, IOException{
-		this(Arrays.asList(new File[]{file}), (String)null);
 	}
 	public void setConceptScheme(String schemeURI){
 		this.scheme = repo.getValueFactory().createURI(schemeURI);
