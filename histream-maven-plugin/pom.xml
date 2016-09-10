@@ -6,7 +6,7 @@
 	<version>0.9-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
-	<name>HIStream maven plugin</name>
+	<name>HIStream : Maven plugin</name>
 
 	<build>
 		<plugins>

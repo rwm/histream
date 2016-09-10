@@ -3,7 +3,6 @@ package de.sekmi.histream.maven;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Properties;
 
 import org.apache.maven.shared.model.fileset.FileSet;
