@@ -3,7 +3,7 @@
 
 	<groupId>de.sekmi.histream.maven</groupId>
 	<artifactId>histream-maven-plugin</artifactId>
-	<version>0.9</version>
+	<version>0.10-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>HIStream : Maven plugin</name>
@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.9</version>
+		<version>0.10-SNAPSHOT</version>
 	</parent>
 
 	<build>
@@ -29,12 +29,12 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-i2b2</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-skos</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 		</dependency>
 
 		<!-- maven plugin dependencies -->

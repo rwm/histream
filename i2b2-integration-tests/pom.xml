@@ -3,12 +3,12 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>i2b2-intregration-tests</artifactId>
-	<version>0.9</version>
+	<version>0.10-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.9</version>
+		<version>0.10-SNAPSHOT</version>
 	</parent>
 
 	<name>HIStream : i2b2 integration tests</name>
@@ -44,22 +44,22 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-i2b2</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-skos</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-import</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-import</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
