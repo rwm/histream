@@ -28,7 +28,7 @@ import de.sekmi.histream.ext.Visit;
  * and retrieval of facts.
  * </p>
  * TODO add/use interface from histream-core
- * XXX TODO allow to map patient_num -> Patient and encounter_num -> Encounter, this must be done before the extension is accessed
+ * XXX TODO allow to map patient_num -&gt; Patient and encounter_num -&gt; Encounter, this must be done before the extension is accessed
  * @author R.W.Majeed
  *
  */
