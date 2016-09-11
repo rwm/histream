@@ -8,6 +8,12 @@
 
 	<name>HIStream : Maven plugin</name>
 
+	<parent>
+		<groupId>de.sekmi.histream</groupId>
+		<artifactId>histream</artifactId>
+		<version>0.9-SNAPSHOT</version>
+	</parent>
+
 	<build>
 		<plugins>
 		<!-- use new plugin plugin. default 3.2 will not work with java 8 -->
@@ -16,16 +22,6 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>3.4</version>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-
 		</plugins>
 	</build>
 	<dependencies>
