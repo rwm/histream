@@ -4,12 +4,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-core</artifactId>
-	<version>0.9-SNAPSHOT</version>
+	<version>0.9</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.9-SNAPSHOT</version>
+		<version>0.9</version>
 	</parent>
   
 	<build>
