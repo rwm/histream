@@ -61,6 +61,7 @@ public class Import implements AutoCloseable{
 	private int deleteConceptCount;
 
 	private String sourceId;
+	private String sourceIdDelete;
 	private String ontScheme;
 	private Timestamp sourceTimestamp;
 	// configuration
@@ -137,6 +138,11 @@ public class Import implements AutoCloseable{
 		this.metaBase = config.get("meta.basepath"); // optional
 
 		this.sourceId = config.get("meta.sourcesystem_cd");
+		// set meta.sourcesystem_cd.delete to '' to omit the delete
+		this.sourceIdDelete = config.getOrDefault("meta.sourcesystem_cd.delete", sourceId);
+		if( this.sourceIdDelete.trim().length() == 0 ){
+			this.sourceIdDelete = null;
+		}
 		// tables
 		this.metaTable = config.get("meta.table");
 		this.metaAccess = config.get("meta.access");
@@ -159,21 +165,25 @@ public class Import implements AutoCloseable{
 		}
 	}
 	private void deleteFromDatabase() throws SQLException{
+		if( sourceIdDelete == null ){
+			// nothing to do
+			return;
+		}
 		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
 		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
 		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
 		
-		deleteConcepts.setString(1, sourceId);
+		deleteConcepts.setString(1, sourceIdDelete);
 		this.deleteConceptCount = deleteConcepts.executeUpdate();
 //		System.out.println("Deleted "+deleteConceptCount+" rows from "+getConceptTable());
 		deleteConcepts.close();
 
-		deleteAccess.setString(1, sourceId+"%");
+		deleteAccess.setString(1, sourceIdDelete+"%");
 		this.deleteAccessCount = deleteAccess.executeUpdate();
 //		System.out.println("Deleted "+deleteAccessCount+" rows from "+getAccessTable());
 		deleteAccess.close();
 
-		deleteOnt.setString(1, sourceId);
+		deleteOnt.setString(1, sourceIdDelete);
 		this.deleteMetaCount = deleteOnt.executeUpdate();
 //		System.out.println("Deleted "+deleteMetaCount+" rows from "+getMetaTable());
 		deleteOnt.close();
