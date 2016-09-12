@@ -27,7 +27,7 @@ import de.sekmi.histream.i2b2.ont.SQLGenerator;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.skos.Store;
 
-@Mojo(name="ontology")
+@Mojo(name="ontology")//, defaultPhase=LifecyclePhase.GENERATE_RESOURCES)
 public class OntologyMojo extends AbstractMojo {	
 	@Parameter(required=true)
 	FileSet source;
@@ -60,9 +60,14 @@ public class OntologyMojo extends AbstractMojo {
 		FileSetManager fsm = new FileSetManager();
 		String[] files = fsm.getIncludedFiles(source);
 		String base = source.getDirectory();
+		getLog().info("Using source base directory: "+base);
 		List<File> list = new ArrayList<>(files.length);
 		for( int i=0; i<files.length; i++ ){
+			getLog().info("Source: "+files[i]);
 			list.add(new File(base, files[i]));
+		}
+		if( list.isEmpty() ){
+			getLog().warn("No ontology source files to process");
 		}
 		return list;
 	}
