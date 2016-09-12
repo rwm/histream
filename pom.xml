@@ -52,9 +52,9 @@
 		</license>
 	</licenses>
 	<modules>
+		<module>histream-i2b2</module>
 		<!--
 		<module>histream-core</module>
-		<module>histream-i2b2</module>
 		<module>histream-hl7</module>
 		<module>histream-skos</module>
 		<module>histream-import</module>
