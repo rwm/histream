@@ -14,8 +14,11 @@ public class VirtualStatement implements Statement{
 	}
 
 	public String escapeString(String value){
-		// TODO escape
-		return value.replace("\\","\\\\").replace("'", "\\'");
+		// escape string literals
+		// postgres v9.1 and up use standard_conforming_strings=on
+		// this means that backslashes are treated literal and there are no escape characters
+		// a literal single quote ' must be written as ''
+		return value.replace("'","''");
 	}
 
 	@Override
