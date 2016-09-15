@@ -311,6 +311,49 @@ public class Import implements AutoCloseable{
 		}
 		return xmlbuf.toString();
 	}
+	/**
+	 * Build a readable representation of a concept path.
+	 * E.g. remove base path and namespace prefixes from path names
+	 * @param path ontology path
+	 * @return readable path
+	 */
+	public String readableConceptPath(String path){
+		if( path.startsWith(metaBase) ){
+			path = path.substring(metaBase.length());
+		}
+		StringBuilder b = new StringBuilder();
+		int pos = 0;
+		boolean done = false;
+		char prefix_char;
+		do{
+			int sep = path.indexOf('\\', pos);
+			if( sep == -1 ){
+				done = true;
+				sep = path.length();
+			}else if( sep == path.length()-1 ){
+				// empty backslash at end of path
+				done = true;
+			}
+			// skip the http:// part of url prefixes
+			if( path.substring(pos,pos+7).equals("http://") ){
+				// prefixes will end in #
+				prefix_char = '#';
+				pos += 7;
+			}else{
+				// prefix will end in :
+				prefix_char = ':';
+			}
+			// is there a prefix in the path segment?
+			int pfx = path.indexOf(prefix_char, pos);
+			if( pfx != -1 && pfx < sep ){
+				// prefix found, ignore the prefix
+				pos = pfx+1;
+			}
+			b.append('\\').append(path.substring(pos, sep));
+			pos = sep+1;
+		}while( !done );
+		return b.toString();
+	}
 	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
 		insertMeta.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
@@ -399,8 +442,10 @@ public class Import implements AutoCloseable{
 		// c_tooltip
 		// try to use concept description
 		String descr = concept.getDescription(locale);
-		if( descr == null )descr = path; // use path if no description available
-		insertMeta.setString(9, path);
+		if( descr == null ){
+			descr = readableConceptPath(path); // use path if no description available
+		}
+		insertMeta.setString(9, descr);
 		
 		// m_applied_path
 		insertMeta.setString(10, "@");
