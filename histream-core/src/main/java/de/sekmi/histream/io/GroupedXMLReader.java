@@ -260,16 +260,16 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		//reader.nextTag();
 
 		currentVisit = visitAccessor.accessStatic(encounterId, currentPatient, (ExternalSourceType)es);
-		currentVisit.setStartTime(encounterStart);
-		currentVisit.setEndTime(encounterEnd);
-		currentVisit.setLocationId(visitData.get("location"));
 		if( es != null ){
 			currentVisit.setSourceTimestamp(es.getSourceTimestamp());
 		}
+		currentVisit.setStartTime(encounterStart);
+		currentVisit.setEndTime(encounterEnd);
+		currentVisit.setLocationId(visitData.get("location"));
 		
 
 
-		// TODO set other visit data: gender, provider, in/out status
+		// TODO set other visit data: provider, in/out status
 		visitData.get("provider");
 		
 	}
