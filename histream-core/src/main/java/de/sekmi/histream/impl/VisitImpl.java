@@ -1,5 +1,6 @@
 package de.sekmi.histream.impl;
 
+
 /*
  * #%L
  * histream
@@ -48,7 +49,12 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 
 	public String getPatientId(){return patientId;}
 	
-	public void setPatientId(String patientId){this.patientId = patientId;}
+	public void setPatientId(String patientId){
+		// patient id should not be changed normally.
+		this.patientId = patientId;
+		// TODO need to update dirty flag?
+		markDirty(true);
+	}
 	
 	@Override
 	public DateTimeAccuracy getStartTime() {
@@ -67,8 +73,8 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 
 	@Override
 	public void setStatus(Status status) {
+		checkAndUpdateDirty(this.status, status);
 		this.status = status;
-		markDirty(true); // maybe compare first
 	}
 
 	@Override
@@ -78,20 +84,20 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 	
 	@Override
 	public void setLocationId(String locationId){
+		checkAndUpdateDirty(this.locationId, locationId);
 		this.locationId = locationId;
-		markDirty(true);
 	}
 
 	@Override
 	public void setEndTime(DateTimeAccuracy endTime) {
+		checkAndUpdateDirty(this.endTime, endTime);
 		this.endTime = endTime;
-		markDirty(true);
 	}
 
 	@Override
 	public void setStartTime(DateTimeAccuracy startTime) {
+		checkAndUpdateDirty(this.startTime, startTime);
 		this.startTime = startTime;
-		markDirty(true);
 	}
 
 	

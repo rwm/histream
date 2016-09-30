@@ -1,5 +1,6 @@
 package de.sekmi.histream.impl;
 
+
 /*
  * #%L
  * histream
@@ -28,7 +29,10 @@ import de.sekmi.histream.ext.StoredExtensionType;
 
 /**
  * Implementation of the Patient interface.
- * @author Raphael
+ * All setter methods will call {@code markDirty(true)} if the object was previously
+ * not dirty and the new value is different from the old one.
+ * 
+ * @author R.W.Majeed
  *
  */
 public class PatientImpl extends StoredExtensionType implements Patient {
@@ -56,19 +60,8 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	
 	@Override
 	public void setBirthDate(DateTimeAccuracy dateTime){
-		// TODO compare and markDirty  if different (also in other setters)
-		if( this.birthDate == null && dateTime == null ){
-			// nothing to do
-			return;
-		}else if( birthDate != null && dateTime != null ){
-			// compare
-			if( birthDate.equals(dateTime) ){
-				// nothing to do
-				return;
-			}
-		}
+		checkAndUpdateDirty(this.birthDate, dateTime);
 		this.birthDate = dateTime;
-		markDirty(true);
 	}
 
 	@Override
@@ -78,6 +71,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 	
 	@Override
 	public void setDeathDate(DateTimeAccuracy dateTime){
+		checkAndUpdateDirty(this.deathDate, dateTime);
 		this.deathDate = dateTime;
 		// non null death date implies patient deceased
 		if( dateTime != null ){
@@ -92,13 +86,8 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 
 	@Override
 	public void setSex(Sex sex) {
-		if( this.sex == null && sex == null ){
-			return; // nothing to do
-		}else if( this.sex != null && sex != null && this.sex.equals(sex) ){
-			return; // nothing to do
-		}
+		checkAndUpdateDirty(this.sex, sex);
 		this.sex = sex;
-		markDirty(true);
 	}
 
 	@Override
@@ -108,6 +97,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 
 	@Override
 	public void setSurname(String surname) {
+		checkAndUpdateDirty(this.surname, surname);
 		this.surname = surname;
 	}
 
@@ -118,6 +108,7 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 
 	@Override
 	public void setGivenName(String givenName) {
+		checkAndUpdateDirty(this.givenName, givenName);
 		this.givenName = givenName;
 	}
 
@@ -128,15 +119,14 @@ public class PatientImpl extends StoredExtensionType implements Patient {
 
 	@Override
 	public void setDeceased(Boolean deceased) {
+		checkAndUpdateDirty(this.deceased, deceased);
 		this.deceased = deceased;
 	}
-	
+
 
 	@Override
 	public String toString(){
 		return "Patient(id="+getId()+", dob="+getBirthDate()+")";
 	}
-
-
 
 }

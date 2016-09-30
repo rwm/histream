@@ -24,6 +24,7 @@ package de.sekmi.histream.ext;
 import java.time.Instant;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Objects;
 
 
 public class StoredExtensionType implements IdExtensionType, ExternalSourceType{
@@ -37,6 +38,12 @@ public class StoredExtensionType implements IdExtensionType, ExternalSourceType{
 	
 	public void markDirty(boolean dirty){
 		this.dirty = dirty;
+	}
+
+	public <T> void checkAndUpdateDirty(T oldValue, T newValue){
+		if( !dirty && !Objects.equals(oldValue, newValue) ){
+			markDirty(true);
+		}
 	}
 
 	@Override
@@ -55,8 +62,8 @@ public class StoredExtensionType implements IdExtensionType, ExternalSourceType{
 
 	@Override
 	public final void setSourceTimestamp(Instant instant) {
+		checkAndUpdateDirty(this.sourceTimestamp, instant);
 		this.sourceTimestamp = instant;
-		markDirty(true);
 	}
 
 	@Override
@@ -66,8 +73,8 @@ public class StoredExtensionType implements IdExtensionType, ExternalSourceType{
 
 	@Override
 	public final void setSourceId(String sourceSystemId) {
+		checkAndUpdateDirty(this.sourceSystemId, sourceSystemId);
 		this.sourceSystemId = sourceSystemId;
-		markDirty(true);
 	}
 	
 	private static final class DirtyIterator<T extends StoredExtensionType> implements Iterator<T>{

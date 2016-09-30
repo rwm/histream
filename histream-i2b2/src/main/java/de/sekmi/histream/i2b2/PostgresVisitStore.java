@@ -226,6 +226,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 			log.warning("Missing row in visit_dimension for encounter_mapping.encounter_num="+num);
 		}else{
 			setAliases(visit, aliases.toArray(new String[aliases.size()]), primary);
+			visit.markDirty(false);
 		}
 	}
 	
