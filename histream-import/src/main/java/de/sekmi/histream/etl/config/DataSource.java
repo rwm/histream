@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.script.ScriptException;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -19,7 +18,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.FactGroupingQueue;
 import de.sekmi.histream.etl.ScriptProcessingQueue;
-import de.sekmi.histream.etl.VisitPostProcessorQueue;
 
 /**
  * Data source configuration.

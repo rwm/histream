@@ -1,5 +1,7 @@
 package de.sekmi.histream.impl;
 
+import java.text.ParseException;
+
 /*
  * #%L
  * histream
@@ -40,7 +42,7 @@ public class TestDateTimeAccuracy {
 		}
 	}
 	@Test
-	public void testParseToString(){
+	public void testParseToString() throws ParseException{
 		final String[] str = new String[]{"2001-03-04T10:16:07", "2001-03-04T10:16:00"};
 		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601(str[0]);
 		Assert.assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
@@ -52,7 +54,7 @@ public class TestDateTimeAccuracy {
 	}
 	
 	@Test
-	public void testPartialDates(){
+	public void testPartialDates() throws ParseException{
 		final String[] str = {"2001-03-04T05:06","2001-03-04T05","2001-03-04","2001-03","2001"};
 		final ChronoUnit[] expectedAccuracy = {ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS, ChronoUnit.MONTHS, ChronoUnit.YEARS};
 		for( int i=0; i<expectedAccuracy.length; i++ ){

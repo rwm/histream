@@ -22,6 +22,7 @@ package de.sekmi.histream.io;
 
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -104,7 +105,7 @@ class XMLObservationParser extends AbstractObservationParser{
 			// TODO: log error
 		}				
 	}
-	protected void newObservation(AttributeAccessor atts){
+	protected void newObservation(AttributeAccessor atts) throws ParseException{
 		// determine start time
 		DateTimeAccuracy start;
 		String ts = atts.getValue("start");
@@ -213,7 +214,7 @@ class XMLObservationParser extends AbstractObservationParser{
 		setMeta(ObservationSupplier.META_SOURCE_TIMESTAMP, atts.getValue("timestamp"));
 		setMeta(ObservationSupplier.META_SOURCE_ID, atts.getValue("id"));
 	}
-	protected void parseEncounter(AttributeAccessor atts){
+	protected void parseEncounter(AttributeAccessor atts) throws ParseException{
 		encounterStart = DateTimeAccuracy.parsePartialIso8601(atts.getValue("start"));
 		if( atts.getValue("end") != null ){
 			encounterEnd = DateTimeAccuracy.parsePartialIso8601(atts.getValue("end"));

@@ -3,7 +3,6 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.net.URL;
 
 import javax.script.ScriptException;
 

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Hashtable;
@@ -253,7 +254,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 			currentVisit = visitAccessor.accessStatic(visitId,currentPatient,(ExternalSourceType)this);
 		}
 	}
-	private void specialFields(SpecialConcept special, Record record){		
+	private void specialFields(SpecialConcept special, Record record) throws ParseException{		
 		// make sure current patient is valid
 		lazyCreatePatient(record.getPatID());
 		
@@ -325,7 +326,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 		return value;
 	}
 	
-	private void newObservation(Record record){
+	private void newObservation(Record record) throws ParseException{
 		DateTimeAccuracy ts;
 		DateTimeAccuracy sourceTs = getSourceDateTime();
 		if( record.getStartDate() == null ){
@@ -413,28 +414,33 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 				// continue;
 			}else{
 				// parse observation
-				Record fields = new Record(fieldSeparatorPattern.split(line, maxFields));
-				// fields: 0 patid, 1 encounter, 2 concept, 3: type, 4: value, 5: starttime, 
-				
-				// handle special concepts (defined by previous commands)
-				SpecialConcept special = specialConcepts.get(fields.getConcept());
-				if( special != null ){
-					specialFields(special, fields);
-					// continue;
-				}else if( inGroup ){
-					// first item is fact, following items are modifiers
-					if( fact == null ){
-						newObservation(fields);
+				try{
+					Record fields = new Record(fieldSeparatorPattern.split(line, maxFields));
+					// fields: 0 patid, 1 encounter, 2 concept, 3: type, 4: value, 5: starttime, 
+					
+					// handle special concepts (defined by previous commands)
+					SpecialConcept special = specialConcepts.get(fields.getConcept());
+					if( special != null ){
+						specialFields(special, fields);
+						// continue;
+					}else if( inGroup ){
+						// first item is fact, following items are modifiers
+						if( fact == null ){
+							newObservation(fields);
+						}else{
+							appendModifier(fields);
+						}
+						// continue;
+						// group ends with #@group(end)
 					}else{
-						appendModifier(fields);
+						// assert( fact == null )
+						newObservation(fields);
+						break;
 					}
-					// continue;
-					// group ends with #@group(end)
-				}else{
-					// assert( fact == null )
-					newObservation(fields);
-					break;
+				} catch (ParseException e) {
+					throw new UncheckedIOException(new IOException(e));
 				}
+
 			}
 		}while( true );
 		Observation ret = fact;

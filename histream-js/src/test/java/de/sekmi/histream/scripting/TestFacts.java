@@ -1,5 +1,6 @@
 package de.sekmi.histream.scripting;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,13 +27,13 @@ public class TestFacts {
 	DateTimeAccuracy defaultStart;
 	
 	@Before
-	public void setup() throws ScriptException{
+	public void setup() throws ScriptException, ParseException{
 		sem = new ScriptEngineManager();
 		engine = sem.getEngineByName("nashorn");
 		// enable strict mode
 		engine.eval("'use strict';");
 		factory = new ObservationFactoryImpl();
-	
+		
 		defaultStart =  DateTimeAccuracy.parsePartialIso8601("2016");
 		Observation[] facts = new Observation[]{
 				factory.createObservation("P1", "C1", DateTimeAccuracy.parsePartialIso8601("2011")),

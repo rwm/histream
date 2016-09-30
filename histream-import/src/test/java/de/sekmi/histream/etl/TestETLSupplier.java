@@ -3,7 +3,6 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -98,7 +97,7 @@ public class TestETLSupplier {
 	}
 	
 	@Test
-	public void testPatientExtension() throws IOException{
+	public void testPatientExtension() throws IOException, java.text.ParseException{
 		Observation fact = os.get();
 		Assert.assertNotNull(fact);
 		Patient p = fact.getExtension(Patient.class);
@@ -119,7 +118,7 @@ public class TestETLSupplier {
 		// nothing to do anymore
 	}
 	@Test
-	public void testVisitExtension() throws IOException{
+	public void testVisitExtension() throws IOException, java.text.ParseException{
 		Observation fact = os.get();
 		Assert.assertNotNull(fact);
 

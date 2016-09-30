@@ -24,6 +24,7 @@ package de.sekmi.histream.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.text.ParseException;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -118,7 +119,11 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 			// read visit attributes
 
 			if( reader.getLocalName().equals("encounter") ){
-				parseEncounter(atts);
+				try {
+					parseEncounter(atts);
+				} catch (ParseException e) {
+					throw new XMLStreamException("Unable to parse encounter", reader.getLocation(), e);
+				}
 			}
 
 			String text = reader.getElementText();
@@ -158,7 +163,11 @@ public class XMLObservationSupplier extends XMLObservationParser implements Obse
 				|| reader.getLocalName().equals("eav-group")) ){
 			throw new XMLStreamException("Element eav-item or eav-group expected instead of "+reader.getLocalName(), reader.getLocation());
 		}
-		newObservation(atts);
+		try {
+			newObservation(atts);
+		} catch (ParseException e) {
+			throw new XMLStreamException("Unable to parse observation", reader.getLocation(), e);
+		}
 		if( reader.getLocalName().equals("eav-group") ){
 			// group item can have value
 			parseValueAttributes(atts);

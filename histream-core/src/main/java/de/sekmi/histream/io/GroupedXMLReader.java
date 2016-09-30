@@ -3,6 +3,7 @@ package de.sekmi.histream.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,16 +147,29 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		
 		// register with extension
 		currentPatient = patientAccessor.accessStatic(patientId, (ExternalSourceType)es);
+		// immediately set source timestamp
+		if( es != null ){
+			currentPatient.setSourceTimestamp(es.getSourceTimestamp());
+		}
 		// TODO set patient data
 		if( patientData.containsKey("birthdate") ){
-			currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(patientData.get("birthdate")));
+			String dob = patientData.get("birthdate");
+			try {
+				currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(dob));
+			} catch (ParseException e) {
+				throw new XMLStreamException("Unable to parse birthdate: "+dob, reader.getLocation(), e);
+			}
 		}
 		if( patientData.containsKey("deceased") ){
 			// patient known to be deceased
 			currentPatient.setDeceased(true);
 			String date = patientData.get("deceased");
 			if( date != null ){
-				currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date));
+				try {
+					currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date));
+				} catch (ParseException e) {
+					throw new XMLStreamException("Unable to parse deceased date: "+date, reader.getLocation(), e);
+				}
 			}
 		}
 		if( patientData.containsKey("gender") ){
@@ -166,9 +180,6 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		}
 		if( patientData.containsKey("given-name") ){
 			currentPatient.setGivenName(patientData.get("given-name"));
-		}
-		if( es != null ){
-			currentPatient.setSourceTimestamp(es.getSourceTimestamp());
 		}
 		
 	}
@@ -224,12 +235,22 @@ public class GroupedXMLReader  implements ObservationSupplier {
 			reader.nextTag();
 		}
 		if( visitData.containsKey("start") ){
-			encounterStart = DateTimeAccuracy.parsePartialIso8601(visitData.get("start"));
+			String date = visitData.get("start");
+			try {
+				encounterStart = DateTimeAccuracy.parsePartialIso8601(date);
+			} catch (ParseException e) {
+				throw new XMLStreamException("Unable to parse encounter/start: "+date, reader.getLocation(), e);
+			}
 		}else{
 			encounterStart = null;
 		}
 		if( visitData.containsKey("end") ){
-			encounterEnd = DateTimeAccuracy.parsePartialIso8601(visitData.get("end"));
+			String date = visitData.get("end");
+			try {
+				encounterEnd = DateTimeAccuracy.parsePartialIso8601(date);
+			} catch (ParseException e) {
+				throw new XMLStreamException("Unable to parse encounter/end: "+date, reader.getLocation(), e);
+			}
 		}else{
 			encounterEnd = null;
 		}

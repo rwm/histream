@@ -1,10 +1,10 @@
 package de.sekmi.histream.scripting;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.Value;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
@@ -20,11 +20,11 @@ public class Fact {
 		return observation.getConceptId();
 	}
 	
-	public Fact start(String incompleteDateTime){
+	public Fact start(String incompleteDateTime) throws ParseException{
 		observation.setStartTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime));
 		return this;
 	}
-	public Fact end(String incompleteDateTime){
+	public Fact end(String incompleteDateTime) throws ParseException{
 		observation.setEndTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime));
 		return this;
 	}

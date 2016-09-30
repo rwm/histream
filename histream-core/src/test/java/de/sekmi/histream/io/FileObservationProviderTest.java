@@ -24,11 +24,13 @@ package de.sekmi.histream.io;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import java.math.BigDecimal;
+import java.text.ParseException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.FactoryConfigurationError;
@@ -81,8 +83,12 @@ public class FileObservationProviderTest {
 				Assert.assertNotNull("Patient extension required", p);
 				Assert.assertEquals("XX12345", p.getId());
 				Assert.assertEquals(Boolean.TRUE, p.getDeceased());
-				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2001-01-01"), p.getBirthDate());
-				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2020"), p.getDeathDate());
+				try {
+					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2001-01-01"), p.getBirthDate());
+					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2020"), p.getDeathDate());
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
 				Assert.assertEquals(Sex.female, p.getSex());
 				Assert.assertEquals("A B", p.getGivenName());
 				Assert.assertEquals("Dampf", p.getSurname());
@@ -93,8 +99,12 @@ public class FileObservationProviderTest {
 				Visit v = o.getExtension(Visit.class);
 				Assert.assertNotNull("Visit extension required", v);
 				Assert.assertEquals("Zuhause", v.getLocationId());
-				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-01T10:30:00"), v.getStartTime());
-				Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00"), v.getEndTime());
+				try{
+					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-01T10:30:00"), v.getStartTime());
+					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00"), v.getEndTime());
+				} catch (ParseException e) {
+					throw new RuntimeException(e);
+				}
 				// TODO test visit information
 				
 				// test source

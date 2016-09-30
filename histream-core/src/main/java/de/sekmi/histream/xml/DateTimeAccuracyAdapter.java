@@ -1,5 +1,7 @@
 package de.sekmi.histream.xml;
 
+import java.text.ParseException;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import de.sekmi.histream.DateTimeAccuracy;
@@ -13,7 +15,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 public class DateTimeAccuracyAdapter extends XmlAdapter<String, DateTimeAccuracy>{
 
 	@Override
-	public DateTimeAccuracy unmarshal(String v) {
+	public DateTimeAccuracy unmarshal(String v) throws ParseException {
 		if( v == null )return null;
 		return DateTimeAccuracy.parsePartialIso8601(v);
 	}

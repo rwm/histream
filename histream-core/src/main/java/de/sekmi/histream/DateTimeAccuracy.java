@@ -1,5 +1,6 @@
 package de.sekmi.histream;
 
+import java.text.ParseException;
 import java.time.DateTimeException;
 
 /*
@@ -194,14 +195,16 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * @return date time with accuracy as derived from parse
 	 * @throws IllegalArgumentException for unparsable string
 	 */
-	public static DateTimeAccuracy parsePartialIso8601(String str)throws IllegalArgumentException{
-		if( str.length() < 4 )throw new IllegalArgumentException("Need at least 4 characters for year: "+str);
+	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
+		if( str.length() < 4 )throw new ParseException("Need at least 4 characters for year: "+str, str.length());
 		// parse year
 		int year = Integer.parseInt(str.substring(0, 4));
 		if( str.length() == 4 ){ // specified to accuracy of years
 			return new DateTimeAccuracy(year);
-		}else if( str.length() < 7 || str.charAt(4) != '-' ){
-			throw new IllegalArgumentException("Expected YYYY-MM");
+		}else if( str.length() < 7 ){
+			throw new ParseException("Expected YYYY-MM", str.length());
+		}else if( str.charAt(4) != '-' ){
+			throw new ParseException("Expected YYYY-MM", 4);
 		}
 		// parse month
 		int month = Integer.parseInt(str.substring(5, 7));
