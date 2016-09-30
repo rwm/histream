@@ -336,17 +336,21 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	*/
 	
 	private void updateStorage(I2b2Patient patient) throws SQLException {
-			synchronized( update ){
-				update.setString(1, getVitalStatusCd(patient));
-				update.setTimestamp(2, inaccurateSqlTimestamp(patient.getBirthDate()));
-				update.setTimestamp(3, inaccurateSqlTimestamp(patient.getDeathDate()));
-				update.setString(4, getSexCd(patient));
+		synchronized( update ){
+			update.setString(1, getVitalStatusCd(patient));
+			update.setTimestamp(2, inaccurateSqlTimestamp(patient.getBirthDate()));
+			update.setTimestamp(3, inaccurateSqlTimestamp(patient.getDeathDate()));
+			update.setString(4, getSexCd(patient));
+			if( patient.getSourceTimestamp() != null ){
 				update.setTimestamp(5, Timestamp.from(patient.getSourceTimestamp()));
-				update.setString(6, patient.getSourceId());
-				update.setInt(7, patient.getNum());
-				update.executeUpdate();
-				patient.markDirty(false);
+			}else{
+				update.setTimestamp(5, null);				
 			}
+			update.setString(6, patient.getSourceId());
+			update.setInt(7, patient.getNum());
+			update.executeUpdate();
+			patient.markDirty(false);
+		}
 	}
 
 
