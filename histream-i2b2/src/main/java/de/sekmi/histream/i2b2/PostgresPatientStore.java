@@ -626,7 +626,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			
 			// don't use source metadata, since we only know the patient id
 			pat.setSourceId(source.getSourceId());
-			//pat.setSourceTimestamp(fact.getSourceTimestamp());
+			pat.setSourceTimestamp(source.getSourceTimestamp());
 
 			// put in cache and insert into storage
 			patientCache.put(num, pat);
