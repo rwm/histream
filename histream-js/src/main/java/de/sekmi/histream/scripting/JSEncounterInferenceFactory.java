@@ -123,15 +123,15 @@ public class JSEncounterInferenceFactory extends EncounterInferenceFactory{
 		}
 		scripts.add(script);
 	}
-
-	private Script getScript(String inferredConceptId){
-		InferenceEntry e = inferenceLookup.get(inferredConceptId);
-		if( e == null ){
-			return null;
-		}else{
-			return e.script;
-		}
-	}
+//
+//	private Script getScript(String inferredConceptId){
+//		InferenceEntry e = inferenceLookup.get(inferredConceptId);
+//		if( e == null ){
+//			return null;
+//		}else{
+//			return e.script;
+//		}
+//	}
 	@Override
 	public boolean canInfer(String inferredConceptId) {
 		return inferenceLookup.containsKey(inferredConceptId);
