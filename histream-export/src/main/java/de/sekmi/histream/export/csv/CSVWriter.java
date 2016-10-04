@@ -82,6 +82,12 @@ public class CSVWriter implements ExportWriter{
 	public void setPatientTableName(String tableName){
 		this.patientTableName = tableName;
 	}
+	public String getPatientTableName(){
+		return this.patientTableName;
+	}
+	public String getVisitTableName(){
+		return this.visitTableName;
+	}
 	/**
 	 * Escape data before it is written to the output file.
 	 * <p>
@@ -97,12 +103,12 @@ public class CSVWriter implements ExportWriter{
 	}
 	@Override
 	public TableWriter openPatientTable() throws IOException {
-		return new Table(this, fileNameForTable(patientTableName));
+		return new Table(this, fileNameForTable(getPatientTableName()));
 	}
 
 	@Override
 	public TableWriter openVisitTable() throws IOException {
-		return new Table(this, fileNameForTable(visitTableName));
+		return new Table(this, fileNameForTable(getVisitTableName()));
 	}
 
 	@Override
