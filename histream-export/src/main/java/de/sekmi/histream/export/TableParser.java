@@ -42,8 +42,10 @@ public class TableParser implements AutoCloseable{
 		Column[] columns = table.getColumns();
 		xpaths = new XPathExpression[columns.length];
 		for( int i=0; i<columns.length; i++ ){
+			String expr = columns[i].getXPath();
 			try {
-				xpaths[i] = xpath.compile(columns[i].getXPath());
+				Objects.requireNonNull(expr, "xpath required for column "+table.getId()+"."+columns[i].getHeader());
+				xpaths[i] = xpath.compile(expr);
 			} catch (XPathExpressionException e) {
 				throw new ExportException("Unable to compile XPath expression for "+table.getId()+"."+columns[i].getHeader(), e);
 			}
