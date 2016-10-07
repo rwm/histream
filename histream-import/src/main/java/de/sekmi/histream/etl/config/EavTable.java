@@ -44,6 +44,12 @@ public class EavTable extends Table<EavRow> {
 			}
 		}
 	}
+	/**
+	 * Ignored columns
+	 */
+	@XmlElement
+	Column<?>[] ignore;
+
 	public Column<?>[] getVirtualValueColumns(){
 		if( virtualColumnMap == null ){
 			return null;
@@ -101,7 +107,7 @@ public class EavTable extends Table<EavRow> {
 			map.registerColumn(mdat.unit);
 		}
 		// make sure all columns are specified
-		validateAllHeaders(headers, map, idat.ignore);
+		validateAllHeaders(headers, map, this.ignore);
 		
 		return map;
 	}

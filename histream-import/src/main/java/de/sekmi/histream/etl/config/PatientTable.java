@@ -26,9 +26,17 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	@XmlElement
 	IDAT idat;
 	
+	/**
+	 * MDAT concepts
+	 */
 	@XmlElementWrapper(name="mdat")
 	@XmlElement(name="concept")
 	Concept[] concepts;
+	/**
+	 * Columns which will be ignored during processing
+	 */
+	@XmlElement
+	Column<?>[] ignore;
 
 	@XmlAccessorType(XmlAccessType.FIELD)
 	public static class IDAT extends IdatColumns{
@@ -38,7 +46,6 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 		DateTimeColumn birthdate;
 		DateTimeColumn deathdate;
 		StringColumn gender;
-		Column<?>[] ignore;
 	}
 
 	@Override
@@ -68,7 +75,7 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 			map.registerColumn(idat.gender);
 		}
 		// make sure all headers are specified in configuration
-		Table.validateAllHeaders(headers, map, idat.ignore);
+		Table.validateAllHeaders(headers, map, this.ignore);
 		
 		return map;
 	}

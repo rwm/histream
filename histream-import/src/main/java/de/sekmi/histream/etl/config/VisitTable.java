@@ -21,6 +21,11 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 	@XmlElementWrapper(name="mdat")
 	@XmlElement(name="concept")
 	Concept[] concepts;
+	/**
+	 * Columns which will be ignored during processing
+	 */
+	@XmlElement
+	Column<?>[] ignore;
 	
 	@XmlType(name="patient-idat")
 	@XmlAccessorType(XmlAccessType.FIELD)
@@ -32,7 +37,6 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		StringColumn location;
 		StringColumn provider;
 		// TODO inpatient/outpatient state
-		Column<?>[] ignore;
 	}
 	@Override
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
@@ -73,7 +77,7 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		}
 		
 		// make sure all columns are specified
-		validateAllHeaders(headers, map, idat.ignore);
+		validateAllHeaders(headers, map, this.ignore);
 
 		return map;
 	}

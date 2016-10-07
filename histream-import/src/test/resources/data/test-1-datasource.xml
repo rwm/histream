@@ -24,12 +24,12 @@
 					<otherwise set-value="" log-warning="Unexpected gender value"/>
 				</map>
 			</gender>
-			<ignore xsi:type="string" column="ignoriert1"/>
-			<ignore xsi:type="string" column="patfakt1"/>
 		</idat>
 		<!-- for MDAT in patient table, use the same patient-table also as
 		a visit table (visit date needed). the patient id can be re-used
 		as visit id, or a constant visit ID can be used. -->
+		<ignore xsi:type="string" column="ignoriert1"/>
+		<ignore xsi:type="string" column="patfakt1"/>
 	</patient-table>
 	<!-- optional -->
 	<visit-table>
@@ -96,8 +96,6 @@
 		<idat>
 			<patient-id column="patid"/>
 			<visit-id column="event"/>
-			<ignore column="locat" xsi:type="string"/>
-			<ignore column="user" xsi:type="string"/>
 		</idat>
 		<mdat>
 			<concept column="param"/>
@@ -133,6 +131,8 @@
 			</value>
 			<!-- ... more value elements -->
 		</virtual>
+		<ignore column="locat" xsi:type="string"/>
+		<ignore column="user" xsi:type="string"/>
 	</eav-table>
 	<!-- scripts are run for each complete encounter in the order of occurrence -->
 	<script type="text/javascript"><![CDATA[
