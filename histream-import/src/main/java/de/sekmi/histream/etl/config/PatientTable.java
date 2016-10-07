@@ -78,9 +78,15 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
 		PatientRow patient = new PatientRow();
 		patient.setId(idat.patientId.valueOf(map, row, null));
-		patient.setGivenName(idat.givenName.valueOf(map, row, null));
-		patient.setSurname(idat.surname.valueOf(map, row, null));
-		patient.setBirthDate(idat.birthdate.valueOf(map, row, null));
+		if( idat.givenName != null ){
+			patient.setGivenName(idat.givenName.valueOf(map, row, null));
+		}
+		if( idat.surname != null ){
+			patient.setSurname(idat.surname.valueOf(map, row, null));
+		}
+		if( idat.birthdate != null ){
+			patient.setBirthDate(idat.birthdate.valueOf(map, row, null));
+		}
 		if( idat.deathdate != null ){
 			patient.setDeathDate(idat.deathdate.valueOf(map, row, null));
 		}
