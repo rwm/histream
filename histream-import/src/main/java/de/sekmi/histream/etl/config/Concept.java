@@ -77,7 +77,6 @@ public class Concept{
 		String concept = this.id;
 		
 		MapFeedback mf = new MapFeedback();
-		Object value = this.value.valueOf(map, row, mf);
 		if( mf.isActionDrop() ){
 			return null; // ignore this fact
 		}
@@ -94,23 +93,28 @@ public class Concept{
 			unit = this.unit.valueOf(map, row);
 		}
 		// TODO: use type of column this.value to infer value type
-		if( value == null ){
+		Object val = null;
+		if( this.value != null ){
+//			Objects.requireNonNull(this.value, "No value for concept: "+id);
+			val = this.value.valueOf(map, row, mf);
+		}
+		if( val == null ){
 			// no value
 			o.setValue(null);
-		}else if( value instanceof String ){
+		}else if( val instanceof String ){
 			// string
-			o.setValue(new StringValue((String)value));
+			o.setValue(new StringValue((String)val));
 			// TODO: set unit
-		}else if( value instanceof BigDecimal ){
+		}else if( val instanceof BigDecimal ){
 			// numeric
-			NumericValue v = new NumericValue((BigDecimal)value,unit);
+			NumericValue v = new NumericValue((BigDecimal)val,unit);
 			o.setValue(v);
-		}else if( value instanceof Long ){
+		}else if( val instanceof Long ){
 			// numeric
-			NumericValue v = new NumericValue((Long)value,unit);
+			NumericValue v = new NumericValue((Long)val,unit);
 			o.setValue(v);
 		}else{
-			throw new ParseException("Unsupported value type for concept id "+this.id+": "+value.getClass());
+			throw new ParseException("Unsupported value type for concept id "+this.id+": "+val.getClass());
 		}
 
 		// TODO: modifiers
