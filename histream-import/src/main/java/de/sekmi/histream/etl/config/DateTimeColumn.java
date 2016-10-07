@@ -60,7 +60,7 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 		try{
 			return DateTimeAccuracy.parse(formatter,input);
 		}catch( DateTimeParseException e ){
-			throw new ParseException("Unable to parse date: "+input, e);
+			throw new ParseException("Unable to parse date '"+input+"' in column '"+this.column+"'", e);
 		}
 	}
 }
