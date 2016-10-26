@@ -3,6 +3,7 @@ package de.sekmi.histream.export.csv;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.sekmi.histream.export.ExportWriter;
 import de.sekmi.histream.export.TableWriter;
@@ -38,11 +39,12 @@ public class CSVWriter implements ExportWriter{
 	/**
 	 * Create a CSV writer which creates table files
 	 * in the specified directory.
-	 * @param directory directory where the table files should be created
+	 * @param directory directory where the table files should be created. Must be non-null.
 	 * @param fieldSeparator field separator character.
 	 * @param fileSuffix file name suffix (e.g. {@code .csv})
 	 */
 	public CSVWriter(Path directory, char fieldSeparator, String fileSuffix){
+		Objects.requireNonNull(directory, "Directory path required");
 		this.charset = Charset.forName("UTF-8");
 		this.directory = directory;
 		this.fieldSeparator = fieldSeparator;
