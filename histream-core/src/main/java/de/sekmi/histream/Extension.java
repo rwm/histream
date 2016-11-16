@@ -58,6 +58,6 @@ public interface Extension<T>{
 	 * TODO change return type to array, to register all compatible classes
 	 * @return instance type
 	 */
-	Class<?>[] getInstanceTypes();
+	Iterable<Class<? super T>> getInstanceTypes();
 	
 }
