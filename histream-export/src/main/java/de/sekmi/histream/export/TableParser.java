@@ -24,11 +24,14 @@ public class TableParser implements AutoCloseable{
 	private XPath xpath;
 	private XPathExpression[] xpaths;
 	private TableWriter writer;
+	/** Count data rows (excluding header) */
+	private int rowCount;
 
 	public TableParser(AbstractTable table, TableWriter writer, XPath xpath) throws ExportException, IOException{
 		this.table = table;
 		this.writer = writer;
 		this.xpath = xpath;
+		this.rowCount = 0;
 		Objects.requireNonNull(table);
 		Objects.requireNonNull(writer);
 		compileXPaths();
@@ -58,6 +61,7 @@ public class TableParser implements AutoCloseable{
 	
 	public void processNode(Node node) throws ExportException, IOException{
 		writer.row(valuesForFragment(node));
+		rowCount ++;
 	}
 
 	private String[] valuesForFragment(Node node) throws ExportException{
@@ -76,5 +80,12 @@ public class TableParser implements AutoCloseable{
 	@Override
 	public void close() throws IOException {
 		writer.close();
+	}
+	/**
+	 * Get the number of processed data rows (excluding header rows if applicable).
+	 * @return row count
+	 */
+	public int getRowCount(){
+		return rowCount;
 	}
 }

@@ -33,6 +33,8 @@ public class TableExport {
 	private XPathFactory factory;
 	private NamespaceContext ns;
 	private ExportErrorHandler errorHandler;
+	private int patientCount;
+	private int visitCount;
 	
 	public TableExport(ExportDescriptor desc){
 		this.desc = desc;
@@ -119,11 +121,12 @@ public class TableExport {
 	 * @throws ExportException export exception
 	 * @throws IOException IO exception
 	 */
-	public void export(ObservationSupplier supplier, ExportWriter writer) throws ExportException, IOException{
+	public ExportSummary export(ObservationSupplier supplier, ExportWriter writer) throws ExportException, IOException{
 		requireDisjointConcepts();
 		try( FragmentExporter e = new FragmentExporter(createXPath(), desc, writer) ){
 			e.setErrorHandler(new ExportErrorHandler());
 			Streams.transfer(supplier, e);
+			return new ExportSummary(e.getPatientCount(), e.getVisitCount());
 		} catch (XMLStreamException | ParserConfigurationException e) {
 			throw new ExportException("Unable to create exporter", e);
 		} catch (UncheckedExportException e ){
@@ -133,5 +136,12 @@ public class TableExport {
 			// unwrap and rethrow
 			throw e.getCause();
 		}
+	}
+
+	public int getPatientCount(){
+		return patientCount;
+	}
+	public int getVisitCount(){
+		return visitCount;
 	}
 }

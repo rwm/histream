@@ -113,8 +113,6 @@ class FragmentExporter extends VisitFragmentParser {
 			// remove visit from patient
 			currentPatient.removeChild(visit);
 		}
-		// TODO check for repeating concepts and write to separate parsers
-		// iterate through facts and 
 	}
 
 	@Override
@@ -149,5 +147,20 @@ class FragmentExporter extends VisitFragmentParser {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Retrieve number of processed patients
+	 * @return patient count
+	 */
+	public int getPatientCount(){
+		return patientParser.getRowCount();
+	}
+	/**
+	 * Retrieve number of processed visits
+	 * @return visit count
+	 */
+	public int getVisitCount(){
+		return visitParser.getRowCount();
 	}
 }
