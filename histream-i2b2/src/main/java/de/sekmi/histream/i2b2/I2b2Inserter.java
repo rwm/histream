@@ -29,12 +29,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
 
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
@@ -80,16 +78,18 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private DataDialect dialect;
 	private int insertCount;
 	
-	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
-		db = PostgresExtension.getConnection(config, new String[]{"jdbc.","data.jdbc."});
-		initialize(config);
-	}
+//	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
+//		db = PostgresExtension.getConnection(config, new String[]{"jdbc.","data.jdbc."});
+//		initialize(config);
+//	}
 	
-	public I2b2Inserter(DataSource ds, Map<String,String> config) throws SQLException{
-		db = ds.getConnection();
-		initialize(config);
+//	public I2b2Inserter(DataSource ds, Map<String,String> config) throws SQLException{
+//		db = ds.getConnection();
+//		initialize(config);
+//	}
+	public I2b2Inserter(){
+		
 	}
-	
 	
 	private interface Preprocessor{
 		void preprocess(Observation fact)throws SQLException;
@@ -148,7 +148,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		log.info("Deleted "+rows+" rows for encounter_num="+encounter_num);
 		return 0 != rows;
 	}
-	private void prepareStatements(Map<String,String> props)throws SQLException{
+	private void prepareStatements()throws SQLException{
 		// no value
 		insertFact = db.prepareStatement(""
 				+ "INSERT INTO observation_fact ("
@@ -171,18 +171,18 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	 * Initialize the database connection
 	 * @throws SQLException if preparation/initialisation failed
 	 */
-	private void initialize(Map<String,String> props)throws SQLException{
-		dialect = new DataDialect();
-		String nullProvider = props.get("nullProvider");
-		if( nullProvider == null ){
-			log.warning("property 'nullProvider' missing, using '@' (may violate foreign keys)");
-			nullProvider = "@";
-		}
-		dialect.setDefaultProviderId(nullProvider);
+	public void open(Connection connection, DataDialect dialect)throws SQLException{
+		this.dialect = dialect;
+		this.db = connection;
+//		String nullProvider = props.get("nullProvider");
+//		if( nullProvider == null ){
+//			log.warning("property 'nullProvider' missing, using '@' (may violate foreign keys)");
+//			nullProvider = "@";
+//		}
 		
 		insertCount = 0;
 		db.setAutoCommit(false);
-		prepareStatements(props);
+		prepareStatements();
 	}
 
 	

@@ -1,10 +1,6 @@
 package de.sekmi.histream.i2b2.ont;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,8 +20,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import de.sekmi.histream.Plugin;
-import de.sekmi.histream.i2b2.PostgresExtension;
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
@@ -496,11 +490,11 @@ public class Import implements AutoCloseable{
 		//String connectString = "jdbc:postgresql://"+props.get("jdbc.host")+":"+props.get("jdbc.port")+"/"+props.get("jdbc.database"); 
 		// use only properties relevant to JDBC
 		// meta connection
-		dbMeta = PostgresExtension.getConnection(props,new String[]{"jdbc.","meta.jdbc."});
+		dbMeta = PostgresUtil.getConnection(props,new String[]{"jdbc.","meta.jdbc."});
 		dbMeta.setAutoCommit(true);
 
 		// data connection
-		dbData = PostgresExtension.getConnection(props,new String[]{"jdbc.","data.jdbc."});
+		dbData = PostgresUtil.getConnection(props,new String[]{"jdbc.","data.jdbc."});
 		dbData.setAutoCommit(true);
 	}
 	
@@ -529,92 +523,94 @@ public class Import implements AutoCloseable{
 	}
 
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static void main(String args[])throws FileNotFoundException, IOException{
-		if( args.length != 2 ){
-			System.err.println("Usage: ontology.properties import.properties");
-			System.exit(1);
-		}
-		File ontConfig = new File(args[0]);
-		File impConfig = new File(args[1]);
-		if( !ontConfig.canRead() ){
-			System.err.println("Unable to read ontology properties from "+args[0]);
-			System.exit(1);
-		}
-		if( !impConfig.canRead() ){
-			System.err.println("Unable to read import properties from "+args[1]);
-			System.exit(1);
-		}
+//	Import.main(new String[]{"../HIStream-i2b2/examples/skos-ontology.properties","../HIStream-i2b2/examples/i2b2-ont-import.properties"});
 
-		Properties ont_props = new Properties();
-		try( InputStream in = new FileInputStream(ontConfig) ){
-			ont_props.load(in);
-		}
-
-		String ontClass = ont_props.getProperty("ontology.class");
-		if( ontClass == null ){
-			System.err.println("Need to specify ontology.class in "+args[0]);
-			System.exit(1);
-		}
-
-		Properties props;
-
-		// open database
-		props = new Properties();
-		try( InputStream in = new FileInputStream(impConfig) ){
-			props.load(in);
-		}
-		Import o= null;
-		
-		try {
-			o = new Import((Map)props);
-		} catch (ClassNotFoundException e) {
-			System.err.println("Unable to load database driver");
-			e.printStackTrace();
-			System.exit(1);
-		} catch (SQLException e) {
-			System.err.println("Error while accessing database");
-			e.printStackTrace();
-			System.exit(1);
-		}
-
-		
-		Class<?> ont;
-		try {
-			ont = Class.forName(ontClass);
-		} catch (ClassNotFoundException e) {
-			o.close();
-			throw new IllegalArgumentException("Class not found: "+ontClass, e);
-		}
-		if( !Ontology.class.isAssignableFrom(ont) ){
-			o.close();
-			throw new IllegalArgumentException(args[0]+" does not implement the Ontology interface");
-		}
-
-		Ontology inst=null;
-		try {
-			inst = (Ontology)Plugin.newInstance(ont, (Map)ont_props);
-			o.setOntology(inst);
-		} catch (Exception e) {
-			System.out.println("Error while loading ontology");
-			e.printStackTrace();
-			o.close();
-			System.exit(1);
-		}
-		try {
-			o.processOntology();
-		} catch (SQLException e) {
-			System.err.println("Database error");
-			e.printStackTrace();
-		} catch (OntologyException e) {
-			System.err.println("Ontology error");
-			e.printStackTrace();
-		}
-		o.close();
-		inst.close();
-		
-		
-	}
+//	@SuppressWarnings({ "unchecked", "rawtypes" })
+//	public static void main(String args[])throws FileNotFoundException, IOException{
+//		if( args.length != 2 ){
+//			System.err.println("Usage: ontology.properties import.properties");
+//			System.exit(1);
+//		}
+//		File ontConfig = new File(args[0]);
+//		File impConfig = new File(args[1]);
+//		if( !ontConfig.canRead() ){
+//			System.err.println("Unable to read ontology properties from "+args[0]);
+//			System.exit(1);
+//		}
+//		if( !impConfig.canRead() ){
+//			System.err.println("Unable to read import properties from "+args[1]);
+//			System.exit(1);
+//		}
+//
+//		Properties ont_props = new Properties();
+//		try( InputStream in = new FileInputStream(ontConfig) ){
+//			ont_props.load(in);
+//		}
+//
+//		String ontClass = ont_props.getProperty("ontology.class");
+//		if( ontClass == null ){
+//			System.err.println("Need to specify ontology.class in "+args[0]);
+//			System.exit(1);
+//		}
+//
+//		Properties props;
+//
+//		// open database
+//		props = new Properties();
+//		try( InputStream in = new FileInputStream(impConfig) ){
+//			props.load(in);
+//		}
+//		Import o= null;
+//		
+//		try {
+//			o = new Import((Map)props);
+//		} catch (ClassNotFoundException e) {
+//			System.err.println("Unable to load database driver");
+//			e.printStackTrace();
+//			System.exit(1);
+//		} catch (SQLException e) {
+//			System.err.println("Error while accessing database");
+//			e.printStackTrace();
+//			System.exit(1);
+//		}
+//
+//		
+//		Class<?> ont;
+//		try {
+//			ont = Class.forName(ontClass);
+//		} catch (ClassNotFoundException e) {
+//			o.close();
+//			throw new IllegalArgumentException("Class not found: "+ontClass, e);
+//		}
+//		if( !Ontology.class.isAssignableFrom(ont) ){
+//			o.close();
+//			throw new IllegalArgumentException(args[0]+" does not implement the Ontology interface");
+//		}
+//
+//		Ontology inst=null;
+//		try {
+//			inst = (Ontology)Plugin.newInstance(ont, (Map)ont_props);
+//			o.setOntology(inst);
+//		} catch (Exception e) {
+//			System.out.println("Error while loading ontology");
+//			e.printStackTrace();
+//			o.close();
+//			System.exit(1);
+//		}
+//		try {
+//			o.processOntology();
+//		} catch (SQLException e) {
+//			System.err.println("Database error");
+//			e.printStackTrace();
+//		} catch (OntologyException e) {
+//			System.err.println("Ontology error");
+//			e.printStackTrace();
+//		}
+//		o.close();
+//		inst.close();
+//		
+//		
+//	}
 
 
 }

@@ -1,5 +1,9 @@
 package de.sekmi.histream.i2b2;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.Connection;
+
 /*
  * #%L
  * histream
@@ -28,15 +32,14 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
@@ -59,14 +62,16 @@ import de.sekmi.histream.ext.Visit.Status;
  * @author marap1
  *
  */
-public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
+public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements Closeable{
 	private static final Logger log = Logger.getLogger(PostgresVisitStore.class.getName());
-	private static final Class<?>[] INSTANCE_TYPES = new Class<?>[]{Visit.class,I2b2Visit.class};
+	private static final Iterable<Class<? super I2b2Visit>> INSTANCE_TYPES = Arrays.asList(Visit.class,I2b2Visit.class);
 	
 	private String projectId;
 	private int maxEncounterNum;
 	private char idSourceSeparator;
 	private String idSourceDefault;
+	private int fetchSize;
+	private Connection db;
 	
 	//private static ChronoUnit[] map_date_units = {ChronoUnit.DAYS, ChronoUnit.MONTHS, ChronoUnit.YEARS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS};
 	//private static char[] map_death_chars = {};
@@ -82,43 +87,48 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
 	
-	/**
-	 * Create a visit store using configuration settings.
-	 * The project id must be specified with the key {@code project}. 
-	 * JDBC connection configuration is specified with the key 
-	 * prefixes {@code jdbc.*} and {@code data.jdbc.*}
-	 * @param configuration key value pairs
-	 * @throws ClassNotFoundException database driver not found
-	 * @throws SQLException SQL exceptions
-	 */
-	public PostgresVisitStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
-		super(configuration);
-		this.projectId = config.get("project");
-		openDatabase(new String[]{"jdbc.","data.jdbc."});
-		initialize();
-	}
+//	/**
+//	 * Create a visit store using configuration settings.
+//	 * The project id must be specified with the key {@code project}. 
+//	 * JDBC connection configuration is specified with the key 
+//	 * prefixes {@code jdbc.*} and {@code data.jdbc.*}
+//	 * @param configuration key value pairs
+//	 * @throws ClassNotFoundException database driver not found
+//	 * @throws SQLException SQL exceptions
+//	 */
+//	public PostgresVisitStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
+//		super(configuration);
+//		this.projectId = config.get("project");
+//		openDatabase(new String[]{"jdbc.","data.jdbc."});
+//		initialize();
+//	}
+//
+//	/**
+//	 * Create a visit store using a {@link DataSource}.
+//	 * The project id must be specified with the key {@code project}. 
+//	 * @param ds data source for the connection
+//	 * @param configuration configuration settings
+//	 * @throws SQLException SQL error
+//	 */
+//	public PostgresVisitStore(DataSource ds, Map<String,String> configuration) throws SQLException{
+//		super(configuration);
+//		this.projectId = config.get("project");
+//		openDatabase(ds);
+//		initialize();
+//	}
 
-	/**
-	 * Create a visit store using a {@link DataSource}.
-	 * The project id must be specified with the key {@code project}. 
-	 * @param ds data source for the connection
-	 * @param configuration configuration settings
-	 * @throws SQLException SQL error
-	 */
-	public PostgresVisitStore(DataSource ds, Map<String,String> configuration) throws SQLException{
-		super(configuration);
-		this.projectId = config.get("project");
-		openDatabase(ds);
-		initialize();
+	public PostgresVisitStore(){
+		this.idSourceDefault = "HIVE";
+		this.idSourceSeparator = ':';
+		this.fetchSize = 1000;
 	}
-	private void initialize() throws SQLException{
+	public void open(Connection connection, String projectId) throws SQLException{
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
-		idSourceDefault = "HIVE";
-		idSourceSeparator = ':';
-		
+		this.projectId = projectId;
+		this.db = connection;
 		db.setAutoCommit(true);
-
+		
 		loadMaxEncounterNum();
 		batchLoad();
 	}
@@ -130,9 +140,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		update = db.prepareStatement("UPDATE visit_dimension SET active_status_cd=?, start_date=?, end_date=?, inout_cd=?, location_cd=?, update_date=current_timestamp, download_date=?, sourcesystem_cd=? WHERE encounter_num=?");
 		//select = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, update_date, sourcesystem_cd FROM visit_dimension WHERE patient_num=?");
 		selectAll = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, download_date, sourcesystem_cd FROM visit_dimension", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAll.setFetchSize(getFetchSize());
+		selectAll.setFetchSize(fetchSize);
 		selectMappingsAll = db.prepareStatement("SELECT encounter_num, encounter_ide, encounter_ide_source, patient_ide, patient_ide_source, encounter_ide_status, project_id FROM encounter_mapping ORDER BY encounter_num", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectMappingsAll.setFetchSize(getFetchSize());
+		selectMappingsAll.setFetchSize(fetchSize);
 
 		deleteSource = db.prepareStatement("DELETE FROM visit_dimension WHERE sourcesystem_cd=?");
 		deleteMapSource = db.prepareStatement("DELETE FROM encounter_mapping WHERE sourcesystem_cd=?");		
@@ -605,7 +615,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 	}
 
 	@Override
-	public Class<?>[] getInstanceTypes() {
+	public Iterable<Class<? super I2b2Visit>> getInstanceTypes() {
 		return INSTANCE_TYPES;
 	}
 
@@ -681,5 +691,17 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit>{
 		if( count != 0 )log.info("Updated "+count+" visits in database");
 	}
 
+	@Override
+	public synchronized void close() throws IOException {
+		if( db != null ){
+			flush();
+			try {
+				db.close();
+			} catch (SQLException e) {
+				throw new IOException(e);
+			}
+			db = null;
+		}
+	}
 
 }

@@ -23,8 +23,8 @@ package de.sekmi.histream.i2b2;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import de.sekmi.histream.i2b2.PostgresVisitStore;
 
@@ -32,14 +32,8 @@ public class TestPostgresVisitStore implements Closeable {
 	private PostgresVisitStore store;
 
 	public void open(String  host, int port) throws ClassNotFoundException, SQLException{
-		HashMap<String, String> props = new HashMap<>();
-		props.put("project", "demo");
-		props.put("user", "i2b2demodata");
-		props.put("host", host);
-		props.put("database", "i2b2");
-		props.put("port", Integer.toString(port));
-		props.put("password", "");
-		store = new PostgresVisitStore(props);
+		store = new PostgresVisitStore();
+		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", "i2b2demodata", "demodata"), "demo");
 	}
 	
 	private void open()throws Exception{

@@ -1,5 +1,9 @@
 package de.sekmi.histream.i2b2;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.Connection;
+
 /*
  * #%L
  * histream
@@ -28,15 +32,15 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
@@ -70,13 +74,14 @@ import de.sekmi.histream.ext.PatientStore;
  * @author marap1
  *
  */
-public class PostgresPatientStore extends PostgresExtension<I2b2Patient> implements PatientStore{
+public class PostgresPatientStore extends PostgresExtension<I2b2Patient> implements PatientStore, Closeable{
 	private static final Logger log = Logger.getLogger(PostgresPatientStore.class.getName());
-	private static final Class<?>[] INSTANCE_TYPES = new Class<?>[]{Patient.class, I2b2Patient.class};
+	private static final Iterable<Class<? super I2b2Patient>> INSTANCE_TYPES = Arrays.asList(Patient.class, I2b2Patient.class);
 	private String projectId;
 	private String idSourceDefault;
 	private char idSourceSeparator;
-	
+	private Connection db;
+	private int fetchSize;
 //	private String autoInsertSourceId;
 
 	// maximum patient number, used to generate new patient_num for new patients
@@ -100,48 +105,56 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private PreparedStatement deletePatientSource;
 	private PreparedStatement deleteMapSource;
 	
-	/**
-	 * Construct new postgres patient store. In addition to properties
-	 * needed by {@link PostgresExtension#PostgresExtension(Map)},
-	 * the following properties are needed: 
-	 * <p>jdbc.{host|port|database} or data.jdbc.{host|port|database} to
-	 * construct the database URI.
-	 * Any other parameters under jdbc. or data.jdbc. are passed to the 
-	 * JDBC connect method.
-	 * 
-	 * <p>project, 
-	 * <p>Optional properties:
-	 * <p>
-	 * 	idSourceDefault ('HIVE'), idSourceSeparator (single char, ':')
-	 * 	fetchSize (int, 10000)
-	 * @param configuration configuration
-	 * @throws SQLException if the preparation or initialisation fails
-	 * @throws ClassNotFoundException if postgresql driver not found
-	 */
-	public PostgresPatientStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
-		super(configuration);
-		this.projectId = config.get("project");
-		openDatabase(new String[]{"jdbc.","data.jdbc."});
-		initialize();
-	}
-	
+//	/**
+//	 * Construct new postgres patient store. In addition to properties
+//	 * needed by {@link PostgresExtension#PostgresExtension(Map)},
+//	 * the following properties are needed: 
+//	 * <p>jdbc.{host|port|database} or data.jdbc.{host|port|database} to
+//	 * construct the database URI.
+//	 * Any other parameters under jdbc. or data.jdbc. are passed to the 
+//	 * JDBC connect method.
+//	 * 
+//	 * <p>project, 
+//	 * <p>Optional properties:
+//	 * <p>
+//	 * 	idSourceDefault ('HIVE'), idSourceSeparator (single char, ':')
+//	 * 	fetchSize (int, 10000)
+//	 * @param configuration configuration
+//	 * @throws SQLException if the preparation or initialisation fails
+//	 * @throws ClassNotFoundException if postgresql driver not found
+//	 */
+//	public PostgresPatientStore(Map<String,String> configuration) throws ClassNotFoundException, SQLException {
+//		super(configuration);
+//		this.projectId = config.get("project");
+//		openDatabase(new String[]{"jdbc.","data.jdbc."});
+//		initialize();
+//	}
+//	
+//
+//	/**
+//	 * Create a patient store using a {@link DataSource}.
+//	 * The project id must be specified with the key {@code project}. 
+//	 * @param ds data source for the connection
+//	 * @param configuration configuration settings
+//	 * @throws SQLException SQL error
+//	 */
+//	public PostgresPatientStore(DataSource ds, Map<String,String> configuration) throws SQLException{
+//		super(configuration);
+//		this.projectId = config.get("project");
+//		openDatabase(ds);
+//		initialize();
+//	}
 
-	/**
-	 * Create a patient store using a {@link DataSource}.
-	 * The project id must be specified with the key {@code project}. 
-	 * @param ds data source for the connection
-	 * @param configuration configuration settings
-	 * @throws SQLException SQL error
-	 */
-	public PostgresPatientStore(DataSource ds, Map<String,String> configuration) throws SQLException{
-		super(configuration);
-		this.projectId = config.get("project");
-		openDatabase(ds);
-		initialize();
-	}
-	private void initialize() throws SQLException{
+	public PostgresPatientStore(){
 		this.idSourceDefault = "HIVE";
 		this.idSourceSeparator = ':';
+		this.fetchSize = 1000;
+		// TODO add methods to change the configuration
+		
+	}
+	public void open(Connection connection, String projectId) throws SQLException{
+		this.db = connection;
+		Objects.requireNonNull(this.projectId, "non-null projectId required");
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
 		idCache = new Hashtable<>(1000);
@@ -198,10 +211,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		//selectAll = db.prepareStatement("SELECT p.patient_num, p.vital_status_cd, p.birth_date, p.death_date, p.sex_cd, p.download_date, p.sourcesystem_cd, m.patient_ide, m.patient_ide_source, m.patient_ide_status FROM patient_mapping m, patient_dimension p WHERE m.patient_num=p.patient_num AND m.project_id='"+projectId+"'");
 		// TODO select only patients relevant to the current project: eg. join patient_dimension with patient_mapping to get only relevant rows.
 		selectAll = db.prepareStatement("SELECT patient_num, vital_status_cd, birth_date, death_date, sex_cd, download_date, sourcesystem_cd FROM patient_dimension", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAll.setFetchSize(getFetchSize());
+		selectAll.setFetchSize(this.fetchSize);
 		
 		selectAllIde = db.prepareStatement("SELECT patient_num, patient_ide, patient_ide_source, patient_ide_status, project_id FROM patient_mapping WHERE project_id='"+projectId+"' ORDER BY patient_num", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-		selectAllIde.setFetchSize(getFetchSize());
+		selectAllIde.setFetchSize(this.fetchSize);
 		
 		deletePatientSource = db.prepareStatement("DELETE FROM patient_dimension WHERE sourcesystem_cd=?");
 		deleteMapSource = db.prepareStatement("DELETE FROM patient_mapping WHERE sourcesystem_cd=?");
@@ -453,7 +466,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		else return null;
 	}
 
-	private void setVitalStatusCd(Patient patient, String vital_cd){
+	private static void setVitalStatusCd(Patient patient, String vital_cd){
 		// load accuracy
 		if( vital_cd == null )return; // nothing to do
 		
@@ -657,7 +670,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 
 	@Override
-	public Class<?>[] getInstanceTypes() {
+	public Iterable<Class<? super I2b2Patient>> getInstanceTypes() {
 		return INSTANCE_TYPES;
 	}
 
@@ -752,6 +765,18 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	public void purge(String id) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
+	}
+	@Override
+	public synchronized void close() throws IOException {
+		if( db != null ){
+			flush();
+			try {
+				db.close();
+			} catch (SQLException e) {
+				throw new IOException(e);
+			}
+			db = null;
+		}
 	}
 	
 }
