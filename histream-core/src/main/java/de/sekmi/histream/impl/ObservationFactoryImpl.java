@@ -190,5 +190,14 @@ public class ObservationFactoryImpl implements ObservationFactory{
 			}
 		};
 	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> Extension<T> getExtension(Class<T> extensionType) {
+		ExtensionEntry e = extensions.get(extensionType);
+		if( e == null ){
+			return null;
+		}
+		return (Extension<T>) e.extension;
+	}
 
 }

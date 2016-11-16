@@ -38,6 +38,8 @@ public interface ObservationFactory {
 	 */
 	void registerExtension(Extension<?> extension);
 	
+	<T> Extension<T> getExtension(Class<T> type);
+
 	/**
 	 * Get a list of currently registered extensions
 	 * @return currently registered extensions
