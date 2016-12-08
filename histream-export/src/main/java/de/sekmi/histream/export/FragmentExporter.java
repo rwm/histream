@@ -157,7 +157,8 @@ class FragmentExporter extends VisitFragmentParser {
 		return patientParser.getRowCount();
 	}
 	/**
-	 * Retrieve number of processed visits
+	 * Retrieve number of processed visits. To make sure all visits are processed,
+	 * {@link #close()} must be called prior to this method.
 	 * @return visit count
 	 */
 	public int getVisitCount(){

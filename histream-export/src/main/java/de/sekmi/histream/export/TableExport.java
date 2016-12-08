@@ -123,10 +123,11 @@ public class TableExport {
 	 */
 	public ExportSummary export(ObservationSupplier supplier, ExportWriter writer) throws ExportException, IOException{
 		requireDisjointConcepts();
-		try( FragmentExporter e = new FragmentExporter(createXPath(), desc, writer) ){
-			e.setErrorHandler(new ExportErrorHandler());
-			Streams.transfer(supplier, e);
-			return new ExportSummary(e.getPatientCount(), e.getVisitCount());
+		FragmentExporter fe = null;
+		try{
+			fe = new FragmentExporter(createXPath(), desc, writer);
+			fe.setErrorHandler(new ExportErrorHandler());
+			Streams.transfer(supplier, fe);
 		} catch (XMLStreamException | ParserConfigurationException e) {
 			throw new ExportException("Unable to create exporter", e);
 		} catch (UncheckedExportException e ){
@@ -135,7 +136,13 @@ public class TableExport {
 		} catch (UncheckedIOException e ){
 			// unwrap and rethrow
 			throw e.getCause();
+		} finally {
+			// make sure all processing is completed before counting visits
+			if( fe != null ){
+				fe.close(); 
+			}
 		}
+		return new ExportSummary(fe.getPatientCount(), fe.getVisitCount());
 	}
 
 	public int getPatientCount(){
