@@ -384,5 +384,8 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		}
 		this.observationCount ++;
 	}
+	public int getObservationCount(){
+		return this.observationCount;
+	}
 
 }

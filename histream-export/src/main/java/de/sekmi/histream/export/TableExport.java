@@ -148,7 +148,7 @@ public class TableExport {
 				}
 			}
 		}
-		return new ExportSummary(fe.getPatientCount(), fe.getVisitCount());
+		return new ExportSummary(fe.getPatientCount(), fe.getVisitCount(), fe.getObservationCount());
 	}
 
 	public int getPatientCount(){
