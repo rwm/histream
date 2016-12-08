@@ -139,7 +139,13 @@ public class TableExport {
 		} finally {
 			// make sure all processing is completed before counting visits
 			if( fe != null ){
-				fe.close(); 
+				try{
+					fe.close();
+				}catch( UncheckedExportException e ){
+					throw e.getCause();
+				}catch( UncheckedIOException e ){
+					throw e.getCause();
+				}
 			}
 		}
 		return new ExportSummary(fe.getPatientCount(), fe.getVisitCount());
