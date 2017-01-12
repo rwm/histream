@@ -154,6 +154,8 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 	public void open(Connection connection, String projectId) throws SQLException{
 		this.db = connection;
+		this.projectId = projectId;
+		// require project id
 		Objects.requireNonNull(this.projectId, "non-null projectId required");
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
