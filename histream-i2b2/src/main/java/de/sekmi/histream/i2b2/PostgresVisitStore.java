@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,6 +128,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		idCache = new Hashtable<>();
 		this.projectId = projectId;
 		this.db = connection;
+		// require project id
+		Objects.requireNonNull(this.projectId, "non-null projectId required");
 		db.setAutoCommit(true);
 		
 		loadMaxEncounterNum();
