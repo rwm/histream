@@ -191,7 +191,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	}
 	
 	@Override
-	public void close() throws SQLException {
+	public void close() {
 
 	}
 	@Override
