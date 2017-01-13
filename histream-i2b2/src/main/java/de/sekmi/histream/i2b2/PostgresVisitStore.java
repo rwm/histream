@@ -131,7 +131,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		// require project id
 		Objects.requireNonNull(this.projectId, "non-null projectId required");
 		db.setAutoCommit(true);
-		
+		prepareStatements();
 		loadMaxEncounterNum();
 		batchLoad();
 	}

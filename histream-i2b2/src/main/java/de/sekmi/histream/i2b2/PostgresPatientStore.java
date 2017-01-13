@@ -160,6 +160,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 //		this.autoInsertSourceId = "HS.auto";
 		patientCache = new Hashtable<>(1000);
 		idCache = new Hashtable<>(1000);
+		prepareStatements();
 		loadMaxPatientNum();
 		batchLoad();
 	}
