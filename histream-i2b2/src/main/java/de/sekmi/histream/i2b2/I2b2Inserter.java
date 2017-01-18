@@ -169,6 +169,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	}
 	/**
 	 * Initialize the database connection
+	 * @param connection database connection for insertions
+	 * @param dialect data dialect for i2b2
 	 * @throws SQLException if preparation/initialisation failed
 	 */
 	public void open(Connection connection, DataDialect dialect)throws SQLException{

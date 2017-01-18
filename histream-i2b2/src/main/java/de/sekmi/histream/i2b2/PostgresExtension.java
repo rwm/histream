@@ -99,7 +99,7 @@ public abstract class PostgresExtension<T> implements Extension<T> {
 	
 
 	/**
-	 * Write updates to disk. The method is automatically called by {@link #close()}.
+	 * Write updates to disk.
 	 */
 	public abstract void flush();
 	
