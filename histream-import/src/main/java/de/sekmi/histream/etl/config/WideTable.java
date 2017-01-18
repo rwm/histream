@@ -50,7 +50,9 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 		WideRow rec = new WideRow(patid,visit);
 		for( Concept c : concepts ){
 			Observation o = c.createObservation(patid, visit, factory, map, row);
-			rec.addFact(o);
+			if( o != null ){
+				rec.addFact(o);				
+			}
 		}
 		return rec;
 	}

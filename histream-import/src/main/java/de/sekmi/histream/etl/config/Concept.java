@@ -77,17 +77,8 @@ public class Concept{
 		String concept = this.id;
 		
 		MapFeedback mf = new MapFeedback();
-		if( mf.isActionDrop() ){
-			return null; // ignore this fact
-		}
-		if( mf.hasConceptOverride() ){
-			concept = mf.getConceptOverride();
-		}
-		Observation o = factory.createObservation(patid, concept, start);
-		if( visit != null ){
-			o.setEncounterId(visit);
-		}
 
+		// parse value
 		String unit = null;
 		if( this.unit != null ){
 			unit = this.unit.valueOf(map, row);
@@ -98,6 +89,18 @@ public class Concept{
 //			Objects.requireNonNull(this.value, "No value for concept: "+id);
 			val = this.value.valueOf(map, row, mf);
 		}
+
+		if( mf.hasConceptOverride() ){
+			concept = mf.getConceptOverride();
+		}
+		if( mf.isActionDrop() ){
+			return null; // ignore this fact
+		}
+		Observation o = factory.createObservation(patid, concept, start);
+		if( visit != null ){
+			o.setEncounterId(visit);
+		}
+
 		if( val == null ){
 			// no value
 			o.setValue(null);
@@ -116,6 +119,7 @@ public class Concept{
 		}else{
 			throw new ParseException("Unsupported value type for concept id "+this.id+": "+val.getClass());
 		}
+
 
 		// TODO: modifiers
 		
