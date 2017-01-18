@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.sekmi.histream.AbnormalFlag;
@@ -244,11 +244,20 @@ public class I2b2Extractor implements ObservationSupplier {
 	}
 
 	@Override
-	public void close() throws SQLException {
-		Statement st = rs.getStatement();
-		rs.close();
-		st.close();
-		dbc.close();
+	public void close() {
+		log.info("Closing extractor "+this.toString());
+//		Statement st = rs.getStatement();
+		try{
+			rs.close();
+		}catch( SQLException e){
+			log.log(Level.WARNING,"Failed to close recortset",e);
+		}
+//		st.close();
+		try{
+			dbc.close();
+		}catch( SQLException e){
+			log.log(Level.WARNING,"Failed to close connection",e);
+		}
 	}
 	
 	public void dump() throws SQLException{

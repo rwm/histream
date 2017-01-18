@@ -97,11 +97,16 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	}
 	
 	private void createTemporaryConceptTable(Connection dbc, Iterable<String> concepts) throws SQLException{
+		// delete table if previously existing
+		try( Statement s = dbc.createStatement() ){
+			s.executeUpdate("DROP TABLE IF EXISTS temp_concepts");
+		}
 		try( Statement s = dbc.createStatement() ){
 			s.executeUpdate("CREATE TEMPORARY TABLE temp_concepts(concept VARCHAR(255) PRIMARY KEY)");			
 		}
 		try( PreparedStatement ps 
 				= dbc.prepareStatement("INSERT INTO temp_concepts(concept) VALUES(?)") ){
+			// TODO do we need to make sure that there are no duplicate concepts???
 			for( String concept : concepts ){
 				ps.clearParameters();
 				ps.clearWarnings();
@@ -139,8 +144,10 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 		// TODO move connection and prepared statement to I2b2Extractor
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		try( Connection dbc = ds.getConnection() ){
-			dbc.setAutoCommit(false);
+		Connection dbc = null;
+		try{ // no try with resource, because we need to pass the connection to the extractor
+			dbc = ds.getConnection();
+			dbc.setAutoCommit(true);
 			StringBuilder b = new StringBuilder(600);
 			b.append("SELECT ");
 			b.append(SELECT_PARAMETERS+" FROM "+SELECT_TABLE+" ");
@@ -171,20 +178,22 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 			b.append("WHERE f.start_date BETWEEN ? AND ? ");
 			b.append(SELECT_ORDER_GROUP);
 			log.info("SQL: "+b.toString());
-	
+
 			ps = prepareStatement(dbc, b.toString());
 			ps.setTimestamp(1, start_min);
 			ps.setTimestamp(2, start_max);
 			rs = ps.executeQuery();
 			return new I2b2Extractor(this, dbc, rs);
 		}catch( SQLException e ){
-			// XXX maybe we don't need to do this, since the connection is closed anyway
 			// clean up
 			if( rs != null ){
 				rs.close();
 			}
 			if( ps != null ){
 				ps.close();
+			}
+			if( dbc != null ){
+				dbc.close();
 			}
 			throw e;
 		}
