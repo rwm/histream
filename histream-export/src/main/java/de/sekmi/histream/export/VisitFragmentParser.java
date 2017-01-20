@@ -1,6 +1,7 @@
 package de.sekmi.histream.export;
 
 import java.util.Objects;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,6 +22,7 @@ import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.io.GroupedXMLWriter;
 
 abstract class VisitFragmentParser extends GroupedXMLWriter {
+//	private static final Logger log = Logger.getLogger(VisitFragmentParser.class.getName());
 	private XMLOutputFactory factory;
 	private Document doc;
 	private DocumentFragment currentPatient;
@@ -28,15 +30,16 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 	private boolean firstVisit;
 	
 	protected VisitFragmentParser() throws XMLStreamException, ParserConfigurationException {
-		super();
+		this(XMLOutputFactory.newInstance());
+	}
+	protected VisitFragmentParser(XMLOutputFactory factory) throws XMLStreamException, ParserConfigurationException{
 		setFormatted(false);
-		factory = XMLOutputFactory.newFactory();
+		this.factory = factory;
 		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
 		createDocument();
 		// write meta data to document node
-		setDOMWriter(doc);
+		setDOMWriter(doc);		
 	}
-	
 	private void fixNamespaces(DocumentFragment fragment){
 		//fragment.setPrefix(null);
 		// cannot do this
@@ -59,6 +62,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 		f.setIgnoringElementContentWhitespace(true);
 		f.setNamespaceAware(true);
 		DocumentBuilder builder = f.newDocumentBuilder();
+//		log.info("Using document builder "+builder.getClass().getName()+", version="+builder.getClass().getPackage().getImplementationVersion());		
 		doc = builder.newDocument();
 		doc.getDomConfig().setParameter("namespaces", true);
 		doc.getDomConfig().setParameter("namespace-declarations", true);
@@ -68,6 +72,9 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 
 	@Override
 	protected void endPatient(Patient patient) throws ObservationException {
+		// super class will close the patient element, which we already closed
+		// use a dummy stream writer, which does nothing
+		this.writer=NoOpStreamWriter.INSTANCE;
 		super.endPatient(patient);
 		if( firstVisit == true ){
 			// patient fragment already processed
@@ -95,8 +102,15 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 	@Override
 	protected void beginEncounter(Visit visit) throws ObservationException {
 		if( firstVisit == false ){
+			// this is the first encounter of a patient
 			// patient fragment was parsed
 			fixNamespaces(currentPatient);
+			// close patient element
+			try {
+				writer.writeEndElement();
+			} catch (XMLStreamException e) {
+				throw new ObservationException(e);
+			}
 			patientFragment((Element)currentPatient.getFirstChild());
 			firstVisit = true;
 		}
