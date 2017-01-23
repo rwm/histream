@@ -1,5 +1,6 @@
 package de.sekmi.histream.etl.config;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -59,6 +60,9 @@ public abstract class Column<T> {
 	@XmlElement(required=false)
 	MapRules map;
 	
+	@XmlAttribute(name="na-action")
+	String naAction;
+
 	/**
 	 * Column name to use for reading input values
 	 * @return column name
@@ -235,6 +239,22 @@ public abstract class Column<T> {
 			}else{
 				// other non string value without string processing
 				ret = valueOf(rowval); // use value directly
+			}
+		}
+		// process na-action
+		if( ret == null && naAction != null ){
+			// got NA value and naAction to process
+			switch( naAction ){
+			case "drop-fact":
+				mapFeedback.dropFact();
+				break;
+			case "warning":
+				// TODO use warning handler
+				// TODO use more context information in warning
+				System.err.println("Warning: no value (NA) for column '"+getName()+"'! Full row: "+Arrays.toString(row));
+				break;
+			default:
+				throw new ParseException("Unsupported na-action '"+naAction+"' in column "+getName());
 			}
 		}
 		return ret;

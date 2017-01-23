@@ -86,7 +86,7 @@
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na="" />
 			</concept>
 			<concept id="bun">
-				<value column="bun\ /,.]+" na="" xsi:type="decimal"/>
+				<value column="bun\ /,.]+" na="@" xsi:type="decimal" na-action="drop-fact" />
 			</concept>
 		</mdat>
 

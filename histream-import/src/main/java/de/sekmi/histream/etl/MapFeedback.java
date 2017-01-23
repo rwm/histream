@@ -36,4 +36,11 @@ public class MapFeedback {
 	public boolean isActionDrop(){
 		return drop;
 	}
+
+	/**
+	 * Reset/clear value override
+	 */
+	public void resetValue(){
+		this.value = null;
+	}
 }

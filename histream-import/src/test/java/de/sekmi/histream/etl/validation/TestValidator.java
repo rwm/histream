@@ -32,8 +32,13 @@ public class TestValidator {
 			v.setErrorHandler(e -> {throw new RuntimeException(e);});
 			Streams.transfer(os, v);
 		}catch( RuntimeException e ){
-			Assert.assertTrue(e.getCause() instanceof DuplicatePatientException);
-			return;
+			if( e.getCause() instanceof DuplicatePatientException ){
+				// expected behaviour
+				return;
+			}else{
+				// unexpected exceptoin
+				throw e;
+			}
 		}
 		Assert.fail("Exception expected");
 	}

@@ -72,16 +72,19 @@ public class Concept{
 	 * @throws ParseException parse 
 	 */
 	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
-		DateTimeAccuracy start = this.start.valueOf(map,row);
-		String concept = this.id;
-		
 		MapFeedback mf = new MapFeedback();
+
+		DateTimeAccuracy start = this.start.valueOf(map,row, mf);
+		mf.resetValue();
+		String concept = this.id;
 
 		// parse value
 		String unit = null;
 		if( this.unit != null ){
-			unit = this.unit.valueOf(map, row);
+			unit = this.unit.valueOf(map, row, mf);
+			mf.resetValue();
 		}
+
 		// TODO: use type of column this.value to infer value type
 		Object val = null;
 		if( this.value != null ){
