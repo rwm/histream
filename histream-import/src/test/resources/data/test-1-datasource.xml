@@ -68,7 +68,7 @@
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na="" />
 				<unit constant-value="mmol/L" />
 				<modifier id="other">
-					<value xsi:type="string" na="" constant-value=""/>
+					<value column="en" xsi:type="string" na="2" na-action="drop-fact" />
 				</modifier>
 			</concept>
 			<concept id="kalium">

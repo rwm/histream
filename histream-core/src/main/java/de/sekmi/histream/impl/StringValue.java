@@ -42,6 +42,10 @@ public class StringValue extends AbstractValue{
 	public StringValue(String value){
 		this.value = value;
 	}
+	public StringValue(String value, String unit){
+		this.value = value;
+		this.units = unit;
+	}
 
 	@Override
 	public boolean equals(Object other){

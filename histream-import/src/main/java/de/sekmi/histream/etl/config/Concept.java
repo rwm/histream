@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.Value;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
@@ -58,7 +59,24 @@ public class Concept{
 		this.id = id;
 		this.start = new DateTimeColumn(startColumn, format);
 	}
-	
+
+	private Value createObservationValue(Object val, String unit) throws ParseException{
+		if( val == null ){
+			// no value
+			return null;
+		}else if( val instanceof String ){
+			// string
+			return new StringValue((String)val, unit);
+		}else if( val instanceof BigDecimal ){
+			// numeric
+			return new NumericValue((BigDecimal)val, unit);
+		}else if( val instanceof Long ){
+			// numeric
+			return new NumericValue((Long)val, unit);
+		}else{
+			throw new ParseException("Unsupported value type for concept id "+this.id+": "+val.getClass());
+		}
+	}
 	/**
 	 * Create an observation for this concept with the given row data.
 	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
@@ -90,6 +108,7 @@ public class Concept{
 		if( this.value != null ){
 //			Objects.requireNonNull(this.value, "No value for concept: "+id);
 			val = this.value.valueOf(map, row, mf);
+			mf.resetValue();
 		}
 
 		if( mf.hasConceptOverride() ){
@@ -106,32 +125,42 @@ public class Concept{
 		}
 
 		Observation o = factory.createObservation(patid, concept, start);
+		o.setValue(createObservationValue(val, unit));
+
+		// load modifiers
+		if( modifiers != null ){
+			for( int i=0; i<modifiers.length; i++ ){
+				mf = new MapFeedback();
+				Modifier m = modifiers[i];
+				// parse value
+				val = null;
+				if( m.value != null ){
+					val = m.value.valueOf(map, row, mf);
+					mf.resetValue();
+				}
+				// parse unit
+				unit = null;
+				if( m.unit != null ){
+					unit = m.unit.valueOf(map, row, mf);
+					mf.resetValue();
+				}
+				concept = m.id;
+				// modifier values can override the modifier-ids via concept override
+				if( mf.hasConceptOverride() ){
+					concept = mf.getConceptOverride();
+				}
+				// or drop the modifier
+				if( mf.isActionDrop() ){
+					continue; // ignore this modifier
+				}
+				o.addModifier(concept, createObservationValue(val, unit));
+			}
+		}
+
 		if( visit != null ){
 			o.setEncounterId(visit);
 		}
 
-		if( val == null ){
-			// no value
-			o.setValue(null);
-		}else if( val instanceof String ){
-			// string
-			o.setValue(new StringValue((String)val));
-			// TODO: set unit
-		}else if( val instanceof BigDecimal ){
-			// numeric
-			NumericValue v = new NumericValue((BigDecimal)val,unit);
-			o.setValue(v);
-		}else if( val instanceof Long ){
-			// numeric
-			NumericValue v = new NumericValue((Long)val,unit);
-			o.setValue(v);
-		}else{
-			throw new ParseException("Unsupported value type for concept id "+this.id+": "+val.getClass());
-		}
-
-
-		// TODO: modifiers
-		
 		return o;
 	}
 }
