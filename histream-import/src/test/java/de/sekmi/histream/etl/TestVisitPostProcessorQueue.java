@@ -53,12 +53,12 @@ public class TestVisitPostProcessorQueue {
 		}
 		
 		assertPatientVisitCount(counts, 0, "p1", null, 0);
-		assertPatientVisitCount(counts, 1, "p1", "v1", 13);
-		assertPatientVisitCount(counts, 2, "p1", "v2", 12);
+		assertPatientVisitCount(counts, 1, "p1", "v1", 14);
+		assertPatientVisitCount(counts, 2, "p1", "v2", 13);
 		assertPatientVisitCount(counts, 3, "p2", null, 0);
 		assertPatientVisitCount(counts, 4, "p2", "v3", 12);
 		assertPatientVisitCount(counts, 5, "p3", null, 0);
-		assertPatientVisitCount(counts, 6, "p3", "v4", 13);
+		assertPatientVisitCount(counts, 6, "p3", "v4", 14);
 		Assert.assertEquals(7, counts.size());
 		
 		// compare total to sum of all counts
