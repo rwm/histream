@@ -63,4 +63,16 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 			throw new ParseException("Unable to parse date '"+input+"' in column '"+this.column+"'", e);
 		}
 	}
+
+	public static final DateTimeColumn alwaysNull(){
+		DateTimeColumn c = new DateTimeColumn(){
+			@Override
+			public DateTimeAccuracy valueFromString(String input){return null;}
+			@Override
+			public DateTimeAccuracy valueOf(Object input){return null;}
+		};
+		c.constantValue = "";
+		c.na = "";
+		return c;
+	}
 }

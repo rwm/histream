@@ -33,7 +33,9 @@ public abstract class Table<T extends FactRow> {
 	 */
 	protected void mapRegisterConcept(ColumnMap map, Concept c) throws ParseException{
 		if( c.start == null ){
-			throw new ParseException("Start timestamp undefined for concept '"+c.id+"'");
+			// concepts without a start column will always have null start dates
+			// thus, the visit timestamp will be used instead
+			c.start = DateTimeColumn.alwaysNull();
 		}
 		map.registerColumn(c.start);
 		if( c.end != null ){

@@ -86,14 +86,7 @@
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na="" />
 			</concept>
 			<concept id="bun">
-				<value column="bun\ /,.]+" na="" xsi:type="string">
-					<map>
-						<case value="1" set-value="" set-concept="enum1_1"/>
-						<case value="2" set-value="" set-concept="enum1_2"/>
-						<otherwise action="drop-fact" />
-					</map>
-				</value>
-				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na="" />
+				<value column="bun\ /,.]+" na="" xsi:type="decimal"/>
 			</concept>
 		</mdat>
 

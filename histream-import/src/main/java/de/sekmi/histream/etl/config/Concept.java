@@ -28,7 +28,6 @@ public class Concept{
 	// TODO: value should contain also type (string,decimal,integer,...)
 	Column<?> value;
 	StringColumn unit;
-	@XmlElement(required=true)
 	DateTimeColumn start;
 	DateTimeColumn end;
 	@XmlElement(name="modifier")

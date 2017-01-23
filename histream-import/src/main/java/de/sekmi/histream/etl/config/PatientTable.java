@@ -127,5 +127,18 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	public Concept[] getConcepts() {
 		return concepts;
 	}
+
+
+	@Override
+	protected void mapRegisterConcept(ColumnMap map, Concept c) throws ParseException {
+		if( true ){
+			throw new ParseException("Patient table concepts not supported yet");
+		}
+		if( c.start == null ){
+			// patient table does not have a default timestamp, facts always need explici timestamps
+			throw new ParseException("Start timestamp required for patient table concept '"+c.id+"'");
+		}
+		super.mapRegisterConcept(map, c);
+	}
 	
 }
