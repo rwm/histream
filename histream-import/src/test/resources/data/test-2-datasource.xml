@@ -65,7 +65,7 @@
 		<mdat>
 			<concept id="natrium">
 				<value column="na" xsi:type="decimal"/>
-				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na=""/>
 				<unit constant-value="mmol/l" />
 				<modifier id="other">
 					<value xsi:type="string" na="" constant-value=""/>
@@ -73,7 +73,7 @@
 			</concept>
 			<concept id="kalium">
 				<value column="k" xsi:type="decimal"/>
-				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na=""/>
 			</concept>
 			<concept id="enum1">
 				<value column="en" na="" xsi:type="string">
@@ -83,7 +83,7 @@
 						<otherwise action="drop-fact" />
 					</map>
 				</value>
-				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na=""/>
 			</concept>
 		</mdat>
 
@@ -99,7 +99,7 @@
 		</idat>
 		<mdat>
 			<concept column="param"/>
-			<start column="start_ts" format="u-M-d"/>
+			<start column="start_ts" format="u-M-d" na="@"/>
 			<end column="end" format="u-M-d" na="@"/>
 			<!-- location -->
 
