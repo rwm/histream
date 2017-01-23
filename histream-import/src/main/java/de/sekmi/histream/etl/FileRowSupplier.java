@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
 
+import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
 public class FileRowSupplier extends RowSupplier {
@@ -27,7 +28,7 @@ public class FileRowSupplier extends RowSupplier {
 			}
 		}
 		this.url = location;
-		this.in = new CSVReader(new InputStreamReader(location.openStream()),fieldSeparator.charAt(0));
+		this.in = new CSVReader(new InputStreamReader(location.openStream()),fieldSeparator.charAt(0), CSVParser.DEFAULT_QUOTE_CHARACTER, (char)0);
 		
 		// TODO: check whether needed to close underlying InputStream
 		
