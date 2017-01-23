@@ -64,6 +64,7 @@ public class TestReadTables {
 			Assert.assertEquals("natrium", o.getConceptId());
 			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 			Assert.assertEquals(BigDecimal.valueOf(124), o.getValue().getNumericValue());
+			Assert.assertEquals("mmol/L", o.getValue().getUnits());
 			ExternalSourceType e = o.getSource();
 			Assert.assertNotNull(e);
 			Assert.assertEquals("test-1", e.getSourceId());

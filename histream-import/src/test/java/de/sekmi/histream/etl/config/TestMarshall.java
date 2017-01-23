@@ -58,7 +58,7 @@ public class TestMarshall {
 			Assert.assertNotNull(c);
 			Assert.assertEquals("natrium", c.id);
 			Assert.assertEquals("na", c.value.column);
-			Assert.assertEquals("mmol/l", c.unit.constantValue);
+			Assert.assertEquals("mmol/L", c.unit.constantValue);
 			
 			// check eav
 			Assert.assertEquals(1, ds.eavTables.length);
