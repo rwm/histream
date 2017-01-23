@@ -168,6 +168,11 @@ public class EavTable extends Table<EavRow> {
 			vval = null;
 		}
 
+		if( start == null ){
+			// start may be null at this point and will be filled later with the visit timestamp
+			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
+		}
+
 		Observation fact = factory.createObservation(patid, concept, start);
 		String visit = idat.visitId.valueOf(colMap, row);
 		if( visit != null ){

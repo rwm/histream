@@ -109,7 +109,7 @@
 		</idat>
 		<mdat>
 			<concept column="param"/>
-			<start column="start_ts" format="u-M-d"/>
+			<start column="start_ts" format="u-M-d" na="@"/>
 			<end column="end" format="u-M-d" na="@"/>
 			<!-- location -->
 

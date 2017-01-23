@@ -133,4 +133,13 @@ public class TestETLSupplier {
 		Assert.assertEquals("v1", v.getId());
 		Assert.assertEquals(null, v.getLocationId());
 	}
+	@Test
+	public void missingStartTimestampUsesVisitTimestamp() throws IOException, java.text.ParseException{
+		List<Observation> all = new ArrayList<>();
+		os.stream().filter( o -> o.getConceptId().equals("natrium") ).forEach(all::add);
+		for( Observation o : all ){
+			System.out.println("Natrium-start: "+o.getStartTime());
+		}
+	}
+
 }

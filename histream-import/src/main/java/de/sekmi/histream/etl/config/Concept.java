@@ -96,6 +96,13 @@ public class Concept{
 		if( mf.isActionDrop() ){
 			return null; // ignore this fact
 		}
+
+		// if start is null/na, use visit start timestamp
+		if( start == null ){
+			// start may be null at this point and will be filled later with the visit timestamp
+			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
+		}
+
 		Observation o = factory.createObservation(patid, concept, start);
 		if( visit != null ){
 			o.setEncounterId(visit);

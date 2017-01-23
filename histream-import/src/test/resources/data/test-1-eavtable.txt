@@ -15,7 +15,7 @@ p1	v2	L1	u1	f_eav_f	2013-08-18	@	decimal	20.6	@
 p1	v2	L1	u1	f_eav_i	2013-08-18	@	decimal	0.36	@
 p1	v2	L1	u1	f_eav_l	2013-08-18	@	decimal	1.3	@
 p1	v2	L1	u1	f_eav_v	2013-08-18	@	decimal	3.8	@
-p1	v2	L1	u1	f_eav_x	2013-08-18	@	integer	0	@
+p1	v2	L1	u1	f_eav_x	@	@	integer	0	@
 p2	v3	L1	u1	f_eav_b	2013-08-24	@	decimal	4.7	@
 p2	v3	L1	u1	f_eav_c	2013-08-24	@	decimal	6.9	@
 p2	v3	L1	u1	f_eav_d	2013-08-24	@	decimal	56.1	@

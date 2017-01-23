@@ -187,6 +187,12 @@ public class FactGroupingQueue implements Supplier<Observation>{
 			// set patient extension
 			patientLookup.assignPatient(f, currentPatientInstance);
 			visitLookup.assignVisit(f, currentVisitInstance);
+			// use visit start date if there is no start date in the observation
+			if( f.getStartTime() == null && currentVisitInstance != null ){
+				f.setStartTime(currentVisitInstance.getStartTime());
+			}
+			// TODO throw error/warning for facts without start date???
+
 			workQueue.add(f);
 		}
 	}
