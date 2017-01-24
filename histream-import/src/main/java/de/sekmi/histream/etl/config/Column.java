@@ -228,7 +228,11 @@ public abstract class Column<T> {
 			Objects.requireNonNull(colMap);
 			Objects.requireNonNull(row);
 			Integer index = colMap.indexOf(this);
-			Objects.requireNonNull(index);
+			Objects.requireNonNull(index, "Column not found: "+getName());
+			// error message if rows not matching
+			if( index >= row.length ){
+				throw new ParseException("Column index "+index+" ("+getName()+") out of bounds. Row length="+row.length);
+			}
 			Object rowval = row[index];
 			// string processing (na, regex-replace, mapping) only performed on string values
 			if( rowval == null || rowval instanceof String ){
