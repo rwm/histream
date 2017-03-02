@@ -360,7 +360,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			if( patient.getSourceTimestamp() != null ){
 				update.setTimestamp(5, Timestamp.from(patient.getSourceTimestamp()));
 			}else{
-				update.setTimestamp(5, null);				
+				update.setTimestamp(5, null);
 			}
 			update.setString(6, patient.getSourceId());
 			update.setInt(7, patient.getNum());
