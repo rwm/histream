@@ -32,6 +32,8 @@ public class DecimalColumn extends Column<BigDecimal>{
 
 	@Override
 	public BigDecimal valueFromString(String input) throws ParseException {
+		// remove leading/trailing spaces
+		input = input.trim(); // TODO warning for user feedback if spaces were removed
 		if( locale == null ){
 			// parse according to BigDecimal(String)
 			try{
@@ -48,7 +50,7 @@ public class DecimalColumn extends Column<BigDecimal>{
 			try {
 				return (BigDecimal)decimalFormat.parse(input);
 			} catch (java.text.ParseException e) {
-				throw new ParseException("Unable to parse number '"+input+"'", e);
+				throw new ParseException("Unable to parse number '"+input+"' with locale "+locale, e);
 			}
 		}
 	}

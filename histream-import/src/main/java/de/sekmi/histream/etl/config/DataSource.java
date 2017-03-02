@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,7 +29,7 @@ import de.sekmi.histream.etl.ScriptProcessingQueue;
  * the location of the data source description.
  * 
  * @see JAXB#unmarshal(java.io.File, Class)
- * @author Raphael
+ * @author R.W.Majeed
  *
  */
 @XmlRootElement(name="datasource")
@@ -89,14 +90,22 @@ public class DataSource {
 			return Arrays.asList();
 		}
 	}
-	
-	public static DataSource load(URL configuration) throws IOException{
+	/**
+	 * Load the datasource configuration from the given URL.
+	 * @param configuration configuration URL
+	 * @return data source object
+	 * @throws IOException IO error
+	 * @throws NullPointerException /datasource or /datasource/meta missing
+	 */
+	public static DataSource load(URL configuration) throws IOException, NullPointerException{
 		URLConnection conn = configuration.openConnection();
 		conn.connect();
 		DataSource ds;
 		try( InputStream in = conn.getInputStream() ){
 			ds = JAXB.unmarshal(configuration, DataSource.class);			
 		}
+		Objects.requireNonNull(ds, "JAXB unmarshall returned null for URL "+configuration);
+		Objects.requireNonNull(ds.getMeta(), "/datasource/meta element missing");
 		ds.getMeta().setLastModified(conn.getLastModified());
 		ds.getMeta().setLocation(configuration);
 		return ds;

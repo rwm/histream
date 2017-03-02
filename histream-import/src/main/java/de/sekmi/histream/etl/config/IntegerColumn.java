@@ -20,6 +20,7 @@ public class IntegerColumn extends Column<Long> {
 
 	@Override
 	public Long valueFromString(String input) throws ParseException {
+		input = input.trim(); // TODO warning for user feedback if spaces were removed
 		return Long.parseLong(input);
 	}
 	

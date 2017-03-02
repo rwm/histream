@@ -37,6 +37,7 @@ import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.skos.transform.ConditionType;
 import de.sekmi.histream.ontology.skos.transform.Rule;
 import de.sekmi.histream.ontology.skos.transform.TransformationRules;
+import de.sekmi.histream.xml.NamespaceResolver;
 
 public class Store implements Ontology, Plugin {
 	private static final Logger log = Logger.getLogger(Store.class.getName());
@@ -47,7 +48,7 @@ public class Store implements Ontology, Plugin {
 	private Resource inferredContext;
 	// SKOS scheme to enforce unique notations
 	private Resource scheme;
-	
+	/// XXX  namespace resolver
 	/**
 	 * Plugin constructor which accepts configuration parameters.
 	 * 
