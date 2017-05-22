@@ -1,6 +1,8 @@
 package de.sekmi.histream.io;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,5 +39,19 @@ public class TestFileObservationSuppliers {
 		Assert.assertTrue( s.stream().count() > 0 );
 		s.close();
 		p.close();
+	}
+
+	public static void main(String[] args) throws Exception{
+		TestFileObservationSuppliers test = new TestFileObservationSuppliers();
+		test.prepareObservationFactory();
+		
+		GroupedXMLProvider p = new GroupedXMLProvider(null);
+		try( InputStream in = new FileInputStream(args[0]) ){
+			ObservationSupplier s = p.createSupplier(in, test.factory);
+			Assert.assertTrue( s.stream().count() > 0 );
+			s.close();
+			p.close();		
+		}
+		
 	}
 }
