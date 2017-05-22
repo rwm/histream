@@ -164,7 +164,8 @@ public class GroupedXMLReader  implements ObservationSupplier {
 			// patient known to be deceased
 			currentPatient.setDeceased(true);
 			String date = patientData.get("deceased");
-			if( date != null ){
+			// will be empty string for <deceased/>
+			if( date != null && date.length() != 0 ){
 				try {
 					currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date));
 				} catch (ParseException e) {
