@@ -89,9 +89,8 @@ public class ConceptImpl implements Concept {
 	}
 
 	@Override
-	public Concept[] getParts() {
-		// TODO implement
-		return null;
+	public Concept[] getParts(boolean inherited) throws OntologyException {
+		return store.getParts(this, inherited);
 	}
 
 	@Override

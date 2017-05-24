@@ -16,6 +16,8 @@ public class HIStreamOntology {
 	public static final URI DWH_OTHERWISE;
 	public static final URI DWH_XPATH;
 	public static final URI DWH_ECMASCRIPT;
+	public static final URI DWH_HAS_PART;
+	public static final URI DWH_IS_PART_OF;
 	
 	static {
 		final ValueFactory f = ValueFactoryImpl.getInstance();
@@ -28,6 +30,8 @@ public class HIStreamOntology {
 		DWH_OTHERWISE = f.createURI(DWH_NAMESPACE, "otherwise");
 		DWH_XPATH = f.createURI(DWH_NAMESPACE, "XPath");
 		DWH_ECMASCRIPT = f.createURI(DWH_NAMESPACE, "ECMAScript");
+		DWH_HAS_PART = f.createURI(DWH_NAMESPACE, "hasPart"); // TODO use correct names/URIs
+		DWH_IS_PART_OF = f.createURI(DWH_NAMESPACE, "isPartOf"); // XXX see above
 		
 	}
 }

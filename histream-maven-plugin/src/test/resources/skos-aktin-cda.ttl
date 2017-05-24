@@ -497,11 +497,18 @@
     dwh:restriction dwh:Integer ;
     skos:notation	"LOINC:9268-4" .
     
-    
+
+:RightPupil a skos:Concept ;
+	dwh:isPartOf :Pupilsize ;
+    skos:prefLabel "Right Pupil"@en ;
+    skos:prefLabel "Rechte Pupille"@de ;
+    skos:notation	"right".
+	
 :Pupilsize a skos:Concept ;
     skos:inScheme :EmergencyNote ;
     skos:prefLabel "Size of pupil"@en ;
     skos:prefLabel "Pupillenweite"@de ;
+	dwh:hasPart :RightPupil ;
     dc:description "Pupillenweite: Auswahlliste" ;
     
     skos:narrower :dilated ;

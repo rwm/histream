@@ -43,16 +43,20 @@ public class Import implements AutoCloseable{
 	private Locale locale;
 	
 	private PreparedStatement insertMeta;
+	private PreparedStatement insertMetaModifier;
 	private PreparedStatement insertAccess;
 	private PreparedStatement insertConcept;
+	private PreparedStatement insertModifier;
 
 	// statistics
 	private int insertMetaCount;
 	private int insertAccessCount;
 	private int insertConceptCount;
+	private int insertModifierCount;
 	private int deleteMetaCount;
 	private int deleteAccessCount;
 	private int deleteConceptCount;
+	private int deleteModifierCount;
 
 	private String sourceId;
 	private String sourceIdDelete;
@@ -63,6 +67,7 @@ public class Import implements AutoCloseable{
 	private String metaTable;
 	private String metaAccess;
 	private String dataConceptTable;
+	private String dataModifierTable;
 
 	private Consumer<String> warningHandler;
 
@@ -100,6 +105,7 @@ public class Import implements AutoCloseable{
 	private String getMetaTable(){return metaTable;}
 	private String getAccessTable(){return metaAccess;}
 	private String getConceptTable(){return dataConceptTable;}
+	private String getModifierTable(){return dataModifierTable;}
 
 	public int getInsertMetaCount(){return this.insertMetaCount;}
 	public int getDeleteMetaCount(){return this.deleteMetaCount;}
@@ -113,6 +119,7 @@ public class Import implements AutoCloseable{
 	}
 	private void prepareStatements() throws SQLException{
 		insertMeta = dbMeta.prepareStatement("INSERT INTO "+getMetaTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
+		insertMetaModifier = dbMeta.prepareStatement("INSERT INTO "+getMetaTable()+"(c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'modifier_cd','modifier_dimension','modifier_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
 		String access_table_name = getMetaTable();
 		if( access_table_name.indexOf('.') >= 0 ){
 			// name contains tablespace
@@ -121,6 +128,8 @@ public class Import implements AutoCloseable{
 		}
 		insertAccess = dbMeta.prepareStatement("INSERT INTO "+getAccessTable()+"(c_table_cd,c_table_name,c_protected_access,c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_facttablecolumn,c_dimtablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip)VALUES(?,'"+access_table_name+"','N',?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?)");
 		insertConcept = dbData.prepareStatement("INSERT INTO "+getConceptTable()+"(concept_path,concept_cd,name_char,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,current_timestamp,?,current_timestamp,?)");
+		insertModifier = dbData.prepareStatement("INSERT INTO "+getModifierTable()+"(modifier_path, modifier_cd, name_char, update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,current_timestamp,?,current_timestamp,?)");
+		
 	}
 
 	public void setWarningHandler(Consumer<String> warningHandler){
@@ -142,10 +151,12 @@ public class Import implements AutoCloseable{
 		this.metaAccess = config.get("meta.access");
 		
 		this.dataConceptTable = config.get("data.concept.table");
+		this.dataModifierTable = config.get("data.modifier.table");
 
 		Objects.requireNonNull(metaTable, "Need configuration: meta.table");
 		Objects.requireNonNull(metaAccess, "Need configuration: meta.access");
 		Objects.requireNonNull(dataConceptTable, "Need configuration: data.concept.table");
+		Objects.requireNonNull(dataConceptTable, "Need configuration: data.modifier.table");
 		// ontology configuration
 		// parse language for locale
 		if( config.get("ont.language") == null ){
@@ -165,12 +176,18 @@ public class Import implements AutoCloseable{
 		}
 		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
 		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
+		PreparedStatement deleteModifiers = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
 		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
 		
 		deleteConcepts.setString(1, sourceIdDelete);
 		this.deleteConceptCount = deleteConcepts.executeUpdate();
 //		System.out.println("Deleted "+deleteConceptCount+" rows from "+getConceptTable());
 		deleteConcepts.close();
+		
+		// delete modifiers
+		deleteModifiers.setString(1, sourceIdDelete);
+		this.deleteModifierCount = deleteModifiers.executeUpdate();
+		deleteModifiers.close();
 
 		deleteAccess.setString(1, sourceIdDelete+"%");
 		this.deleteAccessCount = deleteAccess.executeUpdate();
@@ -217,6 +234,15 @@ public class Import implements AutoCloseable{
 		insertConcept.setString(5, sourceId);
 		insertConcept.executeUpdate();
 		insertConceptCount ++;
+	}
+	private void insertModifierDimension(String path, String name, String concept_cd) throws SQLException{
+		insertModifier.setString(1, path);
+		insertModifier.setString(2, concept_cd);
+		insertModifier.setString(3, name);
+		insertModifier.setTimestamp(4, sourceTimestamp);
+		insertModifier.setString(5, sourceId);
+		insertModifier.executeUpdate();
+		insertModifierCount ++;
 	}
 	private String generateMetadataXML(ValueRestriction vr) throws XMLStreamException, OntologyException{
 		StringWriter xmlbuf = new StringWriter();
@@ -348,10 +374,17 @@ public class Import implements AutoCloseable{
 		}while( !done );
 		return b.toString();
 	}
+
+	private String buildConceptPath(String parentPath, Concept concept){
+		String path_part = concept.getID(); // TODO unique key sufficient, e.g. try label.hashCode()
+		return parentPath + path_part + "\\";
+	}
+	private String buildModifierPath(String parentPath, Concept modifier){
+		return buildConceptPath(parentPath, modifier);
+	}
 	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
 		insertMeta.setInt(1, level);
 		String label = concept.getPrefLabel(locale);
-		String path_part = concept.getID(); // TODO unique key sufficient, e.g. try label.hashCode()
 		
 		if( label == null ){
 			// no label for language, try to get neutral label
@@ -364,7 +397,7 @@ public class Import implements AutoCloseable{
 		}
 		
 		// use hashcode
-		String path = path_prefix + path_part+"\\";
+		String path = buildConceptPath(path_prefix, concept);
 		insertMeta.setString(2, path);
 		insertMeta.setString(3, label);
 		// c_synonym_cd
@@ -403,9 +436,14 @@ public class Import implements AutoCloseable{
 		}
 
 		// c_basecode
-		// TODO support multiple ids (e.g. adding virtual leaves)
-		if( conceptIds.length != 0 ){			
+		if( conceptIds.length == 1 ){
+			// single concept code
+			insertConceptDimension(path, label, conceptIds[0]);
+		}else if( conceptIds.length > 1 ){
+			// multiple concept codes. 
+			// TODO add virtual leaves to tree
 			// insert into concept_dimension
+			// XXX this will violate the primary key (concept_path) if multiple notations are used
 			insertConceptDimension(path, label, conceptIds[0]);
 			// concept has id and can occur in fact table			
 			// TODO make sure, each concept_path is inserted only once
@@ -453,6 +491,9 @@ public class Import implements AutoCloseable{
 		insertMeta.executeUpdate();
 		insertMetaCount ++;
 		
+		// insert modifiers
+		insertModifiers(concept, path);
+
 		if( accessRoot ){
 			insertAccess.setString(1, sourceId+"_"+Integer.toHexString(concept.hashCode()));
 			insertAccess.setInt(2, level);
@@ -470,6 +511,60 @@ public class Import implements AutoCloseable{
 		for( Concept sub : subConcepts ){
 			insertMeta(level+1, path, sub, false);
 		}
+	}
+
+	private void insertModifiers(Concept concept, String concept_path) throws OntologyException, SQLException{
+		// TODO write modifier dimension
+		Concept[] parts = concept.getParts(false);
+		if( parts == null ){
+			return; // nothing to do
+		}
+		for( Concept part : parts ){
+			insertModifierMetaTree(concept_path, 1, part, "\\");
+		}
+	}
+
+	private void insertModifierMetaTree(String concept_path, int level, Concept modifier, String path_prefix) throws OntologyException, SQLException{
+		// fill modifier dimension first
+		String[] ids = modifier.getNotations();
+		String path = buildModifierPath(path_prefix, modifier);
+		String label = modifier.getPrefLabel(locale);
+		for( int i=0; i<ids.length; i++ ){
+			// XXX will fail if multiple notations are present for a single path
+			insertModifierDimension(path, label, ids[i]);
+		}
+		// "INSERT INTO i2b2 (c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
+
+		insertMetaModifier.setInt(1, level); // c_hlevel
+		insertMetaModifier.setString(2, path); // c_fullname
+		// c_name
+		insertMetaModifier.setString(3, label);
+		// c_synonym_cd
+		insertMetaModifier.setString(4, "N");
+		// c_visualattributes
+		insertMetaModifier.setString(5, "RA");
+		// c_basecode
+		insertMetaModifier.setString(6, ids[0]);
+		// c_metadataxml
+		insertMetaModifier.setString(7, null);
+		// c_dimcode
+		insertMetaModifier.setString(8, label);
+		// c_tooltip
+		insertMetaModifier.setString(9, modifier.getDescription(locale));
+		// m_appliedpath
+		insertMetaModifier.setString(10, concept_path+"%");
+		// update, download, import dates
+		insertMetaModifier.setTimestamp(11, sourceTimestamp);
+		// sourcesystem_cd
+		insertMetaModifier.setString(12, sourceId);
+		insertMetaModifier.executeUpdate();
+		insertMetaCount ++;
+
+		// recurse into nested modifier structure
+		for( Concept nested : modifier.getNarrower() ){
+			insertModifierMetaTree(concept_path, level+1, nested, path);
+		}
+		
 	}
 	/*
 	public void loadOntology(Class<?> ontologyClass, Map<String,String> config) throws Exception{

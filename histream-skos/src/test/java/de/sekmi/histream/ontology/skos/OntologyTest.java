@@ -13,6 +13,7 @@ import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.OntologyException;
 import de.sekmi.histream.ontology.ValueRestriction;
 import de.sekmi.histream.ontology.skos.Store;
+import de.sekmi.histream.xml.NamespaceResolver;
 
 public class OntologyTest {
 	Store store;

@@ -84,10 +84,11 @@ public interface Concept {
 	 * The part relationship is different from the narrower relationship
 	 * in the sense that {@link #getNarrower()} will point to more specific concepts while
 	 * {@link #getParts()} will divide the concept in the sense of a whole/part relationship.
-	 * 
+	 * @param inherited whether to return parts which are inherited from broader concepts.
 	 * @return concepts which are part of this concept, or {@code null} if this concept cannot be divided.
+	 * @throws OntologyException for ontology errors
 	 */
-	Concept[] getParts();
+	Concept[] getParts(boolean inherited) throws OntologyException;
 	
 	/**
 	 * Get restrictions for the values of this concept.

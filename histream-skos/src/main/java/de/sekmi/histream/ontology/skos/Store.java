@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ public class Store implements Ontology, Plugin {
 	private Resource inferredContext;
 	// SKOS scheme to enforce unique notations
 	private Resource scheme;
+	private Map<String, String> namespaceShortener;
+	
 	/// XXX  namespace resolver
 	/**
 	 * Plugin constructor which accepts configuration parameters.
@@ -139,6 +142,7 @@ public class Store implements Ontology, Plugin {
 		return count;
 	}
 	private void initializeRepo(Iterable<File> files, Iterable<URL> urls, String baseURI) throws RepositoryException, IOException{
+	    namespaceShortener = new HashMap<>();
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 		rc = repo.getConnection();
@@ -171,6 +175,7 @@ public class Store implements Ontology, Plugin {
 	    inferred += inferInverseRelations(SKOS.TOP_CONCEPT_OF, SKOS.HAS_TOP_CONCEPT);
 	    inferred += inferInverseRelations(SKOS.BROADER, SKOS.NARROWER);
 	    inferred += inferInverseRelations(SKOS.NARROWER, SKOS.BROADER);
+	    // TODO a isPartOf b -> b hasPart a
 	    if( inferred != 0 ){
 	    	log.fine("Inferred "+inferred+" statements.");
 	    }
@@ -229,6 +234,9 @@ public class Store implements Ontology, Plugin {
 	}
 	Concept[] getNarrower(ConceptImpl concept)throws OntologyException{
 		return getRelatedConcepts(concept.getResource(), SKOS.NARROWER);
+	}
+	Concept[] getParts(ConceptImpl concept, boolean inherited)throws OntologyException{
+		return getRelatedConcepts(concept.getResource(), HIStreamOntology.DWH_HAS_PART);
 	}
 	
 	public void printTopConcepts() throws OntologyException{

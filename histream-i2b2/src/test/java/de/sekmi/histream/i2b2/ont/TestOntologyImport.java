@@ -26,7 +26,8 @@ public class TestOntologyImport {
 		props.put("meta.sourcesystem_cd", "test");
 		props.put("meta.table", "i2b2metadata.i2b2");
 		props.put("meta.access", "i2b2metadata.table_access");
-		props.put("data.concept.table", "i2b2crcdata.concepts");
+		props.put("data.concept.table", "i2b2crcdata.concept_dimension");
+		props.put("data.concept.table", "i2b2crcdata.modifier_dimension");
 		props.put("ont.language", "en");
 		imp = new Import(dbcMeta, dbcData, props);
 	}
