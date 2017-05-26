@@ -245,6 +245,9 @@ public class Import implements AutoCloseable{
 		insertModifierCount ++;
 	}
 	private String generateMetadataXML(ValueRestriction vr) throws XMLStreamException, OntologyException{
+		if( vr == null ){
+			return null;
+		}
 		StringWriter xmlbuf = new StringWriter();
 		XMLOutputFactory xmlout = XMLOutputFactory.newInstance();
 		XMLStreamWriter xml = xmlout.createXMLStreamWriter(xmlbuf);
@@ -452,20 +455,11 @@ public class Import implements AutoCloseable{
 
 		
 		// c_metadataxml
-		ValueRestriction vr = concept.getValueRestriction();
-		if( vr == null ){
-			insertMeta.setString(7, null);
-		}else{
-			// build metadata xml
-			
 			// set value
-			try {
-				insertMeta.setString(7, generateMetadataXML(vr));
-			} catch (XMLStreamException e) {
-				// TODO log error
-				e.printStackTrace();
-				insertMeta.setString(7, null);
-			}
+		try {
+			insertMeta.setString(7, generateMetadataXML(concept.getValueRestriction()));
+		} catch (XMLStreamException e) {
+			throw new OntologyException("Failed to generate metadata XML for concept "+concept.getID(), e);
 		}
 		
 		// c_dimcode (with concept_dimension.concept_path LIKE)
@@ -546,7 +540,11 @@ public class Import implements AutoCloseable{
 		// c_basecode
 		insertMetaModifier.setString(6, ids[0]);
 		// c_metadataxml
-		insertMetaModifier.setString(7, null);
+		try {
+			insertMetaModifier.setString(7, generateMetadataXML(modifier.getValueRestriction()));
+		} catch (XMLStreamException e) {
+			throw new OntologyException("Failed to generate metadata XML for modifier "+modifier.getID(), e);
+		}		
 		// c_dimcode
 		insertMetaModifier.setString(8, label);
 		// c_tooltip
