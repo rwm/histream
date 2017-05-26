@@ -45,6 +45,12 @@ public class OntologyMojo extends AbstractMojo {
 	@Parameter
 	boolean overwrite;
 
+//	/**
+//	 * Add a COMMIT command at the end of the generated SQL
+//	 */
+//	@Parameter
+//	boolean commit;
+
 	@Parameter
 	Properties properties;
 
