@@ -57,6 +57,7 @@ dwh:String a owl:Restriction ;
 	skos:inScheme	:TestData ;
 	dwh:restriction dwh:String ;
 	skos:prefLabel	"String_label_en"@en ;
+	skos:prefLabel	"String_label_de"@de ;
 	skos:notation	"T:type:str" .
 	
 :TestDecimalConcept a skos:Concept;
@@ -87,10 +88,12 @@ dwh:String a owl:Restriction ;
 	skos:inScheme	:TestScheme ;
 	skos:broader	:OtherTop ;
 	skos:prefLabel "OtherSub_label_en"@en ;
+	skos:prefLabel "OtherSub_label_de"@de ;
 	skos:notation	"other" .
 
 # Second dimension / modifiers
 :Mod1 a skos:Concept ;
 	dwh:isPartOf	:TestData ;
 	skos:prefLabel	"Mod1 en"@en ;
+	skos:prefLabel	"Mod1 de"@de ;
 	skos:notation	"m1" .
