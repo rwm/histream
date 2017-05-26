@@ -175,6 +175,7 @@ public class Store implements Ontology, Plugin {
 	    inferred += inferInverseRelations(SKOS.TOP_CONCEPT_OF, SKOS.HAS_TOP_CONCEPT);
 	    inferred += inferInverseRelations(SKOS.BROADER, SKOS.NARROWER);
 	    inferred += inferInverseRelations(SKOS.NARROWER, SKOS.BROADER);
+	    inferred += inferInverseRelations(HIStreamOntology.DWH_IS_PART_OF, HIStreamOntology.DWH_HAS_PART);
 	    // TODO a isPartOf b -> b hasPart a
 	    if( inferred != 0 ){
 	    	log.fine("Inferred "+inferred+" statements.");
