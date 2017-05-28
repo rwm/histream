@@ -193,7 +193,8 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
 	 * @param str ISO 8601 string
 	 * @return date time with accuracy as derived from parse
-	 * @throws IllegalArgumentException for unparsable string
+	 * @throws ParseException for unparsable string
+	 * @throws IllegalArgumentException unparsable string (old unchecked exception)
 	 */
 	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
 		if( str.length() < 4 )throw new ParseException("Need at least 4 characters for year: "+str, str.length());
@@ -206,6 +207,7 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		}else if( str.charAt(4) != '-' ){
 			throw new ParseException("Expected YYYY-MM", 4);
 		}
+		// TODO replace IllegalArgumentException with ParseException!!
 		// parse month
 		int month = Integer.parseInt(str.substring(5, 7));
 		if( str.length() == 7 ){ // specified to accuracy of months
