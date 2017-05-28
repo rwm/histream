@@ -158,7 +158,7 @@ public class Import implements AutoCloseable{
 		Objects.requireNonNull(metaTable, "Need configuration: meta.table");
 		Objects.requireNonNull(metaAccess, "Need configuration: meta.access");
 		Objects.requireNonNull(dataConceptTable, "Need configuration: data.concept.table");
-		Objects.requireNonNull(dataConceptTable, "Need configuration: data.modifier.table");
+		Objects.requireNonNull(dataModifierTable, "Need configuration: data.modifier.table");
 		// ontology configuration
 		// parse language for locale
 		if( config.get("ont.language") == null ){
@@ -176,9 +176,11 @@ public class Import implements AutoCloseable{
 			// nothing to do
 			return;
 		}
+		// meta
 		PreparedStatement deleteOnt = dbMeta.prepareStatement("DELETE FROM "+getMetaTable()+" WHERE sourcesystem_cd=?");
 		PreparedStatement deleteAccess = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
-		PreparedStatement deleteModifiers = dbMeta.prepareStatement("DELETE FROM "+getAccessTable()+" WHERE c_table_cd LIKE ?");
+		// data
+		PreparedStatement deleteModifiers = dbData.prepareStatement("DELETE FROM "+getModifierTable()+" WHERE sourcesystem_cd=?");
 		PreparedStatement deleteConcepts = dbData.prepareStatement("DELETE FROM "+getConceptTable()+" WHERE sourcesystem_cd=?");
 		
 		deleteConcepts.setString(1, sourceIdDelete);
