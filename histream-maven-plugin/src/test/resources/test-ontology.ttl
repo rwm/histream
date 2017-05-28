@@ -89,7 +89,9 @@ dwh:String a owl:Restriction ;
 	skos:broader	:OtherTop ;
 	skos:prefLabel "OtherSub_label_en"@en ;
 	skos:prefLabel "OtherSub_label_de"@de ;
-	skos:notation	"other" .
+	# multiple notations
+	skos:notation	"other" ;
+	skos:notation	"another" .
 
 # Second dimension / modifiers
 :Mod1 a skos:Concept ;
@@ -97,3 +99,9 @@ dwh:String a owl:Restriction ;
 	skos:prefLabel	"Mod1 en"@en ;
 	skos:prefLabel	"Mod1 de"@de ;
 	skos:notation	"m1" .
+
+:Mod1Sub a skos:Concept ;
+	skos:broader :Mod1;
+	skos:prefLabel	"Submod1 en"@en ;
+	skos:prefLabel	"Submod1 de"@de ;
+	skos:notation	"m1s" .	

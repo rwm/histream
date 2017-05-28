@@ -20,6 +20,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import de.sekmi.histream.i2b2.ont.MetaEntry.Type;
+import de.sekmi.histream.i2b2.ont.MetaEntry.Visibility;
 import de.sekmi.histream.ontology.Concept;
 import de.sekmi.histream.ontology.Ontology;
 import de.sekmi.histream.ontology.OntologyException;
@@ -385,95 +387,47 @@ public class Import implements AutoCloseable{
 	private String buildModifierPath(String parentPath, Concept modifier){
 		return buildConceptPath(parentPath, modifier);
 	}
-	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
-		insertMeta.setInt(1, level);
-		String label = concept.getPrefLabel(locale);
-		
-		if( label == null ){
-			// no label for language, try to get neutral label
-			label = concept.getPrefLabel(null);
-			if( label == null ){
-				// concept does not have a label
-				label = concept.getID();
-				showWarning("Missing prefLabel for concept "+concept+" substituted with ID");
-			}
+	private void insertConceptMetaEntry(MetaEntry m) throws SQLException{
+		insertMeta.setInt(1, m.level);
+		insertMeta.setString(2, m.path);
+		insertMeta.setString(3, m.label);
+		insertMeta.setString(4, m.synonym?"Y":"N");
+		StringBuilder b = new StringBuilder(3);
+		switch( m.type ){
+		case Container:
+			b.append('C');
+			break;
+		case Folder:
+			b.append('F');
+			break;
+		case Leaf:
+			b.append('L');
+			break;
+		case Multiple:
+			b.append('M');
+			break;
+		default:
+			throw new IllegalStateException();
 		}
-		
-		// use hashcode
-		String path = buildConceptPath(path_prefix, concept);
-		insertMeta.setString(2, path);
-		insertMeta.setString(3, label);
-		// c_synonym_cd
-		String synonymCd = "N";
-		insertMeta.setString(4, synonymCd); // TODO use set to find out if a concept is used multiple times -> synonym Y
-		
-		// c_visualattributes and c_basecode
-		Concept[] subConcepts = concept.getNarrower();
-		String[] conceptIds = concept.getNotations();
-		
-
-		if( conceptIds.length == 0 ){
-			// no notations ==> concept can not be queried
-			// force directory (may be empty if no sub-concepts)
-			insertMeta.setString(5, "FA");
-			insertMeta.setString(6, null);
-		}else if( conceptIds.length == 1 ){
-			// exactly one notation
-			String visualAttr = (subConcepts.length == 0)?"LA":"FA";
-			insertMeta.setString(5, visualAttr);
-			insertMeta.setString(6, conceptIds[0]);
-		}else if( subConcepts.length == 0 ){
-			// no sub-concepts but multiple notations,
-			// TODO use MA and 
-			insertMeta.setString(5, "LA");
-			insertMeta.setString(6, conceptIds[0]);
-			// XXX support for multiple conceptIds can be hacked by appending a number to the path for each conceptid and insert each conceptid
-			// XXX see some concepts in i2b2 demodata religion with visualattributes M
-		}else{
-			// has sub concepts and multiple notations,
-			// no way to represent this in i2b2
-			// just use the first notation and log warning
-			insertMeta.setString(5, "FA");
-			insertMeta.setString(6, conceptIds[0]);
-			showWarning("Ignoring ids other than '"+conceptIds[0]+"' of concept "+concept);
+		switch( m.visibility ){
+		case Disabled:
+			b.append('I');
+			break;
+		case ACTIVE:
+			b.append('A');
+			break;
+		case Hidden:
+			b.append('H');
+			break;
+		default:
+			throw new IllegalStateException();
 		}
-
-		// c_basecode
-		if( conceptIds.length == 1 ){
-			// single concept code
-			insertConceptDimension(path, label, conceptIds[0]);
-		}else if( conceptIds.length > 1 ){
-			// multiple concept codes. 
-			// TODO add virtual leaves to tree
-			// insert into concept_dimension
-			// XXX this will violate the primary key (concept_path) if multiple notations are used
-			insertConceptDimension(path, label, conceptIds[0]);
-			// concept has id and can occur in fact table			
-			// TODO make sure, each concept_path is inserted only once
-		}
-		
-
-		
-		// c_metadataxml
-			// set value
-		try {
-			insertMeta.setString(7, generateMetadataXML(concept.getValueRestriction()));
-		} catch (XMLStreamException e) {
-			throw new OntologyException("Failed to generate metadata XML for concept "+concept.getID(), e);
-		}
-		
-		// c_dimcode (with concept_dimension.concept_path LIKE)
-		insertMeta.setString(8, path);
-		
-		// c_tooltip
-		// try to use concept description
-		String descr = concept.getDescription(locale);
-		if( descr == null ){
-			descr = readableConceptPath(path); // use path if no description available
-		}
-		insertMeta.setString(9, descr);
-		
-		// m_applied_path
+		insertMeta.setString(5, b.toString());
+		insertMeta.setString(6, m.basecode);
+		insertMeta.setString(7, m.xml);
+		insertMeta.setString(8, m.dimcode);
+		insertMeta.setString(9, m.tooltip);
+		// m_applied_path always '@' for concepts
 		insertMeta.setString(10, "@");
 		
 		// download_date
@@ -484,26 +438,116 @@ public class Import implements AutoCloseable{
 		
 		insertMeta.executeUpdate();
 		insertMetaCount ++;
+	}
+	private void insertMeta(int level, String path_prefix, Concept concept, boolean accessRoot) throws SQLException, OntologyException{
+		MetaEntry m = new MetaEntry();
+		m.level = level;
+		m.label = concept.getPrefLabel(locale);
+		
+		if( m.label == null ){
+			// no label for language, try to get neutral label
+			m.label = concept.getPrefLabel(null);
+			if( m.label == null ){
+				// concept does not have a label
+				m.label = concept.getID();
+				showWarning("Missing prefLabel for concept "+concept+" substituted with ID");
+			}
+		}
+		
+		// use hashcode
+		m.path = buildConceptPath(path_prefix, concept);
+
+		// c_synonym_cd
+		m.synonym = false;
+		 // TODO use set to find out if a concept is used multiple times -> synonym Y
+		
+		// c_visualattributes and c_basecode
+		Concept[] subConcepts = concept.getNarrower();
+		String[] conceptIds = concept.getNotations();
+		
+		m.visibility = Visibility.ACTIVE;
+		
+
+		
+		// c_metadataxml
+			// set value
+		try {
+			m.xml = generateMetadataXML(concept.getValueRestriction());
+		} catch (XMLStreamException e) {
+			throw new OntologyException("Failed to generate metadata XML for concept "+concept.getID(), e);
+		}
+		// c_dimcode (with concept_dimension.concept_path LIKE)
+		m.dimcode = m.path;
+		
+		// c_tooltip
+		// try to use concept description
+		String descr = concept.getDescription(locale);
+		if( descr == null ){
+			descr = readableConceptPath(m.path); // use path if no description available
+		}
+		m.tooltip = descr;
+		
+
+		if( conceptIds.length == 0 ){
+			// no notations ==> concept can not be queried
+			// force directory (may be empty if no sub-concepts)
+			m.type = Type.Folder;
+			// TODO set visibility to disabled
+			m.visibility = Visibility.Disabled;
+			m.basecode = null;
+		}else if( conceptIds.length == 1 ){
+			// exactly one notation
+			m.type = (subConcepts.length == 0)?Type.Leaf:Type.Folder;
+			m.basecode = conceptIds[0];
+			// add to concept dimension
+			insertConceptDimension(m.path, m.label, conceptIds[0]);
+		}else if( subConcepts.length == 0 ){
+			// no sub-concepts but multiple notations,
+			// TODO use MA and 
+			m.type = Type.Multiple;
+			MetaEntry sub = m.clone();
+			sub.level = m.level + 1;
+			sub.type = Type.Leaf;
+			for( int i=0; i<conceptIds.length; i++ ){
+				sub.basecode = conceptIds[i];
+				sub.label = m.label + "-" + conceptIds[i].hashCode();
+				sub.path = m.path + sub.label;
+				sub.dimcode = sub.path;
+				insertConceptDimension(sub.path, sub.label, conceptIds[i]);
+				insertConceptMetaEntry(sub);
+			}
+		}else{
+			// has sub concepts and multiple notations,
+			// no way to represent this in i2b2
+			// just use the first notation and log warning
+			m.type = Type.Folder;
+			m.basecode = conceptIds[0];
+			insertConceptDimension(m.path, m.label, conceptIds[0]);
+			showWarning("Ignoring ids other than '"+conceptIds[0]+"' of parent concept "+concept);
+		}
+
+		
+		insertConceptMetaEntry(m);
 		
 		// insert modifiers
-		insertModifiers(concept, path);
+		insertModifiers(concept, m.path);
 
 		if( accessRoot ){
 			insertAccess.setString(1, sourceId+"_"+Integer.toHexString(concept.hashCode()));
 			insertAccess.setInt(2, level);
-			insertAccess.setString(3, path);
-			insertAccess.setString(4, label);
-			insertAccess.setString(5, synonymCd);
+			insertAccess.setString(3, m.path);
+			insertAccess.setString(4, m.label);
+			insertAccess.setString(5, "N");
 			insertAccess.setString(6, "FA");// no leafs on root
-			insertAccess.setString(7, path);
-			insertAccess.setString(8, descr);
+			insertAccess.setString(7, m.path);
+			insertAccess.setString(8, m.tooltip);
 			insertAccess.executeUpdate();
 			
 			insertAccessCount ++;
 		}
 		// insert sub concepts
 		for( Concept sub : subConcepts ){
-			insertMeta(level+1, path, sub, false);
+			insertMeta(level+1, m.path, sub, false);
 		}
 	}
 
@@ -518,48 +562,103 @@ public class Import implements AutoCloseable{
 		}
 	}
 
-	private void insertModifierMetaTree(String concept_path, int level, Concept modifier, String path_prefix) throws OntologyException, SQLException{
-		// fill modifier dimension first
-		String[] ids = modifier.getNotations();
-		String path = buildModifierPath(path_prefix, modifier);
-		String label = modifier.getPrefLabel(locale);
-		for( int i=0; i<ids.length; i++ ){
-			// XXX will fail if multiple notations are present for a single path
-			insertModifierDimension(path, label, ids[i]);
-		}
-		// "INSERT INTO i2b2 (c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
-
-		insertMetaModifier.setInt(1, level); // c_hlevel
-		insertMetaModifier.setString(2, path); // c_fullname
+	private void insertModifierMetaEntry(MetaEntry entry) throws SQLException{
+		insertMetaModifier.setInt(1, entry.level); // c_hlevel
+		insertMetaModifier.setString(2, entry.path); // c_fullname
 		// c_name
-		insertMetaModifier.setString(3, label);
+		insertMetaModifier.setString(3, entry.label);
 		// c_synonym_cd
-		insertMetaModifier.setString(4, "N");
+		insertMetaModifier.setString(4, entry.synonym?"Y":"N");
 		// c_visualattributes
-		insertMetaModifier.setString(5, "RA");
+		StringBuilder b = new StringBuilder(3);
+		switch( entry.type ){
+		case Container:
+			b.append('O');
+			break;
+		case Folder:
+			b.append('D');
+			break;
+		case Leaf:
+			b.append('R');
+			break;
+		default:
+			throw new IllegalStateException();
+		}
+		switch( entry.visibility ){
+		case Disabled:
+			b.append('I');
+			break;
+		case ACTIVE:
+			b.append('A');
+			break;
+		case Hidden:
+			b.append('H');
+			break;
+		default:
+			throw new IllegalStateException();
+		}
+		insertMetaModifier.setString(5, b.toString());
 		// c_basecode
-		insertMetaModifier.setString(6, ids[0]);
+		insertMetaModifier.setString(6, entry.basecode);
 		// c_metadataxml
-		try {
-			insertMetaModifier.setString(7, generateMetadataXML(modifier.getValueRestriction()));
-		} catch (XMLStreamException e) {
-			throw new OntologyException("Failed to generate metadata XML for modifier "+modifier.getID(), e);
-		}		
+		insertMetaModifier.setString(7, entry.xml);
 		// c_dimcode
-		insertMetaModifier.setString(8, label);
+		insertMetaModifier.setString(8, entry.dimcode);
 		// c_tooltip
-		insertMetaModifier.setString(9, modifier.getDescription(locale));
+		insertMetaModifier.setString(9, entry.tooltip);
 		// m_appliedpath
-		insertMetaModifier.setString(10, concept_path+"%");
+		insertMetaModifier.setString(10, entry.modpath);
 		// update, download, import dates
 		insertMetaModifier.setTimestamp(11, sourceTimestamp);
 		// sourcesystem_cd
 		insertMetaModifier.setString(12, sourceId);
 		insertMetaModifier.executeUpdate();
 		insertMetaCount ++;
+	}
+	private void insertModifierMetaTree(String concept_path, int level, Concept modifier, String path_prefix) throws OntologyException, SQLException{
+		// fill modifier dimension first
+		String[] ids = modifier.getNotations();
+		String path = buildModifierPath(path_prefix, modifier);
+		String label = modifier.getPrefLabel(locale);
+		MetaEntry e = new MetaEntry();
+		if( ids.length == 0 ){
+			// no code
+			e.basecode = null;
+		}else if( ids.length == 1 ){
+			// single code
+			e.basecode = ids[0];
+			insertModifierDimension(path, label, ids[0]);
+		}else{
+			// multiple notations
+			showWarning("Using first notation - multiple notations not allowed for i2b2 modifiers: "+modifier.getID());
+			e.basecode = ids[0];
+			insertModifierDimension(path, label, ids[0]);
+		}
+		// "INSERT INTO i2b2 (c_hlevel,c_fullname,c_name,c_synonym_cd,c_visualattributes,c_basecode,c_metadataxml,c_facttablecolumn,c_tablename,c_columnname,c_columndatatype,c_operator,c_dimcode,c_tooltip,m_applied_path,update_date,download_date,import_date,sourcesystem_cd)VALUES(?,?,?,?,?,?,?,'concept_cd','concept_dimension','concept_path','T','LIKE',?,?,?,current_timestamp,?,current_timestamp,?)");
+		e.level = level;
+		e.path = path;
+		e.label = label;
+		e.synonym = false;
 
+		Concept[] narrower = modifier.getNarrower();
+		if( narrower.length == 0 ){
+			// leaf
+			e.type = Type.Leaf;
+		}else{
+			e.type = Type.Folder;
+		}
+		e.visibility = Visibility.ACTIVE;
+		try{
+			e.xml = generateMetadataXML(modifier.getValueRestriction());
+		} catch (XMLStreamException ex) {
+			throw new OntologyException("Failed to generate metadata XML for modifier "+modifier.getID(), ex);
+		}
+		e.dimcode = e.path;
+		e.modpath = concept_path+"%";
+		e.tooltip =  modifier.getDescription(locale);
+		insertModifierMetaEntry(e);
 		// recurse into nested modifier structure
-		for( Concept nested : modifier.getNarrower() ){
+		for( Concept nested : narrower ){
 			insertModifierMetaTree(concept_path, level+1, nested, path);
 		}
 		
