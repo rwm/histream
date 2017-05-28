@@ -360,7 +360,7 @@ public class Import implements AutoCloseable{
 				done = true;
 			}
 			// skip the http:// part of url prefixes
-			if( path.substring(pos,pos+7).equals("http://") ){
+			if( path.length()-pos > 7 && path.substring(pos,pos+7).equals("http://") ){
 				// prefixes will end in #
 				prefix_char = '#';
 				pos += 7;
