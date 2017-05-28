@@ -23,6 +23,7 @@ public class OntologyTest {
 	public void setupOntology()throws Exception{
 		store = new Store(new File("examples/test-ontology.ttl"));
 		store.setConceptScheme(NS_PREFIX+"TestScheme");
+		store.setNamespacePrefixes(new String[]{"http://sekmi.de/histream/skos/tests#"}, new String[]{"test"});
 	}
 
 	@Test
@@ -135,6 +136,16 @@ public class OntologyTest {
 		Assert.assertEquals(1,n.length);
 		Assert.assertEquals("other",n[0]);
 	}
+	@Test
+	public void verifyGetByShortIRI() throws OntologyException{
+
+		Concept c = store.getConceptById("test:OtherSub");
+		Assert.assertNotNull(c);
+		String[] n = c.getNotations();
+		Assert.assertNotNull(n);
+		Assert.assertEquals(1,n.length);
+		Assert.assertEquals("other",n[0]);
+	}
 	@After
 	public void closeOntology() throws IOException{
 		store.close();
@@ -142,6 +153,7 @@ public class OntologyTest {
 	
 	public static void main(String[] args) throws Exception{
 		try( Store store = new Store(new File("examples/test-ontology.ttl")) ){
+			store.setNamespacePrefixes(new String[]{"http://sekmi.de/histream/skos/tests#"}, new String[]{"test"});
 			store.printConceptHierarchy();
 			
 			Concept c = store.getConceptByNotation("Type");

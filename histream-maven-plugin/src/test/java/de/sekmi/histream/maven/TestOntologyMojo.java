@@ -3,6 +3,7 @@ package de.sekmi.histream.maven;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.apache.maven.shared.model.fileset.FileSet;
@@ -23,8 +24,9 @@ public class TestOntologyMojo {
 		mojo.destination = new File("target/i2b2-aktin");
 		mojo.properties = new Properties();
 		mojo.overwrite = true;
+		mojo.prefixes = Collections.singletonMap("a", "http://aktin.org/skos-cda#");
 		try( InputStream in = getClass().getResourceAsStream("/ontology.properties") ){
-			mojo.properties.load(in);			
+			mojo.properties.load(in);
 		}
 				
 		mojo.execute();

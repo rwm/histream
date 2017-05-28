@@ -49,7 +49,8 @@ public class Store implements Ontology, Plugin {
 	private Resource inferredContext;
 	// SKOS scheme to enforce unique notations
 	private Resource scheme;
-	private Map<String, String> namespaceShortener;
+	private String[] registeredPrefixes;
+	private String[] registeredNamespaces;
 	
 	/// XXX  namespace resolver
 	/**
@@ -142,7 +143,6 @@ public class Store implements Ontology, Plugin {
 		return count;
 	}
 	private void initializeRepo(Iterable<File> files, Iterable<URL> urls, String baseURI) throws RepositoryException, IOException{
-	    namespaceShortener = new HashMap<>();
 	    repo = new SailRepository(new MemoryStore());
 	    repo.initialize();
 		rc = repo.getConnection();
@@ -260,7 +260,50 @@ public class Store implements Ontology, Plugin {
 		}
 		
 	}
-	
+
+	public void setNamespacePrefixes(String[] namespaces, String prefixes[]){
+		// TODO order namespaces by length
+		this.registeredNamespaces = namespaces;
+		this.registeredPrefixes = prefixes;
+	}
+	private String expandIdPrefixes(String id){
+		if( registeredPrefixes == null ){
+			// no prefixes to expand
+			return id;
+		}
+		for( int i=0; i<registeredPrefixes.length; i++ ){
+			String prefix = registeredPrefixes[i] + ":";
+			if( id.length() > prefix.length() && id.startsWith(prefix) ){
+				return registeredNamespaces[i] + id.substring(prefix.length());
+			}
+		}
+		return id;
+	}
+	String getNamespacePrefix(String namespace){
+		if( registeredNamespaces == null ){
+			return null;
+		}
+		for( int i=0; i<registeredNamespaces.length; i++ ){
+			if( namespace.equals(registeredNamespaces[i]) ){
+				return registeredPrefixes[i];
+			}
+		}
+		return null;
+	}
+//	
+//	private String shortenIdNamespaces(String id){
+//		if( registeredNamespaces == null ){
+//			// no namespaces to shorten
+//			return id;
+//		}
+//		for( int i=0; i<registeredNamespaces.length; i++ ){
+//			String ns = registeredNamespaces[i];
+//			if( id.length() > ns.length() && id.startsWith(ns) ){
+//				return registeredPrefixes[i] + ":" + id.substring(ns.length());
+//			}
+//		}
+//		return id;
+//	}
 
 	@Override
 	public ConceptImpl getConceptByNotation(String id) throws OntologyException {
@@ -494,7 +537,10 @@ public class Store implements Ontology, Plugin {
 		}
 	}
 	@Override
-	public Concept getConceptById(String id) throws OntologyException {
+	public Concept getConceptById(String conceptId) throws OntologyException {
+		// lookup namespaces
+		String id = expandIdPrefixes(conceptId);
+
 		URI uri = repo.getValueFactory().createURI(id);
 		RepositoryResult<Statement> s = null;
 		ConceptImpl ci = null;

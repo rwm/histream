@@ -32,6 +32,7 @@ public class HIStreamOntology {
 		DWH_ECMASCRIPT = f.createURI(DWH_NAMESPACE, "ECMAScript");
 		DWH_HAS_PART = f.createURI(DWH_NAMESPACE, "hasPart"); // TODO use correct names/URIs
 		DWH_IS_PART_OF = f.createURI(DWH_NAMESPACE, "isPartOf"); // XXX see above
+		// dwh:hasPart rdfs:subPropertyOf http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasPart
 		
 	}
 }

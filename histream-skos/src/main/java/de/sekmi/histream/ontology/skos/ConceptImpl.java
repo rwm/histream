@@ -49,7 +49,7 @@ public class ConceptImpl implements Concept {
 	}
 	
 	public String toString(){
-		return res.toString();
+		return getID();
 	}
 
 	@Override
@@ -135,8 +135,13 @@ public class ConceptImpl implements Concept {
 	@Override
 	public String getID() {
 		URI me = (URI)res;
-		// TODO: use better namespace prefix instead of hashcode
-		return Integer.toHexString(me.getNamespace().hashCode())+":"+me.getLocalName();
+		String prefix = store.getNamespacePrefix(me.getNamespace());
+		if( prefix == null ){
+			// backward compatibility. this breaks the Ontology.getConceptById call.
+			// TODO: use better namespace prefix instead of hashcode
+			prefix = Integer.toHexString(me.getNamespace().hashCode());
+		}
+		return prefix + ":" +me.getLocalName();
 	}
 	
 	

@@ -57,6 +57,9 @@ public class OntologyMojo extends AbstractMojo {
 	@Parameter(defaultValue="${project}", readonly=true, required=true)
 	MavenProject project;
 
+	@Parameter
+	Map<String, String> prefixes;
+
 	private void logWarning(String message){
 		getLog().warn(message);
 	}
@@ -116,6 +119,17 @@ public class OntologyMojo extends AbstractMojo {
 			store = new Store(getSourceFiles(), null);
 		} catch (RepositoryException | IOException e) {
 			throw new MojoExecutionException("Unable to load ontology", e);
+		}
+		if( prefixes != null ){
+			String[] ns = new String[prefixes.size()];
+			String[] pr = new String[ns.length];
+			int i=0;
+			for( String key : prefixes.keySet() ){
+				pr[i] = key;
+				ns[i] = prefixes.get(key);
+				i++;
+			}			
+			store.setNamespacePrefixes(ns, pr);
 		}
 		
 		try {
