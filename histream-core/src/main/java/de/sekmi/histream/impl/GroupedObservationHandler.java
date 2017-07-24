@@ -1,5 +1,6 @@
 package de.sekmi.histream.impl;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import de.sekmi.histream.Observation;
@@ -79,6 +80,11 @@ public abstract class GroupedObservationHandler implements ObservationHandler, A
 	public final void accept(Observation observation) {
 		Patient thisPatient = observation.getExtension(Patient.class);
 		Visit thisVisit = observation.getExtension(Visit.class);
+		// assertations to simplify troubleshooting corrupt data
+		Objects.requireNonNull(thisPatient);
+		Objects.requireNonNull(thisPatient.getId());
+		Objects.requireNonNull(thisVisit);
+		Objects.requireNonNull(thisVisit.getId());
 
 		if( prevPatient == null ){
 			// write start document, meta, patient
