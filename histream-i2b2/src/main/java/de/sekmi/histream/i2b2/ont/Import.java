@@ -491,11 +491,18 @@ public class Import implements AutoCloseable{
 		
 
 		if( conceptIds.length == 0 ){
-			// no notations ==> concept can not be queried
+			// no notations
 			// force directory (may be empty if no sub-concepts)
-			m.type = Type.Folder;
-			// TODO set visibility to disabled
-			m.visibility = Visibility.Disabled;
+			if( subConcepts.length == 0 ){
+				// leaf
+				// no notations ==> concept can not be queried
+				// set visibility to disabled
+				m.visibility = Visibility.Disabled;
+				m.type = Type.Leaf;
+			}else{
+				m.type = Type.Folder;
+			}
+			
 			m.basecode = null;
 		}else if( conceptIds.length == 1 ){
 			// exactly one notation
