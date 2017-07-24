@@ -51,8 +51,8 @@ public class Store implements Ontology, Plugin {
 	private Resource scheme;
 	private String[] registeredPrefixes;
 	private String[] registeredNamespaces;
+	private URI hasPartRelation;
 	
-	/// XXX  namespace resolver
 	/**
 	 * Plugin constructor which accepts configuration parameters.
 	 * 
@@ -176,6 +176,8 @@ public class Store implements Ontology, Plugin {
 	    inferred += inferInverseRelations(SKOS.BROADER, SKOS.NARROWER);
 	    inferred += inferInverseRelations(SKOS.NARROWER, SKOS.BROADER);
 	    inferred += inferInverseRelations(HIStreamOntology.DWH_IS_PART_OF, HIStreamOntology.DWH_HAS_PART);
+	    // set default relations
+	    this.hasPartRelation = HIStreamOntology.DWH_HAS_PART;
 	    // TODO a isPartOf b -> b hasPart a
 	    if( inferred != 0 ){
 	    	log.fine("Inferred "+inferred+" statements.");
@@ -237,7 +239,7 @@ public class Store implements Ontology, Plugin {
 		return getRelatedConcepts(concept.getResource(), SKOS.NARROWER);
 	}
 	Concept[] getParts(ConceptImpl concept, boolean inherited)throws OntologyException{
-		return getRelatedConcepts(concept.getResource(), HIStreamOntology.DWH_HAS_PART);
+		return getRelatedConcepts(concept.getResource(), hasPartRelation);
 	}
 	
 	public void printTopConcepts() throws OntologyException{
@@ -261,6 +263,18 @@ public class Store implements Ontology, Plugin {
 		
 	}
 
+	
+	public void setPartOfRelations(URI hasPart, URI inverseHasPart) throws RepositoryException{
+		if( inverseHasPart != null ){
+			inferInverseRelations(inverseHasPart, hasPart);
+		}
+		this.hasPartRelation = hasPart;
+	}
+	/**
+	 * Set namespace prefixes to be used to shorten concept IDs.
+	 * @param namespaces namespace names
+	 * @param prefixes prefixes for the namespaces
+	 */
 	public void setNamespacePrefixes(String[] namespaces, String prefixes[]){
 		// TODO order namespaces by length
 		this.registeredNamespaces = namespaces;
