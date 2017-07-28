@@ -81,23 +81,23 @@ public class I2b2Visit extends VisitImpl {
 		if( visit.getEndTime() != null ){
 			switch( visit.getEndTime().getAccuracy() ){
 			case DAYS:
-				start_char = 0; // same meaning
-				start_char = 'Y';
+				end_char = 0; // same meaning
+				end_char = 'Y';
 				break;
 			case MONTHS:
-				start_char = 'M';
+				end_char = 'M';
 				break;
 			case YEARS:
-				start_char = 'X';
+				end_char = 'X';
 				break;
 			case HOURS:
-				start_char = 'R';
+				end_char = 'R';
 				break;
 			case MINUTES:
-				start_char = 'T';
+				end_char = 'T';
 				break;
 			case SECONDS:
-				start_char = 'S';
+				end_char = 'S';
 				break;
 			default:
 			}
@@ -105,30 +105,30 @@ public class I2b2Visit extends VisitImpl {
 			// null end date
 			// U: unknown, O: ongoing
 			// default to unknown
-			start_char = 'U';
+			end_char = 'U';
 		}
 
-		// birth date
+		// start date
 		if( visit.getStartTime() != null ){
 			switch( visit.getStartTime().getAccuracy() ){
 			case DAYS:
-				end_char = 0; // same meaning
-				end_char = 'D';
+				start_char = 0; // same meaning
+				start_char = 'D';
 				break;
 			case MONTHS:
-				end_char = 'B';
+				start_char = 'B';
 				break;
 			case YEARS:
-				end_char = 'F';
+				start_char = 'F';
 				break;
 			case HOURS:
-				end_char = 'H';
+				start_char = 'H';
 				break;
 			case MINUTES:
-				end_char = 'I';
+				start_char = 'I';
 				break;
 			case SECONDS:
-				end_char = 'C';
+				start_char = 'C';
 				break;
 			default:
 			}
@@ -136,7 +136,7 @@ public class I2b2Visit extends VisitImpl {
 			// null start date
 			// L: unknown, A: active
 			// default to unknown
-			end_char = 'L';
+			start_char = 'L';
 		}
 
 		if( end_char != 0 && start_char != 0 )
@@ -217,6 +217,7 @@ public class I2b2Visit extends VisitImpl {
 			startIndicator = vital_cd.charAt(1);
 		}// otherwise, the first character is used if end indicator wasn't used. See default case above
 		
+		accuracy = null;
 		// start date indicator
 		switch( startIndicator ){
 		case 'L': // unknown, no date

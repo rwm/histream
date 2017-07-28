@@ -82,6 +82,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private char idSourceSeparator;
 	private Connection db;
 	private int fetchSize;
+	// TODO read only flag!!!!!! XXX
 //	private String autoInsertSourceId;
 
 	// maximum patient number, used to generate new patient_num for new patients
@@ -353,7 +354,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	
 	private void updateStorage(I2b2Patient patient) throws SQLException {
 		synchronized( update ){
-			update.setString(1, getVitalStatusCd(patient));
+			update.setString(1, patient.getVitalStatusCd());
 			update.setTimestamp(2, inaccurateSqlTimestamp(patient.getBirthDate()));
 			update.setTimestamp(3, inaccurateSqlTimestamp(patient.getDeathDate()));
 			update.setString(4, getSexCd(patient));
@@ -403,140 +404,6 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			return null;
 		}
 	}
-	/**
-	 * Get the i2b2 vital_status_cd for a patient.
-	 * Values Y,M,X,R,T,S can be returned.
-	 * @param patient patient object
-	 * @return vital status code, see CRC_Design doc
-	 */
-	private static String getVitalStatusCd(Patient patient){
-		char death_char=0, birth_char=0;
-		if( patient.getDeathDate() != null ){
-			switch( patient.getDeathDate().getAccuracy() ){
-			case DAYS:
-				death_char = 'Y';
-				break;
-			case MONTHS:
-				death_char = 'M';
-				break;
-			case YEARS:
-				death_char = 'X';
-				break;
-			case HOURS:
-				death_char = 'R';
-				break;
-			case MINUTES:
-				death_char = 'T';
-				break;
-			case SECONDS:
-				death_char = 'S';
-				break;
-			default:
-			}
-		}
-
-		// birth date
-		if( patient.getBirthDate() != null ){
-			switch( patient.getBirthDate().getAccuracy() ){
-			case DAYS:
-				death_char = 'D';
-				break;
-			case MONTHS:
-				death_char = 'B';
-				break;
-			case YEARS:
-				death_char = 'F';
-				break;
-			case HOURS:
-				death_char = 'H';
-				break;
-			case MINUTES:
-				death_char = 'I';
-				break;
-			case SECONDS:
-				death_char = 'C';
-				break;
-			default:
-			}
-		}
-
-		if( death_char != 0 && birth_char != 0 )
-			return new String(new char[]{death_char,birth_char});
-		else if( death_char != 0 )
-			return new String(new char[]{death_char});
-		else if( birth_char != 0 )
-			return new String(new char[]{birth_char});
-		else return null;
-	}
-
-	private static void setVitalStatusCd(Patient patient, String vital_cd){
-		// load accuracy
-		if( vital_cd == null )return; // nothing to do
-		
-		ChronoUnit accuracy = null;
-		char birthIndicator = 0;
-		
-		// death date indicator
-		switch( vital_cd.charAt(0) ){
-		case 'N': // living, no date
-		case 'U': // unknown, no date
-		case 'Z': // deceased, no date
-			break;
-		case 'Y': // deceased, accurate to day
-			accuracy = ChronoUnit.DAYS;
-			break;
-		case 'M': // deceased, accurate to month
-			accuracy = ChronoUnit.MONTHS;
-			break;
-		case 'X': // deceased, accurate to year
-			accuracy = ChronoUnit.YEARS;
-			break;
-		case 'R': // deceased, accurate to hour
-			accuracy = ChronoUnit.HOURS;
-			break;
-		case 'T': // deceased, accurate to minute
-			accuracy = ChronoUnit.MINUTES;
-			break;
-		case 'S': // deceased, accurate to second
-			accuracy = ChronoUnit.SECONDS;
-			break;
-		default:
-			// no match for death status -> check for birth status in first character
-			birthIndicator = vital_cd.charAt(0);
-		}
-
-		if( patient.getBirthDate() != null && accuracy != null ){
-			patient.getBirthDate().setAccuracy(accuracy);
-		}
-		if( birthIndicator == 0 && vital_cd.length() > 1 )
-			birthIndicator = vital_cd.charAt(1);
-		// birth date indicator
-		switch( birthIndicator ){
-		case 'L': // unknown, no date
-			break;
-		case 'D': // known, accurate to day
-			accuracy = ChronoUnit.DAYS;
-			break;
-		case 'B': // known, accurate to month
-			accuracy = ChronoUnit.MONTHS;
-			break;
-		case 'F': // known, accurate to year
-			accuracy = ChronoUnit.YEARS;
-			break;
-		case 'H': // known, accurate to hour
-			accuracy = ChronoUnit.HOURS;
-			break;
-		case 'I': // known, accurate to minute
-			accuracy = ChronoUnit.MINUTES;
-			break;
-		case 'C': // known, accurate to second
-			accuracy = ChronoUnit.SECONDS;
-			break;
-		}
-		if( patient.getBirthDate() != null && accuracy != null ){
-			patient.getBirthDate().setAccuracy(accuracy);
-		}		
-	}
 
 	private I2b2Patient loadFromResultSet(ResultSet rs) throws SQLException{
 		int id = rs.getInt(1);
@@ -585,7 +452,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		
 		patient.setSourceId(rs.getString(7));
 		
-		setVitalStatusCd(patient, vital_cd);
+		patient.setVitalStatusCd(vital_cd);
 		
 		patient.markDirty(false);
 		
