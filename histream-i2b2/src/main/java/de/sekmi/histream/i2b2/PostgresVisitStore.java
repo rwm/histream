@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -302,10 +301,10 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	
 	private void updateStorage(I2b2Visit visit) throws SQLException {
 		synchronized( update ){
-			update.setString(1, getActiveStatusCd(visit));
+			update.setString(1, visit.getActiveStatusCd());
 			update.setTimestamp(2, inaccurateSqlTimestamp(visit.getStartTime()));
 			update.setTimestamp(3, inaccurateSqlTimestamp(visit.getEndTime()));
-			update.setString(4, getInOutCd(visit));
+			update.setString(4, visit.getInOutCd());
 			update.setString(5, visit.getLocationId());
 			update.setTimestamp(6, Timestamp.from(visit.getSourceTimestamp()));
 			update.setString(7, visit.getSourceId());
@@ -321,19 +320,6 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 	}
 
-	private static String getInOutCd(Visit patient){
-		if( patient.getStatus() == null )return null;
-		else switch( patient.getStatus() ){
-		case Inpatient:
-			return "I";
-		case Outpatient:
-		case Emergency: // unsupported by i2b2, map to outpatient
-			return "O";
-		default:
-			// XXX should not happen, warning
-			return null;
-		}
-	}
 
 
 	/**
@@ -368,151 +354,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 	}
 	
-	/**
-	 * Get the i2b2 vital_status_cd for a patient.
-	 * TODO move method to generic i2b2 support class.
-	 * @param visit visit object
-	 * @return vital status code, see CRC_Design doc
-	 */
-	private static String getActiveStatusCd(Visit visit){
-		char end_char=0, start_char=0;
-		if( visit.getEndTime() != null ){
-			switch( visit.getEndTime().getAccuracy() ){
-			case DAYS:
-				end_char = 'Y';
-				break;
-			case MONTHS:
-				end_char = 'M';
-				break;
-			case YEARS:
-				end_char = 'X';
-				break;
-			case HOURS:
-				end_char = 'R';
-				break;
-			case MINUTES:
-				end_char = 'T';
-				break;
-			case SECONDS:
-				end_char = 'S';
-				break;
-			default:
-			}
-		}else{
-			// null end date
-			// TODO: U: unknown, O: ongoing
-		}
 
-		// birth date
-		if( visit.getStartTime() != null ){
-			switch( visit.getStartTime().getAccuracy() ){
-			case DAYS:
-				end_char = 'D';
-				end_char = 0; // same meaning
-				break;
-			case MONTHS:
-				end_char = 'B';
-				break;
-			case YEARS:
-				end_char = 'F';
-				break;
-			case HOURS:
-				end_char = 'H';
-				break;
-			case MINUTES:
-				end_char = 'I';
-				break;
-			case SECONDS:
-				end_char = 'C';
-				break;
-			default:
-			}
-		}else{
-			// null start date
-			// TODO: L: unknown, A: active
-		}
 
-		if( end_char != 0 && start_char != 0 )
-			return new String(new char[]{end_char,start_char});
-		else if( end_char != 0 )
-			return new String(new char[]{end_char});
-		else if( start_char != 0 )
-			return new String(new char[]{start_char});
-		else return null;
-	}
-
-	private void setActiveStatusCd(Visit patient, String vital_cd){
-		// load accuracy
-		if( vital_cd == null )return; // nothing to do
-		
-		ChronoUnit accuracy = null;
-		char birthIndicator = 0;
-		
-		// end date indicator
-		switch( vital_cd.charAt(0) ){
-		case 'U': // unknown, no date
-		case 'O': // ongoing, no date
-			// TODO
-			break;
-		case 0:
-		case 'Y': // known, accurate to day
-			accuracy = ChronoUnit.DAYS;
-			break;
-		case 'M': // known, accurate to month
-			accuracy = ChronoUnit.MONTHS;
-			break;
-		case 'X': // known, accurate to year
-			accuracy = ChronoUnit.YEARS;
-			break;
-		case 'R': // known, accurate to hour
-			accuracy = ChronoUnit.HOURS;
-			break;
-		case 'T': // known, accurate to minute
-			accuracy = ChronoUnit.MINUTES;
-			break;
-		case 'S': // known, accurate to second
-			accuracy = ChronoUnit.SECONDS;
-			break;
-		default:
-			// no match for end date -> check for start status in first character
-			birthIndicator = vital_cd.charAt(0);
-		}
-
-		if( patient.getEndTime() != null && accuracy != null ){
-			patient.getEndTime().setAccuracy(accuracy);
-		}
-		if( birthIndicator == 0 && vital_cd.length() > 1 )
-			birthIndicator = vital_cd.charAt(1);
-		// birth date indicator
-		switch( birthIndicator ){
-		case 'L': // unknown, no date
-		case 'A': // active, no date
-			// TODO
-			break;
-		case 0: // same as D
-		case 'D': // known, accurate to day
-			accuracy = ChronoUnit.DAYS;
-			break;
-		case 'B': // known, accurate to month
-			accuracy = ChronoUnit.MONTHS;
-			break;
-		case 'F': // known, accurate to year
-			accuracy = ChronoUnit.YEARS;
-			break;
-		case 'H': // known, accurate to hour
-			accuracy = ChronoUnit.HOURS;
-			break;
-		case 'I': // known, accurate to minute
-			accuracy = ChronoUnit.MINUTES;
-			break;
-		case 'C': // known, accurate to second
-			accuracy = ChronoUnit.SECONDS;
-			break;
-		}
-		if( patient.getStartTime() != null && accuracy != null ){
-			patient.getStartTime().setAccuracy(accuracy);
-		}		
-	}
 	private I2b2Visit loadFromResultSet(ResultSet rs) throws SQLException{
 		int id = rs.getInt(1);
 		int patid = rs.getInt(2);
@@ -555,7 +398,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		visit.setStartTime(startDate);
 		visit.setEndTime(endDate);
 		visit.setStatus(status);
-		setActiveStatusCd(visit, active_status_cd);
+		visit.setActiveStatusCd(active_status_cd);
 
 		visit.setLocationId(rs.getString(7));
 		visit.setSourceTimestamp(rs.getTimestamp(8).toInstant());
