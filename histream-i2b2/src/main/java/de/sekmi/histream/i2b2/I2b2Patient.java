@@ -59,9 +59,8 @@ public class I2b2Patient extends PatientImpl {
 	public void setNum(int patient_num){this.patient_num = patient_num;}
 
 	/**
-	 * Get the i2b2 vital_status_cd for a patient.
+	 * Get the i2b2 vital_status_cd for this patient.
 	 * Values Y,M,X,R,T,S can be returned.
-	 * @param patient patient object
 	 * @return vital status code, see CRC_Design doc
 	 */
 	public String getVitalStatusCd(){

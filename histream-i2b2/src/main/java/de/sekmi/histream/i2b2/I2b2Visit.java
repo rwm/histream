@@ -71,8 +71,7 @@ public class I2b2Visit extends VisitImpl {
 	}
 
 	/**
-	 * Get the i2b2 vital_status_cd for a patient.
-	 * @param visit visit object
+	 * Get the i2b2 vital_status_cd for this visit.
 	 * @return vital status code, see CRC_Design doc
 	 */
 	public String getActiveStatusCd(){
@@ -157,7 +156,7 @@ public class I2b2Visit extends VisitImpl {
 	 *  <li>For {@code null} or {@code ""} use both timestamps accurate to day
 	 *  <li>Try to decode first character as end indicator</li>
 	 *  <li>If {@code vital_cd.length > 1} use second character as start indicator, otherwise if unable to decode the end indicator, use the first character.</li>
-	 *  
+	 * </ol>
 	 * @param vital_cd code to indicate accuracy of start and end date
 	 */
 	public void setActiveStatusCd(String vital_cd){
