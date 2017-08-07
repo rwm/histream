@@ -53,13 +53,12 @@
 	</licenses>
 	<modules>
 		<module>histream-i2b2</module>
-		<module>histream-core</module>
-		<!--<module>histream-hl7</module>-->
+		<!--<module>histream-core</module>
 		<module>histream-skos</module>
 		<module>histream-import</module>
 		<module>histream-export</module>
 		<module>histream-js</module>
-		<module>histream-maven-plugin</module>
+		<module>histream-maven-plugin</module> -->
 		<!--
 		<module>i2b2-integration-tests</module>
 		<module>distribution</module>-->
