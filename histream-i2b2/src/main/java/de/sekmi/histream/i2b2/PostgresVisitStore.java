@@ -77,7 +77,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	//private static char[] map_death_chars = {};
 	private Hashtable<Integer, I2b2Visit> visitCache;
 	private Hashtable<String, I2b2Visit> idCache;
-	private boolean verifyPatientId;
+	/** if true, don't allow a change of patient for a given visit. */
+	private boolean rejectPatientChange;
 	
 	private PreparedStatement insert;
 	private PreparedStatement insertMapping;
@@ -122,7 +123,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		this.idSourceDefault = "HIVE";
 		this.idSourceSeparator = ':';
 		this.fetchSize = 1000;
-		this.verifyPatientId = true;
+		this.rejectPatientChange = false;
 	}
 	public void open(Connection connection, String projectId) throws SQLException{
 		visitCache = new Hashtable<>();
@@ -155,7 +156,11 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	public int size(){
 		return visitCache.size();
 	}
-	
+
+	public void setRejectPatientChange(boolean rejectPatientChange){
+		this.rejectPatientChange = rejectPatientChange;
+	}
+
 	private void loadMaxEncounterNum() throws SQLException{
 		try( Statement s = db.createStatement() ){
 			String sql = "SELECT MAX(encounter_num) FROM visit_dimension";
@@ -454,14 +459,13 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			// commonly, the item is modified after a call to this method,
 			// but changes are written later via a call to update.
 			// (otherwise, the instance would need to know whether to perform INSERT or UPDATE)
-		}else if( verifyPatientId ){
+		}else if( rejectPatientChange ){
 			// visit already existing
 			// verify that the patient number from the visit matches with the observation
 			if( visit.getPatientNum() != patient.getNum() ){
 				// throw exception to abort processing
 				throw new AssertionError("Patient_num mismatch between observation and visit", null);
 			}
-			
 		}
 		return visit;		
 	}
