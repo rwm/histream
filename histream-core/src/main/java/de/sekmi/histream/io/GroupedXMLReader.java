@@ -151,7 +151,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( es != null ){
 			currentPatient.setSourceTimestamp(es.getSourceTimestamp());
 		}
-		// TODO set patient data
+		// set patient data
 		if( patientData.containsKey("birthdate") ){
 			String dob = patientData.get("birthdate");
 			try {
@@ -182,7 +182,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("given-name") ){
 			currentPatient.setGivenName(patientData.get("given-name"));
 		}
-		
+		// TODO add more data. e.g. zip code
 	}
 	
 	/**

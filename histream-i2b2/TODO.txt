@@ -4,5 +4,7 @@ These integer ids are used directly in the patient table.
 
 Add flag for ignoring patient/encounter lookup: Insert facts directly into observation_fact
 
+Write unit test for PostgresVisitStore -> rejectPatientChange
+
 Periodic tasks:
 - Find and remove patient/encounter rows without any corresponding facts (can occur when facts are removed)
