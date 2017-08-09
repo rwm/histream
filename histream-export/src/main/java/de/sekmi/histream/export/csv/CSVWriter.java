@@ -40,7 +40,7 @@ public class CSVWriter implements ExportWriter{
 	 * Create a CSV writer which creates table files
 	 * in the specified directory.
 	 * @param directory directory where the table files should be created. Must be non-null.
-	 * @param fieldSeparator field separator character.
+	 * @param fieldSeparator field separator character. Single space and newline are not allowed as separator characters.
 	 * @param fileSuffix file name suffix (e.g. {@code .csv})
 	 */
 	public CSVWriter(Path directory, char fieldSeparator, String fileSuffix){
@@ -51,6 +51,9 @@ public class CSVWriter implements ExportWriter{
 		this.filenameExtension = fileSuffix;
 		this.patientTableName = "patients";
 		this.visitTableName = "visits";
+		if( fieldSeparator == ' ' || fieldSeparator == '\n' ){
+			throw new IllegalArgumentException("Single space and line separator not allowed as field separator");
+		}
 	}
 
 	public Charset getCharset(){
@@ -101,7 +104,7 @@ public class CSVWriter implements ExportWriter{
 	 */
 	protected String escapeData(String data){
 		// TODO do proper escaping
-		return data.replace(fieldSeparator, ' ').replace('\n', ' ');
+		return data.replace(fieldSeparator, ' ').replace('\n', ' ').replace('\r', ' ');
 	}
 	@Override
 	public TableWriter openPatientTable() throws IOException {
