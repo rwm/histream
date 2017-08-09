@@ -64,7 +64,7 @@
 		</idat>
 		<mdat>
 			<concept id="natrium">
-				<value column="na" xsi:type="decimal"/>
+				<value column="na" xsi:type="decimal" locale="de" />
 				<start column="zeitpunkt" format="d.M.u[ H[:m[:s]]]" na=""/>
 				<unit constant-value="mmol/l" />
 				<modifier id="other">
