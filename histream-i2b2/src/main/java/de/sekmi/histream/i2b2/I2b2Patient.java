@@ -241,5 +241,10 @@ public class I2b2Patient extends PatientImpl {
 		}		
 	}
 
+	@Override
+	public String toString(){
+		return "I2b2Patient(num="+getNum()+", id="+getId()+", dob="+getBirthDate()+")";
+	}
+
 
 }

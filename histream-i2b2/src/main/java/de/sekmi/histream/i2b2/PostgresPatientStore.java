@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -234,18 +233,23 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	
 	private void batchLoad() throws SQLException{
 		try( ResultSet rs = selectAll.executeQuery() ){
+			int count = 0;
 			while( rs.next() ){
+				count ++;
 				I2b2Patient patient = loadFromResultSet(rs);
 				// put in numeric patient cache
 				patientCache.put(patient.getNum(), patient);
 			}
+			log.info("Loaded patient records: "+count);
 		}
-
 		try( ResultSet rs = selectAllIde.executeQuery() ){
 			I2b2Patient p;
 			ArrayList<String> ids = new ArrayList<>(16);
+			// count loaded IDs for logging
+			int total_count = 0, project_count=0;
 			int num = -1; // current patient number
 			while( rs.next() ){
+				total_count ++;
 				if( num == -1 ){  // first patient
 					num = rs.getInt(1);
 				}else if( num != rs.getInt(1) ){
@@ -274,6 +278,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 				if( rs.getString(4).equals("A") && rs.getString(5).equals(projectId) ){
 					p = getCached(num);
 					if( p != null ){
+						project_count ++;
 						p.setId(id);
 						p.markDirty(false);
 					}
@@ -291,7 +296,11 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 					p.mergedIds = new String[ids.size()];
 					p.mergedIds = ids.toArray(p.mergedIds);
 				}
-			}			
+			}
+			log.info("Loaded "+total_count+" aliases with "+project_count+" project specific IDs");
+			if( project_count == 0 && total_count > 0 ){
+				log.warning("No project specific patient IDs. Maybe wrong projectId?");
+			}
 		}
 		
 		// fill idCache
