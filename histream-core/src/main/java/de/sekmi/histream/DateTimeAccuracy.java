@@ -27,6 +27,7 @@ import java.time.DateTimeException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -51,6 +52,7 @@ import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
  */
 @XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
 public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> {
+	// TODO why not use instant, since we always calculate UTC? or Offset/ZonedDateTime?
 	private LocalDateTime dateTime;
 	private ChronoUnit accuracy;
 	
@@ -233,25 +235,22 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		int year = Integer.parseInt(str.substring(0, 4));
 		if( str.length() == 4 ){ // specified to accuracy of years
 			return new DateTimeAccuracy(year);
-		}else if( str.length() < 7 ){
-			throw new ParseException("Expected YYYY-MM", str.length());
-		}else if( str.charAt(4) != '-' ){
-			throw new ParseException("Expected YYYY-MM", 4);
+		}else if( str.length() < 7 || str.charAt(4) != '-' ){
+			throw new ParseException("Expected YYYY-MM", Integer.min(4, str.length()));
 		}
-		// TODO replace IllegalArgumentException with ParseException!!
 		// parse month
 		int month = Integer.parseInt(str.substring(5, 7));
 		if( str.length() == 7 ){ // specified to accuracy of months
 			return new DateTimeAccuracy(year, month);
 		}else if( str.length() < 10 || str.charAt(7) != '-' ){
-			throw new IllegalArgumentException("Expected YYYY-MM-DD");
+			throw new ParseException("Expected YYYY-MM-DD", Integer.min(7, str.length()));
 		}
 		// parse day
 		int day = Integer.parseInt(str.substring(8, 10));
 		if( str.length() == 10 ){ // specified to accuracy of days
 			return new DateTimeAccuracy(year, month, day);
 		}else if( str.length() < 13 || str.charAt(10) != 'T' ){
-			throw new IllegalArgumentException("Expected yyyy-mm-ddThh");
+			throw new ParseException("Expected yyyy-mm-ddThh", Integer.min(10, str.length()));
 		}
 		
 		// parse hours
@@ -259,7 +258,7 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		if( str.length() == 13 ){ // specified to accuracy of hours
 			return new DateTimeAccuracy(year, month, day, hours);
 		}else if( str.length() < 16 || str.charAt(13) != ':' ){
-			throw new IllegalArgumentException("Expected yyyy-mm-ddThh:mm");
+			throw new ParseException("Expected yyyy-mm-ddThh:mm", Integer.min(13,  str.length()));
 		}
 		
 		// parse minutes
@@ -267,17 +266,32 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		if( str.length() == 16 ){ // specified to accuracy of minutes
 			return new DateTimeAccuracy(year, month, day, hours, mins);
 		}else if( str.length() < 19 || str.charAt(16) != ':' ){
-			throw new IllegalArgumentException("Expected yyyy-mm-ddThh:mm:ss");
+			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss", Integer.min(16,  str.length()));
 		}
 
 		// parse seconds
 		int secs = Integer.parseInt(str.substring(17, 19));
-		if( str.length() == 19 ){ // specified to accuracy of seconds
+		if( str.length() == 19 || (str.length() == 20 && str.charAt(19) == 'Z') ){ // specified to accuracy of seconds
 			return new DateTimeAccuracy(year, month, day, hours, mins, secs);
-		}else if( str.length() < 19 || str.charAt(16) != ':' ){
-			throw new IllegalArgumentException("Expected yyyy-mm-ddThh:mm:ss");
+		}else if( str.length() < 25 || !(str.charAt(19) != '+' || str.charAt(19) != '-') ){
+			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss[Z|+oo:oo]", 19);
+		}else if( str.length() != 25 || str.charAt(22) != ':' ){
+			// handles longer input and missing : in offset
+			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss[Z|+oo:oo]", 22);
+		}else{
+			DateTimeAccuracy me = new DateTimeAccuracy(year, month, day, hours, mins, secs);
+			// parse time zone
+			ZoneOffset of = ZoneOffset.ofHoursMinutes(
+					Integer.parseInt(str.substring(20, 22)),
+					Integer.parseInt(str.substring(24, 25))
+			);
+			// adjust to UTC
+			// TODO unit test for this behavior
+			me.dateTime = me.dateTime.atOffset(of).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+			return me;
 		}
-		throw new UnsupportedOperationException("Timezone support not implemented yet");
+		// unparsed data (longer input) will be handled above
+		//throw new ParseException("Unparsed data at index 26", 26);
 	}
 	
 	/**

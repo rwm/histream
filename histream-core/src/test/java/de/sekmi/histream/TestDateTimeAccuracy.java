@@ -1,5 +1,6 @@
 package de.sekmi.histream;
 
+import java.text.ParseException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -53,6 +54,19 @@ public class TestDateTimeAccuracy {
 		Assert.assertEquals(ChronoUnit.MINUTES,a.getAccuracy());
 	}
 
+	@Test
+	public void verifyIncompleteIsoDateException() throws ParseException{
+		try {
+			DateTimeAccuracy.parsePartialIso8601("2003-02-01T04:05:06+");
+			Assert.fail();
+		} catch (ParseException e) {
+		}
+		// TODO test more aspects of zone offset parsing
+		DateTimeAccuracy.parsePartialIso8601("2003-02-01T04:05:06Z");
+		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2003-02-01T04:05:06+01:00");
+		// make sure the date is adjusted to UTC
+		Assert.assertEquals(3, a.get(ChronoField.HOUR_OF_DAY));
+	}
 	@Test
 	public void verifyParseExceptionBehavior(){
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("u");
