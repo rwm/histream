@@ -1,6 +1,7 @@
 package de.sekmi.histream;
 
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.time.DateTimeException;
 
 /*
@@ -25,7 +26,10 @@ import java.time.DateTimeException;
 
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -154,8 +158,8 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * @param field field to add
 	 * @param digits digits to add
 	 */
-	private void appendWithZeroPrefix(StringBuilder builder, TemporalField field, int digits){
-		int v = dateTime.get(field);
+	private static void appendWithZeroPrefix(StringBuilder builder, TemporalAccessor date, TemporalField field, int digits){
+		int v = date.get(field);
 		int pow = 1;
 		for( int i=1; i<digits; i++ )pow *= 10;
 		while( v < pow && pow > 1 ){
@@ -168,21 +172,48 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * Convert the date to a partial ISO 8601 date time string.
 	 * Information up to {@link #getAccuracy()}} is used for the
 	 * string representation.
+	 * <p>
+	 * Output is the same as {@link #toPartialIso8601(ZoneId)} with {@code null} argument.
+	 * </p>
 	 * @return partial date.
 	 */
 	public String toPartialIso8601(){
+		return toPartialIso8601(null);
+	}
+	/**
+	 * Convert the date to a partial ISO 8601 date time string.
+	 * Information up to {@link #getAccuracy()}} is used for the
+	 * string representation.
+	 * @param tz time zone id. Can be {@code null} to omit the zone information
+	 * @return partial date.
+	 */
+	public String toPartialIso8601(ZoneId tz){
 		StringBuilder b = new StringBuilder(20);
 		if( dateTime == null )return "null";
 
+		TemporalAccessor dt;
+		if( tz != null ){
+			// use timezone information
+			dt = dateTime.atZone(tz);
+		}else{
+			// no zone info, output will not have offset
+			dt = dateTime;
+		}
 		
 		char[] prefixes = {0,'-','-','T',':',':'};
 		ChronoField[] fields = {ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE};
 		int[] digits = {4,2,2,2,2,2};
-		
-		for( int i=0; i<fields.length; i++ ){
+		int i;
+		for( i=0; i<fields.length; i++ ){
 			if( prefixes[i] != 0 )b.append(prefixes[i]);
-			appendWithZeroPrefix(b, fields[i], digits[i]);
+			appendWithZeroPrefix(b, dt, fields[i], digits[i]);
 			if( accuracy == fields[i].getBaseUnit() )break;
+		}
+		if( tz != null && i >= 3 ){
+			// hours present
+			// add zone offset
+			String of = ((ZonedDateTime)dt).getOffset().normalized().toString();
+			b.append(of);
 		}
 		
 		return b.toString();
@@ -257,7 +288,13 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * @return date time with accuracy
 	 */
 	public static DateTimeAccuracy parse(DateTimeFormatter formatter, CharSequence text){
-		TemporalAccessor a = formatter.parse(text);
+		ParsePosition pos = new ParsePosition(0);
+		TemporalAccessor a = formatter.parseUnresolved(text, pos);
+		if( pos.getErrorIndex() != -1 ){
+			throw new DateTimeParseException("Text '"+String.valueOf(text.charAt(pos.getErrorIndex()))+"' could not be parsed at index "+pos.getErrorIndex(), text, pos.getErrorIndex());
+		}else if( pos.getIndex() != text.length() ){
+			throw new DateTimeParseException("Unparsed text found at index "+pos.getIndex(), text, pos.getIndex());
+		}
 		int year = a.get(ChronoField.YEAR);
 		// month
 		int month;
