@@ -27,7 +27,6 @@ import java.time.Instant;
 
 
 import java.time.LocalDateTime;
-import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -39,7 +38,6 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -259,19 +257,37 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		return b.toString();
 	}
 
+	/**
+	 * Parses a partial ISO 8601 date time string.
+	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hhmm]
+	 * <p>
+	 * At least the year must be specified. All other fields can be left out.
+	 * If no zone offset is specified, UTC is assumed.
+	 * </p>
+	 * @param str ISO 8601 string
+	 *  If {@code null} is specified, no offset adjustments are done, with same result as UTC
+	 * @return date time with accuracy as derived from parse
+	 * @throws ParseException for unparsable string
+	 * @throws IllegalArgumentException unparsable string (old unchecked exception)
+	 */
+	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
+		return parsePartialIso8601(str, null);
+	}
 
 	/**
 	 * Parses a partial ISO 8601 date time string.
 	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hhmm]
 	 * <p>
 	 * At least the year must be specified. All other fields can be left out.
-	 *
+	 * </p>
 	 * @param str ISO 8601 string
+	 * @param localZone time zone to use for offset if no offset is specified. 
+	 *  If {@code null} is specified, no offset adjustments are done, with same result as UTC
 	 * @return date time with accuracy as derived from parse
 	 * @throws ParseException for unparsable string
 	 * @throws IllegalArgumentException unparsable string (old unchecked exception)
 	 */
-	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
+	public static DateTimeAccuracy parsePartialIso8601(String str, ZoneId localZone)throws ParseException{
 		ParsePosition pos = new ParsePosition(0);
 		TemporalAccessor a = PARTIAL_FORMATTER.parseUnresolved(str, pos);
 		// first check that everything was parsed
@@ -315,6 +331,9 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 			off = ZoneOffset.ofTotalSeconds(a.get(ChronoField.OFFSET_SECONDS));
 			// adjust to UTC
 			dateTime = dateTime.atOffset(off).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+		}else if( localZone != null ){
+			// use specified local zone
+			dateTime = dateTime.atZone(localZone).toOffsetDateTime().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
 		}
 		DateTimeAccuracy me = new DateTimeAccuracy(dateTime);
 		me.accuracy = accuracy;

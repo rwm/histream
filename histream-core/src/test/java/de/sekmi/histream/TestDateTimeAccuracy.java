@@ -14,6 +14,8 @@ import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
+
 public class TestDateTimeAccuracy {
 
 	@Test
@@ -152,6 +154,12 @@ public class TestDateTimeAccuracy {
 			Assert.fail("Exception expected for unparsed text at end of input");
 		}catch( DateTimeParseException e ){
 		}
+	}
+	@Test
+	public void verifyParsingWithLocalZone() throws ParseException{
+		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04", ZoneId.of("Asia/Shanghai"));
+		// date should be treated as if it had a +08:00 offset
+		assertEquals("2001-02-02T20Z", a.toPartialIso8601(ZoneId.of("UTC")));
 	}
 	// TODO: further tests
 }
