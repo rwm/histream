@@ -2,6 +2,7 @@ package de.sekmi.histream.export;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -35,6 +36,7 @@ public class TableExport {
 	private ExportErrorHandler errorHandler;
 	private int patientCount;
 	private int visitCount;
+	private ZoneId zoneId;
 	
 	public TableExport(ExportDescriptor desc){
 		this.desc = desc;
@@ -61,6 +63,13 @@ public class TableExport {
 		return xpath;
 	}
 
+	/**
+	 * Set the zone id to use for timestamps
+	 * @param zone
+	 */
+	public void setZoneId(ZoneId zoneId){
+		this.zoneId = zoneId;
+	}
 	/**
 	 * Make sure, that any intersection between groups are empty.
 	 * Overlapping group means concepts would get multiple classes
@@ -126,6 +135,7 @@ public class TableExport {
 		FragmentExporter fe = null;
 		try{
 			fe = new FragmentExporter(createXPath(), desc, writer);
+			fe.setZoneId(zoneId);
 			fe.setErrorHandler(new ExportErrorHandler());
 			Streams.transfer(supplier, fe);
 		} catch (XMLStreamException | ParserConfigurationException e) {

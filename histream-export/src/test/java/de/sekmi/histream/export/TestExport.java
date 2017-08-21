@@ -2,6 +2,7 @@ package de.sekmi.histream.export;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +36,9 @@ public class TestExport {
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
 		try( ObservationSupplier s = t.getExampleSupplier() ){
+			export.setZoneId(ZoneId.of("Asia/Shanghai"));
 			export.export(s, m);
+			export.setZoneId(null);
 		}
 		// verify class lookup
 		Assert.assertEquals("T:type:str", m.get(MemoryExportWriter.VISIT_TABLE, "byclass", 0));
