@@ -1,6 +1,7 @@
 package de.sekmi.histream.io;
 
 import java.io.OutputStream;
+import java.time.ZoneId;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -21,6 +22,7 @@ import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.GroupedObservationHandler;
 import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationImpl;
+import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
 
 /**
  * Writes observations to a single XML file. Observations must be grouped by patient and encounter.
@@ -36,6 +38,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 	private int formattingDepth;
 	private Meta meta;
 	private int observationCount;
+	private ZoneId zoneId;
 	
 	/**
 	 * Used to output XML
@@ -101,6 +104,18 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 		} catch (PropertyException e) {
 		}
 	}
+
+	/**
+	 * Set the timezone id for output of timestamp values.
+	 * @param timeZone zone id or {@code null} to omit zone offset information
+	 */
+	public void setZoneId(ZoneId timeZone){
+		this.zoneId = timeZone;
+		// modify marshaller to use the timezone for timestamps
+		DateTimeAccuracyAdapter a = new DateTimeAccuracyAdapter();
+		a.setZoneId(zoneId);
+		marshaller.setAdapter(DateTimeAccuracyAdapter.class, a);
+	}
 	
 	@Override
 	protected void beginStream() throws ObservationException{
@@ -162,14 +177,14 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			if( visit.getStartTime() != null ){
 				formatIndent();
 				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"start",NAMESPACE);
-				writer.writeCharacters(visit.getStartTime().toPartialIso8601());
+				writer.writeCharacters(visit.getStartTime().toPartialIso8601(zoneId));
 				writer.writeEndElement();
 				formatNewline();
 			}
 			if( visit.getEndTime() != null ){
 				formatIndent();
 				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"end",NAMESPACE);
-				writer.writeCharacters(visit.getEndTime().toPartialIso8601());
+				writer.writeCharacters(visit.getEndTime().toPartialIso8601(zoneId));
 				writer.writeEndElement();
 				formatNewline();
 			}
@@ -270,7 +285,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			if( patient.getBirthDate() != null ){
 				formatIndent();
 				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"birthdate",NAMESPACE);
-				writer.writeCharacters(patient.getBirthDate().toPartialIso8601());
+				writer.writeCharacters(patient.getBirthDate().toPartialIso8601(zoneId));
 				writer.writeEndElement();
 				formatNewline();
 			}
@@ -280,7 +295,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 				formatIndent();
 				writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,"deceased",NAMESPACE);
 				if( patient.getDeathDate() != null ){
-					writer.writeCharacters(patient.getDeathDate().toPartialIso8601());
+					writer.writeCharacters(patient.getDeathDate().toPartialIso8601(zoneId));
 				}
 				writer.writeEndElement();
 				formatNewline();

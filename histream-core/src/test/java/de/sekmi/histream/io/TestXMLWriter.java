@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
@@ -184,6 +185,18 @@ public class TestXMLWriter {
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
 		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
+		Meta.transfer(s, w);
+		Streams.transfer(s, w);
+		w.close();
+		s.close();
+	}
+	@Test
+	public void testTimestampsWithZoneOffset() throws Exception{
+		FileObservationProviderTest t = new FileObservationProviderTest();
+		t.initializeObservationFactory();
+		ObservationSupplier s = t.getExampleSupplier();
+		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
+		w.setZoneId(ZoneId.of("Asia/Shanghai"));
 		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		w.close();
