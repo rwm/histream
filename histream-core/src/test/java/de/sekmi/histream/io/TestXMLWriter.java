@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.impl.ExternalSourceImpl;
@@ -171,6 +172,7 @@ public class TestXMLWriter {
 		ObservationSupplier s = t.getExampleSupplier();
 		Document doc = createDocument();
 		GroupedXMLWriter w = new GroupedXMLWriter(new DOMResult(doc));
+		w.setZoneId(ZoneId.of("Asia/Shanghai"));
 		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		w.close();
@@ -178,6 +180,8 @@ public class TestXMLWriter {
 
 		doc.normalizeDocument();
 		XMLUtils.printDOM(doc, debugLog);
+		// read back DOM
+		
 	}
 	@Test
 	public void testWriteStream() throws Exception{
@@ -192,15 +196,42 @@ public class TestXMLWriter {
 	}
 	@Test
 	public void testTimestampsWithZoneOffset() throws Exception{
+		ZoneId zone = ZoneId.of("Asia/Shanghai");
 		FileObservationProviderTest t = new FileObservationProviderTest();
 		t.initializeObservationFactory();
 		ObservationSupplier s = t.getExampleSupplier();
-		GroupedXMLWriter w = new GroupedXMLWriter(debugLog);
-		w.setZoneId(ZoneId.of("Asia/Shanghai"));
-		Meta.transfer(s, w);
-		Streams.transfer(s, w);
-		w.close();
-		s.close();
+		Path temp = Files.createTempFile("eav", ".xml");
+		try( OutputStream out = Files.newOutputStream(temp) ){
+			GroupedXMLWriter w = new GroupedXMLWriter(out);
+			w.setZoneId(zone);
+			Meta.transfer(s, w);
+			Streams.transfer(s, w);
+			w.close();
+			s.close();
+		}
+		System.out.println("XML output written to "+temp);
+		// read back XML
+		try( InputStream in = Files.newInputStream(temp) ){
+			GroupedXMLReader reader = new GroupedXMLReader(t.getFactory(), in);
+			Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-09-07T18:40:03+0800"), reader.get().getStartTime());
+			reader.close();
+		}
+		// delete temp file
+		Files.delete(temp);
+		// read without zone
+		try( InputStream in = getClass().getResourceAsStream("/dwh.xml") ){
+			GroupedXMLReader reader = new GroupedXMLReader(t.getFactory(), in);
+			// local timestamps treated as UTC
+			Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-09-07T18:40:03+0800"), reader.get().getStartTime());
+			reader.close();
+		}
+		try( InputStream in = getClass().getResourceAsStream("/dwh.xml") ){
+			// local timestamps treated as CST
+			GroupedXMLReader reader = new GroupedXMLReader(t.getFactory(), in, zone);
+			Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-09-07T10:40:03+0800"), reader.get().getStartTime());
+			reader.close();
+		}
+
 	}
 
 	@Test

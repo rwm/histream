@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.ObservationImpl;
+import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
 
 /**
  * Read grouped observations from XML
@@ -61,32 +63,50 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	private DateTimeAccuracy encounterStart;
 	private DateTimeAccuracy encounterEnd;
 	private Map<String,String> visitData;
+	private ZoneId zoneId;
 
+	
+	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
+		this(factory, input, null);
+	}
 	/**
 	 * The provided {@code input} is not closed by a call to {@link #close()}
 	 * 
 	 * @param factory observation factory
 	 * @param input XML input
+	 * @param localZone zone to use for local timestamps
 	 * @throws JAXBException JAXB error
 	 * @throws XMLStreamException XML stream error
 	 * @throws FactoryConfigurationError other error
 	 */
-	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
-		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input));
+	public GroupedXMLReader(ObservationFactory factory, InputStream input, ZoneId localZone)throws JAXBException, XMLStreamException, FactoryConfigurationError{
+		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input), localZone);
+	}
+	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
+		this(factory,reader,null);
 	}
 	/**
 	 * Construct a reader with a {@link XMLStreamReader}. The {@code reader} is closed when {@link #close()} is called.
 	 * @param factory observation factory
 	 * @param reader xml reader
+	 * @param localZone zone to use for local timestamps
 	 * @throws JAXBException jaxb error
 	 * @throws XMLStreamException stream error
 	 */
-	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
+	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader, ZoneId localZone) throws JAXBException, XMLStreamException{
 		super();
 		this.factory = factory;
 		this.patientData = new HashMap<>();
 		this.visitData = new HashMap<>();
 		unmarshaller = JAXBContext.newInstance(ObservationImpl.class,Meta.class).createUnmarshaller();
+		this.zoneId = localZone;
+		if( zoneId != null ){
+			// modify marshaller to use the timezone for timestamps
+			DateTimeAccuracyAdapter a = new DateTimeAccuracyAdapter();
+			a.setZoneId(zoneId);
+			unmarshaller.setAdapter(DateTimeAccuracyAdapter.class, a);			
+		}
+		
 		// TODO: set schema
 		//unmarshaller.setSchema(schema);
 		this.reader = reader;
@@ -103,7 +123,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		readPatient();
 		readEncounter();
 	}
-	
+
 	private void readToRoot() throws XMLStreamException{
 		while( reader.hasNext() ){
 			reader.next();
@@ -155,7 +175,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( patientData.containsKey("birthdate") ){
 			String dob = patientData.get("birthdate");
 			try {
-				currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(dob));
+				currentPatient.setBirthDate(DateTimeAccuracy.parsePartialIso8601(dob, zoneId));
 			} catch (ParseException e) {
 				throw new XMLStreamException("Unable to parse birthdate: "+dob, reader.getLocation(), e);
 			}
@@ -167,7 +187,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 			// will be empty string for <deceased/>
 			if( date != null && date.length() != 0 ){
 				try {
-					currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date));
+					currentPatient.setDeathDate(DateTimeAccuracy.parsePartialIso8601(date, zoneId));
 				} catch (ParseException e) {
 					throw new XMLStreamException("Unable to parse deceased date: "+date, reader.getLocation(), e);
 				}
@@ -238,7 +258,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( visitData.containsKey("start") ){
 			String date = visitData.get("start");
 			try {
-				encounterStart = DateTimeAccuracy.parsePartialIso8601(date);
+				encounterStart = DateTimeAccuracy.parsePartialIso8601(date, zoneId);
 			} catch (ParseException e) {
 				throw new XMLStreamException("Unable to parse encounter/start: "+date, reader.getLocation(), e);
 			}
@@ -248,7 +268,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 		if( visitData.containsKey("end") ){
 			String date = visitData.get("end");
 			try {
-				encounterEnd = DateTimeAccuracy.parsePartialIso8601(date);
+				encounterEnd = DateTimeAccuracy.parsePartialIso8601(date, zoneId);
 			} catch (ParseException e) {
 				throw new XMLStreamException("Unable to parse encounter/end: "+date, reader.getLocation(), e);
 			}

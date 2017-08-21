@@ -31,8 +31,8 @@ public class DateTimeAccuracyAdapter extends XmlAdapter<String, DateTimeAccuracy
 	public DateTimeAccuracy unmarshal(String v) throws ParseException {
 		if( v == null )return null;
 		// parsing will support any zone offset
-		// TODO if zone is missing, assume specified zone
-		return DateTimeAccuracy.parsePartialIso8601(v);
+		// if zone is missing, assume specified zone
+		return DateTimeAccuracy.parsePartialIso8601(v, zoneId);
 	}
 
 	@Override
