@@ -159,7 +159,7 @@ public class I2b2Extractor implements ObservationSupplier {
 		}
 	
 		
-		Observation o = factory.getObservationFactory().createObservation(patientId, row.cid, new DateTimeAccuracy(row.start.toLocalDateTime()));
+		Observation o = factory.getObservationFactory().createObservation(patientId, row.cid, new DateTimeAccuracy(row.start.toInstant()));
 		if( patient != null ){
 			o.setExtension(Patient.class, patient);
 		}
@@ -180,7 +180,7 @@ public class I2b2Extractor implements ObservationSupplier {
 
 		
 		if( row.end != null ){
-			o.setEndTime(new DateTimeAccuracy(row.end.toLocalDateTime()));
+			o.setEndTime(new DateTimeAccuracy(row.end.toInstant()));
 		}
 		o.setValue(createValue(row));
 		if( row.lid != null ){

@@ -57,48 +57,40 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	static final DateTimeFormatter PARTIAL_FORMATTER  = DateTimeFormatter.ofPattern(PARTIAL_FORMATTER_PATTERN);
 
 	// TODO why not use instant, since we always calculate UTC? or Offset/ZonedDateTime?
-	private LocalDateTime dateTime;
+	private Instant instant;
 	private ChronoUnit accuracy;
 	
 	/**
 	 * Create date time with accuracy to seconds.
 	 * @param dateTime timestamp
 	 */
-	public DateTimeAccuracy(LocalDateTime dateTime){
-		this.dateTime = dateTime;
+	public DateTimeAccuracy(Instant instant){
+		this.instant = instant;
 		this.accuracy = ChronoUnit.SECONDS;
 	}
 	public DateTimeAccuracy(int year) {
-		dateTime = LocalDateTime.of(year, 1, 1, 0, 0);
+		instant = LocalDateTime.of(year, 1, 1, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.YEARS;
-		// truncation works only up to days
-		dateTime.truncatedTo(ChronoUnit.DAYS);
 	}
 	public DateTimeAccuracy(int year, int month) {
-		dateTime = LocalDateTime.of(year, month, 1, 0, 0);
+		instant = LocalDateTime.of(year, month, 1, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.MONTHS;
-		// truncation works only up to days
-		dateTime.truncatedTo(ChronoUnit.DAYS);
 	}
 	public DateTimeAccuracy(int year, int month, int day) {
-		dateTime = LocalDateTime.of(year, month, day, 0, 0);
+		instant = LocalDateTime.of(year, month, day, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.DAYS;
-		dateTime.truncatedTo(accuracy);
 	}
 	public DateTimeAccuracy(int year, int month, int day, int hours) {
-		dateTime = LocalDateTime.of(year, month, day, hours, 0);
+		instant = LocalDateTime.of(year, month, day, hours, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.HOURS;
-		dateTime.truncatedTo(accuracy);
 	}
 	public DateTimeAccuracy(int year, int month, int day, int hours, int mins) {
-		dateTime = LocalDateTime.of(year, month, day, hours, mins);
+		instant = LocalDateTime.of(year, month, day, hours, mins).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.MINUTES;
-		dateTime.truncatedTo(accuracy);
 	}
 	public DateTimeAccuracy(int year, int month, int day, int hours, int mins, int secs) {
-		dateTime = LocalDateTime.of(year, month, day, hours, mins, secs);
+		instant = LocalDateTime.of(year, month, day, hours, mins, secs).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.SECONDS;
-		dateTime.truncatedTo(accuracy);
 	}
 	
 	/**
@@ -108,23 +100,24 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * @return minimum instant within the given accuracy
 	 */
 	public Instant toInstantMin(){
-		return dateTime.toInstant(ZoneOffset.UTC);
+		return instant;
 	}
 	// TODO toInstantMax() (increase field at accuracy and subtract one millisecond)
 	
-	// Temporal interface behaves like underlaying dateTime
+	// Temporal interface behaves like underlaying instant
+	// TODO verify that these methods make sense with given accuracy
 	@Override
-	public long getLong(TemporalField arg0) {return dateTime.getLong(arg0);}
+	public long getLong(TemporalField arg0) {return instant.getLong(arg0);}
 	@Override
-	public boolean isSupported(TemporalField arg0) {return dateTime.isSupported(arg0);}
+	public boolean isSupported(TemporalField arg0) {return instant.isSupported(arg0);}
 	@Override
-	public boolean isSupported(TemporalUnit unit) {return dateTime.isSupported(unit);}
+	public boolean isSupported(TemporalUnit unit) {return instant.isSupported(unit);}
 	@Override
-	public Temporal plus(long amountToAdd, TemporalUnit unit) {return dateTime.plus(amountToAdd,unit);}
+	public Temporal plus(long amountToAdd, TemporalUnit unit) {return instant.plus(amountToAdd,unit);}
 	@Override
-	public long until(Temporal endExclusive, TemporalUnit unit) {return dateTime.until(endExclusive, unit);}
+	public long until(Temporal endExclusive, TemporalUnit unit) {return instant.until(endExclusive, unit);}
 	@Override
-	public Temporal with(TemporalField field, long newValue) {return dateTime.with(field,newValue);}
+	public Temporal with(TemporalField field, long newValue) {return instant.with(field,newValue);}
 
 	/**
 	 * Get the accuracy for the date time object.
@@ -156,11 +149,10 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * Get the local time
 	 * @return local time
 	 */
-	public LocalDateTime getLocal(){ return dateTime; }
+	//public LocalDateTime getLocal(){ return instant.at; }
 	
 	public void set(Date timestamp, ChronoUnit accuracy){
-		dateTime = LocalDateTime.from(timestamp.toInstant());
-		dateTime.truncatedTo(accuracy);
+		instant = timestamp.toInstant();
 		this.accuracy = accuracy;
 	}
 	
@@ -208,16 +200,16 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 */
 	public String toPartialIso8601(ZoneId tz){
 		StringBuilder b = new StringBuilder(20);
-		if( dateTime == null )return "null";
+		if( instant == null )return "null";
 
 		TemporalAccessor dt;
 		if( tz != null ){
 			// use timezone information.
 			// Assume that dateTime is given in UTC. For output convert to destination timezone.
-			dt = dateTime.atOffset(ZoneOffset.UTC).atZoneSameInstant(tz);
+			dt = instant.atOffset(ZoneOffset.UTC).atZoneSameInstant(tz);
 		}else{
 			// no zone info, output will not have offset
-			dt = dateTime;
+			dt = instant.atOffset(ZoneOffset.UTC).toLocalDateTime();
 		}
 		
 		char[] prefixes = {0,'-','-','T',':',':'};
@@ -327,15 +319,22 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		}
 		// check for zone offset
 		ZoneOffset off = null;
+		Instant inst;
 		if( a.isSupported(ChronoField.OFFSET_SECONDS) ){
 			off = ZoneOffset.ofTotalSeconds(a.get(ChronoField.OFFSET_SECONDS));
 			// adjust to UTC
-			dateTime = dateTime.atOffset(off).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+			//inst = dateTime.atOffset(off).withOffsetSameInstant(ZoneOffset.UTC).toInstant();
+			inst = dateTime.atOffset(off).toInstant();
 		}else if( localZone != null ){
 			// use specified local zone
-			dateTime = dateTime.atZone(localZone).toOffsetDateTime().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+			//dateTime = dateTime.atZone(localZone).toOffsetDateTime().withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+			inst = dateTime.atZone(localZone).toInstant();
+		}else{
+			// no zone in input and no default zone
+			// treat as UTC
+			inst = dateTime.atOffset(ZoneOffset.UTC).toInstant();
 		}
-		DateTimeAccuracy me = new DateTimeAccuracy(dateTime);
+		DateTimeAccuracy me = new DateTimeAccuracy(inst);
 		me.accuracy = accuracy;
 		return me;
 	}
@@ -397,7 +396,7 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	}
 	@Override
 	public int compareTo(DateTimeAccuracy o) {
-		return dateTime.compareTo(o.dateTime);
+		return instant.compareTo(o.instant);
 	}
 	
 	@Override
@@ -405,7 +404,7 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		final int prime = 37;
 		int result = 1;
 		result = prime * result + ((accuracy == null) ? 0 : accuracy.hashCode());
-		result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+		result = prime * result + ((instant == null) ? 0 : instant.hashCode());
 		return result;
 	}
 	@Override
@@ -414,7 +413,7 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		if( other.getClass() != DateTimeAccuracy.class )return false;
 		DateTimeAccuracy o = (DateTimeAccuracy)other;
 		if( !o.accuracy.equals(this.accuracy) )return false;
-		return dateTime.equals(o.dateTime);
+		return instant.equals(o.instant);
 	}
 
 }

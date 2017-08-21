@@ -1,6 +1,7 @@
 package de.sekmi.histream.impl;
 
 import java.text.ParseException;
+import java.time.ZoneOffset;
 
 /*
  * #%L
@@ -36,9 +37,9 @@ public class TestDateTimeAccuracy {
 
 	static ChronoField[] fields = {ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
 
-	private void assertFieldValues(Temporal temporal, int[] values){
+	private void assertFieldValues(DateTimeAccuracy a, int[] values){
 		for( int i=0; i<values.length; i++ ){
-			Assert.assertEquals(values[i], temporal.get(fields[i]));
+			Assert.assertEquals(values[i], a.toInstantMin().atOffset(ZoneOffset.UTC).get(fields[i]));
 		}
 	}
 	@Test

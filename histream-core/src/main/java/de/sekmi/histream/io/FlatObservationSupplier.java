@@ -28,8 +28,6 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -242,7 +240,7 @@ public class FlatObservationSupplier extends AbstractObservationParser implement
 	}
 	
 	private DateTimeAccuracy getSourceDateTime(){
-		return new DateTimeAccuracy(LocalDateTime.ofInstant(sourceTimestamp, ZoneId.systemDefault()));
+		return new DateTimeAccuracy(sourceTimestamp);
 	}
 	private void lazyCreatePatient(String patientId){
 		if( currentPatient == null || !currentPatient.getId().equals(patientId) ){

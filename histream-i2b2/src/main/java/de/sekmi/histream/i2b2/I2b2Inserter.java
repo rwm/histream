@@ -273,7 +273,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.setString(4, dialect.encodeProviderId(o.getProviderId()));
 		// start_date
 		Objects.requireNonNull(o.getStartTime());
-		insertFact.setTimestamp(5, Timestamp.valueOf(o.getStartTime().getLocal()));
+		insertFact.setTimestamp(5, Timestamp.from(o.getStartTime().toInstantMin()));
 		
 		insertFact.setString(6, (m==null)?dialect.getNullModifierCd():m.getConceptId());
 		insertFact.setInt(7, instanceNum);
@@ -324,7 +324,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		if( o.getEndTime() == null ){
 			insertFact.setTimestamp(13, null);
 		}else{
-			insertFact.setTimestamp(13, Timestamp.valueOf(o.getEndTime().getLocal()));
+			insertFact.setTimestamp(13, Timestamp.from(o.getEndTime().toInstantMin()));
 		}
 		// location_cd
 		insertFact.setString(14, dialect.encodeLocationCd(o.getLocationId()));

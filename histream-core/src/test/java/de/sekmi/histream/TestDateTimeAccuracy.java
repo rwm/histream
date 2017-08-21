@@ -2,6 +2,7 @@ package de.sekmi.histream;
 
 import java.text.ParseException;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
@@ -24,8 +25,9 @@ public class TestDateTimeAccuracy {
 		String text = "02.2003";
 		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, text);
 		Assert.assertEquals(ChronoUnit.MONTHS,a.getAccuracy());
-		Assert.assertEquals(2, a.get(ChronoField.MONTH_OF_YEAR));
-		Assert.assertEquals(2003, a.get(ChronoField.YEAR));
+		TemporalAccessor ac = a.toInstantMin().atOffset(ZoneOffset.UTC);
+		Assert.assertEquals(2, ac.get(ChronoField.MONTH_OF_YEAR));
+		Assert.assertEquals(2003, ac.get(ChronoField.YEAR));
 	}
 	
 	@Test
@@ -122,7 +124,8 @@ public class TestDateTimeAccuracy {
 		DateTimeAccuracy.parsePartialIso8601("2003-02-01T04:05:06Z");
 		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2003-02-01T04:05:06+0100");
 		// make sure the date is adjusted to UTC
-		Assert.assertEquals(3, a.get(ChronoField.HOUR_OF_DAY));
+		TemporalAccessor ac = a.toInstantMin().atOffset(ZoneOffset.UTC);
+		Assert.assertEquals(3, ac.get(ChronoField.HOUR_OF_DAY));
 	}
 	@Test
 	public void verifyParseExceptionBehavior(){

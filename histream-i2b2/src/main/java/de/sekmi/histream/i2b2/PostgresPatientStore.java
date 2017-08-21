@@ -428,12 +428,12 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		// birth date
 		Timestamp ts = rs.getTimestamp(3);
 		if( ts != null ){
-			birthDate = new DateTimeAccuracy(ts.toLocalDateTime());
+			birthDate = new DateTimeAccuracy(ts.toInstant());
 		}
 		// death date
 		ts = rs.getTimestamp(4);
 		if( ts != null ){
-			deathDate = new DateTimeAccuracy(ts.toLocalDateTime());
+			deathDate = new DateTimeAccuracy(ts.toInstant());
 		}
 		
 		// load sex

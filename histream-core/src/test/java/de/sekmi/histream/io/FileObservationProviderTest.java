@@ -24,6 +24,7 @@ package de.sekmi.histream.io;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -77,7 +78,7 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:secs", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.SECONDS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(3, o.getStartTime().getLong(ChronoField.SECOND_OF_MINUTE));
+				Assert.assertEquals(3, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.SECOND_OF_MINUTE));
 				Patient p = o.getExtension(Patient.class);
 				Assert.assertNotNull("Patient extension required", p);
 				Assert.assertEquals("XX12345", p.getId());
@@ -113,27 +114,27 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:mins", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.MINUTES, o.getStartTime().getAccuracy());
-				Assert.assertEquals(40, o.getStartTime().getLong(ChronoField.MINUTE_OF_HOUR));
+				Assert.assertEquals(40, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MINUTE_OF_HOUR));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:hours", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.HOURS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(10, o.getStartTime().getLong(ChronoField.HOUR_OF_DAY));
+				Assert.assertEquals(10, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.HOUR_OF_DAY));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:day", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.DAYS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(7, o.getStartTime().getLong(ChronoField.DAY_OF_MONTH));
+				Assert.assertEquals(7, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.DAY_OF_MONTH));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:month", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.MONTHS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(9, o.getStartTime().getLong(ChronoField.MONTH_OF_YEAR));
+				Assert.assertEquals(9, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MONTH_OF_YEAR));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:year", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.YEARS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(2014, o.getStartTime().getLong(ChronoField.YEAR));
+				Assert.assertEquals(2014, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.YEAR));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:type:str", o.getConceptId());
@@ -158,10 +159,10 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("mm", o.getValue().getUnits());
 				
 				Assert.assertEquals(ChronoUnit.YEARS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(2010, o.getStartTime().getLong(ChronoField.YEAR));
+				Assert.assertEquals(2010, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.YEAR));
 
 				Assert.assertEquals(ChronoUnit.YEARS, o.getEndTime().getAccuracy());
-				Assert.assertEquals(2011, o.getEndTime().getLong(ChronoField.YEAR));
+				Assert.assertEquals(2011, o.getEndTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.YEAR));
 
 				Assert.assertEquals("T:LOC", o.getLocationId());
 				// TODO test provider, flag

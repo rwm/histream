@@ -94,7 +94,7 @@ public abstract class PostgresExtension<T> implements Extension<T> {
 
 	public static Timestamp inaccurateSqlTimestamp(DateTimeAccuracy dateTime){
 		if( dateTime == null )return null;
-		else return Timestamp.valueOf(dateTime.getLocal());
+		else return Timestamp.from(dateTime.toInstantMin());
 	}
 	
 

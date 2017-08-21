@@ -378,12 +378,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		// birth date
 		Timestamp ts = rs.getTimestamp(4);
 		if( ts != null ){
-			startDate = new DateTimeAccuracy(ts.toLocalDateTime());
+			startDate = new DateTimeAccuracy(ts.toInstant());
 		}
 		// death date
 		ts = rs.getTimestamp(5);
 		if( ts != null ){
-			endDate = new DateTimeAccuracy(ts.toLocalDateTime());
+			endDate = new DateTimeAccuracy(ts.toInstant());
 		}
 		
 		// load sex
