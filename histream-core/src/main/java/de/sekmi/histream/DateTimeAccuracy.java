@@ -3,6 +3,7 @@ package de.sekmi.histream;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.DateTimeException;
+import java.time.Instant;
 
 /*
  * #%L
@@ -26,6 +27,7 @@ import java.time.DateTimeException;
 
 
 import java.time.LocalDateTime;
+import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -37,6 +39,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -47,11 +50,14 @@ import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
 /**
  * Local date and time with specified accuracy. Maximum resolution is seconds.
  * For supported accuracy, see {@link #setAccuracy(ChronoUnit)}.
- * @author Raphael
+ * @author R.W.Majeed
  *
  */
 @XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
 public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> {
+	static final String PARTIAL_FORMATTER_PATTERN = "u[-M[-d['T'H[:m[:s[.S]]][X]]]]";
+	static final DateTimeFormatter PARTIAL_FORMATTER  = DateTimeFormatter.ofPattern(PARTIAL_FORMATTER_PATTERN);
+
 	// TODO why not use instant, since we always calculate UTC? or Offset/ZonedDateTime?
 	private LocalDateTime dateTime;
 	private ChronoUnit accuracy;
@@ -97,7 +103,18 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		dateTime.truncatedTo(accuracy);
 	}
 	
-	// Temporal interface behaves like undelaying dateTime
+	/**
+	 * Convert the partial date time to an instant.
+	 * Will return the minimum instant for the given accuracy.
+	 * E.g. accuracy of YEAR will return the the first second in the given year.
+	 * @return minimum instant within the given accuracy
+	 */
+	public Instant toInstantMin(){
+		return dateTime.toInstant(ZoneOffset.UTC);
+	}
+	// TODO toInstantMax() (increase field at accuracy and subtract one millisecond)
+	
+	// Temporal interface behaves like underlaying dateTime
 	@Override
 	public long getLong(TemporalField arg0) {return dateTime.getLong(arg0);}
 	@Override
@@ -161,14 +178,16 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	 * @param digits digits to add
 	 */
 	private static void appendWithZeroPrefix(StringBuilder builder, TemporalAccessor date, TemporalField field, int digits){
-		int v = date.get(field);
+		padZeros(builder,date.get(field), digits);
+	}
+	private static void padZeros(StringBuilder builder, int value, int digits){
 		int pow = 1;
 		for( int i=1; i<digits; i++ )pow *= 10;
-		while( v < pow && pow > 1 ){
+		while( value < pow && pow > 1 ){
 			builder.append('0');
 			pow /= 10;
 		}
-		builder.append(v);
+		builder.append(value);		
 	}
 	/**
 	 * Convert the date to a partial ISO 8601 date time string.
@@ -195,8 +214,9 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 
 		TemporalAccessor dt;
 		if( tz != null ){
-			// use timezone information
-			dt = dateTime.atZone(tz);
+			// use timezone information.
+			// Assume that dateTime is given in UTC. For output convert to destination timezone.
+			dt = dateTime.atOffset(ZoneOffset.UTC).atZoneSameInstant(tz);
 		}else{
 			// no zone info, output will not have offset
 			dt = dateTime;
@@ -214,84 +234,91 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 		if( tz != null && i >= 3 ){
 			// hours present
 			// add zone offset
-			String of = ((ZonedDateTime)dt).getOffset().normalized().toString();
-			b.append(of);
+			int os = ((ZonedDateTime)dt).getOffset().getTotalSeconds();
+			if( os == 0 ){
+				// output Z
+				b.append('Z');
+			}else{
+				// append sign and four characters
+				if( os < 0 ){
+					b.append('-');
+				}else{
+					b.append('+');
+				}
+				// hours
+				int ox = os / 3600;
+				os = os % 3600;
+				padZeros(b,ox,2);
+				// minutes
+				ox = os / 60;
+				padZeros(b,ox,2);
+				// ignore seconds, not part of ISO
+			}
 		}
 		
 		return b.toString();
 	}
-	
+
+
 	/**
 	 * Parses a partial ISO 8601 date time string.
-	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]
+	 * [-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hhmm]
+	 * <p>
+	 * At least the year must be specified. All other fields can be left out.
+	 *
 	 * @param str ISO 8601 string
 	 * @return date time with accuracy as derived from parse
 	 * @throws ParseException for unparsable string
 	 * @throws IllegalArgumentException unparsable string (old unchecked exception)
 	 */
 	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
-		if( str.length() < 4 )throw new ParseException("Need at least 4 characters for year: "+str, str.length());
-		// parse year
-		int year = Integer.parseInt(str.substring(0, 4));
-		if( str.length() == 4 ){ // specified to accuracy of years
-			return new DateTimeAccuracy(year);
-		}else if( str.length() < 7 || str.charAt(4) != '-' ){
-			throw new ParseException("Expected YYYY-MM", Integer.min(4, str.length()));
+		ParsePosition pos = new ParsePosition(0);
+		TemporalAccessor a = PARTIAL_FORMATTER.parseUnresolved(str, pos);
+		// first check that everything was parsed
+		if( pos.getErrorIndex() != -1 ){
+			throw new ParseException("Parse error at position "+pos.getErrorIndex(), pos.getErrorIndex());
+		}else if( pos.getIndex() != str.length() ){
+			throw new ParseException("Unparsed text found at index "+pos.getIndex()+": "+str.substring(pos.getIndex()), pos.getIndex());
 		}
-		// parse month
-		int month = Integer.parseInt(str.substring(5, 7));
-		if( str.length() == 7 ){ // specified to accuracy of months
-			return new DateTimeAccuracy(year, month);
-		}else if( str.length() < 10 || str.charAt(7) != '-' ){
-			throw new ParseException("Expected YYYY-MM-DD", Integer.min(7, str.length()));
-		}
-		// parse day
-		int day = Integer.parseInt(str.substring(8, 10));
-		if( str.length() == 10 ){ // specified to accuracy of days
-			return new DateTimeAccuracy(year, month, day);
-		}else if( str.length() < 13 || str.charAt(10) != 'T' ){
-			throw new ParseException("Expected yyyy-mm-ddThh", Integer.min(10, str.length()));
-		}
-		
-		// parse hours
-		int hours = Integer.parseInt(str.substring(11, 13));
-		if( str.length() == 13 ){ // specified to accuracy of hours
-			return new DateTimeAccuracy(year, month, day, hours);
-		}else if( str.length() < 16 || str.charAt(13) != ':' ){
-			throw new ParseException("Expected yyyy-mm-ddThh:mm", Integer.min(13,  str.length()));
-		}
-		
-		// parse minutes
-		int mins = Integer.parseInt(str.substring(14, 16));
-		if( str.length() == 16 ){ // specified to accuracy of minutes
-			return new DateTimeAccuracy(year, month, day, hours, mins);
-		}else if( str.length() < 19 || str.charAt(16) != ':' ){
-			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss", Integer.min(16,  str.length()));
-		}
-
-		// parse seconds
-		int secs = Integer.parseInt(str.substring(17, 19));
-		if( str.length() == 19 || (str.length() == 20 && str.charAt(19) == 'Z') ){ // specified to accuracy of seconds
-			return new DateTimeAccuracy(year, month, day, hours, mins, secs);
-		}else if( str.length() < 25 || !(str.charAt(19) != '+' || str.charAt(19) != '-') ){
-			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss[Z|+oo:oo]", 19);
-		}else if( str.length() != 25 || str.charAt(22) != ':' ){
-			// handles longer input and missing : in offset
-			throw new ParseException("Expected yyyy-mm-ddThh:mm:ss[Z|+oo:oo]", 22);
+		// everything parsed without error
+		// now check for accuracy
+		ChronoUnit accuracy;
+		LocalDateTime dateTime;
+		if( a.isSupported(ChronoField.NANO_OF_SECOND) ){
+			// maximum accuracy of nanoseconds
+			// not supported yet, truncate to seconds
+			accuracy = ChronoUnit.NANOS;
+			dateTime = LocalDateTime.from(a);
+		}else if( a.isSupported(ChronoField.SECOND_OF_MINUTE) ){
+			accuracy = ChronoUnit.SECONDS;
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), a.get(ChronoField.HOUR_OF_DAY), a.get(ChronoField.MINUTE_OF_HOUR), a.get(ChronoField.SECOND_OF_MINUTE));
+		}else if( a.isSupported(ChronoField.MINUTE_OF_HOUR) ){
+			accuracy = ChronoUnit.MINUTES;
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), a.get(ChronoField.HOUR_OF_DAY), a.get(ChronoField.MINUTE_OF_HOUR));
+		}else if( a.isSupported(ChronoField.HOUR_OF_DAY) ){
+			accuracy = ChronoUnit.HOURS;
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), a.get(ChronoField.HOUR_OF_DAY), 0);
+		}else if( a.isSupported(ChronoField.DAY_OF_MONTH) ){
+			accuracy = ChronoUnit.DAYS;
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), 0, 0);
+		}else if( a.isSupported(ChronoField.MONTH_OF_YEAR) ){
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), 1, 0, 0);
+			accuracy = ChronoUnit.MONTHS;
 		}else{
-			DateTimeAccuracy me = new DateTimeAccuracy(year, month, day, hours, mins, secs);
-			// parse time zone
-			ZoneOffset of = ZoneOffset.ofHoursMinutes(
-					Integer.parseInt(str.substring(20, 22)),
-					Integer.parseInt(str.substring(24, 25))
-			);
-			// adjust to UTC
-			// TODO unit test for this behavior
-			me.dateTime = me.dateTime.atOffset(of).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-			return me;
+			// format requires at least year
+			accuracy = ChronoUnit.YEARS;
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), 1, 1, 0, 0);
 		}
-		// unparsed data (longer input) will be handled above
-		//throw new ParseException("Unparsed data at index 26", 26);
+		// check for zone offset
+		ZoneOffset off = null;
+		if( a.isSupported(ChronoField.OFFSET_SECONDS) ){
+			off = ZoneOffset.ofTotalSeconds(a.get(ChronoField.OFFSET_SECONDS));
+			// adjust to UTC
+			dateTime = dateTime.atOffset(off).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+		}
+		DateTimeAccuracy me = new DateTimeAccuracy(dateTime);
+		me.accuracy = accuracy;
+		return me;
 	}
 	
 	/**
