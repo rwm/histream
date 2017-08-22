@@ -34,10 +34,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
 import java.util.Date;
 import java.util.Objects;
 
@@ -52,7 +50,7 @@ import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
  *
  */
 @XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
-public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> {
+public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	static final String PARTIAL_FORMATTER_PATTERN = "u[-M[-d['T'H[:m[:s[.S]]][X]]]]";
 	static final DateTimeFormatter PARTIAL_FORMATTER  = DateTimeFormatter.ofPattern(PARTIAL_FORMATTER_PATTERN);
 
@@ -104,21 +102,6 @@ public class DateTimeAccuracy implements Temporal, Comparable<DateTimeAccuracy> 
 	}
 	// TODO toInstantMax() (increase field at accuracy and subtract one millisecond)
 	
-	// Temporal interface behaves like underlaying instant
-	// TODO verify that these methods make sense with given accuracy
-	@Override
-	public long getLong(TemporalField arg0) {return instant.getLong(arg0);}
-	@Override
-	public boolean isSupported(TemporalField arg0) {return instant.isSupported(arg0);}
-	@Override
-	public boolean isSupported(TemporalUnit unit) {return instant.isSupported(unit);}
-	@Override
-	public Temporal plus(long amountToAdd, TemporalUnit unit) {return instant.plus(amountToAdd,unit);}
-	@Override
-	public long until(Temporal endExclusive, TemporalUnit unit) {return instant.until(endExclusive, unit);}
-	@Override
-	public Temporal with(TemporalField field, long newValue) {return instant.with(field,newValue);}
-
 	/**
 	 * Get the accuracy for the date time object.
 	 * <p>
