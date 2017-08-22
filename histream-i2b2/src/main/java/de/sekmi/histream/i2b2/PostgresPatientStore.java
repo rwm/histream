@@ -29,7 +29,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -104,6 +103,8 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private PreparedStatement selectAllIde;
 	private PreparedStatement deletePatientSource;
 	private PreparedStatement deleteMapSource;
+
+	private DataDialect dialect;
 	
 //	/**
 //	 * Construct new postgres patient store. In addition to properties
@@ -149,12 +150,12 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		this.idSourceDefault = "HIVE";
 		this.idSourceSeparator = ':';
 		this.fetchSize = 1000;
-		// TODO add methods to change the configuration
 		
 	}
-	public void open(Connection connection, String projectId) throws SQLException{
+	public void open(Connection connection, String projectId, DataDialect dialect) throws SQLException{
 		this.db = connection;
 		this.projectId = projectId;
+		this.dialect = dialect;
 		// require project id
 		Objects.requireNonNull(this.projectId, "non-null projectId required");
 //		this.autoInsertSourceId = "HS.auto";
@@ -364,11 +365,11 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private void updateStorage(I2b2Patient patient) throws SQLException {
 		synchronized( update ){
 			update.setString(1, patient.getVitalStatusCd());
-			update.setTimestamp(2, inaccurateSqlTimestamp(patient.getBirthDate()));
-			update.setTimestamp(3, inaccurateSqlTimestamp(patient.getDeathDate()));
+			update.setTimestamp(2, dialect.encodeInstantPartial(patient.getBirthDate()));
+			update.setTimestamp(3, dialect.encodeInstantPartial(patient.getDeathDate()));
 			update.setString(4, getSexCd(patient));
 			if( patient.getSourceTimestamp() != null ){
-				update.setTimestamp(5, Timestamp.from(patient.getSourceTimestamp()));
+				update.setTimestamp(5, dialect.encodeInstant(patient.getSourceTimestamp()));
 			}else{
 				update.setTimestamp(5, null);
 			}
@@ -423,19 +424,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		// make sure that non-null vital code contains at least one character
 		if( vital_cd == null || vital_cd.length() == 0 )vital_cd = null;
 		
-		DateTimeAccuracy birthDate = null;
-		DateTimeAccuracy deathDate = null;
 		// birth date
-		Timestamp ts = rs.getTimestamp(3);
-		if( ts != null ){
-			birthDate = new DateTimeAccuracy(ts.toInstant());
-		}
-		// death date
-		ts = rs.getTimestamp(4);
-		if( ts != null ){
-			deathDate = new DateTimeAccuracy(ts.toInstant());
-		}
-		
+		DateTimeAccuracy birthDate = dialect.decodeInstantPartial(rs.getTimestamp(3));
+		DateTimeAccuracy deathDate = dialect.decodeInstantPartial(rs.getTimestamp(4));
+;		
 		// load sex
 		String sex_cd = rs.getString(5);
 		Sex sex = null;
@@ -456,9 +448,9 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		}
 		
 		I2b2Patient patient = new I2b2Patient(id, sex, birthDate, deathDate);
-		if( rs.getTimestamp(6) != null )
-			patient.setSourceTimestamp(rs.getTimestamp(6).toInstant());
-		
+		if( rs.getTimestamp(6) != null ){
+			patient.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(6)));
+		}
 		patient.setSourceId(rs.getString(7));
 		
 		patient.setVitalStatusCd(vital_cd);
@@ -504,7 +496,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		insertIde.setString(2, ids[0]);
 		insertIde.setInt(3, patient_num);
 		insertIde.setString(4, status);
-		insertIde.setTimestamp(5, Timestamp.from(source.getSourceTimestamp()));
+		insertIde.setTimestamp(5, dialect.encodeInstant(source.getSourceTimestamp()));
 		insertIde.setString(6, source.getSourceId());
 		insertIde.executeUpdate();
 	}

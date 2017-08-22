@@ -32,7 +32,7 @@ public class TestPostgresPatientStore implements Closeable {
 	
 	public void open(String  host, int port, String user, String password, String projectId) throws ClassNotFoundException, SQLException{
 		store = new PostgresPatientStore();
-		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", user, password),projectId);
+		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", user, password),projectId, new DataDialect());
 	}
 
 	public PostgresPatientStore getStore(){return store;}
@@ -42,9 +42,9 @@ public class TestPostgresPatientStore implements Closeable {
 		store.close();
 	}
 	
-	private void open()throws Exception{
-		open("localhost",15432,"i2b2demodata", "demodata","demo");
-	}
+//	private void open()throws Exception{
+//		open("localhost",15432,"i2b2demodata", "demodata","demo");
+//	}
 	public static void main(String args[]) throws Exception{
 		TestPostgresPatientStore test = new TestPostgresPatientStore();
 	//	test.open();

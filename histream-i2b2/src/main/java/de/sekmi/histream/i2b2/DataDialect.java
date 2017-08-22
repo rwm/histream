@@ -1,12 +1,22 @@
 package de.sekmi.histream.i2b2;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 import de.sekmi.histream.AbnormalFlag;
+import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Value;
 
 /**
  * Configuration of exact meaning of values in
  * {@code observation_fact} table. E.g. how to
  * store/interpret null values.
+ * <p>
+ * The function calls beginning with {@code encode} produce
+ * values which are stored in the database. The {@code decode} functions
+ * are used to decode the database values and produce a usable value.
  * 
  * @author R.W.Majeed
  *
@@ -18,6 +28,9 @@ public class DataDialect {
 	private String nullModifierCd;
 	private String nullValueFlagCd;
 	private String nullValueTypeCd;
+	/** Timezone for timestamp / date time columns */
+	private ZoneId zoneId;
+	// TODO nullSexCd, nullInOutCd
 
 	public DataDialect(){
 		this.nullUnitCd = "@"; // technically, null is allowed, but the demodata uses both '@' and ''
@@ -28,9 +41,13 @@ public class DataDialect {
 		this.nullValueTypeCd = "@"; // TODO check database
 		// null not allowed, use default 
 		this.nullProviderId = "@";
+		this.zoneId = ZoneId.systemDefault();
 	}
 	void setDefaultProviderId(String providerId){
 		this.nullProviderId = providerId;
+	}
+	public void setTimeZone(ZoneId zone){
+		this.zoneId = zone;
 	}
 	public String getDefaultProviderId(){
 		return nullProviderId;
@@ -43,7 +60,9 @@ public class DataDialect {
 	public String getNullLocationCd(){
 		return nullLocationCd;
 	}
-	
+	public ZoneId getTimeZone(){
+		return zoneId;
+	}
 	public String getNullModifierCd(){
 		return nullModifierCd;
 	}
@@ -52,6 +71,34 @@ public class DataDialect {
 	}
 	public String getNullValueTypeCd(){
 		return nullValueTypeCd;
+	}
+	public Timestamp encodeInstant(Instant instant){
+		if( instant == null ){
+			return null;
+		}else{
+			return Timestamp.from(instant.atZone(zoneId).toLocalDateTime().atOffset(ZoneOffset.UTC).toInstant());
+		}
+	}
+	public Timestamp encodeInstantPartial(DateTimeAccuracy instant){
+		if( instant == null ){
+			return null;
+		}else{
+			return encodeInstant(instant.toInstantMin());
+		}
+	}
+	public Instant decodeInstant(Timestamp timestamp){
+		if( timestamp == null ){
+			return null;
+		}else{
+			return timestamp.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().atZone(zoneId).toInstant();
+		}
+	}
+	public DateTimeAccuracy decodeInstantPartial(Timestamp timestamp){
+		if( timestamp == null ){
+			return null;
+		}else{
+			return new DateTimeAccuracy(decodeInstant(timestamp));
+		}
 	}
 	private boolean isNullComparison(String value, String nullValue){
 		if( value == null ){

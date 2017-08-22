@@ -29,7 +29,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -88,7 +87,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	private PreparedStatement selectMappingsAll;
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
-	
+
+	private DataDialect dialect;
+
 //	/**
 //	 * Create a visit store using configuration settings.
 //	 * The project id must be specified with the key {@code project}. 
@@ -125,11 +126,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		this.fetchSize = 1000;
 		this.rejectPatientChange = false;
 	}
-	public void open(Connection connection, String projectId) throws SQLException{
+	public void open(Connection connection, String projectId, DataDialect dialect) throws SQLException{
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
 		this.projectId = projectId;
 		this.db = connection;
+		this.dialect = dialect;
 		// require project id
 		Objects.requireNonNull(this.projectId, "non-null projectId required");
 		db.setAutoCommit(true);
@@ -309,11 +311,11 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	private void updateStorage(I2b2Visit visit) throws SQLException {
 		synchronized( update ){
 			update.setString(1, visit.getActiveStatusCd());
-			update.setTimestamp(2, inaccurateSqlTimestamp(visit.getStartTime()));
-			update.setTimestamp(3, inaccurateSqlTimestamp(visit.getEndTime()));
+			update.setTimestamp(2, dialect.encodeInstantPartial(visit.getStartTime()));
+			update.setTimestamp(3, dialect.encodeInstantPartial(visit.getEndTime()));
 			update.setString(4, visit.getInOutCd());
-			update.setString(5, visit.getLocationId());
-			update.setTimestamp(6, Timestamp.from(visit.getSourceTimestamp()));
+			update.setString(5, dialect.encodeLocationCd(visit.getLocationId()));
+			update.setTimestamp(6, dialect.encodeInstant(visit.getSourceTimestamp()));
 			update.setString(7, visit.getSourceId());
 
 			// where encounter_num=visit.getNum()
@@ -338,7 +340,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		synchronized( insert ){
 			insert.setInt(1, visit.getNum() );
 			insert.setInt(2, visit.getPatientNum());
-			insert.setTimestamp(3, Timestamp.from(visit.getSourceTimestamp()));
+			insert.setTimestamp(3, dialect.encodeInstant(visit.getSourceTimestamp()));
 			insert.setString(4, visit.getSourceId());
 			insert.executeUpdate();
 			// other fields are not written, don't clear the dirty flag
@@ -355,7 +357,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			insertMapping.setString(5, ids[0]); // patient_ide_source
 			
 			
-			insertMapping.setTimestamp(6, Timestamp.from(visit.getSourceTimestamp()));
+			insertMapping.setTimestamp(6, dialect.encodeInstant(visit.getSourceTimestamp()));
 			insertMapping.setString(7, visit.getSourceId());
 			insertMapping.executeUpdate();
 		}
@@ -373,18 +375,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		// make sure that non-null vital code contains at least one character
 		if( active_status_cd != null && active_status_cd.length() == 0 )active_status_cd = null;
 		
-		DateTimeAccuracy startDate = null;
-		DateTimeAccuracy endDate = null;
-		// birth date
-		Timestamp ts = rs.getTimestamp(4);
-		if( ts != null ){
-			startDate = new DateTimeAccuracy(ts.toInstant());
-		}
-		// death date
-		ts = rs.getTimestamp(5);
-		if( ts != null ){
-			endDate = new DateTimeAccuracy(ts.toInstant());
-		}
+		DateTimeAccuracy startDate = dialect.decodeInstantPartial(rs.getTimestamp(4));
+		DateTimeAccuracy endDate = dialect.decodeInstantPartial(rs.getTimestamp(5));
 		
 		// load sex
 		String inout_cd = rs.getString(6);
@@ -407,8 +399,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		visit.setStatus(status);
 		visit.setActiveStatusCd(active_status_cd);
 
-		visit.setLocationId(rs.getString(7));
-		visit.setSourceTimestamp(rs.getTimestamp(8).toInstant());
+		visit.setLocationId(dialect.decodeLocationCd(rs.getString(7)));
+		visit.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(8)));
 		visit.setSourceId(rs.getString(9));
 		
 		// additional fields go here

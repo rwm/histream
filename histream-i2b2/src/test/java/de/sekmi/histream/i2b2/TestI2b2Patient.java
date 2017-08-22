@@ -1,6 +1,7 @@
 package de.sekmi.histream.i2b2;
 
 import java.text.ParseException;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 
@@ -66,14 +67,14 @@ public class TestI2b2Patient {
 		I2b2Patient v = createPatientWithTimestamps();
 		v.setVitalStatusCd("UH");
 		assertEquals(ChronoUnit.HOURS, v.getBirthDate().getAccuracy());
-		assertEquals(4, v.getBirthDate().get(ChronoField.HOUR_OF_DAY));
+		assertEquals(4, v.getBirthDate().toInstantMin().atOffset(ZoneOffset.UTC).toLocalDateTime().get(ChronoField.HOUR_OF_DAY));
 		assertNull(v.getDeathDate());
 
 		v = createPatientWithTimestamps();
 		v.setVitalStatusCd("RL");
 		assertNull(v.getBirthDate());
 		assertEquals(ChronoUnit.HOURS, v.getDeathDate().getAccuracy());
-		assertEquals(4, v.getDeathDate().get(ChronoField.HOUR_OF_DAY));
+		assertEquals(4, v.getDeathDate().toInstantMin().atOffset(ZoneOffset.UTC).toLocalDateTime().get(ChronoField.HOUR_OF_DAY));
 	}
 	@Test
 	public void verifyMonthAndYearAccuracy(){

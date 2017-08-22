@@ -33,7 +33,7 @@ public class TestPostgresVisitStore implements Closeable {
 
 	public void open(String  host, int port) throws ClassNotFoundException, SQLException{
 		store = new PostgresVisitStore();
-		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", "i2b2demodata", "demodata"), "demo");
+		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", "i2b2demodata", "demodata"), "demo", new DataDialect());
 	}
 	
 	private void open()throws Exception{

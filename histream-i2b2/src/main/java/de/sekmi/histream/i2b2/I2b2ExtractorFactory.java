@@ -1,5 +1,6 @@
 package de.sekmi.histream.i2b2;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,10 +15,8 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationExtractor;
 import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
@@ -64,6 +63,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 		ds = crc_ds;
 		dialect = new DataDialect();
 	}
+
 	public ObservationFactory getObservationFactory(){
 		return observationFactory;
 	}
@@ -140,7 +140,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	 * @throws SQLException error
 	 */
 	//@SuppressWarnings("resource")
-	public I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
+	I2b2Extractor extract(Timestamp start_min, Timestamp start_max, Iterable<String> notations) throws SQLException{
 		// TODO move connection and prepared statement to I2b2Extractor
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -204,11 +204,11 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 
 	}
 	@Override
-	public ObservationSupplier extract(Instant start_min, Instant start_max, Iterable<String> notations) throws ObservationException{
+	public I2b2Extractor extract(Instant start_min, Instant start_max, Iterable<String> notations) throws IOException{
 		try {
-			return extract(Timestamp.from(start_min), Timestamp.from(start_max), notations);
+			return extract(dialect.encodeInstant(start_min),dialect.encodeInstant(start_max), notations);
 		} catch (SQLException e) {
-			throw new ObservationException(e);
+			throw new IOException(e);
 		}
 	}
 }

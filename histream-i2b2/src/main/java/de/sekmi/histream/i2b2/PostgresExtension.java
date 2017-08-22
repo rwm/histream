@@ -22,9 +22,6 @@ package de.sekmi.histream.i2b2;
 
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Extension;
 /**
  * Extension with database connectivity.
@@ -90,13 +87,7 @@ public abstract class PostgresExtension<T> implements Extension<T> {
 //		}else{
 //			return defaultFetchSize;
 //		}
-//	}
-
-	public static Timestamp inaccurateSqlTimestamp(DateTimeAccuracy dateTime){
-		if( dateTime == null )return null;
-		else return Timestamp.from(dateTime.toInstantMin());
-	}
-	
+//	}	
 
 	/**
 	 * Write updates to disk.

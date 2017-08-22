@@ -3,6 +3,7 @@ package de.sekmi.histream.etl.config;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 
 import javax.xml.bind.JAXB;
@@ -41,7 +42,7 @@ public class TestReadTables {
 		try( RecordSupplier<PatientRow> s = ds.patientTable.open(of,ds.getMeta()) ){
 			PatientRow r = s.get();
 			Assert.assertEquals("p1", r.getId());
-			Assert.assertEquals(2003, r.getBirthDate().get(ChronoField.YEAR));
+			Assert.assertEquals(2003, r.getBirthDate().toInstantMin().atOffset(ZoneOffset.UTC).get(ChronoField.YEAR));
 			
 		}
 	}
@@ -50,7 +51,7 @@ public class TestReadTables {
 		try( RecordSupplier<VisitRow> s = ds.visitTable.open(of,ds.getMeta()) ){
 			VisitRow r = s.get();
 			Assert.assertEquals("v1", r.getId());
-			Assert.assertEquals(2013, r.getStartTime().get(ChronoField.YEAR));
+			Assert.assertEquals(2013, r.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).get(ChronoField.YEAR));
 			
 		}
 	}

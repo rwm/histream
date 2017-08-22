@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
@@ -55,6 +54,10 @@ import de.sekmi.histream.impl.AbstractObservationHandler;
  * valtype_cd: N numeric, B stored in observation_blob, T text, '@' no value, 'NLP' NLP result xml objects.
  * Undocumented but used in demodata: D: datetime "YYYY-MM-DD HH:mm" stored in tval_char, "YYYYMMDD.HHmm0" stored in nval_num.
  * <p>
+ * Timestamp and datetime values are stored without timezone information. The timezone
+ * which should be used when reading/writing to database can be specified via
+ * the {@link DataDialect} param in {@link #open(Connection, DataDialect)}.
+ * <p>
  * The most difficult part is handling the instance_num field.
  * By default, i2b2 uses a four byte signed integer for instance_num. Incrementing
  * instance_num for every record would lead eventually to a number overflow.
@@ -64,7 +67,7 @@ import de.sekmi.histream.impl.AbstractObservationHandler;
  * in any order. Therefore, we keep track of the maximum instance_num per encounter
  * in the visit store (which caches visits anyways) and increase the instance_num only
  * for observations with modifiers.
- * 
+ *
  * @author R.W.Majeed
  *
  */
@@ -88,9 +91,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 //		initialize(config);
 //	}
 	public I2b2Inserter(){
-		
 	}
-	
 	private interface Preprocessor{
 		void preprocess(Observation fact)throws SQLException;
 	}
@@ -273,7 +274,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		insertFact.setString(4, dialect.encodeProviderId(o.getProviderId()));
 		// start_date
 		Objects.requireNonNull(o.getStartTime());
-		insertFact.setTimestamp(5, Timestamp.from(o.getStartTime().toInstantMin()));
+		insertFact.setTimestamp(5, dialect.encodeInstant(o.getStartTime().toInstantMin()));
 		
 		insertFact.setString(6, (m==null)?dialect.getNullModifierCd():m.getConceptId());
 		insertFact.setInt(7, instanceNum);
@@ -324,12 +325,12 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		if( o.getEndTime() == null ){
 			insertFact.setTimestamp(13, null);
 		}else{
-			insertFact.setTimestamp(13, Timestamp.from(o.getEndTime().toInstantMin()));
+			insertFact.setTimestamp(13, dialect.encodeInstant(o.getEndTime().toInstantMin()));
 		}
 		// location_cd
 		insertFact.setString(14, dialect.encodeLocationCd(o.getLocationId()));
 		// download_date
-		insertFact.setTimestamp(15, Timestamp.from(o.getSource().getSourceTimestamp()));
+		insertFact.setTimestamp(15, dialect.encodeInstant(o.getSource().getSourceTimestamp()));
 		insertFact.setString(16, o.getSource().getSourceId());
 		
 		insertFact.executeUpdate();

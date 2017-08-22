@@ -1,6 +1,7 @@
 package de.sekmi.histream.i2b2;
 
 import java.text.ParseException;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 
@@ -13,7 +14,7 @@ public class TestI2b2Visit {
 
 	private DateTimeAccuracy createAccurateTimestamp(){
 		try {
-			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06");
+			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06Z");
 		} catch (ParseException e) {
 			throw new AssertionError();
 		}
@@ -70,14 +71,14 @@ public class TestI2b2Visit {
 		I2b2Visit v = createVisitWithTimestamps();
 		v.setActiveStatusCd("UH");
 		assertEquals(ChronoUnit.HOURS, v.getStartTime().getAccuracy());
-		assertEquals(4, v.getStartTime().get(ChronoField.HOUR_OF_DAY));
+		assertEquals(4, v.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).get(ChronoField.HOUR_OF_DAY));
 		assertNull(v.getEndTime());
 
 		v = createVisitWithTimestamps();
 		v.setActiveStatusCd("RL");
 		assertNull(v.getStartTime());
 		assertEquals(ChronoUnit.HOURS, v.getEndTime().getAccuracy());
-		assertEquals(4, v.getEndTime().get(ChronoField.HOUR_OF_DAY));
+		assertEquals(4, v.getEndTime().toInstantMin().atOffset(ZoneOffset.UTC).get(ChronoField.HOUR_OF_DAY));
 	}
 	@Test
 	public void verifyMonthAndYearAccuracy(){
