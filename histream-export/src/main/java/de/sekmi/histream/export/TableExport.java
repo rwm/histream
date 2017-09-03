@@ -65,7 +65,7 @@ public class TableExport {
 
 	/**
 	 * Set the zone id to use for timestamps
-	 * @param zone
+	 * @param zoneId time zone for exported timestamps
 	 */
 	public void setZoneId(ZoneId zoneId){
 		this.zoneId = zoneId;
@@ -129,6 +129,7 @@ public class TableExport {
 	 * @param writer export writer
 	 * @throws ExportException export exception
 	 * @throws IOException IO exception
+	 * @return summary
 	 */
 	public ExportSummary export(ObservationSupplier supplier, ExportWriter writer) throws ExportException, IOException{
 		requireDisjointConcepts();

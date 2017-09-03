@@ -60,7 +60,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	
 	/**
 	 * Create date time with accuracy to seconds.
-	 * @param dateTime timestamp
+	 * @param instant timestamp
 	 */
 	public DateTimeAccuracy(Instant instant){
 		this.instant = instant;
@@ -128,10 +128,10 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		// 
 	}
 	
-	/**
-	 * Get the local time
-	 * @return local time
-	 */
+//	/**
+//	 * Get the local time
+//	 * @return local time
+//	 */
 	//public LocalDateTime getLocal(){ return instant.at; }
 	
 	public void set(Date timestamp, ChronoUnit accuracy){

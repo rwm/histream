@@ -21,7 +21,7 @@ public interface ObservationExtractor {
 	 * @param start_max maximum time for observation start (inclusive)
 	 * @param notations concept notations. Specifies which observations are extracted.
 	 * @return supplier for the extracted observations. Must be closed after use.
-	 * @throws ObservationException error (e.g. database failure)
+	 * @throws IOException error (e.g. database failure)
 	 */
 	ObservationSupplier extract(Instant start_min, Instant start_max, Iterable<String> notations) throws IOException;
 }
