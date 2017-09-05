@@ -65,7 +65,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	private Map<String,String> visitData;
 	private ZoneId zoneId;
 
-	
+	@Deprecated
 	public GroupedXMLReader(ObservationFactory factory, InputStream input)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, input, null);
 	}
@@ -82,6 +82,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	public GroupedXMLReader(ObservationFactory factory, InputStream input, ZoneId localZone)throws JAXBException, XMLStreamException, FactoryConfigurationError{
 		this(factory, XMLInputFactory.newInstance().createXMLStreamReader(input), localZone);
 	}
+	@Deprecated // TODO remove method without zoneid
 	public GroupedXMLReader(ObservationFactory factory, XMLStreamReader reader) throws JAXBException, XMLStreamException{
 		this(factory,reader,null);
 	}

@@ -66,26 +66,32 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		this.instant = instant;
 		this.accuracy = ChronoUnit.SECONDS;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year) {
 		instant = LocalDateTime.of(year, 1, 1, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.YEARS;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year, int month) {
 		instant = LocalDateTime.of(year, month, 1, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.MONTHS;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year, int month, int day) {
 		instant = LocalDateTime.of(year, month, day, 0, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.DAYS;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year, int month, int day, int hours) {
 		instant = LocalDateTime.of(year, month, day, hours, 0).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.HOURS;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year, int month, int day, int hours, int mins) {
 		instant = LocalDateTime.of(year, month, day, hours, mins).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.MINUTES;
 	}
+	@Deprecated
 	public DateTimeAccuracy(int year, int month, int day, int hours, int mins, int secs) {
 		instant = LocalDateTime.of(year, month, day, hours, mins, secs).toInstant(ZoneOffset.UTC);
 		accuracy = ChronoUnit.SECONDS;
@@ -141,7 +147,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	
 	@Override
 	public String toString(){
-		return toPartialIso8601();
+		return toPartialIso8601(ZoneOffset.UTC.normalized());
 	}
 	
 	/**
@@ -245,6 +251,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	 * @throws ParseException for unparsable string
 	 * @throws IllegalArgumentException unparsable string (old unchecked exception)
 	 */
+	@Deprecated
 	public static DateTimeAccuracy parsePartialIso8601(String str)throws ParseException{
 		return parsePartialIso8601(str, null);
 	}
