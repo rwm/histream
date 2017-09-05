@@ -3,7 +3,6 @@ package de.sekmi.histream.i2b2;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 import de.sekmi.histream.AbnormalFlag;
 import de.sekmi.histream.DateTimeAccuracy;
@@ -29,7 +28,7 @@ public class DataDialect {
 	private String nullValueFlagCd;
 	private String nullValueTypeCd;
 	/** Timezone for timestamp / date time columns */
-	private ZoneId zoneId;
+	private ZoneId zoneId; // TODO may not be needed since the db always uses epoch seconds
 	// TODO nullSexCd, nullInOutCd
 
 	public DataDialect(){
@@ -76,7 +75,8 @@ public class DataDialect {
 		if( instant == null ){
 			return null;
 		}else{
-			return Timestamp.from(instant.atZone(zoneId).toLocalDateTime().atOffset(ZoneOffset.UTC).toInstant());
+			return Timestamp.from(instant);
+			//return Timestamp.from(instant.atZone(zoneId).toLocalDateTime().atOffset(ZoneOffset.UTC).toInstant());
 		}
 	}
 	public Timestamp encodeInstantPartial(DateTimeAccuracy instant){
@@ -90,7 +90,8 @@ public class DataDialect {
 		if( timestamp == null ){
 			return null;
 		}else{
-			return timestamp.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().atZone(zoneId).toInstant();
+			return timestamp.toInstant();
+			//return timestamp.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().atZone(zoneId).toInstant();
 		}
 	}
 	public DateTimeAccuracy decodeInstantPartial(Timestamp timestamp){
