@@ -4,7 +4,7 @@
 	
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream</artifactId>
-	<version>0.15-SNAPSHOT</version>
+	<version>0.14.1</version>
   
 	<name>HIStream</name>
 	<description>Real-time stream based decision support system</description>
@@ -25,7 +25,7 @@
 	<scm>
 		<connection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</connection>
 		<developerConnection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.14.1</tag>
 		<url>https://gitlab.uni-oldenburg.de/rwmajeed/histream/tree/master</url>
 	</scm>
 	<distributionManagement>
