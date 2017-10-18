@@ -82,9 +82,9 @@ public abstract class GroupedObservationHandler implements ObservationHandler, A
 		Visit thisVisit = observation.getExtension(Visit.class);
 		// assertations to simplify troubleshooting corrupt data
 		Objects.requireNonNull(thisPatient);
-		Objects.requireNonNull(thisPatient.getId());
+		Objects.requireNonNull(thisPatient.getId(),"Patient w/o ID");
 		Objects.requireNonNull(thisVisit);
-		Objects.requireNonNull(thisVisit.getId());
+		Objects.requireNonNull(thisVisit.getId(),"Visit w/o ID");
 
 		if( prevPatient == null ){
 			// write start document, meta, patient
