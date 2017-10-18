@@ -35,6 +35,7 @@ public class CSVWriter implements ExportWriter{
 	private String filenameExtension;
 	private String patientTableName;
 	private String visitTableName;
+	private String nullString;
 	
 	/**
 	 * Create a CSV writer which creates table files
@@ -49,6 +50,7 @@ public class CSVWriter implements ExportWriter{
 		this.directory = directory;
 		this.fieldSeparator = fieldSeparator;
 		this.filenameExtension = fileSuffix;
+		this.nullString = ""; // write null values as empty strings
 		this.patientTableName = "patients";
 		this.visitTableName = "visits";
 		if( fieldSeparator == ' ' || fieldSeparator == '\n' ){
@@ -103,6 +105,9 @@ public class CSVWriter implements ExportWriter{
 	 * @return escaped data field
 	 */
 	protected String escapeData(String data){
+		if( data == null ){
+			return nullString;
+		}
 		// TODO do proper escaping
 		return data.replace(fieldSeparator, ' ').replace('\n', ' ').replace('\r', ' ');
 	}
