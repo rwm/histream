@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -44,6 +45,7 @@ public class GroupedXMLReader  implements ObservationSupplier {
 	static final String PATIENT_ELEMENT = "patient";
 	static final String ENCOUNTER_ELEMENT = "encounter";
 	static final String FACT_ELEMENT = "fact";
+	public static final QName ROOT_ELEMENT = new QName(GroupedXMLWriter.NAMESPACE, DOCUMENT_ROOT);
 	
 	private ObservationFactory factory;
 	private ExtensionAccessor<Patient> patientAccessor;
