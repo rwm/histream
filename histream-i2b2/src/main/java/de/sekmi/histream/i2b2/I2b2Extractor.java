@@ -2,6 +2,7 @@ package de.sekmi.histream.i2b2;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -24,24 +25,13 @@ import de.sekmi.histream.impl.StringValue;
  * @author R.W.Majeed
  *
  */
-public class I2b2Extractor implements ObservationSupplier {
+public abstract class I2b2Extractor implements ObservationSupplier {
 	private static final Logger log = Logger.getLogger(I2b2Extractor.class.getName());
 
-	private I2b2ExtractorFactory factory;
-	private Connection dbc;
-	private ResultSet rs;
-	private boolean finished;
-	
-	/**
-	 * Constructs a new extractor. Connection and ResultSet need to be 
-	 * closed by a call to {@link #close()} if the object is not needed
-	 * anymore.
-	 * <p>
-	 * 	
-	 * </p>
-	 * @param factory
-	 * @param dbc
-	 * @param rs ResultSet with rows from {@code observation_fact} table. 
+	protected I2b2ExtractorFactory factory;
+	protected Connection dbc;
+
+	/** ResultSet with rows from {@code observation_fact} table. 
 	 * Initially positioned before the first row. It is accessed read only
 	 * and forward only. Its columns are required to be in the following order:
 	 * <ol>
@@ -56,18 +46,52 @@ public class I2b2Extractor implements ObservationSupplier {
 	 *  <li>end_date</li>
 	 *  <li>RTRIM(valtype_cd) valtype_cd, tval_char, nval_num, RTRIM(valueflag_cd) valueflag_cd, units_cd, sourcesystem_cd</li>
 	 * </ol>
+	 **/
+	private PreparedStatement ps;
+	private ResultSet rs;
+	private boolean finished;
+	
+	/**
+	 * Constructs a new extractor. Connection and ResultSet need to be 
+	 * closed by a call to {@link #close()} if the object is not needed
+	 * anymore.
+	 * <p>
+	 * 	
+	 * </p>
+	 * @param factory
+	 * @param dbc
 	 * @throws SQLException error
 	 */
-	I2b2Extractor(I2b2ExtractorFactory factory, Connection dbc, ResultSet rs) throws SQLException {
+	I2b2Extractor(I2b2ExtractorFactory factory, Connection dbc) throws SQLException {
 		this.factory = factory;
 		this.dbc = dbc;
-		this.rs = rs;
+	}
+
+	protected abstract PreparedStatement prepareQuery() throws SQLException;
+
+	/**
+	 * Prepares and executes the query, producing the result set
+	 * which can then be used to fetch observations.
+	 * <p>
+	 * This method can be called manually before the first call to {@link #get()}.
+	 * If not called manually, it will be called automatically during the first
+	 * call to {@link #get()}. During that implicit invocations, any errors are
+	 * forwarded to the {@link #errorHandler(SQLException)}.
+	 * </p>
+	 * @throws SQLException SQL error
+	 */
+	public void prepareResultSet() throws SQLException{
+		if( rs != null ){
+			// this method assumes that there is no previous result set
+			throw new IllegalStateException();
+		}
+		this.ps = prepareQuery();
+		this.rs = ps.executeQuery();
 		if( rs.next() == false ){
 			// empty result set, no observations to process.
 			finished = true;
-		}
+		}		
 	}
-	
 	/**
 	 * Retrieves errors during the get() operation.
 	 * The default implementation is to wrap the exception
@@ -204,6 +228,16 @@ public class I2b2Extractor implements ObservationSupplier {
 		if( finished == true ){
 			return null;
 		}
+		if( rs == null ){
+			try {
+				prepareResultSet();
+			} catch (SQLException e) {
+				finished = true; // prevent repeating the query execution failure
+				// if we fail here, we are unable retrieve any fact
+				errorHandler(e);
+				return null;
+			}
+		}
 		Observation o = null;
 		try{
 			// next/first observation is always top concept
@@ -246,13 +280,12 @@ public class I2b2Extractor implements ObservationSupplier {
 	@Override
 	public void close() {
 		log.info("Closing extractor "+this.toString());
-//		Statement st = rs.getStatement();
 		try{
-			rs.close();
+			if( rs != null )rs.close();
+			if( ps != null )ps.close();
 		}catch( SQLException e){
-			log.log(Level.WARNING,"Failed to close recortset",e);
+			log.log(Level.WARNING,"Failed to close RecordSet",e);
 		}
-//		st.close();
 		try{
 			dbc.close();
 		}catch( SQLException e){

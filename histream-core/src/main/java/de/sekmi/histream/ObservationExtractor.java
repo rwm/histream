@@ -3,6 +3,8 @@ package de.sekmi.histream;
 import java.io.IOException;
 import java.time.Instant;
 
+import de.sekmi.histream.ext.Visit;
+
 /**
  * Extracts observations from complex sources
  * such as databases and data warehouses.
@@ -24,4 +26,5 @@ public interface ObservationExtractor {
 	 * @throws IOException error (e.g. database failure)
 	 */
 	ObservationSupplier extract(Instant start_min, Instant start_max, Iterable<String> notations) throws IOException;
+	ObservationSupplier extract(Iterable<Visit> visits, Iterable<String> notations) throws IOException;
 }
