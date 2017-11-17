@@ -81,7 +81,7 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 		if( factory.useEncounterTiming ){
 			// interval refers to encounter start.
 			// build and join an encounter table
-			joinParts.add("INNER JOIN encounter_dimension ed ON ed.encouner_num=f.encounter_num AND ed.start_time BETWEEN ? AND ?");
+			joinParts.add("INNER JOIN visit_dimension vd ON vd.encounter_num=f.encounter_num AND vd.start_date BETWEEN ? AND ?");
 			joinArguments.add(interval_start);
 			joinArguments.add(interval_end);
 		}else{
