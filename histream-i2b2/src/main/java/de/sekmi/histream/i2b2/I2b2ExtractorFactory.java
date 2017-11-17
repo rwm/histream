@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -168,6 +169,7 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 		Iterator<Visit> vi = vl.iterator();
 		for( int i=0; i<nums.length; i++ ){
 			Visit v = vi.next();
+			Objects.requireNonNull(v, "null visit in argument list");
 			int num;
 			if( v instanceof I2b2Visit ){
 				num = ((I2b2Visit) v).getNum();
