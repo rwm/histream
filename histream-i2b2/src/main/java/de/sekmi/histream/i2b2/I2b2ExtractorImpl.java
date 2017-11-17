@@ -86,7 +86,7 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 			joinArguments.add(interval_end);
 		}else{
 			// interval refers to fact start
-			whereParts.add("f.start_time BETWEEN ? AND ?");
+			whereParts.add("f.start_date BETWEEN ? AND ?");
 			whereArguments.add(interval_start);
 			whereArguments.add(interval_end);
 		}
