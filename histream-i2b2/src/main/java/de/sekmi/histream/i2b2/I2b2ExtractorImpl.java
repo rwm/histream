@@ -190,7 +190,7 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 
 	/**
 	 * Limit by specifying encounter_num's to use
-	 * @param visits 
+	 * @param encounter_num array of encounter numbers to use
 	 */
 	public void setVisits(int[] encounter_num){
 		this.encounter_nums = encounter_num;
