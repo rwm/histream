@@ -8,12 +8,12 @@
 
 	<groupId>de.sekmi.histream</groupId>
 	<artifactId>histream-export</artifactId>
-	<version>0.15</version>
+	<version>0.16-SNAPSHOT</version>
 
 	<parent>
 		<groupId>de.sekmi.histream</groupId>
 		<artifactId>histream</artifactId>
-		<version>0.15</version>
+		<version>0.16-SNAPSHOT</version>
 	</parent>
 
 	<build>
@@ -24,12 +24,12 @@
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.15</version>
+			<version>0.16-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
 			<artifactId>histream-core</artifactId>
-			<version>0.15</version>
+			<version>0.16-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
