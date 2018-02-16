@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<!-- Duplicate concept for patient -->
+	<meta>
+		<id>LTx_PH_ILD_COPD</id>
+		<etl-strategy>replace-source</etl-strategy>
+	</meta>
+	
+	 <patient-table>
+		<source xsi:type="csv-file">
+			<url>test-4-table.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+      <!-- Vorname, Nachname, Geschlecht unbekannt -->
+			<patient-id column="Pheno-ID"/>
+			<given-name column="Pheno-ID"/>
+			<surname column="Pheno-ID"/>
+		</idat>
+		<ignore xsi:type="string" column="*"/>
+	</patient-table>
+	<visit-table>
+		<source xsi:type="csv-file">
+			<url>test-4-table.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+			<patient-id column="Pheno-ID"/>
+			<visit-id column="Zeitpunkt"/>
+			<start column="Zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+		</idat>
+	<ignore xsi:type="string" column="*"/>
+	</visit-table>
+	<eav-table>
+		<source xsi:type="csv-file">
+			<url>test-4-table.csv</url>
+			<separator>;</separator>
+		</source>	
+		<idat>
+			<patient-id column="Pheno-ID"/>
+			<visit-id column="Zeitpunkt"/>
+		</idat>
+		<mdat>
+			<concept column="Export-Param"/>
+			<start column="Zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+			<end column="Zeitpunkt" format="d.M.u[ H[:m[:s]]]"/>
+			<type constant-value="string"/>
+			<value column="Wert" na=""/>
+			<unit column="Einheiten" na=""/>
+		</mdat>
+		<virtual>
+			<value column="Diagnose" xsi:type="string" na="">
+				<map>					
+					<otherwise log-warning="Unexpected value" action="drop-fact" />
+				</map>
+			</value>
+			<value column="Zusatzdiagnose" xsi:type="string" na="">
+				<map>
+					<case value="IPF" set-concept="B:DP-ID-IPF" set-value=""/>
+					<case value="UIP" set-concept="B:DP-ID-IPF" set-value=""/>
+					<otherwise log-warning="Unexpected value" action="drop-fact" />
+				</map>
+			</value>
+			<value column="Probenart" xsi:type="string" na="">
+				<map>
+					<otherwise action="drop-fact"/>
+				</map>
+			</value>
+			<value column="Diesease Area" xsi:type="string" na="">
+				<map>
+					<otherwise action="drop-fact"/>
+				</map>
+			</value>
+		</virtual>	
+		<ignore xsi:type="string" column="*"/>
+	</eav-table>
+	<post-processing>
+		<filter xsi:type="duplicate-fact"/>
+	</post-processing>
+</datasource>

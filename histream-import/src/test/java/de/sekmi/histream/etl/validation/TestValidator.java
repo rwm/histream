@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.ETLObservationSupplier;
+import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.io.Streams;
 
 public class TestValidator {
@@ -68,5 +69,15 @@ public class TestValidator {
 			}
 		}
 		Assert.fail("Exception expected");
+	}
+	@Test
+	public void validateData4WithDuplicateFilter() throws Exception{
+		// duplicate concepts
+		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-4-datasource2.xml")) ){
+			Validator v = new Validator(true,true);
+			v.setErrorHandler(e -> {throw new RuntimeException(e);});
+			Streams.transfer(os, v);
+		}
+		// no duplicate concept exception should occur
 	}
 }
