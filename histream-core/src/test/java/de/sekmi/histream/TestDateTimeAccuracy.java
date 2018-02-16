@@ -164,5 +164,19 @@ public class TestDateTimeAccuracy {
 		// date should be treated as if it had a +08:00 offset
 		assertEquals("2001-02-02T20Z", a.toPartialIso8601(ZoneId.of("UTC")));
 	}
+
+	@Test
+	public void verifyComparison() throws ParseException{
+		ZoneId zone = ZoneOffset.UTC.normalized();
+		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04", zone);
+		DateTimeAccuracy b = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:00", zone);
+		// instant min are equal
+		Assert.assertEquals(a.toInstantMin(), b.toInstantMin());
+		// yet a and b are not equal
+		Assert.assertNotEquals(a, b);
+		// defined order
+		Assert.assertTrue(a.compareTo(b) > 0);
+		Assert.assertTrue(b.compareTo(a) < 0);
+	}
 	// TODO: further tests
 }

@@ -386,7 +386,12 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	}
 	@Override
 	public int compareTo(DateTimeAccuracy o) {
-		return instant.compareTo(o.instant);
+		int cmp = instant.compareTo(o.instant);
+		// if instants are equal, order by accuracy. more accurate comes first
+		if( cmp == 0 ){
+			cmp = accuracy.compareTo(o.accuracy);
+		}
+		return cmp;
 	}
 	
 	@Override
