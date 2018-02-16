@@ -75,6 +75,10 @@ public class Validator extends AbstractObservationHandler implements Transformat
 
 			// clear concepts
 			concepts.clear();
+			// add concept
+			if( duplicateConceptCheck ){
+				concepts.add(new StartPlusConcept(t));
+			}
 			
 			prevPatient = patid; // remember patient to suppress errors for the same patient
 

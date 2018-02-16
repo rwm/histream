@@ -51,4 +51,22 @@ public class TestValidator {
 			Streams.transfer(os, v);
 		}
 	}
+	@Test
+	public void validateData4() throws Exception{
+		// duplicate concepts
+		try( ObservationSupplier os = ETLObservationSupplier.load(getClass().getResource("/data/test-4-datasource.xml")) ){
+			Validator v = new Validator(true,true);
+			v.setErrorHandler(e -> {throw new RuntimeException(e);});
+			Streams.transfer(os, v);
+		}catch( RuntimeException e ){
+			if( e.getCause() instanceof DuplicateConceptException ){
+				// expected behaviour
+				return;
+			}else{
+				// unexpected exceptoin
+				throw e;
+			}
+		}
+		Assert.fail("Exception expected");
+	}
 }
