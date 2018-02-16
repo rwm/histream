@@ -62,11 +62,11 @@ public class TestETLSupplier {
 		Assert.assertNotNull("Source id metadata required",os.getMeta(ObservationSupplier.META_SOURCE_ID));
 		//Assert.assertNotNull("Source timestamp metadata required",os.getMeta(ObservationSupplier.META_SOURCE_TIMESTAMP));
 		// verify all scripts are loaded
-		ObservationFactory f = new ObservationFactoryImpl();
-		FactGroupingQueue fq = os.getConfiguration().createFactQueue(f);
-		Assert.assertTrue(fq instanceof ScriptProcessingQueue);
-		ScriptProcessingQueue sq = (ScriptProcessingQueue)fq;
-		Assert.assertEquals(2, sq.getNumScripts());
+//		ObservationFactory f = new ObservationFactoryImpl();
+//		FactGroupingQueue fq = os.getConfiguration().createFactQueue(f);
+//		Assert.assertTrue(fq instanceof ScriptProcessingQueue);
+//		ScriptProcessingQueue sq = (ScriptProcessingQueue)fq;
+//		Assert.assertEquals(2, sq.getNumScripts());
 	}
 	@Test
 	public void testXMLConversion() throws Exception{
@@ -140,6 +140,28 @@ public class TestETLSupplier {
 		for( Observation o : all ){
 			System.out.println("Natrium-start: "+o.getStartTime());
 		}
+	}
+	@Test
+	public void verifyInlineScriptExecution() throws IOException, java.text.ParseException{
+		List<Observation> all = new ArrayList<>();
+		
+		os.stream().filter( o -> o.getConceptId().equals("cnt") ).forEach(all::add);
+//		for( Observation o : all ){
+//			System.out.println("cnt: "+o.getStartTime()+", "+o.getValue().getStringValue());
+//		}
+		// should have a cnt fact for each visit
+		Assert.assertEquals(4, all.size());
+	}
+	@Test
+	public void verifyExternalScriptExecution() throws IOException, java.text.ParseException{
+		List<Observation> all = new ArrayList<>();
+		
+		os.stream().filter( o -> o.getConceptId().equals("ext-js") ).forEach(all::add);
+//		for( Observation o : all ){
+//			System.out.println("cnt: "+o.getStartTime()+", "+o.getValue().getStringValue());
+//		}
+		// should have a cnt fact for each visit
+		Assert.assertEquals(4, all.size());
 	}
 
 }

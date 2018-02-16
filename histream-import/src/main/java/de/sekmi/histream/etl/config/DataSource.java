@@ -16,9 +16,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.etl.FactGroupingQueue;
-import de.sekmi.histream.etl.ScriptProcessingQueue;
+import de.sekmi.histream.etl.filter.PostProcessingFilter;
 
 /**
  * Data source configuration.
@@ -56,6 +54,8 @@ public class DataSource {
 	@XmlElement(name="eav-table")
 	EavTable[] eavTables;
 	
+	@XmlElement(name="post-processing", required=false)
+	PostProcessing postProcessing;
 	/**
 	 * Scripts to execute for each visit. A script
 	 * can add or delete facts for the visit. If scripts
@@ -111,6 +111,12 @@ public class DataSource {
 		return ds;
 	}
 
+	public PostProcessingFilter[] getPostProcessingFilters(){
+		if( postProcessing == null ){
+			return new PostProcessingFilter[]{};
+		}
+		return postProcessing.filter;
+	}
 	/**
 	 * If scripts are present, an instance of {@link ScriptProcessingQueue}
 	 * is returned. Otherwise an instance of {@link FactGroupingQueue}.
@@ -118,7 +124,7 @@ public class DataSource {
 	 * @return fact queue
 	 * @throws IOException error
 	 */
-	public FactGroupingQueue createFactQueue(ObservationFactory factory) throws IOException{
+//	public FactGroupingQueue createFactQueue(ObservationFactory factory) throws IOException{
 //		if( true ){
 //			// TODO debug problems with visitpostprocessorqueue
 //			return new VisitPostProcessorQueue() {
@@ -127,10 +133,10 @@ public class DataSource {
 //				}
 //			};
 //		}
-		if( scripts == null || scripts.length == 0 ){
-			return new FactGroupingQueue();
-		}else{
-			return new ScriptProcessingQueue(scripts, meta, factory);
-		}
-	}
+//		if( scripts == null || scripts.length == 0 ){
+//			return new FactGroupingQueue();
+//		}else{
+//			return new ScriptProcessingQueue(scripts, meta, factory);
+//		}
+//	}
 }

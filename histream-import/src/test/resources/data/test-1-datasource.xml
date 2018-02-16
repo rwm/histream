@@ -35,7 +35,6 @@
 	<visit-table>
 		<source xsi:type="csv-file">
 			<url>test-1-visits.txt</url>
-			<type>text/csv</type>
 			<separator>\t</separator>
 		</source>
 		<idat>
@@ -139,13 +138,18 @@
 		<ignore column="user" xsi:type="string"/>
 	</eav-table>
 	<!-- scripts are run for each complete encounter in the order of occurrence -->
-	<script type="text/javascript"><![CDATA[
-		if( facts.get("natrium") && facts.get("kalium") ){
-			facts.add("nakl").value(1);
-		}
-		facts.add("cnt").value(facts.size());
-	]]>
-	</script>
-	<!-- TODO check why second script does not work -->
-	<script type="text/javascript" charset="UTF-8" src="test-1-script.js"/>
+	<post-processing>
+		<filter xsi:type="duplicate-fact">
+			<concept>kalium</concept>
+		</filter>
+		<filter xsi:type="javascript">
+			<script><![CDATA[
+			if( facts.get("natrium") && facts.get("kalium") ){
+				facts.add("nakl").value(1);
+			}
+			facts.add("cnt").value(facts.size());
+		]]></script>
+		</filter>
+		<filter xsi:type="javascript" charset="UTF-8" src="test-1-script.js"/>
+	</post-processing>
 </datasource>

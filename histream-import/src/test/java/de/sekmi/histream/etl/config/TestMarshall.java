@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.sekmi.histream.etl.config.DataSource;
+import de.sekmi.histream.etl.filter.DuplicateFactFilter;
+import de.sekmi.histream.etl.filter.ScriptFilter;
 
 public class TestMarshall {
 
@@ -64,6 +66,13 @@ public class TestMarshall {
 			Assert.assertEquals(1, ds.eavTables.length);
 			Assert.assertNotNull(ds.eavTables[0].virtualColumnMap);
 			Assert.assertNotNull(ds.eavTables[0].virtualColumnMap.get("f_eav_x"));
+			
+			// check post processing
+			Assert.assertNotNull(ds.postProcessing);
+			Assert.assertEquals(3, ds.postProcessing.filter.length);
+			Assert.assertEquals(DuplicateFactFilter.class, ds.postProcessing.filter[0].getClass());
+			DuplicateFactFilter f = (DuplicateFactFilter)ds.postProcessing.filter[0];
+			ScriptFilter sf = (ScriptFilter)ds.postProcessing.filter[1];
 			
 			// check script
 			/* Assert.assertEquals(2,  ds.scripts.length);

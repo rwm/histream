@@ -14,6 +14,7 @@ import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.etl.config.EavTable;
 import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.WideTable;
+import de.sekmi.histream.etl.filter.FilterPostProcessingQueue;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.impl.SimplePatientExtension;
 import de.sekmi.histream.impl.SimpleVisitExtension;
@@ -114,7 +115,7 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 * @throws ParseException configuration error
 	 */
 	public ETLObservationSupplier(DataSource ds, ObservationFactory factory) throws IOException, ParseException {
-		this(ds,factory,ds.createFactQueue(factory));
+		this(ds,factory,new FilterPostProcessingQueue(ds, factory));
 	}
 	/**
 	 * Construct a new observation supplier directly from a {@link DataSource}.
