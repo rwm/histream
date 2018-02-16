@@ -54,21 +54,25 @@ public class EncounterScriptEngine {
 		scripts = new LinkedList<>();
 	}
 
-	public void addScript(String script, String sourceId, Instant timestamp) throws ScriptException{
+	public int addScript(String script, String sourceId, Instant timestamp) throws ScriptException{
+		int index = scripts.size();
 		scripts.add(new Script(((Compilable)engine).compile(script), sourceId, timestamp));
+		return index;
 	}
-	public void addScript(URL location, String charset, String sourceId) throws ScriptException, IOException{
+	public int addScript(URL location, String charset, String sourceId) throws ScriptException, IOException{
 		URLConnection conn = location.openConnection();
 		Instant timestamp = Instant.ofEpochMilli(conn.getLastModified());
 		try(
 				InputStream in = conn.getInputStream();
 				Reader reader = new InputStreamReader(in, charset)
 		){
-			addScript(reader, sourceId, timestamp);
+			return addScript(reader, sourceId, timestamp);
 		}
 	}
-	public void addScript(Reader reader, String sourceId, Instant timestamp) throws ScriptException{
+	public int addScript(Reader reader, String sourceId, Instant timestamp) throws ScriptException{
+		int index = scripts.size();
 		scripts.add(new Script(((Compilable)engine).compile(reader), sourceId, timestamp));	
+		return index;
 	}
 	
 	public int getScriptCount(){
@@ -78,7 +82,7 @@ public class EncounterScriptEngine {
 	public void setObservationFactory(ObservationFactory factory){
 		this.factory = factory;
 	}
-	private void process(AbstractFacts facts) throws ScriptException{
+	public void processAll(AbstractFacts facts) throws ScriptException{
 		Bindings b = engine.createBindings();
 		b.put("facts", facts);
 		for( Script script : scripts ){
@@ -87,14 +91,28 @@ public class EncounterScriptEngine {
 		}
 		// TODO is there a way to add information which script threw an exception?		
 	}
-	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException{
+	public void processSingle(AbstractFacts facts, int scriptIndex) throws ScriptException{
+		Bindings b = engine.createBindings();
+		b.put("facts", facts);
+		
+		Script script = scripts.get(scriptIndex);
+		facts.setSource(script.source);
+		script.script.eval(b);
+	}
+	
+	public AbstractFacts wrapEncounterFacts(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts){
 		SimpleFacts f = new SimpleFacts(factory, patientId, encounterId, defaultStartTime);
 		f.setObservations(facts);
-		process(f);
+		return f;
 	}
-	public void processEncounter(Patient patient, Visit visit, List<Observation> facts) throws ScriptException{
+	public AbstractFacts wrapEncounterFacts(Patient patient, Visit visit, List<Observation> facts){
 		VisitExtensionFacts f = new VisitExtensionFacts(factory, patient, visit);
 		f.setObservations(facts);
-		process(f);
+		return f;
+	}
+	// TODO add method to execute a single script
+
+	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException {
+		processAll( wrapEncounterFacts(patientId, encounterId, defaultStartTime, facts) );
 	}
 }
