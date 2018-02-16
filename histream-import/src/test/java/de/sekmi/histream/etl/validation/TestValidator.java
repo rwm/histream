@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.ETLObservationSupplier;
-import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.io.Streams;
 
 public class TestValidator {

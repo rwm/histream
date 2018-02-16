@@ -72,7 +72,9 @@ public class TestMarshall {
 			Assert.assertEquals(3, ds.postProcessing.filter.length);
 			Assert.assertEquals(DuplicateFactFilter.class, ds.postProcessing.filter[0].getClass());
 			DuplicateFactFilter f = (DuplicateFactFilter)ds.postProcessing.filter[0];
+			Assert.assertEquals(1, f.concept.length);
 			ScriptFilter sf = (ScriptFilter)ds.postProcessing.filter[1];
+			Assert.assertNotNull(sf);
 			
 			// check script
 			/* Assert.assertEquals(2,  ds.scripts.length);
