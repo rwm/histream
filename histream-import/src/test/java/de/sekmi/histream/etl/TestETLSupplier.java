@@ -1,6 +1,8 @@
 package de.sekmi.histream.etl;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +13,11 @@ import org.junit.Test;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.Meta;
-import de.sekmi.histream.impl.ObservationFactoryImpl;
 import de.sekmi.histream.io.GroupedXMLWriter;
 import de.sekmi.histream.io.Streams;
 
@@ -103,8 +103,9 @@ public class TestETLSupplier {
 		Patient p = fact.getExtension(Patient.class);
 		Assert.assertNotNull(p);
 		Assert.assertEquals("p1", p.getId());
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-01"), p.getBirthDate());
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11"), p.getDeathDate());
+		ZoneId zone = ZoneOffset.UTC.normalized();
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-01",zone), p.getBirthDate());
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11",zone), p.getDeathDate());
 
 		// TODO verify other patient information
 		Assert.assertEquals("v1", p.getGivenName());
@@ -128,7 +129,7 @@ public class TestETLSupplier {
 		Assert.assertEquals("v1", v.getId());
 		// TODO make sure custom partial date format is parsed correctly for missing seconds
 		//Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-20T09:00"), v.getStartTime());
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-21T13:00:21"), v.getEndTime());
+		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-21T13:00:21", ZoneId.systemDefault()), v.getEndTime());
 
 		Assert.assertEquals("v1", v.getId());
 		Assert.assertEquals(null, v.getLocationId());

@@ -1,6 +1,7 @@
 package de.sekmi.histream.etl.config;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -26,7 +27,9 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	 */
 	@XmlAttribute
 	String format;
-	
+
+	@XmlAttribute
+	String zone;
 	
 	public DateTimeColumn(String name, String format){
 		super(name);
@@ -56,9 +59,15 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 		if( formatter == null ){
 			throw new ParseException("format must be specified for DateTime fields if strings are parsed");
 		}
+		ZoneId zoneId;
+		if( zone != null ){
+			zoneId = ZoneId.of(zone);
+		}else{
+			zoneId = ZoneId.systemDefault();
+		}
 		// parse
 		try{
-			return DateTimeAccuracy.parse(formatter,input);
+			return DateTimeAccuracy.parse(formatter,input, zoneId);
 		}catch( DateTimeParseException e ){
 			throw new ParseException("Unable to parse date '"+input+"' in column '"+this.column+"'", e);
 		}

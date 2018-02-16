@@ -40,8 +40,8 @@
 		<idat>
 			<patient-id column="patid"/>
 			<visit-id column="fallnr"/>
-			<start column="start" format="d.M.u[ H[:m[:s]]]" na="" truncate-to="year"/>
-			<end column="end" format="d.M.u[ H[:m[:s]]]" na=""/>
+			<start column="start" format="d.M.u[ H[:m[:s]]]" na=""/>
+			<end column="end" format="d.M.u[ H[:m[:s]]]" zone="Europe/Berlin" na=""/>
 		</idat>
 		<mdat>
 			<!-- in/out code -->
