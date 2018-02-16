@@ -1,6 +1,8 @@
 package de.sekmi.histream.scripting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import de.sekmi.histream.Observation;
@@ -51,13 +53,18 @@ public abstract class AbstractFacts {
 		if( i == -1 ){
 			return null;
 		}else{
-			Fact f = facts.remove(i);
-			Observation o = sourceList.remove(i);
-			// verify that fact and observation are associated
-			assert f.getObservation() == o;
-			return f;
+			return removeIndex(i);
 		}
 	}
+
+	public Fact removeIndex(int index){
+		Fact f = facts.remove(index);
+		Observation o = sourceList.remove(index);
+		// verify that fact and observation are associated
+		assert f.getObservation() == o;
+		return f;
+	}
+
 	public Fact get(int index){
 		return facts.get(index);
 	}
@@ -81,4 +88,36 @@ public abstract class AbstractFacts {
 		return f;
 	}
 
+	public void sort(Comparator<Fact> comparator){
+		Integer[] indices = new Integer[facts.size()];
+		for( int i=0; i<indices.length; i++ ){
+			indices[i] = i;
+		}
+		// determine sort order
+		Arrays.sort(indices, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return comparator.compare(facts.get(o1), facts.get(o2));
+			}
+		});
+		// reorder both arrays
+		for( int i=0; i<indices.length; i++ ){
+			while( i != indices[i] ){
+
+				// store old target values which will be overridden
+				int oldI = indices[indices[i]];
+				Fact oldF = facts.get(indices[i]);
+				Observation oldO = sourceList.get(indices[i]);
+
+				// replace target values
+				facts.set(indices[i], facts.get(i));
+				sourceList.set(indices[i], sourceList.get(i));
+
+				// move old targets to old values
+				indices[i] = oldI;
+				facts.set(i, oldF);
+				sourceList.set(i, oldO);
+			}
+		}
+	}
 }
