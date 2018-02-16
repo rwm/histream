@@ -112,6 +112,7 @@ public abstract class AbstractFacts {
 				// replace target values
 				facts.set(indices[i], facts.get(i));
 				sourceList.set(indices[i], sourceList.get(i));
+				indices[indices[i]] = indices[i];
 
 				// move old targets to old values
 				indices[i] = oldI;
