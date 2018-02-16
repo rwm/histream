@@ -22,7 +22,6 @@
 	<visit-table>
 		<source xsi:type="csv-file">
 			<url>test-4-table.csv</url>
-			<type>text/csv</type>
 			<separator>;</separator>
 		</source>
 		<idat>
@@ -35,7 +34,6 @@
 	<eav-table>
 		<source xsi:type="csv-file">
 			<url>test-4-table.csv</url>
-			<type>text/csv</type>
 			<separator>;</separator>
 		</source>	
 		<idat>

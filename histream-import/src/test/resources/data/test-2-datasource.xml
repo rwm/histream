@@ -35,7 +35,6 @@
 	<visit-table>
 		<source xsi:type="csv-file">
 			<url>test-2-visits-duplicate.txt</url>
-			<type>text/csv</type>
 			<separator>\t</separator>
 		</source>
 		<idat>
