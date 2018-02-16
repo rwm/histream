@@ -67,33 +67,33 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		this.accuracy = ChronoUnit.SECONDS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year) {
-		instant = LocalDateTime.of(year, 1, 1, 0, 0).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year) {
+		instant = LocalDateTime.of(year, 1, 1, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.YEARS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year, int month) {
-		instant = LocalDateTime.of(year, month, 1, 0, 0).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year, int month) {
+		instant = LocalDateTime.of(year, month, 1, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.MONTHS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year, int month, int day) {
-		instant = LocalDateTime.of(year, month, day, 0, 0).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year, int month, int day) {
+		instant = LocalDateTime.of(year, month, day, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.DAYS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year, int month, int day, int hours) {
-		instant = LocalDateTime.of(year, month, day, hours, 0).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours) {
+		instant = LocalDateTime.of(year, month, day, hours, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.HOURS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year, int month, int day, int hours, int mins) {
-		instant = LocalDateTime.of(year, month, day, hours, mins).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins) {
+		instant = LocalDateTime.of(year, month, day, hours, mins).atZone(zone).toInstant();
 		accuracy = ChronoUnit.MINUTES;
 	}
 	@Deprecated
-	public DateTimeAccuracy(int year, int month, int day, int hours, int mins, int secs) {
-		instant = LocalDateTime.of(year, month, day, hours, mins, secs).toInstant(ZoneOffset.UTC);
+	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins, int secs) {
+		instant = LocalDateTime.of(year, month, day, hours, mins, secs).atZone(zone).toInstant();
 		accuracy = ChronoUnit.SECONDS;
 	}
 	
@@ -334,9 +334,10 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	 * 
 	 * @param formatter formatter
 	 * @param text input text
+	 * @param zoneId time zone to use, if the parser doesn't supply a time zone or offset
 	 * @return date time with accuracy
 	 */
-	public static DateTimeAccuracy parse(DateTimeFormatter formatter, CharSequence text){
+	public static DateTimeAccuracy parse(DateTimeFormatter formatter, CharSequence text, ZoneId zoneId){
 		ParsePosition pos = new ParsePosition(0);
 		TemporalAccessor a = formatter.parseUnresolved(text, pos);
 		if( pos.getErrorIndex() != -1 ){
@@ -344,44 +345,53 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		}else if( pos.getIndex() != text.length() ){
 			throw new DateTimeParseException("Unparsed text found at index "+pos.getIndex(), text, pos.getIndex());
 		}
+		
+		try{
+			int offset = a.get(ChronoField.OFFSET_SECONDS);
+			// explicit offset specified, use that information
+			zoneId = ZoneOffset.ofTotalSeconds(offset);
+		}catch( DateTimeException e ){
+			// no offset available
+			// use default specified in zoneId param
+		}
 		int year = a.get(ChronoField.YEAR);
 		// month
 		int month;
 		try{
 			month = a.get(ChronoField.MONTH_OF_YEAR);
 		}catch( DateTimeException e ){
-			return new DateTimeAccuracy(year);
+			return new DateTimeAccuracy(zoneId, year);
 		}
 		
 		int day;
 		try{
 			day = a.get(ChronoField.DAY_OF_MONTH);
 		}catch( DateTimeException e ){
-			return new DateTimeAccuracy(year,month);
+			return new DateTimeAccuracy(zoneId, year,month);
 		}
 
 		int hour;
 		try{
 			hour = a.get(ChronoField.HOUR_OF_DAY);
 		}catch( DateTimeException e ){
-			return new DateTimeAccuracy(year,month,day);
+			return new DateTimeAccuracy(zoneId, year,month,day);
 		}
 
 		int minute;
 		try{
 			minute = a.get(ChronoField.MINUTE_OF_HOUR);
 		}catch( DateTimeException e ){
-			return new DateTimeAccuracy(year,month,day, hour);
+			return new DateTimeAccuracy(zoneId, year,month,day, hour);
 		}
 		
 		int seconds;
 		try{
 			seconds = a.get(ChronoField.SECOND_OF_MINUTE);
 		}catch( DateTimeException e ){
-			return new DateTimeAccuracy(year,month,day, hour, minute);
+			return new DateTimeAccuracy(zoneId, year,month,day, hour, minute);
 		}
 
-		return new DateTimeAccuracy(year,month,day, hour, minute, seconds);
+		return new DateTimeAccuracy(zoneId, year,month,day, hour, minute, seconds);
 		// milliseconds not supported for now
 	}
 	@Override

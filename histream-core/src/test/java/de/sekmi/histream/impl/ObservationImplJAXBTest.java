@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZoneOffset;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
@@ -61,7 +62,7 @@ public class ObservationImplJAXBTest {
 		o.conceptId = "C"+index;
 		o.patientId = "P"+index;
 		o.encounterId = "E"+index;
-		o.startTime = new DateTimeAccuracy(2015,1,1,index);
+		o.startTime = new DateTimeAccuracy(ZoneOffset.UTC, 2015,1,1,index);
 		switch( index ){
 		case 0:
 			// string value

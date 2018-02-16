@@ -23,7 +23,7 @@ public class TestDateTimeAccuracy {
 	public void testParseYYYYDD(){
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.u");
 		String text = "02.2003";
-		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, text);
+		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, text, ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.MONTHS,a.getAccuracy());
 		TemporalAccessor ac = a.toInstantMin().atOffset(ZoneOffset.UTC);
 		Assert.assertEquals(2, ac.get(ChronoField.MONTH_OF_YEAR));
@@ -35,10 +35,10 @@ public class TestDateTimeAccuracy {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.u[ H[:m[:s]]]");
 		DateTimeAccuracy a;
 		ZoneId tz = ZoneId.of("Asia/Shanghai"); // China standard time
-		a = DateTimeAccuracy.parse(formatter, "01.02.2003");
+		a = DateTimeAccuracy.parse(formatter, "01.02.2003", ZoneOffset.UTC);
 		Assert.assertEquals("2003-02-01", a.toPartialIso8601(null));
 		Assert.assertEquals("2003-02-01", a.toPartialIso8601(tz));
-		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13");
+		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13", ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.HOURS, a.getAccuracy());
 		Assert.assertEquals("2003-02-01T13", a.toPartialIso8601(null));
 		Assert.assertEquals("2003-02-01T21+0800", a.toPartialIso8601(tz));
@@ -103,13 +103,13 @@ public class TestDateTimeAccuracy {
 		formatter.withResolverStyle(ResolverStyle.STRICT);
 
 		DateTimeAccuracy a;
-		a = DateTimeAccuracy.parse(formatter, "01.02.2003");
+		a = DateTimeAccuracy.parse(formatter, "01.02.2003",  ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.DAYS,a.getAccuracy());
 		
-		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13");
+		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13",  ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.HOURS,a.getAccuracy());
 
-		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13:14");
+		a = DateTimeAccuracy.parse(formatter, "01.02.2003 13:14", ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.MINUTES,a.getAccuracy());
 	}
 
@@ -144,16 +144,16 @@ public class TestDateTimeAccuracy {
 		}
 		// verify same behavior for DateTimeAccurecy
 		// should not fail below
-		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, "2003");
+		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, "2003" ,ZoneOffset.UTC);
 		Assert.assertEquals(ChronoUnit.YEARS, a.getAccuracy());
 		// next two calls should throw exceptions
 		try{
-			DateTimeAccuracy.parse(formatter, "+");
+			DateTimeAccuracy.parse(formatter, "+", ZoneOffset.UTC);
 			Assert.fail("Exception unexpected input");
 		}catch( DateTimeParseException e ){
 		}
 		try{
-			DateTimeAccuracy.parse(formatter, "2003+");
+			DateTimeAccuracy.parse(formatter, "2003+", ZoneOffset.UTC);
 			Assert.fail("Exception expected for unparsed text at end of input");
 		}catch( DateTimeParseException e ){
 		}
