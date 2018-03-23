@@ -36,6 +36,7 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 
+// TODO remove this class
 @Deprecated
 public class XMLObservationSupplier extends XMLObservationParser implements ObservationSupplier{
 	//private static final String namespaceURI = "http://sekmi.de/histream/dwh-eav";

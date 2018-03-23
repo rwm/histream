@@ -46,7 +46,7 @@ public class TestVisitFragmentParser {
 //		System.out.println("XPath="+ret);
 		ret = (String)xp.evaluate("count(eav:fact)", visit, XPathConstants.STRING);
 //		System.out.println("Facts:"+ret);
-		Assert.assertEquals("12", ret);
+		Assert.assertEquals("13", ret);
 	}
 	
 }

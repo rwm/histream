@@ -2,6 +2,7 @@ package de.sekmi.histream.scripting;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.time.ZoneId;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
@@ -21,11 +22,11 @@ public class Fact {
 	}
 	
 	public Fact start(String incompleteDateTime) throws ParseException{
-		observation.setStartTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime));
+		observation.setStartTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime, ZoneId.systemDefault()));
 		return this;
 	}
 	public Fact end(String incompleteDateTime) throws ParseException{
-		observation.setEndTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime));
+		observation.setEndTime(DateTimeAccuracy.parsePartialIso8601(incompleteDateTime, ZoneId.systemDefault()));
 		return this;
 	}
 	
@@ -57,5 +58,15 @@ public class Fact {
 	
 	public Observation getObservation(){
 		return observation;
+	}
+
+	public String toString(){
+		StringBuilder b = new StringBuilder();
+		b.append("{patient=").append(getObservation().getPatientId());
+		b.append(", visit=").append(getObservation().getEncounterId());
+		b.append(", start=").append(getObservation().getStartTime());
+		b.append(", concept=").append(getConcept());
+		b.append("}");
+		return b.toString();
 	}
 }

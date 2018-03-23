@@ -101,7 +101,7 @@ public class FileObservationProviderTest {
 				Assert.assertEquals("Zuhause", v.getLocationId());
 				try{
 					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-01T10:30:00"), v.getStartTime());
-					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00"), v.getEndTime());
+					Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2014-01-05T10:30:00.123"), v.getEndTime());
 				} catch (ParseException e) {
 					throw new RuntimeException(e);
 				}
@@ -114,8 +114,8 @@ public class FileObservationProviderTest {
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:msec", o.getConceptId());
 				// TODO store and calculate time in nanos
-				Assert.assertEquals(ChronoUnit.SECONDS, o.getStartTime().getAccuracy());
-				Assert.assertEquals(30, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MINUTE_OF_HOUR));
+				Assert.assertEquals(ChronoUnit.MILLIS, o.getStartTime().getAccuracy());
+				Assert.assertEquals(123, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MILLI_OF_SECOND));
 			},
 			(Observation o) ->  {
 				Assert.assertEquals("T:date:mins", o.getConceptId());
@@ -238,6 +238,7 @@ public class FileObservationProviderTest {
 	
 	@Test
 	public void testStAXReader() throws FileNotFoundException, XMLStreamException, FactoryConfigurationError  {
+		// TODO delete XMLObservationSupplier
 		XMLObservationSupplier xos = new XMLObservationSupplier(factory, new FileInputStream("examples/dwh-eav.xml"));
 		validateExample(xos);
 		xos.close();

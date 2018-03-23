@@ -38,9 +38,10 @@ public class XPathEvaluatorTest {
 			Assert.assertEquals(expr, true, eval.test(expr, o));
 		}
 		// skip to string value
-		for( int i=0; i<6; i++ ){
+		for( int i=0; i<7; i++ ){
 			o = s.get();
 		}
+		Assert.assertEquals("T:type:str", o.getConceptId());
 
 		// compare string value
 		Assert.assertEquals(true, eval.test("f:fact/f:value='abc123'", o));

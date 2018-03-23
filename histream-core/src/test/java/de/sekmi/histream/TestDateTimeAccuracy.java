@@ -83,7 +83,7 @@ public class TestDateTimeAccuracy {
 		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06");
 		assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
 		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06.789");
-		assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
+		assertEquals(ChronoUnit.MILLIS, a.getAccuracy());
 		// verify zone offset
 		// for second accuracy
 		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06+0800");
@@ -165,6 +165,13 @@ public class TestDateTimeAccuracy {
 		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04", ZoneId.of("Asia/Shanghai"));
 		// date should be treated as if it had a +08:00 offset
 		assertEquals("2001-02-02T20Z", a.toPartialIso8601(ZoneId.of("UTC")));
+	}
+
+	@Test
+	public void verifyMillisecondParseAndToString() throws ParseException{
+		DateTimeAccuracy a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06.789", ZoneId.of("UTC"));
+		// date should be treated as if it had a +08:00 offset
+		assertEquals("2001-02-03T04:05:06.789Z", a.toPartialIso8601(ZoneId.of("UTC")));
 	}
 
 	@Test

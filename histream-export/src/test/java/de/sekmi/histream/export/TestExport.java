@@ -44,8 +44,8 @@ public class TestExport {
 		Assert.assertEquals("T:type:str", m.get(MemoryExportWriter.VISIT_TABLE, "byclass", 0));
 		m.dump();
 		// verify eav table
-		Assert.assertEquals(6, m.rowCount("eavtabletest"));
-		Assert.assertEquals("T:date:month", m.get("eavtabletest", "code", 4));
+		Assert.assertEquals(7, m.rowCount("eavtabletest"));
+		Assert.assertEquals("T:date:month", m.get("eavtabletest", "code", 5));
 		
 		// TODO something wrong with namespaces in xpath/dom
 	}

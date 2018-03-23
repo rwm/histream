@@ -201,9 +201,9 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 			dt = instant.atOffset(ZoneOffset.UTC).toLocalDateTime();
 		}
 		
-		char[] prefixes = {0,'-','-','T',':',':'};
-		ChronoField[] fields = {ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE};
-		int[] digits = {4,2,2,2,2,2};
+		char[] prefixes = {0,'-','-','T',':',':','.'};
+		ChronoField[] fields = {ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE,ChronoField.MILLI_OF_SECOND};
+		int[] digits = {4,2,2,2,2,2,3};
 		int i;
 		for( i=0; i<fields.length; i++ ){
 			if( prefixes[i] != 0 )b.append(prefixes[i]);
@@ -282,7 +282,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		// now check for accuracy
 		ChronoUnit accuracy;
 		LocalDateTime dateTime;
-		if( a.isSupported(ChronoField.MILLI_OF_SECOND) ){
+		if( a.isSupported(ChronoField.NANO_OF_SECOND) ){
 			// maximum accuracy of nanoseconds
 			// not supported yet, truncate to seconds
 			accuracy = ChronoUnit.MILLIS;
