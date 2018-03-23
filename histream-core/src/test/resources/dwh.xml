@@ -40,13 +40,14 @@
 		<source timestamp="2015-09-28T09:41:10Z"/>
 		<encounter id="XXE12345">
 			<start>2014-01-01T10:30:00</start>
-			<end>2014-01-05T10:30:00</end>
+			<end>2014-01-05T10:30:00.123</end>
 			<location>Zuhause</location>
 			<!-- TODO inpatient/outpatient 
 			<provider>xxxa</provider>-->
 			<source timestamp="2015-09-28T08:41:10Z"/>
 <!-- no more <facts> group -->
 			<fact concept="T:date:secs" start="2014-09-07T10:40:03"/>
+			<fact concept="T:date:msec" start="2014-09-07T10:40:03.123"/>
 			<fact concept="T:date:mins" start="2014-09-07T10:40"/>
 			<fact concept="T:date:hours" start="2014-09-07T10"/>
 			<fact concept="T:date:day" start="2014-09-07"/>

@@ -112,6 +112,12 @@ public class FileObservationProviderTest {
 				Assert.assertNotNull(s);
 			},
 			(Observation o) ->  {
+				Assert.assertEquals("T:date:msec", o.getConceptId());
+				// TODO store and calculate time in nanos
+				Assert.assertEquals(ChronoUnit.SECONDS, o.getStartTime().getAccuracy());
+				Assert.assertEquals(30, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MINUTE_OF_HOUR));
+			},
+			(Observation o) ->  {
 				Assert.assertEquals("T:date:mins", o.getConceptId());
 				Assert.assertEquals(ChronoUnit.MINUTES, o.getStartTime().getAccuracy());
 				Assert.assertEquals(40, o.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).getLong(ChronoField.MINUTE_OF_HOUR));

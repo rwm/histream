@@ -51,7 +51,7 @@ import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
  */
 @XmlJavaTypeAdapter(DateTimeAccuracyAdapter.class)
 public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
-	static final String PARTIAL_FORMATTER_PATTERN = "u[-M[-d['T'H[:m[:s[.S]]][X]]]]";
+	static final String PARTIAL_FORMATTER_PATTERN = "u[-M[-d['T'H[:m[:s[.SSS]]][X]]]]";
 	static final DateTimeFormatter PARTIAL_FORMATTER  = DateTimeFormatter.ofPattern(PARTIAL_FORMATTER_PATTERN);
 
 	// TODO why not use instant, since we always calculate UTC? or Offset/ZonedDateTime?
@@ -282,11 +282,12 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		// now check for accuracy
 		ChronoUnit accuracy;
 		LocalDateTime dateTime;
-		if( a.isSupported(ChronoField.NANO_OF_SECOND) ){
+		if( a.isSupported(ChronoField.MILLI_OF_SECOND) ){
 			// maximum accuracy of nanoseconds
 			// not supported yet, truncate to seconds
-			accuracy = ChronoUnit.NANOS;
-			dateTime = LocalDateTime.from(a);
+			accuracy = ChronoUnit.MILLIS;
+//			dateTime = LocalDateTime.from(a);
+			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), a.get(ChronoField.HOUR_OF_DAY), a.get(ChronoField.MINUTE_OF_HOUR), a.get(ChronoField.SECOND_OF_MINUTE), a.get(ChronoField.NANO_OF_SECOND));
 		}else if( a.isSupported(ChronoField.SECOND_OF_MINUTE) ){
 			accuracy = ChronoUnit.SECONDS;
 			dateTime = LocalDateTime.of(a.get(ChronoField.YEAR), a.get(ChronoField.MONTH_OF_YEAR), a.get(ChronoField.DAY_OF_MONTH), a.get(ChronoField.HOUR_OF_DAY), a.get(ChronoField.MINUTE_OF_HOUR), a.get(ChronoField.SECOND_OF_MINUTE));

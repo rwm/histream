@@ -82,6 +82,8 @@ public class TestDateTimeAccuracy {
 		assertEquals(ChronoUnit.MINUTES, a.getAccuracy());
 		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06");
 		assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
+		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06.789");
+		assertEquals(ChronoUnit.SECONDS, a.getAccuracy());
 		// verify zone offset
 		// for second accuracy
 		a = DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06+0800");
