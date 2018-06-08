@@ -53,6 +53,7 @@ import de.sekmi.histream.ext.Visit.Status;
  * <p>
  * Some optional columns are used: active_status_cd, start_date, end_date, inout_cd, location_cd, sourcesystem_cd
  * <p>
+ * XXX after loading encounters, the String patientId not set anymore and always null. To determine the patientId, the patientStore is required for lookup of the patientNum
  * TODO use encounter_mapping table to map actual (source) patient_ide to internal patient_num for facts.
  * <p>
  * The variable argument list for {@link #createInstance(Object...)} requires the following arguments:
@@ -137,14 +138,14 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		db.setAutoCommit(true);
 		prepareStatements();
 		loadMaxEncounterNum();
-		batchLoad();
+		batchLoad(); /// XXX loading visits does not set the String patientId, for that, the patientStore would be needed
 	}
 	@Override
 	protected void prepareStatements() throws SQLException {
 		// TODO: use prefix from configuration to specify tablespace
 		insert = db.prepareStatement("INSERT INTO visit_dimension(encounter_num, patient_num, import_date, download_date, sourcesystem_cd) VALUES(?,?,current_timestamp,?,?)");
 		insertMapping = db.prepareStatement("INSERT INTO encounter_mapping(encounter_num, encounter_ide, encounter_ide_source, patient_ide, patient_ide_source, encounter_ide_status, project_id, import_date, download_date, sourcesystem_cd) VALUES(?,?,?,?,?,'A','"+projectId+"',current_timestamp,?,?)");
-		update = db.prepareStatement("UPDATE visit_dimension SET active_status_cd=?, start_date=?, end_date=?, inout_cd=?, location_cd=?, update_date=current_timestamp, download_date=?, sourcesystem_cd=? WHERE encounter_num=?");
+		update = db.prepareStatement("UPDATE visit_dimension SET patient_num=?, active_status_cd=?, start_date=?, end_date=?, inout_cd=?, location_cd=?, update_date=current_timestamp, download_date=?, sourcesystem_cd=? WHERE encounter_num=?");
 		//select = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, update_date, sourcesystem_cd FROM visit_dimension WHERE patient_num=?");
 		selectAll = db.prepareStatement("SELECT encounter_num, patient_num, active_status_cd, start_date, end_date, inout_cd, location_cd, download_date, sourcesystem_cd FROM visit_dimension", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		selectAll.setFetchSize(fetchSize);
@@ -310,16 +311,17 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	
 	private void updateStorage(I2b2Visit visit) throws SQLException {
 		synchronized( update ){
-			update.setString(1, visit.getActiveStatusCd());
-			update.setTimestamp(2, dialect.encodeInstantPartial(visit.getStartTime()));
-			update.setTimestamp(3, dialect.encodeInstantPartial(visit.getEndTime()));
-			update.setString(4, visit.getInOutCd());
-			update.setString(5, dialect.encodeLocationCd(visit.getLocationId()));
-			update.setTimestamp(6, dialect.encodeInstant(visit.getSourceTimestamp()));
-			update.setString(7, visit.getSourceId());
+			update.setInt(1, visit.getPatientNum());
+			update.setString(2, visit.getActiveStatusCd());
+			update.setTimestamp(3, dialect.encodeInstantPartial(visit.getStartTime()));
+			update.setTimestamp(4, dialect.encodeInstantPartial(visit.getEndTime()));
+			update.setString(5, visit.getInOutCd());
+			update.setString(6, dialect.encodeLocationCd(visit.getLocationId()));
+			update.setTimestamp(7, dialect.encodeInstant(visit.getSourceTimestamp()));
+			update.setString(8, visit.getSourceId());
 
 			// where encounter_num=visit.getNum()
-			update.setInt(8, visit.getNum());
+			update.setInt(9, visit.getNum());
 			int rows = update.executeUpdate();
 			if( rows == 0 ){
 				log.warning("UPDATE executed for visit_dimension.encounter_num="+visit.getNum()+", but no rows changed.");
@@ -368,7 +370,8 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	private I2b2Visit loadFromResultSet(ResultSet rs) throws SQLException{
 		int id = rs.getInt(1);
 		int patid = rs.getInt(2);
-		
+		// XXX String patientId is always null after loading from the database.
+
 		// load vital status code, which contains information about
 		// accuracy of birth and death dates.
 		String active_status_cd = rs.getString(3);
@@ -426,10 +429,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		I2b2Visit visit = idCache.get(encounterId);
 		
 		if( visit == null ){
+			// visit does not exist, create a new one
+
 			maxEncounterNum ++;
 			int encounter_num = maxEncounterNum;
 			visit = new I2b2Visit(encounter_num, patient.getNum());
-			visit.setPatientId(patient.getId());
+			visit.setPatient(patient);
 			
 			// created from observation, use source metadata
 			visit.setSourceId(source.getSourceId());
@@ -451,12 +456,17 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			// commonly, the item is modified after a call to this method,
 			// but changes are written later via a call to update.
 			// (otherwise, the instance would need to know whether to perform INSERT or UPDATE)
-		}else if( rejectPatientChange ){
+		}else {
 			// visit already existing
 			// verify that the patient number from the visit matches with the observation
 			if( visit.getPatientNum() != patient.getNum() ){
 				// throw exception to abort processing
-				throw new AssertionError("Patient_num mismatch between observation and visit", null);
+				if( rejectPatientChange ){
+					throw new AssertionError("Patient_num mismatch for visit "+encounterId+": history says "+visit.getPatientNum()+" while data says "+patient.getNum(), null);
+				}else {
+					log.info("Updating visit #"+visit.getNum()+" for patient change from #"+visit.getPatientNum()+" to #"+patient.getNum());
+					visit.setPatient(patient);
+				}
 			}
 		}
 		return visit;		

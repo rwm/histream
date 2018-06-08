@@ -47,7 +47,7 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 		}
 		VisitImpl visit = new VisitImpl();
 		visit.setId((String)args[0]);
-		visit.setPatientId(((Patient)args[1]).getId());
+		visit.setPatient(((Patient)args[1]));
 		ExternalSourceType source = (ExternalSourceType)args[2];
 		visit.setSourceId(source.getSourceId());
 		visit.setSourceTimestamp(source.getSourceTimestamp());

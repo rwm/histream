@@ -1,6 +1,8 @@
 package de.sekmi.histream.impl;
 
 
+import java.util.Objects;
+
 /*
  * #%L
  * histream
@@ -24,6 +26,7 @@ package de.sekmi.histream.impl;
 
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
 import de.sekmi.histream.ext.Visit;
 
@@ -49,9 +52,10 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 
 	public String getPatientId(){return patientId;}
 	
-	public void setPatientId(String patientId){
+	public void setPatient(Patient patient){
+		Objects.requireNonNull(patient);
 		// patient id should not be changed normally.
-		this.patientId = patientId;
+		this.patientId = patient.getId();
 		// TODO need to update dirty flag?
 		markDirty(true);
 	}
