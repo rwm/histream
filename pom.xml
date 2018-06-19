@@ -57,8 +57,8 @@
 		<module>histream-export</module>
 		<module>histream-js</module>
 		<module>histream-import</module>
-		<!--
 		<module>histream-skos</module>
+		<!--
 		<module>histream-maven-plugin</module> -->
 		<!--
 		<module>i2b2-integration-tests</module>
