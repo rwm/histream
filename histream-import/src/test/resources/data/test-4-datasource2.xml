@@ -76,5 +76,11 @@
 	</eav-table>
 	<post-processing>
 		<filter xsi:type="duplicate-fact"/>
+		<!--  also possible to specify concepts to filter
+			<filter xsi:type="duplicate-fact">
+				<concept>kalium</concept>
+			</filter>
+		 -->
+
 	</post-processing>
 </datasource>

@@ -139,9 +139,6 @@
 	</eav-table>
 	<!-- scripts are run for each complete encounter in the order of occurrence -->
 	<post-processing>
-		<filter xsi:type="duplicate-fact">
-			<concept>kalium</concept>
-		</filter>
 		<filter xsi:type="javascript">
 			<script><![CDATA[
 			if( facts.get("natrium") && facts.get("kalium") ){

@@ -103,7 +103,7 @@ public class TestETLSupplier {
 		Patient p = fact.getExtension(Patient.class);
 		Assert.assertNotNull(p);
 		Assert.assertEquals("p1", p.getId());
-		ZoneId zone = ZoneOffset.UTC.normalized();
+		ZoneId zone = ZoneId.systemDefault();
 		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-01",zone), p.getBirthDate());
 		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11",zone), p.getDeathDate());
 

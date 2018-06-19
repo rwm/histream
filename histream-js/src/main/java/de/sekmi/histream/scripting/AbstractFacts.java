@@ -1,8 +1,6 @@
 package de.sekmi.histream.scripting;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import de.sekmi.histream.Observation;
@@ -88,18 +86,9 @@ public abstract class AbstractFacts {
 		return f;
 	}
 
+	/*
+	 * TODO use linked sort to sort both arrays simultaneously by the order given by the comparator
 	public void sort(Comparator<Fact> comparator){
-		Integer[] indices = new Integer[facts.size()];
-		for( int i=0; i<indices.length; i++ ){
-			indices[i] = i;
-		}
-		// determine sort order
-		Arrays.sort(indices, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return comparator.compare(facts.get(o1), facts.get(o2));
-			}
-		});
 		// reorder both arrays
 		for( int i=0; i<indices.length; i++ ){
 			while( i != indices[i] ){
@@ -120,5 +109,20 @@ public abstract class AbstractFacts {
 				sourceList.set(i, oldO);
 			}
 		}
+	}
+*/
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder(facts.size() * 128);
+		builder.append("[\n");
+		for( int i=0; i<facts.size(); i++ ){
+			if( i != 0 ) {
+				builder.append(",\n");
+			}
+			builder.append(facts.get(i).toString());
+		}
+		builder.append("\n]");
+		return builder.toString();
 	}
 }

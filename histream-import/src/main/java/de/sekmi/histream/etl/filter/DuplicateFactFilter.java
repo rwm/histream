@@ -18,21 +18,29 @@ public class DuplicateFactFilter extends PostProcessingFilter{
 	@XmlElement
 	public String[] concept;
 
-	private static class FactComparator implements Comparator<Fact>{
+	static class FactComparator implements Comparator<Fact>{
 		@Override
 		public int compare(Fact o1, Fact o2) {
-			int cmp = o1.getObservation().getStartTime().compareTo(
-						o2.getObservation().getStartTime()	);
-			if( cmp == 0 ){
-				// if times are equal, sort by concept
-				cmp = o1.getConcept().compareTo(o2.getConcept());
-			}
-			return cmp;
+			return DuplicateFactFilter.compare(o1, o2);
 		}
+	}
+	public static int compare(Fact o1, Fact o2) {
+		int cmp = o1.getObservation().getStartTime().compareTo(
+					o2.getObservation().getStartTime()	);
+		if( true )return cmp;
+		if( cmp == 0 ){
+			// if times are equal, sort by concept
+			cmp = o1.getConcept().compareTo(o2.getConcept());
+		}
+		return cmp;
 	}
 	private void removeAllDuplicates(AbstractFacts facts){
 		// order by start and concept
-		facts.sort( new FactComparator() );
+		if( true ) {
+			throw new UnsupportedOperationException("Not yet implemented");
+		}
+		//facts.sort( new FactComparator() );
+		
 
 		ArrayList<Integer> duplicates = new ArrayList<>();
 		
