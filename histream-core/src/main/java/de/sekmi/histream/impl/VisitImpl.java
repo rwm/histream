@@ -37,17 +37,24 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 	private String patientId;
 	private String locationId;
 	
-	public VisitImpl(){
+	/**
+	 * Empty constructor protected, only
+	 * available to overriding classes.
+	 */
+	protected VisitImpl() {
 		
+	}
+	public VisitImpl(String id, String patientId, DateTimeAccuracy startTime){
+		setId(id);
+		this.patientId = patientId;
+		this.startTime = startTime;		
+		markDirty(true);
 	}
 	
 	public VisitImpl(String id, String patientId, DateTimeAccuracy startTime, DateTimeAccuracy endTime, Status status){
-		setId(id);
-		this.patientId = patientId;
+		this(id, patientId, startTime);
 		this.status = status;
-		this.startTime = startTime;
 		this.endTime = endTime;
-		markDirty(true);
 	}
 
 	public String getPatientId(){return patientId;}
@@ -59,7 +66,7 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 		// TODO need to update dirty flag?
 		markDirty(true);
 	}
-	
+
 	@Override
 	public DateTimeAccuracy getStartTime() {
 		return startTime;

@@ -84,19 +84,18 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 
 	@Override
 	public VisitRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
-		VisitRow visit = new VisitRow();
-		visit.setId(idat.visitId.valueOf(map, row));
-		visit.setPatientId(idat.patientId.valueOf(map, row));
+		String vid = idat.visitId.valueOf(map, row);
+		String pid = idat.patientId.valueOf(map, row);
 		DateTimeAccuracy start = idat.start.valueOf(map, row);
-		if( start != null ){
-			visit.setStartTime(start);
-		}else{
+		if( start == null ){
 			// no start time specified for visit row
 			// any other way to retrieve a timestamp??
 			// ignore row
 			// TODO issue warning
 			return null;
 		}
+		VisitRow visit = new VisitRow(vid, pid, start);
+
 		if( idat.end != null ){
 			visit.setEndTime(idat.end.valueOf(map, row));
 		}
