@@ -3,6 +3,7 @@ package de.sekmi.histream.etl.config;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,7 +33,7 @@ public class CsvFile extends TableSource{
 	String url;
 	
 	/**
-	 * File encoding is not used yet.
+	 * Encoding to use for reading text files
 	 */
 	@XmlElement
 	String encoding;
@@ -44,11 +45,11 @@ public class CsvFile extends TableSource{
 	@XmlElement
 	String separator;
 	
-	@XmlElement
-	String quote;
-	
-	@XmlElement
-	char escape;
+//	@XmlElement
+//	String quote;
+//	
+//	@XmlElement
+//	char escape;
 	
 	private CsvFile(){
 	}
@@ -59,9 +60,18 @@ public class CsvFile extends TableSource{
 	}
 	@Override
 	public RowSupplier rows(Meta meta) throws IOException {
+		// resolve url relative to base url from metadata
 		URL base = meta.getLocation();
 		URL source = (base == null)?new URL(url):new URL(base, url);
-		return new FileRowSupplier(source, separator);
+		// determine charset
+		Charset charset;
+		if( encoding != null ) {
+			charset = Charset.forName(encoding);
+		}else{
+			// if not defined, use system charset
+			charset = Charset.defaultCharset();
+		}
+		return new FileRowSupplier(source, separator, charset);
 	}
 
 }

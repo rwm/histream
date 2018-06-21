@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.time.Instant;
 
 import com.opencsv.CSVParser;
@@ -19,7 +20,7 @@ public class FileRowSupplier extends RowSupplier {
 
 	private Instant timestamp;
 
-	public FileRowSupplier(URL location, String fieldSeparator) throws IOException{
+	public FileRowSupplier(URL location, String fieldSeparator, Charset charset) throws IOException{
 		if( fieldSeparator.length() > 1 ){
 			if( fieldSeparator.equals("\\t") ){
 				fieldSeparator = "\t";
@@ -28,7 +29,7 @@ public class FileRowSupplier extends RowSupplier {
 			}
 		}
 		this.url = location;
-		this.in = new CSVReader(new InputStreamReader(location.openStream()),fieldSeparator.charAt(0), CSVParser.DEFAULT_QUOTE_CHARACTER, (char)0);
+		this.in = new CSVReader(new InputStreamReader(location.openStream(), charset),fieldSeparator.charAt(0), CSVParser.DEFAULT_QUOTE_CHARACTER, (char)0);
 		
 		// TODO: check whether needed to close underlying InputStream
 		
