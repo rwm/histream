@@ -342,7 +342,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		ParsePosition pos = new ParsePosition(0);
 		TemporalAccessor a = formatter.parseUnresolved(text, pos);
 		if( pos.getErrorIndex() != -1 ){
-			throw new DateTimeParseException("Text '"+String.valueOf(text.charAt(pos.getErrorIndex()))+"' could not be parsed at index "+pos.getErrorIndex(), text, pos.getErrorIndex());
+			throw new DateTimeParseException("Text '"+text+"' could not be parsed at index "+pos.getErrorIndex(), text, pos.getErrorIndex());
 		}else if( pos.getIndex() != text.length() ){
 			throw new DateTimeParseException("Unparsed text found at index "+pos.getIndex(), text, pos.getIndex());
 		}
