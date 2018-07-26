@@ -140,7 +140,7 @@ abstract class VisitFragmentParser extends GroupedXMLWriter {
 	/**
 	 * Called after each patient fragment was parsed.
 	 * The patient fragment does not contain any encounters,
-	 * these are provided to {@link #visitFragment(Node)}.
+	 * these are provided to {@link #visitFragment(Element)}.
 	 * @param patient patient node
 	 * @throws ObservationException error
 	 */

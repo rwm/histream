@@ -58,8 +58,8 @@ public abstract class I2b2Extractor implements ObservationSupplier {
 	 * <p>
 	 * 	
 	 * </p>
-	 * @param factory
-	 * @param dbc
+	 * @param factory extractor factory
+	 * @param dbc database connection
 	 * @throws SQLException error
 	 */
 	I2b2Extractor(I2b2ExtractorFactory factory, Connection dbc) throws SQLException {

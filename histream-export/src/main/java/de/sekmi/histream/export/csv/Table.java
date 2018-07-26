@@ -14,8 +14,8 @@ class Table implements TableWriter{
 	private final CSVWriter export;
 	private PrintWriter out;
 	/**
-	 * @param csvWriter
-	 * @throws IOException 
+	 * @param csvWriter CSV writer
+	 * @throws IOException IO error
 	 */
 	Table(CSVWriter csvWriter, String filename) throws IOException {
 		export = csvWriter;
