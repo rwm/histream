@@ -13,6 +13,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 
+import org.w3c.dom.DOMException;
+
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -394,7 +396,7 @@ public class GroupedXMLWriter extends GroupedObservationHandler{
 			formatIndent();
 			marshalFactWithContext(observation, observation.getExtension(Visit.class), meta.source);
 			formatNewline();
-		} catch (JAXBException | XMLStreamException e) {
+		} catch (JAXBException | XMLStreamException | DOMException e) {
 			throw new ObservationException(e);
 		}
 		this.observationCount ++;
