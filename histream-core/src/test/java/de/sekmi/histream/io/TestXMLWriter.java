@@ -7,11 +7,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,10 +39,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.sekmi.histream.DateTimeAccuracy;
+import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
+import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.Meta;
+import de.sekmi.histream.impl.ObservationFactoryImpl;
+import de.sekmi.histream.impl.SimplePatientExtension;
+import de.sekmi.histream.impl.SimpleVisitExtension;
+import de.sekmi.histream.impl.StringValue;
 import de.sekmi.histream.xml.XMLUtils;
 
 public class TestXMLWriter {
@@ -66,6 +81,7 @@ public class TestXMLWriter {
 		Document doc = builder.newDocument();
 		doc.getDomConfig().setParameter("namespaces", true);
 		doc.getDomConfig().setParameter("namespace-declarations", true);
+		// TODO check if DOM can be configured to allow newline characters in values
 
 // not suppoted by default implementation
 //		doc.getDomConfig().setParameter("canonical-form", true);
@@ -101,6 +117,19 @@ public class TestXMLWriter {
 		Assert.assertEquals(XMLConstants.DEFAULT_NS_PREFIX, w.getPrefix("urn:ns:def"));
 
 		w.writeEndDocument();		
+	}
+
+	@Test
+	public void testMarshallNewlineInValues() throws ParserConfigurationException, ParseException {
+		DOMResult result = new DOMResult(createDocument());
+		ObservationFactory factory = new ObservationFactoryImpl();
+		factory.registerExtension(new SimplePatientExtension());
+		factory.registerExtension(new SimpleVisitExtension());
+		
+		Observation o = factory.createObservation("A", "B", DateTimeAccuracy.parsePartialIso8601("2018", ZoneOffset.UTC.normalized()));
+		o.setValue(new StringValue("1\n2"));
+		JAXB.marshal(o, result);
+		
 	}
 	@Test
 	public void testStreamWriterNamespaces() throws XMLStreamException, ParserConfigurationException{
@@ -164,6 +193,42 @@ public class TestXMLWriter {
 			reader.close();
 		}
 	}
+	@XmlRootElement
+	private static class ValType{
+		public ValType() {}
+		public ValType(String s) { this.value = s;}
+		@XmlValue 
+		String value;
+	}
+	@Test
+	public void testWriteDOM2() throws Exception{
+
+		// create document
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+//		f.setNamespaceAware(true);
+//		f.setCoalescing(true);
+//		f.setIgnoringComments(true);
+		DocumentBuilder builder = f.newDocumentBuilder();
+		Document doc = builder.newDocument();
+//		doc.getDomConfig().setParameter("namespaces", true);
+//		doc.getDomConfig().setParameter("namespace-declarations", true);
+
+		DOMResult dr = new DOMResult(doc);
+
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
+		// this does not work with the DOM stream writer
+
+//		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+		XMLStreamWriter writer = factory.createXMLStreamWriter(dr);
+		Marshaller marshaller = JAXBContext.newInstance(ValType.class).createMarshaller();
+//		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+		marshaller.marshal(new ValType("1\n2"), writer);
+		doc.normalizeDocument();
+		XMLUtils.printDOM(doc, debugLog);
+
+	}
+	
 	@Test
 	public void testWriteDOM() throws Exception{
 
@@ -175,6 +240,17 @@ public class TestXMLWriter {
 		w.setZoneId(ZoneId.of("Asia/Shanghai"));
 		Meta.transfer(s, w);
 		Streams.transfer(s, w);
+		
+		// manually create observation
+		Observation o = t.getFactory().createObservation("A", "B", DateTimeAccuracy.parsePartialIso8601("2018", ZoneOffset.UTC.normalized()));
+		o.setValue(new StringValue("1\n2"));
+		ExternalSourceType es = new ExternalSourceImpl("manual", Instant.now());
+		o.setSource(es);
+		Patient pat = t.getFactory().getExtension(Patient.class).createInstance("A",es);
+		o.setExtension(Patient.class, pat);
+		o.setExtension(Visit.class, t.getFactory().getExtension(Visit.class).createInstance("V",pat,es));
+		w.accept(o);
+
 		w.close();
 		s.close();
 
