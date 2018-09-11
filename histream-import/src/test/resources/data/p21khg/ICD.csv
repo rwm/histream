@@ -1,5 +1,4 @@
 IK;Entlassender-Standort;Entgeltbereich;KH-internes-Kennzeichen;Diagnoseart;ICD-Version;ICD-Kode;Lokalisation;Diagnosensicherheit;Sekundär-Kode;Lokalisation2;Diagnosensicherheit2
-260100012;01;PSY;6;ND;2017;F10.1;;;;;
 260100012;01;DRG;1;HD;2017;M16.7;L;;;;
 260100012;01;DRG;2;HD;2017;M16.7;L;;;;
 260100012;01;DRG;3;HD;2017;R26.8;;;;;
@@ -10,6 +9,7 @@ IK;Entlassender-Standort;Entgeltbereich;KH-internes-Kennzeichen;Diagnoseart;ICD-
 260100012;01;DRG;1;ND;2017;K66.0;;;;;
 260100012;01;PSY;4;ND;2017;F10.1;;;;;
 260100012;01;PSY;6;HD;2017;F20.1;;;;;
+260100012;01;PSY;6;ND;2017;F10.1;;;;;
 260100012;01;PSY;6;ND;2017;F10.1;;;;;
 260100012;01;PSY;7;HD;2017;F20.0;;;;;
 260100012;01;PSY;7;ND;2017;F05.8;;;;;
