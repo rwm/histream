@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+	<meta>
+		<id>test-1</id>
+		<etl-strategy>replace-source</etl-strategy>
+	</meta>
+	
+	<patient-table>
+		<source xsi:type="csv-file">
+			<url>p21khg/_PAT.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+			<patient-id column="Patientennummer"/>
+			<!-- TODO allow concatenation/splitting of columns to join separate columns for birth year and month -->
+			<birthdate format="u" na="" column="Geburtsjahr"/>
+			<gender column="Geschlecht" na="">
+				<map> <!-- maps a column -->
+					<case value="w" set-value="female"/>
+					<case value="m" set-value="male"/>
+					<otherwise set-value="" log-warning="Unexpected gender value"/>
+				</map>
+			</gender>
+		</idat>
+		<ignore xsi:type="string" column="*"/>
+	</patient-table>
+	<!-- optional -->
+	<visit-table>
+		<source xsi:type="csv-file">
+			<url>p21khg/FALL.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+			<patient-id column="Patientennummer"/>
+			<visit-id column="KH-internes-Kennzeichen"/>
+			<start column="Aufnahmedatum" format="uuuuMMddHHmm" na=""/>
+			<end column="Entlassungsdatum" format="uuuuMMddHHmm" zone="Europe/Berlin" na=""/>
+		</idat>
+		<mdat>
+			<!-- in/out code -->
+			<concept id="AG">
+				<value column="Aufnahmegrund" xsi:type="string"/>
+			<start column="Aufnahmedatum" format="uuuuMMddHHmm" na=""/>
+			</concept>
+		</mdat>
+		<ignore xsi:type="string" column="*"/>
+	</visit-table>
+	<wide-table>
+		<source xsi:type="csv-file">
+			<url>p21khg/FAB.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+			<visit-id column="KH-internes-Kennzeichen"/>
+		</idat>
+		<mdat>
+			<!-- wechsel zwischen fachabteilung  -->
+			<concept id="FAB">
+				<value column="FAB" xsi:type="string" />
+				<start column="FAB-Aufnahmedatum" format="uuuuMMddHHmm" na="" />
+				<end column="FAB-Aufnahmedatum" format="uuuuMMddHHmm" na="" />
+				<modifier id="ENTG">
+					<value column="Entgeltbereich" xsi:type="string" na-action="drop-fact" />
+				</modifier>
+			</concept>
+		</mdat>
+	</wide-table>
+	<wide-table>
+		<source xsi:type="csv-file">
+			<url>p21khg/ICD.csv</url>
+			<separator>;</separator>
+		</source>
+		<idat>
+			<visit-id column="KH-internes-Kennzeichen"/>
+		</idat>
+		<mdat>
+			<!-- coded diagnoses -->
+			<concept id="ICD">
+				<!-- TODO code should be part of the concept -->
+				<value column="ICD-Kode" xsi:type="string" />
+				<modifier id="art">
+					<value column="Diagnoseart" xsi:type="string">
+						<map>
+							<case value="HD" set-value="" set-concept="DIAG:H"/>
+							<case value="ND" set-value="" set-concept="DIAG:N"/>
+							<otherwise action="drop-fact" />
+						</map>
+					</value>
+				</modifier>
+				<modifier id="ICDVer">
+					<value column="ICD-Version" xsi:type="string" />
+				</modifier>
+				<modifier id="lokality">
+					<value column="Lokalisation" xsi:type="string">
+						<map>
+							<case value="L" set-value="" set-concept="DIAG:LO:L"/>
+							<case value="R" set-value="" set-concept="DIAG:LO:R"/>
+							<otherwise action="drop-fact" /><!-- removes the modifier if none of the listed values is specified -->
+						</map>
+					</value>
+				</modifier>
+			</concept>
+		</mdat>
+	</wide-table>
+
+</datasource>
