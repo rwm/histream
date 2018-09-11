@@ -15,7 +15,6 @@ import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
 
 public class TestDateTimeAccuracy {
 
@@ -28,6 +27,16 @@ public class TestDateTimeAccuracy {
 		TemporalAccessor ac = a.toInstantMin().atOffset(ZoneOffset.UTC);
 		Assert.assertEquals(2, ac.get(ChronoField.MONTH_OF_YEAR));
 		Assert.assertEquals(2003, ac.get(ChronoField.YEAR));
+	}
+	@Test
+	public void testParseTimestampWithoutSeparators(){
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuuMMddHHmm");
+		String text = "201705190800";
+		DateTimeAccuracy a = DateTimeAccuracy.parse(formatter, text, ZoneOffset.UTC);
+		Assert.assertEquals(ChronoUnit.MINUTES,a.getAccuracy());
+		TemporalAccessor ac = a.toInstantMin().atOffset(ZoneOffset.UTC);
+		Assert.assertEquals(5, ac.get(ChronoField.MONTH_OF_YEAR));
+		Assert.assertEquals(2017, ac.get(ChronoField.YEAR));
 	}
 	
 	@Test
