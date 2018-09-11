@@ -1,6 +1,15 @@
 README
 ======
 
+Developing and testing import descriptors
+-----------------------------------------
+For standalone operation of import descriptor parsing,
+put histream-core.jar, histream-import.jar and histream-js.jar 
+into a single folder and run the following command:
+
+java -cp \*.jar de.sekmi.histream.etl.XMLExport datasource.xml
+
+
 Schema/XSD for import descriptions
 ----------------------------------
 If you want an XSD file for the import description XML,
