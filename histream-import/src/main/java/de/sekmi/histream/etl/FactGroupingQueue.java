@@ -251,7 +251,10 @@ public class FactGroupingQueue implements Supplier<Observation>{
 					currentRows.remove(tableIndex);
 					factTables.remove(tableIndex);
 					continue; // index will now point to next table
-				}else if( row.getPatientId().equals(currentPatient.getPatientId()) && compareWithNulls(row.getVisitId(), currentVisitId) == 0 ){
+				}if( (row.getPatientId() == null || row.getPatientId().equals(currentPatient.getPatientId())) && compareWithNulls(row.getVisitId(), currentVisitId) == 0 ){
+					// if the row does not have a patient id, it is assumed that the visit id is unique and sufficient for matching
+					// if the row has both patient id and visit id, both are used for matching
+					
 					// row fits into current group
 					addFactsToWorkQueue(row);
 					// prefetch next row
