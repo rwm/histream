@@ -52,7 +52,6 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 		if( idat.patientId == null ) {
 			// if there is no patient id in this table, 
 			// we can get the patient id by lookup by visit
-			System.out.println("No patient");
 			patid = null;
 		}else {
 			patid = idat.patientId.valueOf(map, row);
