@@ -1,7 +1,11 @@
 package de.sekmi.histream.etl;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 import java.nio.file.Paths;
 
+import javax.xml.stream.XMLStreamException;
 
 import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.io.GroupedXMLWriter;
@@ -26,11 +30,15 @@ public class XMLExport {
 			System.err.println("Usage: XMLExport <import-descriptor-file>");
 			System.exit(-1);
 		}
-		ETLObservationSupplier suppl = ETLObservationSupplier.load(Paths.get(args[0]).toUri().toURL());
-		GroupedXMLWriter writer = new GroupedXMLWriter(System.out);
+		descriptorToXML(Paths.get(args[0]).toUri().toURL(), System.out);
+	}
+
+	public static void descriptorToXML(URL importDescriptor, OutputStream out) throws IOException, ParseException, XMLStreamException {
+		ETLObservationSupplier suppl = ETLObservationSupplier.load(importDescriptor);
+		GroupedXMLWriter writer = new GroupedXMLWriter(out);
 		Meta.transfer(suppl, writer);
 		Streams.transfer(suppl, writer);
 		suppl.close();
-		writer.close();
+		writer.close();		
 	}
 }
