@@ -150,6 +150,7 @@ public class Concept{
 					concept = mf.getConceptOverride();
 				}
 				// or drop the modifier
+				// TODO how to specify that a modifier should be dropped (e.g. if the value is NA)???
 				if( mf.isActionDrop() ){
 					continue; // ignore this modifier
 				}

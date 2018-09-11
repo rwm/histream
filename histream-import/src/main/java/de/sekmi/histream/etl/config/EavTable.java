@@ -75,6 +75,10 @@ public class EavTable extends Table<EavRow> {
 		ColumnMap map = new ColumnMap(headers);
 		if( idat.patientId == null ){
 			throw new ParseException("datasource/eav-table/idat/patient-id column not specified");
+			// TODO allow missing patient id, similar to WideTable.java
+			// missing patient id is allowed, for cases 
+			// when the visit id is unique and sufficient for matching
+
 		}
 		if( idat.visitId == null ){
 			throw new ParseException("datasource/eav-table/idat/visit-id column not specified");
