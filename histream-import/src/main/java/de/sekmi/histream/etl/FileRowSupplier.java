@@ -12,7 +12,7 @@ import java.time.Instant;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
-public class FileRowSupplier extends RowSupplier {
+public class FileRowSupplier implements RowSupplier {
 	private CSVReader in;
 	private String[] headers;
 	private URL url;
@@ -96,9 +96,33 @@ public class FileRowSupplier extends RowSupplier {
 		return timestamp;
 	}
 
+	/**
+	 * Returns the line number of the record previously
+	 * returned by {@link #get()}.
+	 * @return previous record's line number
+	 */
+	public int getLineNo() {
+		if( lineNo == 0 ) {
+			throw new IllegalStateException("Line no requires call to get() first");
+		}
+		// returned line numbers start with 1, the variable starts with 0
+		// no need to subtract 1
+		return lineNo;
+	}
+	/**
+	 * Retrieves the URL for the source file.
+	 * @return source file's URL
+	 */
+	public URL getSourceURL() {
+		return url;
+	}
 	@Override
 	public String getLocation() {
-		return url.toString()+":"+lineNo;
+		return formatLocation(url, lineNo);
+	}
+
+	public static String formatLocation(URL url, int lineNo) {
+		return url.toString()+":"+lineNo;		
 	}
 
 }

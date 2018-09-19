@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.function.Supplier;
 
-public abstract class RowSupplier implements Supplier<Object[]>, AutoCloseable{
+public interface RowSupplier extends Supplier<Object[]>, AutoCloseable{
 
-	public RowSupplier(){
-		
-	}
 	public abstract String[] getHeaders();
 	
 	@Override

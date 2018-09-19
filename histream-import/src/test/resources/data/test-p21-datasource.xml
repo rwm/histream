@@ -6,9 +6,16 @@
 	</meta>
 	
 	<patient-table>
-		<source xsi:type="csv-file">
+		<source xsi:type="csv-filtered">
 			<url>p21khg/_PAT.csv</url>
 			<separator>;</separator>
+			<convert 
+			<sort-cols>
+			 <col>Patid</col>
+			</sort-cols>
+			<unique-filter>
+			 <col>Patid</col>
+			</unique-filter>
 		</source>
 		<idat>
 			<patient-id column="Patientennummer"/>

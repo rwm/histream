@@ -51,15 +51,14 @@ public class CsvFile extends TableSource{
 //	@XmlElement
 //	char escape;
 	
-	private CsvFile(){
+	protected CsvFile(){
 	}
 	public CsvFile(String urlSpec, String separator) throws MalformedURLException{
 		this();
 		this.url = urlSpec;
 		this.separator = separator;
 	}
-	@Override
-	public RowSupplier rows(Meta meta) throws IOException {
+	protected FileRowSupplier openRowSupplier(Meta meta) throws IOException {
 		// resolve url relative to base url from metadata
 		URL base = meta.getLocation();
 		URL source = (base == null)?new URL(url):new URL(base, url);
@@ -71,7 +70,11 @@ public class CsvFile extends TableSource{
 			// if not defined, use system charset
 			charset = Charset.defaultCharset();
 		}
-		return new FileRowSupplier(source, separator, charset);
+		return new FileRowSupplier(source, separator, charset);		
 	}
 
+	@Override
+	public RowSupplier rows(Meta meta) throws IOException {
+		return openRowSupplier(meta);
+	}
 }
