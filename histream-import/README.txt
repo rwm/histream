@@ -7,8 +7,8 @@ For standalone operation of import descriptor parsing,
 put histream-core.jar, histream-import.jar and histream-js.jar 
 into a single folder and run the following command:
 
-java -cp \*.jar de.sekmi.histream.etl.XMLExport datasource.xml
-
+java --add-modules java.xml.bind -cp \* de.sekmi.histream.etl.XMLExport datasource.xml
+ 
 
 Schema/XSD for import descriptions
 ----------------------------------
