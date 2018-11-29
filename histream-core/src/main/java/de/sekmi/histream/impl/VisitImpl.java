@@ -36,6 +36,7 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 	private Status status;
 	private String patientId;
 	private String locationId;
+	private String providerId;
 	
 	/**
 	 * Empty constructor protected, only
@@ -109,6 +110,15 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 	public void setStartTime(DateTimeAccuracy startTime) {
 		checkAndUpdateDirty(this.startTime, startTime);
 		this.startTime = startTime;
+	}
+	@Override
+	public String getProviderId() {
+		return this.providerId;
+	}
+	@Override
+	public void setProviderId(String providerId) {
+		checkAndUpdateDirty(this.providerId, providerId);
+		this.providerId = providerId;
 	}
 
 	

@@ -103,6 +103,9 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 		if( idat.location != null ){
 			visit.setLocationId(idat.location.valueOf(map, row));
 		}
+		if( idat.provider != null ){
+			visit.setProviderId(idat.provider.valueOf(map, row));
+		}
 		// TODO other 
 		
 		// concepts

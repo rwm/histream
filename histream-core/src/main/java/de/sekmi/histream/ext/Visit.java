@@ -42,6 +42,9 @@ public interface Visit extends IdExtensionType,ExternalSourceType {
 	String getLocationId();
 	void setLocationId(String locationId);
 	
+	String getProviderId();
+	void setProviderId(String providerId);
+	
 	public enum Status{
 		Inpatient, Outpatient, Emergency
 	}
