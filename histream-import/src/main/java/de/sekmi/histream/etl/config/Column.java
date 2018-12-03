@@ -154,9 +154,10 @@ public abstract class Column<T> {
 	}
 
 	/**
-	 * Process and return the column value from a table row without map rule processing.
-	 * This method behaves as if {@link #valueOf(ColumnMap, Object[], MapFeedback)} was called
-	 * with the last argument set to {@code null}.
+	 * Process and return the column value from a table row with limited map rule processing.
+	 * The mapping operation is allowed, but does not allow actions (like drop fact) or concept modification 
+	 * In contrast to {@link #valueOf(ColumnMap, Object[], MapFeedback)} with the last argument set to {@code null} (thus not allowing any map operation)
+	 * this method allows mapping.
 	 * 
 	 * @see #valueOf(Object)
 	 * @param colMap column map
@@ -165,9 +166,14 @@ public abstract class Column<T> {
 	 * @throws ParseException parse errors
 	 */
 	public T valueOf(ColumnMap colMap, Object[] row) throws ParseException{
-		return valueOf(colMap, row, null);
+		MapFeedback mf = new MapFeedback();		
+		T value = valueOf(colMap, row, mf);
+		if( mf.isActionDrop() || mf.getConceptOverride() != null ){
+			throw new ParseException("concept override or drop not allowed for column "+getName());
+		}
+		return value;
 	}
-	
+
 	private T processedValue(String val, MapFeedback mapFeedback) throws ParseException{
 		T ret;
 		// apply regular expression replacements
@@ -177,7 +183,7 @@ public abstract class Column<T> {
 		// apply map rules
 		if( map != null ){
 			if( mapFeedback == null ){
-				throw new ParseException("map element allowed for column "+getName());
+				throw new ParseException("map element not supported for column "+getName());
 			}
 			applyMapRules(val, mapFeedback);
 			// use value override, if present

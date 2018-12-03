@@ -98,11 +98,7 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 			patient.setDeathDate(idat.deathdate.valueOf(map, row, null));
 		}
 		if( idat.gender != null ){
-			MapFeedback mf = new MapFeedback();
-			String genderCode = idat.gender.valueOf(map, row, mf);
-			if( mf.isActionDrop() || mf.getConceptOverride() != null ){
-				throw new ParseException("concept override or drop not allowed for patient gender");
-			}
+			String genderCode = idat.gender.valueOf(map, row);
 			// gender may omitted
 			if( genderCode != null ){
 				try{

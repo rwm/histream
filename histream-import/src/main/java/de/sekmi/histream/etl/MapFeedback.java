@@ -1,5 +1,13 @@
 package de.sekmi.histream.etl;
 
+/**
+ * Feedback from mapping operation. E.g. drop fact or override concept.
+ *
+ * @author R.W.Majeed
+ *
+ */
+// TODO allow different subclasses of feedback. some places allow mapping, but drop-fact does not make sense (e.g. gender, location). In some cases, action might drop value, modifier or whole observation.
+
 public class MapFeedback {
 	private boolean drop;
 	private String concept;
