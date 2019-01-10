@@ -54,10 +54,17 @@ public class Concept{
 	private Concept(){
 	}
 	
-	public Concept(String id, String startColumn, String format){
+	/**
+	 * Constructor used for testing
+	 * 
+	 * @param id concept id
+	 * @param startColumn start column name
+	 * @param format start date format
+	 */
+	Concept(String id, String startColumn, String format){
 		this();
 		this.id = id;
-		this.start = new DateTimeColumn(startColumn, format);
+		this.start = new DateTimeColumn(startColumn, format, null);
 	}
 
 	private Value createObservationValue(Object val, String unit) throws ParseException{

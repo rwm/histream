@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.IllformedLocaleException;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -22,18 +24,45 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	@XmlTransient
 	DateTimeFormatter formatter;
 	/**
-	 * Format string for parsing via {@link DateTimeFormatter}
-	 * @see DateTimeFormatter#ofPattern(String)
+	 * Format string for parsing via {@link DateTimeFormatter}.
+	 * For locale specific formats, the locale can be specified
+	 * via {@link #locale}.
+	 * <p>
+	 * If no locale is specified, the parsing
+	 * is done via {@link DateTimeFormatter#ofPattern(String)} which 
+	 * uses the system default locale.
+	 * </p>
 	 */
 	@XmlAttribute
 	String format;
 
+	/** Locale to use for parsing date strings. Specified as BCP 47 tag. 
+	 * Some formats support naming months e.g. Mar 1st 2018. 
+	 * In these cases, a locale must be specified to indicate the language 
+	 * for month names etc.
+	 * See {@link DateTimeFormatter#ofPattern(String, java.util.Locale)}
+	 * <p>
+	 * If no locale specified, the java default locale is used.
+	 * See {@link DateTimeFormatter#ofPattern(String)}
+	 * </p>
+	 * */
+	@XmlAttribute
+	String locale;
+
 	@XmlAttribute
 	String zone;
 	
-	public DateTimeColumn(String name, String format){
+
+	/**
+	 * Construct a date time column
+	 * @param name column name
+	 * @param format date format
+	 * @param locale locale, set to {@code null} for java default locale
+	 */
+	public DateTimeColumn(String name, String format, String locale){
 		super(name);
 		this.format = format;
+		this.locale = locale;
 	}
 	
 	protected DateTimeColumn(){
@@ -54,7 +83,13 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	public DateTimeAccuracy valueFromString(String input) throws ParseException {
 		// parse date according to format
 		if( formatter == null && format != null ){
-			formatter = DateTimeFormatter.ofPattern(format);
+			if( locale == null ) {
+				formatter = DateTimeFormatter.ofPattern(format);
+			}else try {
+				formatter = DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale));
+			}catch( IllformedLocaleException e ) {
+				throw new ParseException("Failed to parse DateTime column locale tag: "+locale);
+			}
 		}
 		if( formatter == null ){
 			throw new ParseException("format must be specified for DateTime fields if strings are parsed");
