@@ -186,6 +186,15 @@ public class EavTable extends Table<EavRow> {
 		if( end != null ){
 			fact.setEndTime(end);
 		}
+		String location = null;
+		if( mdat.location != null ) {
+			location = mdat.location.valueOf(colMap, row);
+		}
+
+		if( location != null ) {
+			fact.setLocationId(location);
+		}
+		
 		if( vval != null ){
 			// convert native type to observation value
 			if( vval instanceof String ){
