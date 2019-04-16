@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
 import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.ext.Visit.Status;
@@ -476,6 +477,9 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		return getOrCreateInstance(fact.getEncounterId(), fact.getExtension(I2b2Patient.class), fact.getSource());
 	}
 
+	public I2b2Visit createInstance(String encounterId, Patient patient, ExternalSourceType source) {
+		return getOrCreateInstance(encounterId, (I2b2Patient)patient, source);
+	}
 	@Override
 	public Iterable<Class<? super I2b2Visit>> getInstanceTypes() {
 		return INSTANCE_TYPES;

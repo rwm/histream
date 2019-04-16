@@ -25,11 +25,54 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Instant;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.i2b2.PostgresPatientStore;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 public class TestPostgresPatientStore implements Closeable {
 	PostgresPatientStore store;
+	LocalHSQLDataSource ds;
 	
+	@Before
+	public void createDatabase() throws SQLException, IOException {
+		ds = new LocalHSQLDataSource();
+		ds.delete();
+		ds.createI2b2();
+	}
+
+	private void openPatientStore() throws SQLException {
+		store = new PostgresPatientStore();
+		store.open(ds.getConnection(), "test", new DataDialect());
+	}
+	@After
+	public void cleanupDatabase() throws SQLException, IOException {
+		if( store != null ) {
+			store.close();
+		}
+		ds.delete();
+	}
+	
+	@Test
+	public void insertPatient() throws IOException, SQLException {
+		ExternalSourceType t = new ExternalSourceImpl("junit", Instant.now());
+		openPatientStore();
+		store.createInstance("ABC001", t);
+		store.flush();
+		store.close();
+		store = null;
+		// reload store from database
+		openPatientStore();
+		// attempt to load previously stored patient
+		I2b2Patient p = store.retrieve("ABC001");
+		Assert.assertNotNull(p);
+	}
+
 	public void open(String  host, int port, String user, String password, String projectId) throws ClassNotFoundException, SQLException{
 		store = new PostgresPatientStore();
 		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", user, password),projectId, new DataDialect());

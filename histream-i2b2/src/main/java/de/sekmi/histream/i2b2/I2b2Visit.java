@@ -73,6 +73,8 @@ public class I2b2Visit extends VisitImpl {
 			// also set the patient_num 
 			int patient_num = ((I2b2Patient)patient).getNum();
 			this.patient_num = patient_num;
+		}else {
+			throw new IllegalArgumentException("Patient expected of instanceOf I2b2Patient");
 		}
 	}
 
