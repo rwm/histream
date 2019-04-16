@@ -23,7 +23,6 @@ package de.sekmi.histream.impl;
 
 import de.sekmi.histream.Observation;
 
-import java.util.Arrays;
 
 import de.sekmi.histream.Extension;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -31,10 +30,10 @@ import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
 public class SimpleVisitExtension implements Extension<VisitImpl>{
-	private final static Iterable<Class<? super VisitImpl>> TYPES = Arrays.asList(Visit.class, VisitImpl.class);
+	private final static Class<?>[] TYPES = new Class[] {Visit.class, VisitImpl.class};
 
 	@Override
-	public Iterable<Class<? super VisitImpl>> getInstanceTypes() {return TYPES;}
+	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
 	public VisitImpl createInstance(Object... args) {
@@ -63,6 +62,11 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 		//visit.setSourceId(observation.getSourceId());
 		//visit.setSourceTimestamp(observation.getSourceTimestamp());
 		return visit;
+	}
+
+	@Override
+	public Class<VisitImpl> getSlotType() {
+		return VisitImpl.class;
 	}
 
 }

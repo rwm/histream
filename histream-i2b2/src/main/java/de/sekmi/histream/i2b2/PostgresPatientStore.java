@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -74,7 +73,7 @@ import de.sekmi.histream.ext.PatientStore;
  */
 public class PostgresPatientStore extends PostgresExtension<I2b2Patient> implements PatientStore, Closeable{
 	private static final Logger log = Logger.getLogger(PostgresPatientStore.class.getName());
-	private static final Iterable<Class<? super I2b2Patient>> INSTANCE_TYPES = Arrays.asList(Patient.class, I2b2Patient.class);
+	private static final Class<?>[] INSTANCE_TYPES = new Class[] {Patient.class, I2b2Patient.class};
 	private String projectId;
 	private String idSourceDefault;
 	private char idSourceSeparator;
@@ -541,7 +540,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 
 	@Override
-	public Iterable<Class<? super I2b2Patient>> getInstanceTypes() {
+	public Class<?>[] getInstanceTypes() {
 		return INSTANCE_TYPES;
 	}
 
@@ -648,6 +647,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			}
 			db = null;
 		}
+	}
+	@Override
+	public Class<I2b2Patient> getSlotType() {
+		return I2b2Patient.class;
 	}
 	
 }

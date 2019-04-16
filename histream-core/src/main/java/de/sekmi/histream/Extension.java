@@ -26,9 +26,9 @@ package de.sekmi.histream;
  * Extensions allow additional information to be stored and retrieved
  * for observations. 
  * 
- * @author Raphael
+ * @author R.W.Majeed
  *
- * @param <T> type class
+ * @param <T> slot type to be kept in memory with the observation
  */
 public interface Extension<T>{
 	/**
@@ -58,6 +58,7 @@ public interface Extension<T>{
 	 * TODO change return type to array, to register all compatible classes
 	 * @return instance type
 	 */
-	Iterable<Class<? super T>> getInstanceTypes();
+	Class<?>[] getInstanceTypes();
 	
+	Class<T> getSlotType();
 }

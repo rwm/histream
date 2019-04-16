@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -65,7 +64,7 @@ import de.sekmi.histream.ext.Visit.Status;
  */
 public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements Closeable{
 	private static final Logger log = Logger.getLogger(PostgresVisitStore.class.getName());
-	private static final Iterable<Class<? super I2b2Visit>> INSTANCE_TYPES = Arrays.asList(Visit.class,I2b2Visit.class);
+	private static final Class<?>[] INSTANCE_TYPES = new Class[] {Visit.class,I2b2Visit.class};
 	
 	private String projectId;
 	private int maxEncounterNum;
@@ -480,10 +479,6 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	public I2b2Visit createInstance(String encounterId, Patient patient, ExternalSourceType source) {
 		return getOrCreateInstance(encounterId, (I2b2Patient)patient, source);
 	}
-	@Override
-	public Iterable<Class<? super I2b2Visit>> getInstanceTypes() {
-		return INSTANCE_TYPES;
-	}
 
 	/**
 	 * Find a visit. Does not create the visit if it doesn't exist.
@@ -568,6 +563,14 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			}
 			db = null;
 		}
+	}
+	@Override
+	public Class<?>[] getInstanceTypes() {
+		return INSTANCE_TYPES;
+	}
+	@Override
+	public Class<I2b2Visit> getSlotType() {
+		return I2b2Visit.class;
 	}
 
 }

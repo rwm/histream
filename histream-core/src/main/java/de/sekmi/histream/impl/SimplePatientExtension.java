@@ -1,7 +1,4 @@
 package de.sekmi.histream.impl;
-
-import java.util.Arrays;
-
 /*
  * #%L
  * histream
@@ -36,10 +33,10 @@ import de.sekmi.histream.ext.Patient;
  *
  */
 public class SimplePatientExtension implements Extension<PatientImpl>{
-	private final static Iterable<Class<? super PatientImpl>> TYPES = Arrays.asList(Patient.class, PatientImpl.class);
+	private final static Class<?>[] TYPES = new Class[] {Patient.class, PatientImpl.class};
 
 	@Override
-	public Iterable<Class<? super PatientImpl>> getInstanceTypes() {return TYPES;}
+	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
 	public PatientImpl createInstance(Object... args) {
@@ -61,6 +58,11 @@ public class SimplePatientExtension implements Extension<PatientImpl>{
 	public PatientImpl createInstance(Observation observation) {
 		PatientImpl patient = createInstance(observation.getPatientId(), observation.getSource());
 		return patient;
+	}
+
+	@Override
+	public Class<PatientImpl> getSlotType() {
+		return PatientImpl.class;
 	}
 
 }
