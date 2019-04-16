@@ -32,6 +32,15 @@ public class TestFileObservationSuppliers {
 		s.close();
 		p.close();
 	}
+	
+	@Test
+	public void verifyMinimalXML() throws Exception{
+		GroupedXMLProvider p = new GroupedXMLProvider(null);
+		ObservationSupplier s = p.createSupplier(getClass().getResourceAsStream("/min.xml"), factory);
+		Assert.assertTrue( s.stream().count() > 0 );
+		s.close();
+		p.close();
+	}
 	@Test
 	public void verifyFlatSupplier() throws Exception{
 		FlatProviderFactory p = new FlatProviderFactory(null);
