@@ -9,6 +9,7 @@ import java.util.Map;
  * @author R.W.Majeed
  *
  */
+@Deprecated
 public class CachedPatientExtension extends SimplePatientExtension {
 	private Map<String, PatientImpl> cache;
 

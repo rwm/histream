@@ -32,6 +32,7 @@ import de.sekmi.histream.ext.Patient;
  * @author R.W.Majeed
  *
  */
+@Deprecated
 public class SimplePatientExtension implements Extension<PatientImpl>{
 	private final static Class<?>[] TYPES = new Class[] {Patient.class, PatientImpl.class};
 
@@ -63,6 +64,11 @@ public class SimplePatientExtension implements Extension<PatientImpl>{
 	@Override
 	public Class<PatientImpl> getSlotType() {
 		return PatientImpl.class;
+	}
+
+	@Override
+	public <U> U extractSubtype(PatientImpl slotInstance, Class<U> subtype) {
+		return extractSubtype(slotInstance, subtype);
 	}
 
 }

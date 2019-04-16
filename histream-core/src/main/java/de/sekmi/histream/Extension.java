@@ -61,4 +61,20 @@ public interface Extension<T>{
 	Class<?>[] getInstanceTypes();
 	
 	Class<T> getSlotType();
+	/**
+	 * Extract subtype information from the slot type.
+	 * E.g. a visit store can provide info about the patient
+	 * @param slotInstance slot instance type
+	 * @param subtype subtype to retrieve
+	 * @return subtype instance
+	 */
+	<U> U extractSubtype(T slotInstance, Class<U> subtype);
+
+	public static <U,T> U extractSupertype(T slotInstance, Class<U> supertype){
+		if( supertype.isInstance(slotInstance) ) {
+			return supertype.cast(slotInstance);
+		}else {
+			throw new IllegalArgumentException("Unsupported supertype "+supertype);
+		}
+	}
 }

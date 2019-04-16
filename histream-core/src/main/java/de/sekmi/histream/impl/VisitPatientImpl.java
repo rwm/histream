@@ -26,16 +26,14 @@ import java.util.Objects;
 
 
 import de.sekmi.histream.DateTimeAccuracy;
-import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
 import de.sekmi.histream.ext.Visit;
 
-@Deprecated
-public class VisitImpl extends StoredExtensionType implements Visit {
+public class VisitPatientImpl extends StoredExtensionType implements Visit {
+	private PatientImpl patient;
 	private DateTimeAccuracy startTime;
 	private DateTimeAccuracy endTime;
 	private Status status;
-	private String patientId;
 	private String locationId;
 	private String providerId;
 	
@@ -43,32 +41,27 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 	 * Empty constructor protected, only
 	 * available to overriding classes.
 	 */
-	protected VisitImpl() {
+	protected VisitPatientImpl() {
 		
 	}
-	public VisitImpl(String id, String patientId, DateTimeAccuracy startTime){
+	public VisitPatientImpl(String id, PatientImpl patient, DateTimeAccuracy startTime){
 		setId(id);
-		this.patientId = patientId;
-		this.startTime = startTime;		
-		markDirty(true);
+		setPatient(patient);
+		this.startTime = startTime;
 	}
 	
-	public VisitImpl(String id, String patientId, DateTimeAccuracy startTime, DateTimeAccuracy endTime, Status status){
-		this(id, patientId, startTime);
-		this.status = status;
-		this.endTime = endTime;
-	}
-
-	public String getPatientId(){return patientId;}
+	public String getPatientId(){return patient.getId();}
 	
-	public void setPatient(Patient patient){
+	public void setPatient(PatientImpl patient){
 		Objects.requireNonNull(patient);
 		// patient id should not be changed normally.
-		this.patientId = patient.getId();
-		// TODO need to update dirty flag?
+		this.patient = patient;
 		markDirty(true);
 	}
 
+	public PatientImpl getPatient() {
+		return this.patient;
+	}
 	@Override
 	public DateTimeAccuracy getStartTime() {
 		return startTime;

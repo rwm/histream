@@ -40,13 +40,10 @@ import java.util.logging.Logger;
 
 
 import de.sekmi.histream.DateTimeAccuracy;
-import de.sekmi.histream.Extension;
-import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
 import de.sekmi.histream.ext.Patient.Sex;
-import de.sekmi.histream.ext.PatientStore;
 
 /**
  * Patient cache which synchronizes with i2b2 patient_dimension and patient_mapping tables.
@@ -72,14 +69,13 @@ import de.sekmi.histream.ext.PatientStore;
  * @author marap1
  *
  */
-public class PostgresPatientStore extends PostgresExtension<I2b2Patient> implements PatientStore, Closeable{
-	private static final Logger log = Logger.getLogger(PostgresPatientStore.class.getName());
-	private static final Class<?>[] INSTANCE_TYPES = new Class[] {Patient.class, I2b2Patient.class};
-	private String projectId;
-	private String idSourceDefault;
-	private char idSourceSeparator;
-	private Connection db;
-	private int fetchSize;
+public class PostgresPatientCache implements Closeable{
+	private static final Logger log = Logger.getLogger(PostgresPatientCache.class.getName());
+	protected String projectId;
+	protected String idSourceDefault;
+	protected char idSourceSeparator;
+	protected Connection db;
+	protected int fetchSize;
 	// TODO read only flag!!!!!! XXX
 //	private String autoInsertSourceId;
 
@@ -104,7 +100,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	private PreparedStatement deletePatientSource;
 	private PreparedStatement deleteMapSource;
 
-	private DataDialect dialect;
+	protected DataDialect dialect;
 	
 //	/**
 //	 * Construct new postgres patient store. In addition to properties
@@ -146,7 +142,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 //		initialize();
 //	}
 
-	public PostgresPatientStore(){
+	public PostgresPatientCache(){
 		this.idSourceDefault = "HIVE";
 		this.idSourceSeparator = ':';
 		this.fetchSize = 1000;
@@ -170,9 +166,13 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 	
 	public I2b2Patient lookupPatientNum(Integer patient_num){
-		return patientCache.get(patient_num);
+		return getCached(patient_num);
 	}
-	
+
+	public I2b2Patient lookupPatientId(String patient_id) {
+		return getCached(patient_id);
+	}
+
 	private I2b2Patient getCached(String patient_id){
 		return idCache.get(patient_id);
 	}
@@ -196,7 +196,10 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		log.info("MAX(patient_num) = "+maxPatientNum);
 	}
 
-	@Override
+	/**
+	 * This method is called from {@link #open(Connection, String, DataDialect)}. Override to prepare additional statements.
+	 * @throws SQLException SQL error
+	 */
 	protected void prepareStatements()throws SQLException{
 
 		db.setAutoCommit(true);
@@ -501,7 +504,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		insertIde.executeUpdate();
 	}
 	
-	private I2b2Patient getOrCreateInstance(String patientId, ExternalSourceType source){
+	public I2b2Patient createPatient(String patientId, ExternalSourceType source){
 		I2b2Patient pat = getCached(patientId);
 		if( pat == null ){
 			// string id not known to cache
@@ -535,52 +538,28 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		return pat;
 	}
 	
-	@Override
-	public I2b2Patient createInstance(Observation fact) {
-		return getOrCreateInstance(fact.getPatientId(), fact.getSource());		
-	}
+//	@SuppressWarnings("unused")
+//	@Override
+//	public void merge(Patient patient, String additionalId, ExternalSourceType source) {
+//		I2b2Patient p = (I2b2Patient)patient;
+//		if( true )throw new UnsupportedOperationException();
+//		// TODO add additionalId to patient.mergedIds 
+//		
+//		try {
+//			insertIde(p.getNum(), additionalId, "M", source);
+//		} catch (SQLException e) {
+//			log.log(Level.SEVERE, "Unable to insert patient merge", e);
+//		}
+//	}
 
-	@Override
-	public Class<?>[] getInstanceTypes() {
-		return INSTANCE_TYPES;
-	}
+//	@Override
+//	public String[] getAliasIds(Patient patient) {
+//		I2b2Patient p = (I2b2Patient)patient;
+//		return p.mergedIds;
+//	}
+//	
 
-	@Override
-	public I2b2Patient createInstance(Object... args) throws IllegalArgumentException {
-		if( args.length != 2 || !(args[0] instanceof String) || !(args[1] instanceof ExternalSourceType) ){
-			throw new IllegalArgumentException("Expected arguments: String patientId, ExternalSourceType source");
-		}
-		return getOrCreateInstance((String)args[0], (ExternalSourceType)args[1]);
-	}
 
-	@Override
-	public I2b2Patient retrieve(String id) {
-		return idCache.get(id);
-	}
-
-	@SuppressWarnings("unused")
-	@Override
-	public void merge(Patient patient, String additionalId, ExternalSourceType source) {
-		I2b2Patient p = (I2b2Patient)patient;
-		if( true )throw new UnsupportedOperationException();
-		// TODO add additionalId to patient.mergedIds 
-		
-		try {
-			insertIde(p.getNum(), additionalId, "M", source);
-		} catch (SQLException e) {
-			log.log(Level.SEVERE, "Unable to insert patient merge", e);
-		}
-	}
-
-	@Override
-	public String[] getAliasIds(Patient patient) {
-		I2b2Patient p = (I2b2Patient)patient;
-		return p.mergedIds;
-	}
-	
-
-	// TODO unify method with PostgresVisitStore
-	@Override
 	public void deleteWhereSourceId(String sourceId) throws SQLException {
 		deletePatientSource.setString(1, sourceId);
 		int numRows = deletePatientSource.executeUpdate();
@@ -616,7 +595,6 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 	}
 	
 
-	@Override
 	public void flush(){
 		int count = 0;
 		Iterator<I2b2Patient> dirty = StoredExtensionType.dirtyIterator(patientCache.elements());
@@ -632,11 +610,7 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 		log.info("Updated "+count+" patients in database");
 	}
 
-	@Override
-	public void purge(String id) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+
 	@Override
 	public synchronized void close() throws IOException {
 		if( db != null ){
@@ -649,13 +623,5 @@ public class PostgresPatientStore extends PostgresExtension<I2b2Patient> impleme
 			db = null;
 		}
 	}
-	@Override
-	public Class<I2b2Patient> getSlotType() {
-		return I2b2Patient.class;
-	}
-	@Override
-	public <U> U extractSubtype(I2b2Patient slotInstance, Class<U> subtype) {
-		return Extension.extractSupertype(slotInstance, subtype);
-	}
-	
+
 }

@@ -2,8 +2,8 @@ package de.sekmi.histream.i2b2;
 
 import java.time.temporal.ChronoUnit;
 
-import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.PatientImpl;
 
 /*
  * #%L
@@ -25,8 +25,7 @@ import de.sekmi.histream.ext.Visit;
  * #L%
  */
 
-
-import de.sekmi.histream.impl.VisitImpl;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 
 /**
@@ -35,8 +34,7 @@ import de.sekmi.histream.impl.VisitImpl;
  * @author Raphael
  *
  */
-@Deprecated
-public class I2b2Visit extends VisitImpl {
+public class I2b2PatientVisit extends VisitPatientImpl {
 
 	/**
 	 * I2b2 internal encounter id (32bit integer)
@@ -55,7 +53,7 @@ public class I2b2Visit extends VisitImpl {
 	
 	int maxInstanceNum;
 	
-	public I2b2Visit(int encounter_num, int patient_num) {
+	public I2b2PatientVisit(int encounter_num, int patient_num) {
 		super();
 		this.encounter_num = encounter_num;
 		this.patient_num = patient_num;
@@ -68,7 +66,7 @@ public class I2b2Visit extends VisitImpl {
 	public int getPatientNum(){return patient_num;}
 
 	@Override
-	public void setPatient(Patient patient) {
+	public void setPatient(PatientImpl patient) {
 		super.setPatient(patient);
 		if( patient instanceof I2b2Patient ) {
 			// also set the patient_num 

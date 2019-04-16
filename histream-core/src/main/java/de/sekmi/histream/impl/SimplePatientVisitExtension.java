@@ -29,26 +29,27 @@ import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
 
-@Deprecated
-public class SimpleVisitExtension implements Extension<VisitImpl>{
-	private final static Class<?>[] TYPES = new Class[] {Visit.class, VisitImpl.class};
+public class SimplePatientVisitExtension implements Extension<VisitPatientImpl>{
+	private final static Class<?>[] TYPES = new Class[] {Visit.class,VisitPatientImpl.class,Patient.class,PatientImpl.class};
 
 	@Override
 	public Class<?>[] getInstanceTypes() {return TYPES;}
 
 	@Override
-	public VisitImpl createInstance(Object... args) {
+	public VisitPatientImpl createInstance(Object... args) {
 		if( args.length != 3 
 				|| !(args[0] instanceof String)
-				|| !(args[1] instanceof Patient)
+				|| !(args[1] instanceof String)
 				|| !(args[2] instanceof ExternalSourceType) )
 		{
-			throw new IllegalArgumentException("Need arguments String, Patient, ExternalSourceType");
+			throw new IllegalArgumentException("Need arguments Patient id, Visit id, ExternalSourceType");
 		}
-		VisitImpl visit = new VisitImpl();
-		visit.setId((String)args[0]);
-		visit.setPatient(((Patient)args[1]));
 		ExternalSourceType source = (ExternalSourceType)args[2];
+		PatientImpl patient = new PatientImpl();
+		patient.setId((String)args[0]);
+		patient.setSourceId(source.getSourceId());
+		patient.setSourceTimestamp(source.getSourceTimestamp());
+		VisitPatientImpl visit = new VisitPatientImpl((String)args[1], patient, null);
 		visit.setSourceId(source.getSourceId());
 		visit.setSourceTimestamp(source.getSourceTimestamp());
 		
@@ -56,8 +57,8 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 	}
 
 	@Override
-	public VisitImpl createInstance(Observation observation) {
-		VisitImpl visit = createInstance(observation.getEncounterId(), observation.getExtension(Patient.class), observation.getSource());
+	public VisitPatientImpl createInstance(Observation observation) {
+		VisitPatientImpl visit = createInstance(observation.getPatientId(), observation.getEncounterId(), observation.getSource());
 		//visit.setId();
 		//visit.setPatientId(observation.getPatientId());
 		//visit.setSourceId(observation.getSourceId());
@@ -66,12 +67,19 @@ public class SimpleVisitExtension implements Extension<VisitImpl>{
 	}
 
 	@Override
-	public Class<VisitImpl> getSlotType() {
-		return VisitImpl.class;
+	public Class<VisitPatientImpl> getSlotType() {
+		return VisitPatientImpl.class;
 	}
+
 	@Override
-	public <U> U extractSubtype(VisitImpl slotInstance, Class<U> subtype) {
-		return extractSubtype(slotInstance, subtype);
+	public <U> U extractSubtype(VisitPatientImpl slotInstance, Class<U> subtype) {
+		if( subtype.isAssignableFrom(PatientImpl.class) ){
+			return subtype.cast(slotInstance.getPatient());
+		}else if( subtype.isInstance(slotInstance) ) {
+			return subtype.cast(slotInstance);
+		}else {
+			throw new IllegalArgumentException("Unsupported subtype "+subtype);
+		}
 	}
 
 }

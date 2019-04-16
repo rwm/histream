@@ -34,18 +34,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 import de.sekmi.histream.DateTimeAccuracy;
-import de.sekmi.histream.Extension;
-import de.sekmi.histream.Observation;
 import de.sekmi.histream.ext.ExternalSourceType;
-import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
-import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.ext.Visit.Status;
 
 /**
@@ -63,22 +58,12 @@ import de.sekmi.histream.ext.Visit.Status;
  * @author marap1
  *
  */
-@Deprecated
-public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements Closeable{
-	private static final Logger log = Logger.getLogger(PostgresVisitStore.class.getName());
-	private static final Class<?>[] INSTANCE_TYPES = new Class[] {Visit.class,I2b2Visit.class};
-	
-	private String projectId;
+public class PostgresPatientVisitCache extends PostgresPatientCache implements Closeable{
+	private static final Logger log = Logger.getLogger(PostgresPatientVisitCache.class.getName());
+
 	private int maxEncounterNum;
-	private char idSourceSeparator;
-	private String idSourceDefault;
-	private int fetchSize;
-	private Connection db;
-	
-	//private static ChronoUnit[] map_date_units = {ChronoUnit.DAYS, ChronoUnit.MONTHS, ChronoUnit.YEARS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS};
-	//private static char[] map_death_chars = {};
-	private Hashtable<Integer, I2b2Visit> visitCache;
-	private Hashtable<String, I2b2Visit> idCache;
+	private Hashtable<Integer, I2b2PatientVisit> visitCache;
+	private Hashtable<String, I2b2PatientVisit> idCache;
 	/** if true, don't allow a change of patient for a given visit. */
 	private boolean rejectPatientChange;
 	
@@ -90,8 +75,6 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	private PreparedStatement selectMappingsAll;
 	private PreparedStatement deleteSource;
 	private PreparedStatement deleteMapSource;
-
-	private DataDialect dialect;
 
 //	/**
 //	 * Create a visit store using configuration settings.
@@ -123,27 +106,21 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 //		initialize();
 //	}
 
-	public PostgresVisitStore(){
-		this.idSourceDefault = "HIVE";
-		this.idSourceSeparator = ':';
-		this.fetchSize = 1000;
+	public PostgresPatientVisitCache(){
 		this.rejectPatientChange = false;
 	}
+	@Override
 	public void open(Connection connection, String projectId, DataDialect dialect) throws SQLException{
+		// first load patients
+		super.open(connection, projectId, dialect);
 		visitCache = new Hashtable<>();
 		idCache = new Hashtable<>();
-		this.projectId = projectId;
-		this.db = connection;
-		this.dialect = dialect;
-		// require project id
-		Objects.requireNonNull(this.projectId, "non-null projectId required");
-		db.setAutoCommit(true);
-		prepareStatements();
 		loadMaxEncounterNum();
 		batchLoad(); /// XXX loading visits does not set the String patientId, for that, the patientStore would be needed
 	}
 	@Override
 	protected void prepareStatements() throws SQLException {
+		super.prepareStatements();
 		// TODO: use prefix from configuration to specify tablespace
 		insert = db.prepareStatement("INSERT INTO visit_dimension(encounter_num, patient_num, import_date, download_date, sourcesystem_cd) VALUES(?,?,current_timestamp,?,?)");
 		insertMapping = db.prepareStatement("INSERT INTO encounter_mapping(encounter_num, encounter_ide, encounter_ide_source, patient_ide, patient_ide_source, encounter_ide_status, project_id, import_date, download_date, sourcesystem_cd) VALUES(?,?,?,?,?,'A','"+projectId+"',current_timestamp,?,?)");
@@ -182,7 +159,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		log.info("MAX(encounter_num) = "+maxEncounterNum);
 	}
 
-	public I2b2Visit lookupEncounterNum(Integer encounter_num){
+	public I2b2PatientVisit lookupEncounterNum(Integer encounter_num){
 		return visitCache.get(encounter_num);
 	}
 	public void loadMaxInstanceNums() throws SQLException{
@@ -195,7 +172,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		int noMatch = 0;
 		try( ResultSet rs = stmt.executeQuery(sql) ){
 			while( rs.next() ){
-				I2b2Visit v = visitCache.get(rs.getInt(2));
+				I2b2PatientVisit v = visitCache.get(rs.getInt(2));
 				if( v != null )v.maxInstanceNum = rs.getInt(3);
 				else noMatch ++;
 				count ++;
@@ -235,7 +212,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	 * @param aliases alias patient IDs (e.g. merged)
 	 * @param primary index of primary alias (in aliases)
 	 */
-	private void setAliases(I2b2Visit visit, String[] aliases, int primary){
+	private void setAliases(I2b2PatientVisit visit, String[] aliases, int primary){
 		visit.aliasIds = aliases;
 		visit.primaryAliasIndex = primary;
 		visit.setId(aliases[primary]);
@@ -245,7 +222,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 	}
 	private void batchSetAliases(int num, ArrayList<String> aliases, int primary){
-		I2b2Visit visit = visitCache.get(num);
+		I2b2PatientVisit visit = visitCache.get(num);
 		if( visit == null ){
 			log.warning("Missing row in visit_dimension for encounter_mapping.encounter_num="+num);
 		}else{
@@ -253,12 +230,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			visit.markDirty(false);
 		}
 	}
-	
+
 	private void batchLoad() throws SQLException{
 		// load visits
 		try( ResultSet rs = selectAll.executeQuery() ){
 			while( rs.next() ){
-				I2b2Visit visit = loadFromResultSet(rs);
+				I2b2PatientVisit visit = loadFromResultSet(rs);
 				visitCache.put(visit.getNum(), visit);
 			}
 		}
@@ -295,7 +272,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 	}
 	/*
-	private I2b2Visit retrieveFromStorage(String id) throws IOException{
+	private I2b2PatientVisit retrieveFromStorage(String id) throws IOException{
 		synchronized( select ){
 			try {
 				select.setInt(1, Integer.parseInt(id));
@@ -311,7 +288,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 	}*/
 	
-	private void updateStorage(I2b2Visit visit) throws SQLException {
+	private void updateStorage(I2b2PatientVisit visit) throws SQLException {
 		synchronized( update ){
 			update.setInt(1, visit.getPatientNum());
 			update.setString(2, visit.getActiveStatusCd());
@@ -340,7 +317,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	 * @param visit visit to add
 	 * @throws SQLException if the INSERT failed
 	 */
-	private void addToStorage(I2b2Visit visit) throws SQLException{
+	private void addToStorage(I2b2PatientVisit visit) throws SQLException{
 		synchronized( insert ){
 			insert.setInt(1, visit.getNum() );
 			insert.setInt(2, visit.getPatientNum());
@@ -369,7 +346,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 	
 
 
-	private I2b2Visit loadFromResultSet(ResultSet rs) throws SQLException{
+	private I2b2PatientVisit loadFromResultSet(ResultSet rs) throws SQLException{
 		int id = rs.getInt(1);
 		int patid = rs.getInt(2);
 		// XXX String patientId is always null after loading from the database.
@@ -398,7 +375,7 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 		
 		// TODO: use patid
-		I2b2Visit visit = new I2b2Visit(id, patid);
+		I2b2PatientVisit visit = new I2b2PatientVisit(id, patid);
 		visit.setStartTime(startDate);
 		visit.setEndTime(endDate);
 		visit.setStatus(status);
@@ -410,6 +387,16 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		
 		// additional fields go here
 		
+		// assign patient
+		I2b2Patient patient = lookupPatientNum(patid);
+		if( patient == null ) {
+			// visit in database with illegal patient reference. patient does not exist
+			// call warning handler
+			// TODO decide what to do.. create patient? fail loading visit? or maybe create a temporary memory patient without storage
+			log.severe("Visit "+id+" references non-existing patient_num "+patid);
+		}else {
+			visit.setPatient(patient);
+		}
 		// mark clean
 		visit.markDirty(false);
 		return visit;
@@ -419,23 +406,23 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		log.log(Level.SEVERE, "Unable to retrieve visit "+id, e);
 	}
  	*/
-	private void insertionException(I2b2Visit visit, SQLException e) {
+	private void insertionException(I2b2PatientVisit visit, SQLException e) {
 		log.log(Level.SEVERE, "Unable to insert visit "+visit.getId(), e);
 	}
 
-	private void updateException(I2b2Visit visit, SQLException e) {
+	private void updateException(I2b2PatientVisit visit, SQLException e) {
 		log.log(Level.SEVERE, "Unable to update visit "+visit.getId(), e);
 	}
 
-	private I2b2Visit getOrCreateInstance(String encounterId, I2b2Patient patient, ExternalSourceType source){
-		I2b2Visit visit = idCache.get(encounterId);
+	public I2b2PatientVisit createVisit(String encounterId, I2b2Patient patient, ExternalSourceType source){
+		I2b2PatientVisit visit = idCache.get(encounterId);
 		
 		if( visit == null ){
 			// visit does not exist, create a new one
 
 			maxEncounterNum ++;
 			int encounter_num = maxEncounterNum;
-			visit = new I2b2Visit(encounter_num, patient.getNum());
+			visit = new I2b2PatientVisit(encounter_num, patient.getNum());
 			visit.setPatient(patient);
 			
 			// created from observation, use source metadata
@@ -473,27 +460,21 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		}
 		return visit;		
 	}
-	@Override
-	public I2b2Visit createInstance(Observation fact){
-		return getOrCreateInstance(fact.getEncounterId(), fact.getExtension(I2b2Patient.class), fact.getSource());
-	}
-
-	public I2b2Visit createInstance(String encounterId, Patient patient, ExternalSourceType source) {
-		return getOrCreateInstance(encounterId, (I2b2Patient)patient, source);
-	}
 
 	/**
 	 * Find a visit. Does not create the visit if it doesn't exist.
 	 * @param id visit id/alias
 	 * @return visit or {@code null} if not found.
 	 */
-	public I2b2Visit findVisit(String id){
+	public I2b2PatientVisit findVisit(String id){
 		return idCache.get(id);
 	}
 	
-	// TODO unify method with PostgresVisitStore
 	@Override
 	public void deleteWhereSourceId(String sourceId) throws SQLException {
+		// first delete patient
+		super.deleteWhereSourceId(sourceId);
+		// then visit
 		deleteSource.setString(1, sourceId);
 		int numRows = deleteSource.executeUpdate();
 		log.info("Deleted "+numRows+" rows with sourcesystem_cd = "+sourceId);
@@ -501,17 +482,17 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		deleteMapSource.setString(1, sourceId);
 		deleteMapSource.executeUpdate();
 		// find matching patients in cache
-		Enumeration<I2b2Visit> all = visitCache.elements();
-		LinkedList<I2b2Visit>remove = new LinkedList<>();
+		Enumeration<I2b2PatientVisit> all = visitCache.elements();
+		LinkedList<I2b2PatientVisit>remove = new LinkedList<>();
 		while( all.hasMoreElements() ){
-			I2b2Visit p = all.nextElement();
+			I2b2PatientVisit p = all.nextElement();
 			if( p.getSourceId() != null && p.getSourceId().equals(sourceId) ){
 				remove.add(p); // remove later, otherwise the Enumeration might fail
 			}
 			// XXX does not work with sourceId == null
 		}
 		// remove patients from cache
-		for( I2b2Visit p : remove ){
+		for( I2b2PatientVisit p : remove ){
 			visitCache.remove(p.getNum());
 			
 			for( String id : p.aliasIds ){
@@ -525,25 +506,12 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 		loadMaxEncounterNum();
 	}
 
-
-	@Override
-	public I2b2Visit createInstance(Object... args) throws UnsupportedOperationException {
-		if( args.length != 3 
-				|| !(args[0] instanceof String) 
-				|| !(args[1] instanceof I2b2Patient) 
-				|| !(args[2] instanceof ExternalSourceType) )
-		{
-			throw new IllegalArgumentException("Need arguments String visitId, I2b2Patient patient, ExternalSourceType source");
-		}
-		return getOrCreateInstance((String)args[0], (I2b2Patient)args[1], (ExternalSourceType)args[2]);
-	}
-
 	@Override
 	public void flush() {
-		Iterator<I2b2Visit> dirty = StoredExtensionType.dirtyIterator(visitCache.elements());
+		Iterator<I2b2PatientVisit> dirty = StoredExtensionType.dirtyIterator(visitCache.elements());
 		int count = 0;
 		while( dirty.hasNext() ){
-			I2b2Visit visit = dirty.next();
+			I2b2PatientVisit visit = dirty.next();
 			try {
 				updateStorage(visit);
 				count ++;
@@ -566,17 +534,4 @@ public class PostgresVisitStore extends PostgresExtension<I2b2Visit> implements 
 			db = null;
 		}
 	}
-	@Override
-	public Class<?>[] getInstanceTypes() {
-		return INSTANCE_TYPES;
-	}
-	@Override
-	public Class<I2b2Visit> getSlotType() {
-		return I2b2Visit.class;
-	}
-	@Override
-	public <U> U extractSubtype(I2b2Visit slotInstance, Class<U> subtype) {
-		return Extension.extractSupertype(slotInstance, subtype);
-	}
-
 }

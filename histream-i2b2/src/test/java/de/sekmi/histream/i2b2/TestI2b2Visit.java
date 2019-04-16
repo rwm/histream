@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import de.sekmi.histream.DateTimeAccuracy;
 
+@Deprecated
 public class TestI2b2Visit {
 
 	private DateTimeAccuracy createAccurateTimestamp(){
