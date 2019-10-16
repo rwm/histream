@@ -39,7 +39,7 @@ public class SimplePatientVisitExtension implements Extension<VisitPatientImpl>{
 	public VisitPatientImpl createInstance(Object... args) {
 		if( args.length != 3 
 				|| !(args[0] instanceof String)
-				|| !(args[1] instanceof String)
+				|| !(args[1] instanceof PatientImpl)
 				|| !(args[2] instanceof ExternalSourceType) )
 		{
 			throw new IllegalArgumentException("Need arguments Patient id, Visit id, ExternalSourceType");

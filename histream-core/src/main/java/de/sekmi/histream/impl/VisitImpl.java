@@ -121,6 +121,10 @@ public class VisitImpl extends StoredExtensionType implements Visit {
 		checkAndUpdateDirty(this.providerId, providerId);
 		this.providerId = providerId;
 	}
+	@Override
+	public Patient getPatient() {
+		throw new UnsupportedOperationException();
+	}
 
 	
 

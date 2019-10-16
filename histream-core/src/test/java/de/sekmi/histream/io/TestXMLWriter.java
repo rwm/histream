@@ -223,6 +223,7 @@ public class TestXMLWriter {
 		XMLStreamWriter writer = factory.createXMLStreamWriter(dr);
 		Marshaller marshaller = JAXBContext.newInstance(ValType.class).createMarshaller();
 //		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+		// this caused exception in jre/jdk 1.8.0_172
 		marshaller.marshal(new ValType("1\n2"), writer);
 		doc.normalizeDocument();
 		XMLUtils.printDOM(doc, debugLog);

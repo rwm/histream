@@ -33,6 +33,8 @@ public interface Visit extends IdExtensionType,ExternalSourceType {
 	 */
 	DateTimeAccuracy getEndTime();
 
+	Patient getPatient();
+	
 	void setEndTime(DateTimeAccuracy endTime);
 	void setStartTime(DateTimeAccuracy startTime);
 	

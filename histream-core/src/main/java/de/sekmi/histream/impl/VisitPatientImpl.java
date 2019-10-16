@@ -59,6 +59,7 @@ public class VisitPatientImpl extends StoredExtensionType implements Visit {
 		markDirty(true);
 	}
 
+	@Override
 	public PatientImpl getPatient() {
 		return this.patient;
 	}

@@ -106,6 +106,10 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	public Instant toInstantMin(){
 		return instant;
 	}
+
+	public LocalDateTime toLocalDateTimeMin(ZoneId zone) {
+		return instant.atZone(zone).toLocalDateTime();
+	}
 	// TODO toInstantMax() (increase field at accuracy and subtract one millisecond)
 	
 	/**

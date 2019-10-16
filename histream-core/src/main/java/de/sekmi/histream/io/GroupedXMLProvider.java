@@ -42,6 +42,7 @@ public class GroupedXMLProvider implements FileObservationSupplierFactory, Plugi
 		// don't need to close anything
 	}
 
+	@Deprecated // TODO need local time zone as argument
 	@Override
 	public ObservationSupplier createSupplier(InputStream in, ObservationFactory factory) throws IOException {
 		try {

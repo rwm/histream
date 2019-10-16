@@ -2,11 +2,15 @@ package de.sekmi.histream.ext;
 
 import java.util.List;
 
+import de.sekmi.histream.DateTimeAccuracy;
+
 public interface PatientVisitStore {
 	Patient findPatient(String patientId);
 	Visit findVisit(String visitId);
 	void merge(Patient patient, String additionalId, ExternalSourceType source);
-	
+
+	Patient createPatient(String patientId, ExternalSourceType source);
+	Visit createVisit(String visitId, DateTimeAccuracy start, Patient patient, ExternalSourceType source);
 	/**
 	 * Get alias ids for the given patient (e.g. resulting from a merge) 
 	 * @param patient patient instance
