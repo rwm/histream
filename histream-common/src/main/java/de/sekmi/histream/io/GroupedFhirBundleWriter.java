@@ -6,12 +6,7 @@ import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.Objects;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
@@ -21,19 +16,14 @@ import org.w3c.dom.DOMException;
 import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
-import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
-import de.sekmi.histream.Value.Operator;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Patient.Sex;
 import de.sekmi.histream.ext.Visit;
-import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.GroupedObservationHandler;
 import de.sekmi.histream.impl.Meta;
-import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.ObservationImpl;
-import de.sekmi.histream.impl.StringValue;
 import de.sekmi.histream.xml.DateTimeAccuracyAdapter;
 
 /**
@@ -106,7 +96,9 @@ public class GroupedFhirBundleWriter extends GroupedObservationHandler{
 	@Override
 	protected void beginStream() throws ObservationException{
 		this.metaSource = meta.getSource();
+		Objects.requireNonNull(this.metaSource,"Metadata zone id required");
 		this.zoneId = this.metaSource.getSourceZone();
+		Objects.requireNonNull(this.zoneId, "Metadata zoneId undefined");
 		try {
 			w.writeStartDocument(null, null, null);
 		} catch (XMLStreamException e) {

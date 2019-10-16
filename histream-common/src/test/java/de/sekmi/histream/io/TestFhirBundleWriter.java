@@ -47,6 +47,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 
 		DOMResult result = new DOMResult(createDocument());
 		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(result);
+		w.setMeta(Meta.META_SOURCE_TIMEZONE, "Europe/Berlin", null);
 		w.beginStream();
 		// doesn't work for DOM writers
 		/*
@@ -69,6 +70,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 		OutputStream out = Files.newOutputStream(debugFile);
 		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out);
 		w.setMeta(Meta.META_SOURCE_ID, "123", null);
+		w.setMeta(Meta.META_SOURCE_TIMEZONE, "Europe/Berlin", null);
 		w.close();
 		out.close();
 		// read file
