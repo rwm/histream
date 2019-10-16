@@ -3,6 +3,8 @@ package de.sekmi.histream.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.sekmi.histream.impl.ObservationFactoryImpl;
+
 public class PostVisitFactCount extends VisitPostProcessorQueue{
 	private List<VisitCount> counts;
 
@@ -21,6 +23,7 @@ public class PostVisitFactCount extends VisitPostProcessorQueue{
 	}
 	
 	public PostVisitFactCount() {
+		super(new ObservationFactoryImpl());
 		counts = new ArrayList<>();
 	}
 	@Override

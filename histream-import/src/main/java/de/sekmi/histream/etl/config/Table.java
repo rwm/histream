@@ -1,15 +1,17 @@
 package de.sekmi.histream.etl.config;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.FactRow;
 import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.etl.PreparedObservation;
 import de.sekmi.histream.etl.RecordSupplier;
+import de.sekmi.histream.ext.ExternalSourceType;
 
 @XmlTransient
 public abstract class Table<T extends FactRow> {
@@ -104,15 +106,15 @@ public abstract class Table<T extends FactRow> {
 	 * 
 	 * @param map column map
 	 * @param row row data
-	 * @param factory observation factory
+	 * @param source source information for the data contained in the returned record
+	 * @param recordOrigin location to use for errors and debugging indicating where exactly the record was obtained from.
 	 * @return complete record or {@code null} if the row should be ignored
 	 * @throws ParseException for parse errors
 	 */
-	public abstract T fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException;
+	public abstract T fillRecord(ColumnMap map, Object[] row, ExternalSourceType source, String recordOrigin) throws ParseException;
 	
-	public RecordSupplier<T> open(ObservationFactory factory, Meta meta) throws IOException, ParseException{
-		return new RecordSupplier<>(source.rows(meta), this, factory, meta);
+	public RecordSupplier<T> open(Meta meta) throws IOException, ParseException{
+		return new RecordSupplier<>(source.rows(meta), this, meta);
 	}
-
 
 }

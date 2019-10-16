@@ -12,8 +12,6 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.PostVisitFactCount.VisitCount;
 import de.sekmi.histream.etl.config.DataSource;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
-import de.sekmi.histream.impl.SimplePatientExtension;
-import de.sekmi.histream.impl.SimpleVisitExtension;
 
 public class TestVisitPostProcessorQueue {
 	private ETLObservationSupplier os;
@@ -23,8 +21,6 @@ public class TestVisitPostProcessorQueue {
 	public void loadConfiguration() throws IOException, ParseException{
 		DataSource ds = DataSource.load(getClass().getResource("/data/test-1-datasource.xml"));
 		ObservationFactory factory = new ObservationFactoryImpl();
-		factory.registerExtension(new SimplePatientExtension());
-		factory.registerExtension(new SimpleVisitExtension());
 		v = new PostVisitFactCount();
 		os = new ETLObservationSupplier(ds, factory, v); 
 	}

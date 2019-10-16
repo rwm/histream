@@ -15,7 +15,8 @@ public interface RowSupplier extends Supplier<Object[]>, AutoCloseable{
 	public abstract void close() throws IOException;
 	
 	/**
-	 * Get a the location of the data source and current cursor position.
+	 * Get the location of the data source and current cursor position
+	 * which was used to obtain the row returned by a previous call to {@link #get()}.
 	 * For a text file, this would be file name and line number. 
 	 * A SQL table might return database and table name with row id.
 	 * @return location string

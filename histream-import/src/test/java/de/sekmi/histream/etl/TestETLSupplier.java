@@ -23,10 +23,13 @@ import de.sekmi.histream.io.Streams;
 
 public class TestETLSupplier {
 	private ETLObservationSupplier os;
+	private ZoneId zone;
 	
 	@Before
 	public void loadConfiguration() throws IOException, ParseException{
 		os = ETLObservationSupplier.load(getClass().getResource("/data/test-1-datasource.xml"));
+		this.zone = os.getConfiguration().getMeta().getTimezone();
+		Assert.assertNotNull(zone);
 	}
 
 	@After
@@ -49,9 +52,9 @@ public class TestETLSupplier {
 			Assert.assertNotNull(source.getSourceTimestamp());
 
 			// patient id should match patient.id
-			Assert.assertEquals(fact.getPatientId(), fact.getExtension(Patient.class).getId());
+			Assert.assertEquals(fact.getPatientId(), fact.getVisit().getPatient().getId());
 			// encounter id should match encounter.id
-			Assert.assertEquals(fact.getEncounterId(), fact.getExtension(Visit.class).getId());
+			Assert.assertEquals(fact.getEncounterId(), fact.getVisit().getId());
 			// next fact
 			fact = os.get();
 		}
@@ -59,7 +62,7 @@ public class TestETLSupplier {
 	
 	@Test
 	public void expectMetadataPresent() throws Exception{
-		Assert.assertNotNull("Source id metadata required",os.getMeta(ObservationSupplier.META_SOURCE_ID));
+		Assert.assertNotNull("Source id metadata required",os.getMeta(Meta.META_SOURCE_ID,null));
 		//Assert.assertNotNull("Source timestamp metadata required",os.getMeta(ObservationSupplier.META_SOURCE_TIMESTAMP));
 		// verify all scripts are loaded
 //		ObservationFactory f = new ObservationFactoryImpl();
@@ -97,42 +100,10 @@ public class TestETLSupplier {
 	}
 	
 	@Test
-	public void testPatientExtension() throws IOException, java.text.ParseException{
-		Observation fact = os.get();
-		Assert.assertNotNull(fact);
-		Patient p = fact.getExtension(Patient.class);
-		Assert.assertNotNull(p);
-		Assert.assertEquals("p1", p.getId());
-		ZoneId zone = ZoneId.systemDefault();
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-01",zone), p.getBirthDate());
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2003-02-11",zone), p.getDeathDate());
-
-		// TODO verify other patient information
-		Assert.assertEquals("v1", p.getGivenName());
-		Assert.assertEquals("n1", p.getSurname());
-	}
-	
-	@Test
 	public void testExtensionInstances() throws IOException{
 		List<Observation> all = new ArrayList<>();
 		os.stream().forEach(all::add);
 		// nothing to do anymore
-	}
-	@Test
-	public void testVisitExtension() throws IOException, java.text.ParseException{
-		Observation fact = os.get();
-		Assert.assertNotNull(fact);
-
-		Visit v = fact.getExtension(Visit.class);
-		Assert.assertNotNull(v);
-
-		Assert.assertEquals("v1", v.getId());
-		// TODO make sure custom partial date format is parsed correctly for missing seconds
-		//Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-20T09:00"), v.getStartTime());
-		Assert.assertEquals(DateTimeAccuracy.parsePartialIso8601("2013-03-21T13:00:21", ZoneId.systemDefault()), v.getEndTime());
-
-		Assert.assertEquals("v1", v.getId());
-		Assert.assertEquals(null, v.getLocationId());
 	}
 	@Test
 	public void missingStartTimestampUsesVisitTimestamp() throws IOException, java.text.ParseException{

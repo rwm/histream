@@ -8,7 +8,9 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
 import de.sekmi.histream.etl.ParseException;
-import de.sekmi.histream.etl.WideRow;
+import de.sekmi.histream.etl.PreparedObservation;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 public class WideTable extends Table<WideRow> implements ConceptTable{
 
@@ -27,7 +29,7 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 			// missing patientId column is allowed. In these cases visitId should be unique for identification
 			// TODO write INFO message that patient-id is not available and visit-id is used for matching
 		}else {
-			map.registerColumn(idat.patientId);			
+			map.registerColumn(idat.patientId);
 		}
 		if( idat.visitId == null ){
 			throw new ParseException("datasource/wide-table/idat/visit-id column not specified");
@@ -46,7 +48,7 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 	}
 
 	@Override
-	public WideRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
+	public WideRow fillRecord(ColumnMap map, Object[] row, ExternalSourceType source, String recordOrigin) throws ParseException {
 		String visit = idat.visitId.valueOf(map, row);
 		String patid;
 		if( idat.patientId == null ) {
@@ -56,11 +58,15 @@ public class WideTable extends Table<WideRow> implements ConceptTable{
 		}else {
 			patid = idat.patientId.valueOf(map, row);
 		}
-		WideRow rec = new WideRow(patid,visit);
+		WideRow rec = new WideRow(this,patid,visit);
+		rec.source = source;
+		rec.recordOrigin = recordOrigin;
+
 		for( Concept c : concepts ){
-			Observation o = c.createObservation(patid, visit, factory, map, row);
+			PreparedObservation o = c.prepareObservation(map, row);
+			// null is returned for action=drop-fact
 			if( o != null ){
-				rec.addFact(o);				
+				rec.addPreparedObservation(o);
 			}
 		}
 		return rec;

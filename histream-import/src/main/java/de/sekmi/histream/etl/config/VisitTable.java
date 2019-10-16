@@ -12,7 +12,8 @@ import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
 import de.sekmi.histream.etl.ParseException;
-import de.sekmi.histream.etl.VisitRow;
+import de.sekmi.histream.etl.PreparedObservation;
+import de.sekmi.histream.ext.ExternalSourceType;
 
 public class VisitTable extends Table<VisitRow> implements ConceptTable{
 	@XmlElement
@@ -83,7 +84,7 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 	}
 
 	@Override
-	public VisitRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
+	public VisitRow fillRecord(ColumnMap map, Object[] row, ExternalSourceType source, String recordOrigin) throws ParseException {
 		String vid = idat.visitId.valueOf(map, row);
 		String pid = idat.patientId.valueOf(map, row);
 		DateTimeAccuracy start = idat.start.valueOf(map, row);
@@ -94,28 +95,31 @@ public class VisitTable extends Table<VisitRow> implements ConceptTable{
 			// TODO issue warning
 			return null;
 		}
+		// TODO lookup patient
 		VisitRow visit = new VisitRow(vid, pid, start);
+		visit.recordOrigin = recordOrigin;
+		visit.source = source;
 
 		if( idat.end != null ){
-			visit.setEndTime(idat.end.valueOf(map, row));
+			visit.end = idat.end.valueOf(map, row);
 		}
 		
 		if( idat.location != null ){
-			visit.setLocationId(idat.location.valueOf(map, row));
+			visit.location = idat.location.valueOf(map, row);
 		}
 		if( idat.provider != null ){
-			visit.setProviderId(idat.provider.valueOf(map, row));
+			visit.provider = idat.provider.valueOf(map, row);
 		}
 		// TODO other 
 		
 		// concepts
 		if( concepts != null ){
 			for( Concept c : concepts ){
-				Observation o = c.createObservation(visit.getPatientId(), visit.getId(), factory, map, row);
+				PreparedObservation o = c.prepareObservation(map, row);
 				if( o == null ){
 					// observation ignored
 				}else{
-					visit.getFacts().add(o);
+					visit.addPreparedObservation(o);
 				}
 			}
 		}

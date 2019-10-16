@@ -16,6 +16,7 @@ import de.sekmi.histream.ext.Visit;
  * @author R.W.Majeed
  *
  */
+@Deprecated
 class ExtensionSync implements VisitLookup, PatientLookup{
 
 	private ExtensionAccessor<Patient> patientAccessor;

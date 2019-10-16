@@ -3,7 +3,10 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,13 +14,16 @@ import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.etl.config.DataSource;
+import de.sekmi.histream.etl.config.EavRow;
 import de.sekmi.histream.etl.config.EavTable;
 import de.sekmi.histream.etl.config.Meta;
+import de.sekmi.histream.etl.config.PatientRow;
+import de.sekmi.histream.etl.config.VisitRow;
+import de.sekmi.histream.etl.config.WideRow;
 import de.sekmi.histream.etl.config.WideTable;
 import de.sekmi.histream.etl.filter.FilterPostProcessingQueue;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
-import de.sekmi.histream.impl.SimplePatientExtension;
-import de.sekmi.histream.impl.SimpleVisitExtension;
+import de.sekmi.histream.impl.ScopedProperty;
 
 /**
  * Supplier for observations which are loaded from arbitrary
@@ -63,7 +69,6 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	private RecordSupplier<VisitRow> vr;
 	private List<RecordSupplier<? extends FactRow>> fr;
 	
-	private ExtensionSync sync;
 	private FactGroupingQueue queue;
 	
 	private DataSource ds;
@@ -95,8 +100,6 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 */
 	public static ETLObservationSupplier load(URL configuration) throws IOException, ParseException{
 		ObservationFactory of = new ObservationFactoryImpl();
-		of.registerExtension(new SimplePatientExtension());
-		of.registerExtension(new SimpleVisitExtension());
 		return load(configuration, of);
 	}
 	/** 
@@ -128,34 +131,31 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	 */
 	protected ETLObservationSupplier(DataSource ds, ObservationFactory factory, FactGroupingQueue queue) throws IOException, ParseException {
 		this.ds = ds;
-		this.sync = new ExtensionSync(factory);
 		this.queue = queue;
 
 		Meta meta = ds.getMeta();
 		// in case of exception, make sure already opened suppliers are closed
 		Exception error = null;
 		try{
-			pr = ds.getPatientTable().open(factory, meta);
-			vr = ds.getVisitTable().open(factory, meta);
+			pr = ds.getPatientTable().open(meta);
+			vr = ds.getVisitTable().open(meta);
 
 			// TODO: if there are scripts, use VisitScriptQueue
 			queue.setPatientTable(pr);
-			queue.setPatientLookup(sync);
 			queue.setVisitTable(vr);
-			queue.setVisitLookup(sync);
 
 			// open all tables
 			List<WideTable> wt = ds.getWideTables();
 			fr = new ArrayList<>(wt.size());
 			for( WideTable t : wt ){
 				//@SuppressWarnings("resource")
-				RecordSupplier<WideRow> s = t.open(factory, meta);
+				RecordSupplier<WideRow> s = t.open(meta);
 				queue.addFactTable(s);
 				fr.add(s);
 			}
 			List<EavTable> et = ds.getEavTables();
 			for( EavTable t : et ){
-				RecordSupplier<EavRow> s = t.open(factory, meta);
+				RecordSupplier<EavRow> s = t.open(meta);
 				queue.addFactTable(s);
 				fr.add(s);
 			}
@@ -219,17 +219,26 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	}
 
 	@Override
-	public String getMeta(String key) {
+	public String getMeta(String key, String path) {
 		switch( key ){
-		case ObservationSupplier.META_ETL_STRATEGY:
+		case de.sekmi.histream.impl.Meta.META_ETL_STRATEGY:
 			return ds.getMeta().getETLStrategy();
-		case ObservationSupplier.META_SOURCE_ID:
+		case de.sekmi.histream.impl.Meta.META_SOURCE_ID:
 			return ds.getMeta().getSourceId();
-		case ObservationSupplier.META_ORDER_GROUPED:
+		case de.sekmi.histream.impl.Meta.META_ORDER_GROUPED:
 			return "true";
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public Iterable<ScopedProperty> getMeta() {
+		// TODO implement
+		return Arrays.asList(
+				new ScopedProperty(null, "source.timestamp", Instant.ofEpochMilli(ds.getMeta().getLastModified()).toString()),
+				new ScopedProperty(null, "source.id", ds.getMeta().getSourceId())
+		);
 	}
 
 }

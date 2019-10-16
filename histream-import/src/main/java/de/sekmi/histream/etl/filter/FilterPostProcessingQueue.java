@@ -16,6 +16,7 @@ public class FilterPostProcessingQueue extends VisitPostProcessorQueue {
 	private PostProcessingFilter[] filters;
 
 	public FilterPostProcessingQueue(DataSource ds, ObservationFactory factory) throws IOException {
+		super(factory);
 		try {
 			engine = new EncounterScriptEngine();
 		} catch (ScriptException e) {
@@ -45,8 +46,8 @@ public class FilterPostProcessingQueue extends VisitPostProcessorQueue {
 		if( getVisit() == null ){
 			return; // don't want null visits
 		}
-		AbstractFacts facts = engine.wrapEncounterFacts(getPatient(), getVisit(), getVisitFacts());
-		
+		AbstractFacts facts = engine.wrapEncounterFacts(getVisit(), getVisitFacts());
+
 		for( int i=0; i<filters.length; i++ ){
 			try {
 				filters[i].processVisit(facts);

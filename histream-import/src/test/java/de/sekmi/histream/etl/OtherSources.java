@@ -11,7 +11,7 @@ import de.sekmi.histream.io.Streams;
 
 public class OtherSources {
 
-	@Test
+//	@Test
 	public void testSource1() throws Exception{
 		URL url = Paths.get("../../../2015-06 DZL/Datenquellen/Biobanken/Marburg (Cosyconet)/datasource.xml").toUri().toURL();
 		ETLObservationSupplier os = ETLObservationSupplier.load(url);
@@ -21,7 +21,7 @@ public class OtherSources {
 		os.close();
 		w.close();
 	}
-	@Test
+//	@Test
 	public void testSource2() throws Exception{
 		URL url = Paths.get("../../../2015-06 DZL/Datenquellen/Biobanken/Gauting/datasource.xml").toUri().toURL();
 		ETLObservationSupplier os = ETLObservationSupplier.load(url);
@@ -42,7 +42,7 @@ public class OtherSources {
 		os.close();
 		w.close();
 	}*/
-	@Test
+//	@Test
 	public void testSource4() throws Exception{
 		URL url = Paths.get("../../../2015-06 DZL/Datenquellen/Biobanken/Heidelberg/datasource.xml").toUri().toURL();
 		ETLObservationSupplier os = ETLObservationSupplier.load(url);

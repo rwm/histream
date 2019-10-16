@@ -3,6 +3,7 @@
 	<meta>
 		<id>test-1</id>
 		<etl-strategy>replace-source</etl-strategy>
+		<timezone>Europe/Berlin</timezone>
 	</meta>
 	
 	<patient-table>
@@ -14,7 +15,7 @@
 			<patient-id column="patid"/>
 			<given-name column="vorname"/>
 			<surname column="nachname"/>
-			<birthdate format="d.M.u" na="" column="geburtsdatum"/>
+			<birthdate format="d.M.u" na="" column="geburtsdatum" target-precision="Month"/>
 			<deathdate format="d.M.u" na="" column="verstorben"/>
 			<gender column="geschlecht" na="">
 				<map> <!-- maps a column -->

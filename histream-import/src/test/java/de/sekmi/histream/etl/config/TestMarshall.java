@@ -98,13 +98,13 @@ public class TestMarshall {
 		s.xmlSources[0].transform = new XmlSource.Transform[1];
 		s.xmlSources[0].transform[0] = new XmlSource.Transform("file:my.xsl","c:/to/file");
 		s.patientTable = new PatientTable();
-		CsvFile fs = new CsvFile("file:patient.source","text/csv");
+		CsvFile fs = new CsvFile("file:patient.source",",");
 		fs.separator = "\\t";
 		s.patientTable.source = fs;
 		s.patientTable.idat = new PatientTable.IDAT();
 		s.patientTable.idat.patientId = new StringColumn("patid"); 
 		s.visitTable = new VisitTable();
-		s.visitTable.source = new CsvFile("file:lala.txt", "text/plain");
+		s.visitTable.source = new CsvFile("file:lala.txt", ";");
 		s.visitTable.idat = new VisitTable.IDAT();
 		s.visitTable.idat.patientId = new StringColumn("patid");
 		s.visitTable.idat.visitId = new StringColumn("visit");		

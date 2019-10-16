@@ -64,6 +64,7 @@ public class Validator extends AbstractObservationHandler implements Transformat
 		String patid = t.getPatientId();
 		String encid = t.getEncounterId();
 
+//		System.out.println("val:"+patid+", "+encid+", "+t.getConceptId()+", val="+t.getValue());
 		// check if patient already known
 		if( prevPatient == null || !prevPatient.equals(patid) ){
 			// new patient
@@ -120,7 +121,7 @@ public class Validator extends AbstractObservationHandler implements Transformat
 	}
 
 	@Override
-	public void setMeta(String key, String value) {
+	public void setMeta(String key, String value, String path) {
 		// TODO Auto-generated method stub
 		
 	}

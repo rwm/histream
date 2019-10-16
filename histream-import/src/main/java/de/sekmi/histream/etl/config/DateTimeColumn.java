@@ -4,11 +4,13 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.IllformedLocaleException;
 import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.etl.ParseException;
@@ -52,7 +54,12 @@ public class DateTimeColumn extends Column<DateTimeAccuracy>{
 	@XmlAttribute
 	String zone;
 	
-
+	/** attribute to reduce accuracy for privacy reasons. 
+	 * e.g. output-resolution=Years.
+	 */
+	@XmlAttribute(name="target-precision")
+	@XmlJavaTypeAdapter(ChronoPrecisionAdapter.class)
+	ChronoUnit targetPrecision;
 	/**
 	 * Construct a date time column
 	 * @param name column name

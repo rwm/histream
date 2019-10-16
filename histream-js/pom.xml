@@ -17,7 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
-			<artifactId>histream-core</artifactId>
+			<artifactId>histream-common</artifactId>
 			<version>0.16-SNAPSHOT</version>
 		</dependency>
 		<dependency>

@@ -5,11 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import de.sekmi.histream.Observation;
-import de.sekmi.histream.ext.Patient;
-import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.etl.config.PatientRow;
+import de.sekmi.histream.etl.config.VisitRow;
+import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.impl.PatientImpl;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 /**
  * Algorithm:
@@ -26,8 +31,9 @@ import de.sekmi.histream.ext.Visit;
 public class FactGroupingQueue implements Supplier<Observation>{
 	private RecordSupplier<PatientRow> patientTable;
 	private RecordSupplier<VisitRow> visitTable;
-	private PatientLookup patientLookup;
-	private VisitLookup visitLookup;
+//	private PatientLookup patientLookup;
+//	private VisitLookup visitLookup;
+	private ObservationFactory factory;
 	
 	private List<RecordSupplier<? extends FactRow>> factTables;
 
@@ -35,8 +41,8 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	private PatientRow currentPatient;
 	private VisitRow nextVisit;
 	
-	private Patient currentPatientInstance;
-	private Visit currentVisitInstance;
+	private PatientImpl currentPatientInstance;
+	private VisitPatientImpl currentVisitInstance;
 
 	private String currentVisitId;
 	private List<FactRow> currentRows;
@@ -63,7 +69,8 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	}
 
 
-	public FactGroupingQueue(){
+	public FactGroupingQueue(ObservationFactory factory){
+		this.factory = factory;
 		this.factTables = new ArrayList<>();
 		this.workQueue = new ArrayDeque<>();
 	}
@@ -88,8 +95,9 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	 * 
 	 * @param lookup patient lookup
 	 */
-	public void setPatientLookup(PatientLookup lookup){
-		this.patientLookup = lookup;
+	public void setPatientLookup(BiFunction<PatientImpl, ExternalSourceType, PatientImpl> lookup){
+//		this.patientLookup = lookup;
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -101,20 +109,18 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	 * 
 	 * @param lookup visit lookup
 	 */
-	public void setVisitLookup(VisitLookup lookup){
-		this.visitLookup = lookup;
+	public void setVisitLookup(BiFunction<VisitPatientImpl, ExternalSourceType, VisitPatientImpl> lookup){
+//		this.visitLookup = lookup;
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
 	 * Current patient changed: {@link #currentPatient}
 	 */
 	private void patientChanged(){
-		if( patientLookup != null ){
-			currentPatientInstance = patientLookup.lookupPatient(currentPatient, patientTable.getSource());
-		}else{
-			// no lookup, just use the data we have
-			currentPatientInstance = currentPatient;
-		}
+		// no lookup, just use the data we have
+		currentPatient.createFacts(null, null, factory);
+		currentPatientInstance = currentPatient.getPatient();
 		addFactsToWorkQueue(currentPatient);
 	}
 
@@ -134,14 +140,10 @@ public class FactGroupingQueue implements Supplier<Observation>{
 			currentVisitInstance = null;
 			// TODO later support facts without encounter
 		}else{
-			// sync visit with extension factory
-			if( visitLookup != null ){
-				// currentVisitId? == nextVisit.getId()??
-				currentVisitInstance = visitLookup.lookupVisit(currentPatientInstance, nextVisit, visitTable.getSource());				
-			}else{
-				currentVisitInstance = nextVisit;
-			}
-			
+			// TODO maybe allow visit lookup
+			nextVisit.createFacts(currentPatientInstance, null, factory);
+			currentVisitInstance = nextVisit.getVisit();
+			Objects.requireNonNull(currentVisitInstance);
 			addFactsToWorkQueue(nextVisit);
 		}
 	}
@@ -168,9 +170,20 @@ public class FactGroupingQueue implements Supplier<Observation>{
 			
 			// for every patient, facts without visitId (=null) are parsed first
 			currentVisitId = null;		
-			visitChanged(); // maybe not needed, visit is already null
+
+			// call visitFinished to indicate a new patient (before first visit)
+			visitFinished();
 			
 			nextVisit = visitTable.get();
+			if( nextVisit != null ) {
+				// first patient row loaded
+				currentVisitId = nextVisit.getVisitId();
+				visitChanged();
+
+				// prefetch next visit, because #get() assumes
+				// nextVisit pointing to the next visit
+				nextVisit = visitTable.get();
+			}
 
 		}else{ // currentPatient == null
 			// patient table empty
@@ -182,11 +195,17 @@ public class FactGroupingQueue implements Supplier<Observation>{
 		}
 	}
 	
+	/**
+	 * Add one or more facts contained in the FactRow to the work queue.
+	 * All facts from the provided row are assigned to the same patient/visit combination.
+	 * @param r fact row
+	 */
 	private void addFactsToWorkQueue(FactRow r){
+
 		for( Observation f : r.getFacts() ){
 			// set patient extension
-			patientLookup.assignPatient(f, currentPatientInstance);
-			visitLookup.assignVisit(f, currentVisitInstance);
+//			patientLookup.assignPatient(f, currentPatientInstance);
+//			visitLookup.assignVisit(f, currentVisitInstance);
 			// use visit start date if there is no start date in the observation
 			if( f.getStartTime() == null && currentVisitInstance != null ){
 				f.setStartTime(currentVisitInstance.getStartTime());
@@ -201,9 +220,9 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	 * Called after all facts for the current visit are processed.
 	 * <p>
 	 *  This will also be the case for the {@code null}-Visit which
-	 *  occurs once for each patient with the purpose to allow non-visit
-	 *  related facts to be included. In this case, {@link #getVisit()}
-	 *  will return {@code null}.
+	 *  occurs once for each patient and before the first visit 
+	 *  with the purpose to allow non-visit related facts to be included.
+	 *  In this case, {@link #getVisit()} will return {@code null}.
 	 * </p>
 	 */
 	protected void visitFinished(){
@@ -217,7 +236,7 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	 * </p>
 	 * @return current patient.
 	 */
-	protected Patient getPatient(){
+	protected PatientImpl getPatient(){
 		return currentPatientInstance;
 	}
 	/**
@@ -228,7 +247,7 @@ public class FactGroupingQueue implements Supplier<Observation>{
 	 * </p>
 	 * @return current visit.
 	 */
-	protected Visit getVisit(){
+	protected VisitPatientImpl getVisit(){
 		return currentVisitInstance;
 	}
 	
@@ -255,6 +274,7 @@ public class FactGroupingQueue implements Supplier<Observation>{
 					// if the row does not have a patient id, it is assumed that the visit id is unique and sufficient for matching
 					// if the row has both patient id and visit id, both are used for matching
 					
+					row.createFacts(currentPatientInstance, currentVisitInstance, this.factory);
 					// row fits into current group
 					addFactsToWorkQueue(row);
 					// prefetch next row

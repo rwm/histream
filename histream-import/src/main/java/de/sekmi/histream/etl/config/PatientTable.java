@@ -7,13 +7,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.ConceptTable;
-import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
-import de.sekmi.histream.etl.PatientRow;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient.Sex;
 
 /**
@@ -44,9 +41,10 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 		StringColumn givenName;
 		StringColumn surname;
 		DateTimeColumn birthdate;
-		DateTimeColumn deathdate;
+		DateTimeColumn deathdate; // TODO deathdate is not IDAT
 		StringColumn gender;
 	}
+	// TODO attribute to reduce accuracy of birthdate/deathdate for privacy reasons. e.g. output-resolution=Years.
 
 	@Override
 	public ColumnMap getColumnMap(String[] headers) throws ParseException {
@@ -82,38 +80,46 @@ public class PatientTable extends Table<PatientRow> implements ConceptTable{
 	
 
 	@Override
-	public PatientRow fillRecord(ColumnMap map, Object[] row, ObservationFactory factory) throws ParseException {
-		PatientRow patient = new PatientRow();
-		patient.setId(idat.patientId.valueOf(map, row, null));
-		if( idat.givenName != null ){
-			patient.setGivenName(idat.givenName.valueOf(map, row, null));
+	public PatientRow fillRecord(ColumnMap map, Object[] row, ExternalSourceType source, String location) throws ParseException {
+		String patid = idat.patientId.valueOf(map, row, null);
+		PatientRow patient = new PatientRow(patid);
+
+		if( idat.givenName != null ) {
+			patient.givenName = idat.givenName.valueOf(map, row, null);
 		}
-		if( idat.surname != null ){
-			patient.setSurname(idat.surname.valueOf(map, row, null));
+
+		if( idat.surname != null ) {
+			patient.surname = idat.surname.valueOf(map, row, null);			
 		}
-		if( idat.birthdate != null ){
-			patient.setBirthDate(idat.birthdate.valueOf(map, row, null));
+		
+		if( idat.birthdate != null ) {
+			patient.birthdate = idat.birthdate.valueOf(map, row, null);
 		}
-		if( idat.deathdate != null ){
-			patient.setDeathDate(idat.deathdate.valueOf(map, row, null));
+
+		if( idat.deathdate != null ) {
+			patient.deathdate = idat.deathdate.valueOf(map, row, null);
 		}
+
 		if( idat.gender != null ){
 			String genderCode = idat.gender.valueOf(map, row);
 			// gender may omitted
 			if( genderCode != null ){
 				try{
-					patient.setSex(Sex.valueOf(genderCode));
+					patient.sex = Sex.valueOf(genderCode);
 				}catch( IllegalArgumentException e ){
-					throw new ParseException("Unsupported gender value '"+genderCode+"'. Use one of "+Arrays.toString(Sex.values()));
+					throw new ParseException("Unsupported gender value '"+genderCode+"'. Use one of "+Arrays.toString(Sex.values()), location);
 				}
 			}
 		}
+
 		// concepts
 		if( concepts != null ){
-			for( Concept c : concepts ){
-				Observation o = c.createObservation(patient.getPatientId(), null, factory, map, row);
-				patient.getFacts().add(o);
-			}
+			// concepts without visit not supported
+			throw new ParseException("Patient table should not provide concepts outside of visit", location);
+//			for( Concept c : concepts ){
+//				Observation o = c.createObservation(patient.getPatientId(), null, factory, map, row);
+//				patient.getFacts().add(o);
+//			}
 		}
 		return patient;
 	}

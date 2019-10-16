@@ -12,12 +12,11 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import de.sekmi.histream.DateTimeAccuracy;
-import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
+import de.sekmi.histream.Value;
 import de.sekmi.histream.etl.ColumnMap;
-import de.sekmi.histream.etl.EavRow;
 import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
 
@@ -65,6 +64,7 @@ public class EavTable extends Table<EavRow> {
 		DateTimeColumn start;
 		DateTimeColumn end;
 		StringColumn location;
+		StringColumn provider;
 		StringColumn type;
 		StringColumn value;
 		StringColumn unit;
@@ -101,6 +101,9 @@ public class EavTable extends Table<EavRow> {
 		if( mdat.location != null ){
 			map.registerColumn(mdat.location);
 		}
+		if( mdat.provider != null ){
+			map.registerColumn(mdat.provider);
+		}
 		if( mdat.type != null ){
 			map.registerColumn(mdat.type);
 		}
@@ -121,8 +124,9 @@ public class EavTable extends Table<EavRow> {
 	}
 
 	@Override
-	public EavRow fillRecord(ColumnMap colMap, Object[] row, ObservationFactory factory) throws ParseException {
+	public EavRow fillRecord(ColumnMap colMap, Object[] row, ExternalSourceType source, String recordOrigin) throws ParseException {
 		String patid = idat.patientId.valueOf(colMap, row);
+		String visit = idat.visitId.valueOf(colMap, row);
 		DateTimeAccuracy start = mdat.start.valueOf(colMap,row);
 		String concept = mdat.concept.valueOf(colMap,row);
 		String value = mdat.value.valueOf(colMap,row);
@@ -177,38 +181,38 @@ public class EavTable extends Table<EavRow> {
 			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
 		}
 
-		Observation fact = factory.createObservation(patid, concept, start);
-		String visit = idat.visitId.valueOf(colMap, row);
-		if( visit != null ){
-			fact.setEncounterId(visit);
-		}
-		DateTimeAccuracy end = mdat.end.valueOf(colMap,row);
-		if( end != null ){
-			fact.setEndTime(end);
-		}
-		String location = null;
-		if( mdat.location != null ) {
-			location = mdat.location.valueOf(colMap, row);
+		EavRow eav = new EavRow(patid,visit,concept);
+		eav.source = source;
+		eav.recordOrigin = recordOrigin;
+
+		if( mdat.end != null ) {
+			eav.end = mdat.end.valueOf(colMap,row);
 		}
 
-		if( location != null ) {
-			fact.setLocationId(location);
+		if( mdat.location != null ) {
+			eav.location = mdat.location.valueOf(colMap, row);
+		}
+		if( mdat.provider != null ) {
+			eav.provider = mdat.provider.valueOf(colMap, row);
 		}
 		
 		if( vval != null ){
+			Value val;
 			// convert native type to observation value
 			if( vval instanceof String ){
-				fact.setValue(new StringValue((String)vval));
+				val = new StringValue((String)vval);
 			}else if( vval instanceof BigDecimal ){
-				fact.setValue(new NumericValue((BigDecimal)vval,unit));
+				val = new NumericValue((BigDecimal)vval,unit);
 			}else if( vval instanceof Long ){
-				fact.setValue(new NumericValue((Long)vval,unit));
+				val = new NumericValue((Long)vval,unit);
 			}else{
 				throw new ParseException("Internal error: unsupported native value type: "+vval.getClass());
 			}
+			eav.value = val;
+			
 		}// else fact without value
-		
-		return new EavRow(fact);
+
+		return eav;
 	}
 
 }

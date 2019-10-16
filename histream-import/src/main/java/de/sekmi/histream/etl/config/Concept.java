@@ -14,8 +14,10 @@ import de.sekmi.histream.Value;
 import de.sekmi.histream.etl.ColumnMap;
 import de.sekmi.histream.etl.MapFeedback;
 import de.sekmi.histream.etl.ParseException;
+import de.sekmi.histream.etl.PreparedObservation;
 import de.sekmi.histream.impl.NumericValue;
 import de.sekmi.histream.impl.StringValue;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 /**
  * Concept from a wide table
@@ -84,6 +86,84 @@ public class Concept{
 			throw new ParseException("Unsupported value type for concept id "+this.id+": "+val.getClass());
 		}
 	}
+
+	protected PreparedObservation prepareObservation(ColumnMap map, Object[] row)  throws ParseException{
+		PreparedObservation po = new PreparedObservation();
+		MapFeedback mf = new MapFeedback();
+
+		po.setStart(this.start.valueOf(map,row, mf));
+		mf.resetValue();
+
+		String concept = this.id;
+
+		// parse end
+		if( this.end != null ) {
+			 po.setEnd(this.end.valueOf(map,row,mf));
+		}
+		
+		// parse value
+		String unit = null;
+		if( this.unit != null ){
+			unit = this.unit.valueOf(map, row, mf);
+			mf.resetValue();
+		}
+
+		// TODO: use type of column this.value to infer value type
+		Object val = null;
+		if( this.value != null ){
+//			Objects.requireNonNull(this.value, "No value for concept: "+id);
+			val = this.value.valueOf(map, row, mf);
+			mf.resetValue();
+		}
+
+		if( mf.hasConceptOverride() ){
+			concept = mf.getConceptOverride();
+		}
+		if( mf.isActionDrop() ){
+			return null; // ignore this fact
+		}
+		po.setConcept(concept);
+
+		// if start is null/na, use visit start timestamp
+		if( start == null ){
+			// start may be null at this point and will be filled later with the visit timestamp
+			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
+		}
+		
+		po.setValue(createObservationValue(val, unit));
+
+		// load modifiers
+		if( modifiers != null ){
+			for( int i=0; i<modifiers.length; i++ ){
+				mf = new MapFeedback();
+				Modifier m = modifiers[i];
+				// parse value
+				val = null;
+				if( m.value != null ){
+					val = m.value.valueOf(map, row, mf);
+					mf.resetValue();
+				}
+				// parse unit
+				unit = null;
+				if( m.unit != null ){
+					unit = m.unit.valueOf(map, row, mf);
+					mf.resetValue();
+				}
+				concept = m.id;
+				// modifier values can override the modifier-ids via concept override
+				if( mf.hasConceptOverride() ){
+					concept = mf.getConceptOverride();
+				}
+				// or drop the modifier
+				// TODO how to specify that a modifier should be dropped (e.g. if the value is NA)???
+				if( mf.isActionDrop() ){
+					continue; // ignore this modifier
+				}
+				po.addModifier(concept, createObservationValue(val, unit));
+			}
+		}
+		return po;
+	}
 	/**
 	 * Create an observation for this concept with the given row data.
 	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
@@ -96,7 +176,8 @@ public class Concept{
 	 * @return fact
 	 * @throws ParseException parse 
 	 */
-	protected Observation createObservation(String patid, String visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
+	@Deprecated
+	protected Observation createObservation(VisitPatientImpl visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
 		MapFeedback mf = new MapFeedback();
 
 		DateTimeAccuracy start = this.start.valueOf(map,row, mf);
@@ -131,7 +212,7 @@ public class Concept{
 			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
 		}
 
-		Observation o = factory.createObservation(patid, concept, start);
+		Observation o = factory.createObservation(visit, concept, start);
 		o.setValue(createObservationValue(val, unit));
 
 		// load modifiers
@@ -163,10 +244,6 @@ public class Concept{
 				}
 				o.addModifier(concept, createObservationValue(val, unit));
 			}
-		}
-
-		if( visit != null ){
-			o.setEncounterId(visit);
 		}
 
 		return o;

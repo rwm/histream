@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Queue;
 
 import de.sekmi.histream.Observation;
+import de.sekmi.histream.ObservationFactory;
 
 /**
  * Fact queue which executes post processing for each complete visit.
@@ -23,14 +24,15 @@ public abstract class VisitPostProcessorQueue extends FactGroupingQueue {
 	private List<Observation> visitFacts;
 	private Queue<Observation> processedQueue;
 	
-	public VisitPostProcessorQueue() {
-		super();
+	public VisitPostProcessorQueue(ObservationFactory factory) {
+		super(factory);
 		visitFacts = new ArrayList<>();
 		processedQueue = new LinkedList<>();
 	}
 	
 	@Override
 	protected void visitFinished(){
+//		System.out.println("VisitFinished "+getVisit());
 		super.visitFinished();
 		postProcessVisit();
 		if( !visitFacts.isEmpty() ){

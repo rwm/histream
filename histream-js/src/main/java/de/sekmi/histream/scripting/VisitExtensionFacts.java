@@ -4,27 +4,20 @@ import java.util.Objects;
 
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.ext.Patient;
-import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 public class VisitExtensionFacts extends AbstractFacts {
-	private Patient patient;
-	private Visit visit;
+	private VisitPatientImpl visit;
 	
-	public VisitExtensionFacts(ObservationFactory factory, Patient patient, Visit visit) {
+	public VisitExtensionFacts(ObservationFactory factory, VisitPatientImpl visit) {
 		super(factory);
-		Objects.requireNonNull(patient);
 		Objects.requireNonNull(visit);
-		this.patient = patient;
 		this.visit = visit;
 	}
 	
 	@Override
 	protected Observation create(String conceptId) {
-		Observation o = factory.createObservation(patient.getId(), conceptId, visit.getStartTime());
-		o.setExtension(Patient.class, patient);
-		o.setEncounterId(visit.getId());
-		o.setExtension(Visit.class, visit);
+		Observation o = factory.createObservation(visit, conceptId, visit.getStartTime());
 		return o;
 	}
 

@@ -17,13 +17,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.ext.ExternalSourceType;
-import de.sekmi.histream.ext.Patient;
-import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ExternalSourceImpl;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 
 public class EncounterScriptEngine {
@@ -100,19 +98,17 @@ public class EncounterScriptEngine {
 		script.script.eval(b);
 	}
 	
-	public AbstractFacts wrapEncounterFacts(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts){
-		SimpleFacts f = new SimpleFacts(factory, patientId, encounterId, defaultStartTime);
-		f.setObservations(facts);
-		return f;
-	}
-	public AbstractFacts wrapEncounterFacts(Patient patient, Visit visit, List<Observation> facts){
-		VisitExtensionFacts f = new VisitExtensionFacts(factory, patient, visit);
+	public AbstractFacts wrapEncounterFacts(VisitPatientImpl visit, List<Observation> facts){
+		VisitExtensionFacts f = new VisitExtensionFacts(factory, visit);
 		f.setObservations(facts);
 		return f;
 	}
 	// TODO add method to execute a single script
-
-	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException {
-		processAll( wrapEncounterFacts(patientId, encounterId, defaultStartTime, facts) );
+//
+//	public void processEncounter(String patientId, String encounterId, DateTimeAccuracy defaultStartTime, List<Observation> facts) throws ScriptException {
+//		processAll( wrapEncounterFacts(patientId, encounterId, defaultStartTime, facts) );
+//	}
+	public void processEncounter(VisitPatientImpl visit, List<Observation> facts) throws ScriptException {
+		processAll( wrapEncounterFacts(visit, facts) );
 	}
 }

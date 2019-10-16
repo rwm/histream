@@ -3,8 +3,6 @@ package de.sekmi.histream.etl;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import de.sekmi.histream.Observation;
-import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.etl.config.Meta;
 import de.sekmi.histream.etl.config.Table;
 import de.sekmi.histream.ext.ExternalSourceType;
@@ -14,10 +12,9 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 	private RowSupplier rows;
 	private Table<R> table;
 	private ColumnMap map;
-	private ObservationFactory factory;
 	private ExternalSourceType source;
 	
-	public RecordSupplier(RowSupplier rows, Table<R> table, ObservationFactory factory, Meta meta)throws ParseException{
+	public RecordSupplier(RowSupplier rows, Table<R> table, Meta meta)throws ParseException{
 		this.rows = rows;
 		this.table = table;
 		try{
@@ -27,7 +24,6 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 			e.setLocation(rows.getLocation());
 			throw e;
 		}
-		this.factory = factory;
 		this.source = new ExternalSourceImpl(meta.getSourceId(), rows.getTimestamp());
 	}
 	
@@ -49,22 +45,18 @@ public class RecordSupplier<R extends FactRow> implements Supplier<R>, AutoClose
 				return null;
 			}
 			
+			String location = rows.getLocation();
 			try {
-				p = table.fillRecord(map, row, factory);
+				p = table.fillRecord(map, row, source, location);
 			} catch (ParseException e) {
 				if( e.getLocation() == null ){
 					// add location information
-					e.setLocation(rows.getLocation());
+					e.setLocation(location);
 				}
 				throw new UncheckedParseException(e);
 			}
 			// repeat if fillRecord decides to skip the record
 		}while( p == null );
-
-		// fill source information
-		for( Observation o : p.getFacts() ){
-			o.setSource(source);
-		}
 		
 		return p;
 	}
