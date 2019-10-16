@@ -27,7 +27,8 @@ public class DataDialect {
 	private String nullModifierCd;
 	private String nullValueFlagCd;
 	private String nullValueTypeCd;
-	/** Timezone for timestamp / date time columns */
+	private int maxTvalLength;
+	/** Timezone for timestamp / date time columns. */
 	private ZoneId zoneId; // TODO may not be needed since the db always uses epoch seconds
 	// TODO nullSexCd, nullInOutCd
 
@@ -40,6 +41,7 @@ public class DataDialect {
 		this.nullValueTypeCd = "@"; // TODO check database
 		// null not allowed, use default 
 		this.nullProviderId = "@";
+		this.maxTvalLength = 255;
 		this.zoneId = ZoneId.systemDefault();
 	}
 	void setDefaultProviderId(String providerId){
@@ -71,6 +73,9 @@ public class DataDialect {
 	public String getNullValueTypeCd(){
 		return nullValueTypeCd;
 	}
+	public int getMaxTvalLength() {
+		return maxTvalLength;
+	}
 	public Timestamp encodeInstant(Instant instant){
 		if( instant == null ){
 			return null;
@@ -79,17 +84,20 @@ public class DataDialect {
 			//return Timestamp.from(instant.atZone(zoneId).toLocalDateTime().atOffset(ZoneOffset.UTC).toInstant());
 		}
 	}
-	public Timestamp encodeInstantPartial(DateTimeAccuracy instant){
+	public Timestamp encodeInstantPartial(DateTimeAccuracy instant, ZoneId zone){
 		if( instant == null ){
 			return null;
-		}else{
-			return encodeInstant(instant.toInstantMin());
+		}else { //if( zone != null ){
+			return Timestamp.valueOf(instant.toLocal(zone));
+//		}else {
+//			return encodeInstant(instant.toInstantMin());
 		}
 	}
 	public Instant decodeInstant(Timestamp timestamp){
 		if( timestamp == null ){
 			return null;
 		}else{
+			// XXX maybe use dialect.zoneId to 
 			return timestamp.toInstant();
 			//return timestamp.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().atZone(zoneId).toInstant();
 		}

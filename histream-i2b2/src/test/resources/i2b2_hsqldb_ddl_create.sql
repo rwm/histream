@@ -11,13 +11,16 @@ CREATE TABLE observation_fact(
 	valtype_cd VARCHAR(50) NULL,
 	tval_char VARCHAR(255) NULL,
 	nval_num DECIMAL(18,5) NULL,
+	valueflag_cd VARCHAR(50) NULL,
 	units_cd VARCHAR(50) NULL,
 	end_date DATETIME NULL,
 	location_cd VARCHAR(50) NULL,
+	observation_blob CLOB,
 	update_date DATETIME NULL,
 	download_date DATETIME NULL,
 	import_date DATETIME NULL,
-	sourcesystem_cd VARCHAR(50) NULL
+	sourcesystem_cd VARCHAR(50) NULL,
+	upload_id INTEGER NULL
 );
 CREATE TABLE patient_dimension(
 	patient_num INTEGER NOT NULL,

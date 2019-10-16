@@ -10,12 +10,11 @@ import org.junit.Test;
 
 import de.sekmi.histream.DateTimeAccuracy;
 
-@Deprecated
 public class TestI2b2Visit {
 
 	private DateTimeAccuracy createAccurateTimestamp(){
 		try {
-			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06Z");
+			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06Z",null);
 		} catch (ParseException e) {
 			throw new AssertionError();
 		}
@@ -25,19 +24,19 @@ public class TestI2b2Visit {
 		assertEquals(ChronoUnit.SECONDS, createAccurateTimestamp().getAccuracy());
 	
 		// make sure visit has full accuracy by default
-		I2b2Visit v = createVisitWithTimestamps();
+		I2b2PatientVisit v = createVisitWithTimestamps();
 		assertEquals(ChronoUnit.SECONDS, v.getEndTime().getAccuracy());
 		assertEquals(ChronoUnit.SECONDS, v.getStartTime().getAccuracy());		
 	}
-	private I2b2Visit createVisitWithTimestamps(){
-		I2b2Visit v = new I2b2Visit(0, 0);
+	private I2b2PatientVisit createVisitWithTimestamps(){
+		I2b2PatientVisit v = new I2b2PatientVisit(0, 0);
 		v.setStartTime(createAccurateTimestamp());
 		v.setEndTime(createAccurateTimestamp());
 		return v;
 	}
 	@Test
 	public void verifyDaysAccuracy(){
-		I2b2Visit v = createVisitWithTimestamps();
+		I2b2PatientVisit v = createVisitWithTimestamps();
 		// check if the timestamps are both accurate to day
 		
 		v.setActiveStatusCd(null);
@@ -57,7 +56,7 @@ public class TestI2b2Visit {
 	}
 	@Test
 	public void verifyMinuteAccuracy(){
-		I2b2Visit v = createVisitWithTimestamps();
+		I2b2PatientVisit v = createVisitWithTimestamps();
 		v.setActiveStatusCd("I");
 		assertEquals(ChronoUnit.MINUTES, v.getStartTime().getAccuracy());
 		assertEquals(ChronoUnit.DAYS, v.getEndTime().getAccuracy());
@@ -69,7 +68,7 @@ public class TestI2b2Visit {
 	}
 	@Test
 	public void verifyHourAndNullAccuracy(){
-		I2b2Visit v = createVisitWithTimestamps();
+		I2b2PatientVisit v = createVisitWithTimestamps();
 		v.setActiveStatusCd("UH");
 		assertEquals(ChronoUnit.HOURS, v.getStartTime().getAccuracy());
 		assertEquals(4, v.getStartTime().toInstantMin().atOffset(ZoneOffset.UTC).get(ChronoField.HOUR_OF_DAY));
@@ -83,7 +82,7 @@ public class TestI2b2Visit {
 	}
 	@Test
 	public void verifyMonthAndYearAccuracy(){
-		I2b2Visit v = createVisitWithTimestamps();
+		I2b2PatientVisit v = createVisitWithTimestamps();
 		v.setActiveStatusCd("XB");
 		assertEquals(ChronoUnit.MONTHS, v.getStartTime().getAccuracy());
 		assertEquals(ChronoUnit.YEARS, v.getEndTime().getAccuracy());

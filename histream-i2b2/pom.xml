@@ -25,8 +25,15 @@
 		</dependency>
 		<dependency>
 			<groupId>de.sekmi.histream</groupId>
-			<artifactId>histream-core</artifactId>
+			<artifactId>histream-common</artifactId>
 			<version>0.16-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-common</artifactId>
+			<type>test-jar</type>
+			<version>0.16-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

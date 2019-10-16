@@ -44,17 +44,22 @@ public class I2b2Patient extends PatientImpl {
 	String[] mergedIds;
 	
 	
-	public I2b2Patient(int num){
+	public I2b2Patient(int num, String id){
+		super(id);
 		this.patient_num = num;
 	}
 	public I2b2Patient(int num, Sex sex, DateTimeAccuracy birthDate,
 			DateTimeAccuracy deathDate) {
-		this(num);
+		super();
+		this.patient_num = num;
 		setSex(sex);
 		setBirthDate(birthDate);
 		setDeathDate(deathDate);
 	}
 
+	public void setPatientId(String id) {
+		setId(id);
+	}
 	public int getNum(){return patient_num;}
 	public void setNum(int patient_num){this.patient_num = patient_num;}
 

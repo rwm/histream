@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -54,6 +55,13 @@ public class LocalHSQLDataSource implements DataSource{
 			}
 		}		
 	}
+	private static void executeSQL(Connection dbc, URL resource) throws SQLException, IOException {
+		try( InputStream in = resource.openStream();
+				BufferedReader rd = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)) )
+		{
+			executeSQL(dbc, rd);
+		}
+	}
 	/**
 	 * Create the database and initialize it with the specified DDL statements
 	 * @param sql_ddl SQL DDL statements
@@ -75,6 +83,11 @@ public class LocalHSQLDataSource implements DataSource{
 			this.create(rd);
 		}		
 	}
+	public void loadTestDataset1() throws SQLException, IOException {
+		try( Connection dbc = getConnection() ){
+			executeSQL(dbc, LocalHSQLDataSource.class.getResource("/i2b2_hsqldb_data.sql"));
+		}
+	}
 	public Integer executeCountQuery(String sql) throws SQLException {
 		Integer ret = null;
 		try( Connection c = getConnection();
@@ -86,6 +99,18 @@ public class LocalHSQLDataSource implements DataSource{
 			}
 		}
 		return ret;
+	}
+	public <T> T executeQuerySingleResult(String sql, Class<T> returnType) throws SQLException {
+		try( Connection c = getConnection();
+				Statement s = c.createStatement();
+				ResultSet rs = s.executeQuery(sql) )
+		{
+			if( rs.next() ) {
+				return rs.getObject(1, returnType);
+			}
+		}
+		return null;
+		
 	}
 	public LocalHSQLDataSource() {
 		pw = new PrintWriter(System.out);

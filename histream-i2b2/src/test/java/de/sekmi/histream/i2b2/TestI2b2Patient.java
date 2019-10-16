@@ -15,7 +15,7 @@ public class TestI2b2Patient {
 
 	private DateTimeAccuracy createAccurateTimestamp(){
 		try {
-			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06");
+			return DateTimeAccuracy.parsePartialIso8601("2001-02-03T04:05:06Z",null);
 		} catch (ParseException e) {
 			throw new AssertionError();
 		}

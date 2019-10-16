@@ -62,6 +62,11 @@ public class I2b2PatientVisit extends VisitPatientImpl {
 		
 	}
 
+	protected void setAliases(String[] aliases, int primaryIndex) {
+		this.aliasIds = aliases;
+		this.primaryAliasIndex = primaryIndex;
+		setId(aliases[primaryIndex]);
+	}
 	public int getNum(){return encounter_num;}
 	public int getPatientNum(){return patient_num;}
 

@@ -12,15 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
 
 import de.sekmi.histream.ObservationExtractor;
-import de.sekmi.histream.ObservationFactory;
-import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.Visit;
+import de.sekmi.histream.impl.PatientImpl;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 /**
  * Extract observations from i2b2.
@@ -34,18 +33,19 @@ import de.sekmi.histream.ext.Visit;
  *
  */
 public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor {
-	private static final Logger log = Logger.getLogger(I2b2ExtractorFactory.class.getName());
+//	private static final Logger log = Logger.getLogger(I2b2ExtractorFactory.class.getName());
 
 	private DataSource ds;
 	private Integer fetchSize;
-	private ObservationFactory observationFactory;
+//	private ObservationFactory observationFactory;
 
 	DataDialect dialect;
 	boolean allowWildcardConceptCodes;
 	boolean useEncounterTiming;
+	boolean persistTempTables;
 	
-	Function<Integer,? extends Patient> lookupPatientNum;
-	Function<Integer,? extends Visit> lookupVisitNum;
+	Function<Integer,? extends PatientImpl> lookupPatientNum;
+	Function<Integer,? extends VisitPatientImpl> lookupVisitNum;
 	/**
 	 * Boolean feature whether to allow wildcard concept keys. 
 	 * <p>
@@ -55,25 +55,26 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 	 */
 	public static final String ALLOW_WILDCARD_CONCEPT_CODES = "de.sekmi.histream.i2b2.wildcard_concepts";
 	public static final String USE_ENCOUNTER_TIMESTAMPS = "de.sekmi.histream.i2b2.encounter_timing";
+	public static final String PERSIST_TEMP_TABLES = "de.sekmi.histream.i2b2.persist_temp_tables";
 	
 	
 
-	public I2b2ExtractorFactory(DataSource crc_ds, ObservationFactory factory) throws SQLException{
+	public I2b2ExtractorFactory(DataSource crc_ds) throws SQLException{
 		// TODO implement
-		this.observationFactory = factory;
+//		this.observationFactory = factory;
 		ds = crc_ds;
 		dialect = new DataDialect();
 		fetchSize = 500;
 	}
 
-	public ObservationFactory getObservationFactory(){
-		return observationFactory;
-	}
+//	public ObservationFactory getObservationFactory(){
+//		return observationFactory;
+//	}
 	
-	public void setPatientLookup(Function<Integer, ? extends Patient> lookup){
+	public void setPatientLookup(Function<Integer, ? extends PatientImpl> lookup){
 		this.lookupPatientNum = lookup;		
 	}
-	public void setVisitLookup(Function<Integer, ? extends Visit> lookup){
+	public void setVisitLookup(Function<Integer, ? extends VisitPatientImpl> lookup){
 		this.lookupVisitNum = lookup;
 	}
 	public void setFeature(String feature, Object value){
@@ -88,6 +89,13 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 		case USE_ENCOUNTER_TIMESTAMPS:
 			if( value instanceof Boolean ){
 				this.useEncounterTiming = (Boolean)value;
+			}else{
+				throw new IllegalArgumentException("Boolean value expected for feature "+feature);
+			}
+			break;
+		case PERSIST_TEMP_TABLES:
+			if( value instanceof Boolean ){
+				this.persistTempTables = (Boolean)value;
 			}else{
 				throw new IllegalArgumentException("Boolean value expected for feature "+feature);
 			}
@@ -171,8 +179,8 @@ public class I2b2ExtractorFactory implements AutoCloseable, ObservationExtractor
 			Visit v = vi.next();
 			Objects.requireNonNull(v, "null visit in argument list");
 			int num;
-			if( v instanceof I2b2Visit ){
-				num = ((I2b2Visit) v).getNum();
+			if( v instanceof I2b2PatientVisit ){
+				num = ((I2b2PatientVisit) v).getNum();
 			}else{
 				throw new IllegalStateException("encounter_num not available for visit type "+v.getClass());
 			}

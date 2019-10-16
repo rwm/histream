@@ -1,5 +1,6 @@
 package de.sekmi.histream.i2b2;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +12,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import de.sekmi.histream.ObservationFactory;
 import de.sekmi.histream.impl.ObservationFactoryImpl;
 
@@ -19,7 +23,7 @@ public class TestExtractor implements DataSource{
 	public static void main(String[] args) throws SQLException{
 		TestExtractor t = new TestExtractor();
 		ObservationFactory of = new ObservationFactoryImpl();
-		try( I2b2ExtractorFactory ef = new I2b2ExtractorFactory(t, of) ){
+		try( I2b2ExtractorFactory ef = new I2b2ExtractorFactory(t) ){
 			
 			try( I2b2Extractor e = ef.extract(Timestamp.valueOf("2015-01-16 00:00:00"), Timestamp.valueOf("2015-01-17 00:00:00"), null) ){
 				
@@ -102,5 +106,23 @@ public class TestExtractor implements DataSource{
 	public Connection getConnection(String username, String password) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Test
+	public void extractFromDatabase() throws SQLException, IOException {
+		LocalHSQLDataSource ds = new LocalHSQLDataSource();
+		ds.delete();
+		ds.createI2b2();
+		ds.loadTestDataset1();
+		long count = 0;
+		try( I2b2ExtractorFactory f = new I2b2ExtractorFactory(ds) ){
+			f.setFeature(I2b2ExtractorFactory.PERSIST_TEMP_TABLES, Boolean.TRUE);
+			try( I2b2Extractor e = f.extract(Timestamp.valueOf("2011-01-01 00:00:00"), Timestamp.valueOf("2011-01-03 00:00:00"), Arrays.asList("ICD10GM:Y36.9!")) ){
+				count = e.stream().count();
+			}
+			
+		}
+		Assert.assertNotEquals(0, count);
+		ds.delete();
 	}
 }

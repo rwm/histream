@@ -14,4 +14,7 @@ INSERT INTO observation_fact(encounter_num,patient_num,start_date,concept_cd)VAL
 INSERT INTO observation_fact(encounter_num,patient_num,start_date,concept_cd)VALUES(2001,1001,'2011-01-01 01:02:00','ICD10GM:F30.8');
 INSERT INTO observation_fact(encounter_num,patient_num,start_date,concept_cd)VALUES(2002,1001,'2011-01-02 01:01:00','ICD10GM:Y36.9!');
 INSERT INTO observation_fact(encounter_num,patient_num,start_date,concept_cd)VALUES(2004,1002,'2011-01-01 01:01:00','ICD10GM:Y36.9!');
+
+UPDATE observation_fact SET download_date='2020-01-01 00:00:00', sourcesystem_cd='test_src';
+
 COMMIT;

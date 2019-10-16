@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,11 +15,12 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.Value;
-import de.sekmi.histream.ext.Patient;
-import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.impl.NumericValue;
+import de.sekmi.histream.impl.ObservationImpl;
+import de.sekmi.histream.impl.ScopedProperty;
 import de.sekmi.histream.impl.StringValue;
+import de.sekmi.histream.impl.VisitPatientImpl;
 
 /**
  * Retrieves observations from i2b2. See {@link I2b2ExtractorFactory}.
@@ -168,41 +170,30 @@ public abstract class I2b2Extractor implements ObservationSupplier {
 	}
 	private Observation createObservation(Row row){
 		// map/lookup patient_num -> Patient, encounter_num -> Visit
-		Patient patient = null;
-		String patientId = null;
-		if( factory.lookupPatientNum != null ){
-			patient = factory.lookupPatientNum.apply(row.pid);
-			if( patient == null ){
-				log.severe("Unable to find patient with patient_num="+row.pid);
-			}
-		}
-		if( patient != null ){
-			patientId = patient.getId();
-		}else{
-			patientId = Integer.toString(row.pid);
-		}
+//		Patient patient = null;
+//		String patientId = null;
+//		if( factory.lookupPatientNum != null ){
+//			patient = factory.lookupPatientNum.apply(row.pid);
+//			if( patient == null ){
+//				log.severe("Unable to find patient with patient_num="+row.pid);
+//			}
+//		}
+//		if( patient != null ){
+//			patientId = patient.getId();
+//		}else{
+//			patientId = Integer.toString(row.pid);
+//		}
 	
-		
-		Observation o = factory.getObservationFactory().createObservation(patientId, row.cid, new DateTimeAccuracy(row.start.toInstant()));
-		if( patient != null ){
-			o.setExtension(Patient.class, patient);
-		}
 		// parse visit
-		Visit visit = null;
+		VisitPatientImpl visit = null;
 		if( factory.lookupVisitNum != null ){
 			visit = factory.lookupVisitNum.apply(row.eid);
 			if( visit == null ){
 				log.severe("Unable to find visit with encounter_num="+row.eid);
 			}
 		}
-		if( visit != null ){
-			o.setEncounterId(visit.getId());
-			o.setExtension(Visit.class, visit);
-		}else{
-			o.setEncounterId(Integer.toString(row.eid));
-		}
-
-		
+//		Observation o = factory.getObservationFactory().createObservation(visit, row.cid, new DateTimeAccuracy(row.start.toInstant()));
+		Observation o = ObservationImpl.createObservation(visit, row.cid, new DateTimeAccuracy(row.start.toInstant()));
 		if( row.end != null ){
 			o.setEndTime(new DateTimeAccuracy(row.end.toInstant()));
 		}
@@ -272,9 +263,15 @@ public abstract class I2b2Extractor implements ObservationSupplier {
 	}
 
 	@Override
-	public String getMeta(String key) {
+	public String getMeta(String key, String path) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Iterable<ScopedProperty> getMeta() {
+		// TODO Auto-generated method stub
+		return Collections.emptyList();
 	}
 
 	@Override

@@ -33,10 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.sekmi.histream.ext.ExternalSourceType;
-import de.sekmi.histream.i2b2.PostgresPatientStore;
 import de.sekmi.histream.impl.ExternalSourceImpl;
 public class TestPostgresPatientStore implements Closeable {
-	PostgresPatientStore store;
+	PostgresPatientCache store;
 	LocalHSQLDataSource ds;
 	
 	@Before
@@ -47,7 +46,7 @@ public class TestPostgresPatientStore implements Closeable {
 	}
 
 	private void openPatientStore() throws SQLException {
-		store = new PostgresPatientStore();
+		store = new PostgresPatientCache();
 		store.open(ds.getConnection(), "test", new DataDialect());
 	}
 	@After
@@ -62,23 +61,23 @@ public class TestPostgresPatientStore implements Closeable {
 	public void insertPatient() throws IOException, SQLException {
 		ExternalSourceType t = new ExternalSourceImpl("junit", Instant.now());
 		openPatientStore();
-		store.createInstance("ABC001", t);
+		store.createPatient("ABC001", t);
 		store.flush();
 		store.close();
 		store = null;
 		// reload store from database
 		openPatientStore();
 		// attempt to load previously stored patient
-		I2b2Patient p = store.retrieve("ABC001");
+		I2b2Patient p = store.lookupPatientId("ABC001");
 		Assert.assertNotNull(p);
 	}
 
 	public void open(String  host, int port, String user, String password, String projectId) throws ClassNotFoundException, SQLException{
-		store = new PostgresPatientStore();
+		store = new PostgresPatientCache();
 		store.open(DriverManager.getConnection("jdbc:postgresql://"+host+":"+port+"/i2b2", user, password),projectId, new DataDialect());
 	}
 
-	public PostgresPatientStore getStore(){return store;}
+	public PostgresPatientCache getStore(){return store;}
 
 	@Override
 	public void close() throws IOException{

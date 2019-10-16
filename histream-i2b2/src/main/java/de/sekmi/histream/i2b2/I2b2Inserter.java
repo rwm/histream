@@ -37,9 +37,9 @@ import de.sekmi.histream.Modifier;
 import de.sekmi.histream.Observation;
 import de.sekmi.histream.ObservationException;
 import de.sekmi.histream.ObservationHandler;
-import de.sekmi.histream.Plugin;
 import de.sekmi.histream.Value;
 import de.sekmi.histream.impl.AbstractObservationHandler;
+import de.sekmi.histream.impl.Meta;
 
 /**
  * Inserts observations in to the i2b2 observation_fact table.
@@ -71,7 +71,7 @@ import de.sekmi.histream.impl.AbstractObservationHandler;
  * @author R.W.Majeed
  *
  */
-public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable, Plugin{
+public class I2b2Inserter extends AbstractObservationHandler implements ObservationHandler, Closeable{
 	private static final Logger log = Logger.getLogger(I2b2Inserter.class.getName());
 	private Connection db;
 	private PreparedStatement insertFact;
@@ -80,6 +80,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	private Preprocessor etlPreprocessor;
 	private DataDialect dialect;
 	private int insertCount;
+	// TODO use destination cache for separating source patient/visit info from database
+	//private PostgresPatientVisitCache destinationCache;
 	
 //	public I2b2Inserter(Map<String,String> config) throws ClassNotFoundException, SQLException{
 //		db = PostgresExtension.getConnection(config, new String[]{"jdbc.","data.jdbc."});
@@ -96,11 +98,11 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		void preprocess(Observation fact)throws SQLException;
 	}
 	private class DistinctVisitPurge implements Preprocessor{
-		private I2b2Visit prev;
+		private I2b2PatientVisit prev;
 
 		@Override
 		public void preprocess(Observation fact) throws SQLException{
-			I2b2Visit current = fact.getExtension(I2b2Visit.class);
+			I2b2PatientVisit current = fact.getExtension(I2b2PatientVisit.class);
 			if( current != prev ){
 				purgeVisit(current.getNum());
 				prev = current;
@@ -155,12 +157,12 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 				+ "INSERT INTO observation_fact ("
 				+ "encounter_num, patient_num, concept_cd, provider_id, "
 				+ "start_date, modifier_cd, instance_num, valtype_cd, "
-				+ "tval_char, nval_num, valueflag_cd, units_cd, end_date, location_cd, "
+				+ "tval_char, nval_num, valueflag_cd, units_cd, end_date, location_cd, observation_blob, "
 				+ "update_date, download_date, import_date, sourcesystem_cd, upload_id"
 				+ ") VALUES ("
 				+ "?, ?, ?, ?, "
 				+ "?, ?, ?, ?,"
-				+ "?, ?, ?, ?, ?, ?,"
+				+ "?, ?, ?, ?, ?, ?, ?,"
 				+ "current_timestamp, ?, current_timestamp, ?, NULL)");
 
 		deleteSource = db.prepareStatement("DELETE FROM observation_fact WHERE sourcesystem_cd=?");
@@ -218,7 +220,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	
 	private int incrementInstanceNum(Observation o){
 		try{
-			I2b2Visit v = o.getExtension(I2b2Visit.class);
+			I2b2PatientVisit v = o.getExtension(I2b2PatientVisit.class);
 			v.maxInstanceNum ++;
 			return v.maxInstanceNum;
 		}catch( IllegalArgumentException e ){
@@ -232,8 +234,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	
 	private int getPatientNum(Observation o){
 		try{
-			I2b2Patient patient = o.getExtension(I2b2Patient.class);
-			return patient.getNum();
+			I2b2PatientVisit visit = o.getExtension(I2b2PatientVisit.class);
+			return visit.getPatientNum();
 		}catch( IllegalArgumentException e ){
 			// i2b2 patient not available, try to parse the patient id as number
 			return Integer.parseInt(o.getPatientId());
@@ -242,7 +244,7 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 
 	private int getEncounterNum(Observation o){
 		try{
-			I2b2Visit visit = o.getExtension(I2b2Visit.class);
+			I2b2PatientVisit visit = o.getExtension(I2b2PatientVisit.class);
 			return visit.getNum();
 		}catch( IllegalArgumentException e ){
 			// i2b2 encounter not available, try to parse the encounter id as number
@@ -304,12 +306,23 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 				insertFact.setString(11, dialect.encodeValueFlagCd(v));
 				// units_cd
 				insertFact.setString(12, dialect.encodeUnitCd(v.getUnits()));
+				insertFact.setString(15, null);
 				break;
 			case Text:
-				// valtype_cd
-				insertFact.setString(8, "T");
-				// tval_char
-				insertFact.setString(9, v.getStringValue());
+				String val = v.getStringValue();
+				if( val.length() > dialect.getMaxTvalLength() ) {
+					// store string in observation_blob
+					// valtype_cd
+					insertFact.setString(8, "B");
+					insertFact.setString(9, null);
+					insertFact.setString(15, val);
+				}else {
+					// valtype_cd
+					insertFact.setString(8, "T");
+					// tval_char
+					insertFact.setString(9, val);
+					insertFact.setString(15, null);
+				}
 				// nval_num
 				insertFact.setBigDecimal(10, null);
 				// value_flag_cd
@@ -330,8 +343,8 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 		// location_cd
 		insertFact.setString(14, dialect.encodeLocationCd(o.getLocationId()));
 		// download_date
-		insertFact.setTimestamp(15, dialect.encodeInstant(o.getSource().getSourceTimestamp()));
-		insertFact.setString(16, o.getSource().getSourceId());
+		insertFact.setTimestamp(16, dialect.encodeInstant(o.getSource().getSourceTimestamp()));
+		insertFact.setString(17, o.getSource().getSourceId());
 		
 		insertFact.executeUpdate();
 		
@@ -362,9 +375,9 @@ public class I2b2Inserter extends AbstractObservationHandler implements Observat
 	}
 
 	@Override
-	public void setMeta(String key, String value) {
+	public void setMeta(String key, String value, String path) {
 		Objects.requireNonNull(key);
-		if( key.equals("etl.strategy") ){
+		if( key.equals(Meta.META_ETL_STRATEGY) ){
 			// use default strategy 'insert' for null values
 			if( value == null ){
 				value = "insert";

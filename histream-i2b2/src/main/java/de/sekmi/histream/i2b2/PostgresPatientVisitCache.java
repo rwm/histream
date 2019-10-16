@@ -34,14 +34,19 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.ext.ExternalSourceType;
+import de.sekmi.histream.ext.Patient;
+import de.sekmi.histream.ext.PatientVisitStore;
 import de.sekmi.histream.ext.StoredExtensionType;
+import de.sekmi.histream.ext.Visit;
 import de.sekmi.histream.ext.Visit.Status;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 
 /**
  * Visit cache which synchronizes with an i2b2 visit_dimension table.
@@ -58,7 +63,7 @@ import de.sekmi.histream.ext.Visit.Status;
  * @author marap1
  *
  */
-public class PostgresPatientVisitCache extends PostgresPatientCache implements Closeable{
+public class PostgresPatientVisitCache extends PostgresPatientCache implements PatientVisitStore, Closeable{
 	private static final Logger log = Logger.getLogger(PostgresPatientVisitCache.class.getName());
 
 	private int maxEncounterNum;
@@ -213,9 +218,7 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 	 * @param primary index of primary alias (in aliases)
 	 */
 	private void setAliases(I2b2PatientVisit visit, String[] aliases, int primary){
-		visit.aliasIds = aliases;
-		visit.primaryAliasIndex = primary;
-		visit.setId(aliases[primary]);
+		visit.setAliases(aliases, primary);
 		// put in cache
 		for( String id : aliases ){
 			idCache.put(id, visit);
@@ -292,12 +295,12 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 		synchronized( update ){
 			update.setInt(1, visit.getPatientNum());
 			update.setString(2, visit.getActiveStatusCd());
-			update.setTimestamp(3, dialect.encodeInstantPartial(visit.getStartTime()));
-			update.setTimestamp(4, dialect.encodeInstantPartial(visit.getEndTime()));
+			update.setTimestamp(3, dialect.encodeInstantPartial(visit.getStartTime(),visit.getSource().getSourceZone()));
+			update.setTimestamp(4, dialect.encodeInstantPartial(visit.getEndTime(),visit.getSource().getSourceZone()));
 			update.setString(5, visit.getInOutCd());
 			update.setString(6, dialect.encodeLocationCd(visit.getLocationId()));
-			update.setTimestamp(7, dialect.encodeInstant(visit.getSourceTimestamp()));
-			update.setString(8, visit.getSourceId());
+			update.setTimestamp(7, dialect.encodeInstant(visit.getSource().getSourceTimestamp()));
+			update.setString(8, visit.getSource().getSourceId());
 
 			// where encounter_num=visit.getNum()
 			update.setInt(9, visit.getNum());
@@ -321,8 +324,8 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 		synchronized( insert ){
 			insert.setInt(1, visit.getNum() );
 			insert.setInt(2, visit.getPatientNum());
-			insert.setTimestamp(3, dialect.encodeInstant(visit.getSourceTimestamp()));
-			insert.setString(4, visit.getSourceId());
+			insert.setTimestamp(3, dialect.encodeInstant(visit.getSource().getSourceTimestamp()));
+			insert.setString(4, visit.getSource().getSourceId());
 			insert.executeUpdate();
 			// other fields are not written, don't clear the dirty flag
 		}
@@ -338,8 +341,8 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 			insertMapping.setString(5, ids[0]); // patient_ide_source
 			
 			
-			insertMapping.setTimestamp(6, dialect.encodeInstant(visit.getSourceTimestamp()));
-			insertMapping.setString(7, visit.getSourceId());
+			insertMapping.setTimestamp(6, dialect.encodeInstant(visit.getSource().getSourceTimestamp()));
+			insertMapping.setString(7, visit.getSource().getSourceId());
 			insertMapping.executeUpdate();
 		}
 	}
@@ -382,9 +385,11 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 		visit.setActiveStatusCd(active_status_cd);
 
 		visit.setLocationId(dialect.decodeLocationCd(rs.getString(7)));
-		visit.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(8)));
-		visit.setSourceId(rs.getString(9));
-		
+		ExternalSourceImpl source = new ExternalSourceImpl();
+		source.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(8)));
+		source.setSourceId(rs.getString(9));
+		source.setSourceZone(dialect.getTimeZone());
+		visit.setSource(source);
 		// additional fields go here
 		
 		// assign patient
@@ -414,6 +419,14 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 		log.log(Level.SEVERE, "Unable to update visit "+visit.getId(), e);
 	}
 
+	@Override
+	public Visit createVisit(String visitId, DateTimeAccuracy start, Patient patient, ExternalSourceType source) {
+		if( !(patient instanceof I2b2Patient) ) {
+			throw new IllegalArgumentException("Patient argument must be of type I2b2Patient");
+		}
+		return this.createVisit(visitId, start, (I2b2Patient)patient, source);
+		
+	}
 	public I2b2PatientVisit createVisit(String encounterId, I2b2Patient patient, ExternalSourceType source){
 		I2b2PatientVisit visit = idCache.get(encounterId);
 		
@@ -426,8 +439,7 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 			visit.setPatient(patient);
 			
 			// created from observation, use source metadata
-			visit.setSourceId(source.getSourceId());
-			visit.setSourceTimestamp(source.getSourceTimestamp());
+			visit.setSource(source);
 
 			// put in cache
 			visitCache.put(encounter_num, visit);
@@ -486,7 +498,7 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 		LinkedList<I2b2PatientVisit>remove = new LinkedList<>();
 		while( all.hasMoreElements() ){
 			I2b2PatientVisit p = all.nextElement();
-			if( p.getSourceId() != null && p.getSourceId().equals(sourceId) ){
+			if( p.getSource().getSourceId() != null && p.getSource().getSourceId().equals(sourceId) ){
 				remove.add(p); // remove later, otherwise the Enumeration might fail
 			}
 			// XXX does not work with sourceId == null
@@ -508,6 +520,9 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 
 	@Override
 	public void flush() {
+		// flush patients first
+		super.flush();
+		// now visits
 		Iterator<I2b2PatientVisit> dirty = StoredExtensionType.dirtyIterator(visitCache.elements());
 		int count = 0;
 		while( dirty.hasNext() ){
@@ -533,5 +548,30 @@ public class PostgresPatientVisitCache extends PostgresPatientCache implements C
 			}
 			db = null;
 		}
+	}
+	@Override
+	public Patient findPatient(String patientId) {
+		return lookupPatientId(patientId);
+	}
+	@Override
+	public void merge(Patient patient, String additionalId, ExternalSourceType source) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String[] getPatientAliasIds(Patient patient) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public void purgePatient(String patientId) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public void purgeVisit(String visitId) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public List<? extends Visit> allVisits(Patient patient) {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -38,6 +38,10 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 	}
 
 	private String tempTableName(String base){
+		if( temporaryTableSuffix == null ) {
+			return base; // no suffix
+		}
+		// add (eg random) suffix to make the table name unique
 		return base+temporaryTableSuffix;
 	}
 	private void limitNotations(List<String> joinParts, List<String> whereParts) throws SQLException{
@@ -159,6 +163,8 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 				}
 				b.append(part);
 			}
+			// append space
+			b.append("  ");
 		}
 		// GROUP ...
 		b.append(SELECT_ORDER_GROUP);
@@ -224,8 +230,8 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 				ps.clearParameters();
 				ps.clearWarnings();
 				int vn;
-				if( visit instanceof I2b2Visit ){
-					vn = ((I2b2Visit)visit).getNum();
+				if( visit instanceof I2b2PatientVisit){
+					vn = ((I2b2PatientVisit)visit).getNum();
 				}else{
 					throw new SQLException("Unsupported visit type "+visit.getClass());
 				}
@@ -236,15 +242,24 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 	}
 	private void createTemporaryConceptTable(Connection dbc, Iterable<String> concepts) throws SQLException{
 		// delete table if previously existing
+		String tempTable = tempTableName("temp_concepts");
 		try( Statement s = dbc.createStatement() ){
-			s.executeUpdate("DROP TABLE IF EXISTS "+tempTableName("temp_concepts"));
+			s.executeUpdate("DROP TABLE IF EXISTS "+tempTable);
 		}
 		try( Statement s = dbc.createStatement() ){
-			s.executeUpdate("CREATE TEMPORARY TABLE "+tempTableName("temp_concepts")+"(concept VARCHAR(255) PRIMARY KEY)");
-			temporaryTables.add("temp_concepts");
+			StringBuilder b = new StringBuilder();
+			b.append("CREATE ");
+			if( !factory.persistTempTables ) {
+				b.append("TEMPORARY ");
+			}
+			b.append("TABLE ");
+			b.append(tempTable);
+			temporaryTables.add(tempTable);
+			b.append("(concept VARCHAR(255) PRIMARY KEY)");
+			s.executeUpdate(b.toString());
 		}
 		try( PreparedStatement ps 
-				= dbc.prepareStatement("INSERT INTO "+tempTableName("temp_concepts")+"(concept) VALUES(?)") ){
+				= dbc.prepareStatement("INSERT INTO "+tempTable+"(concept) VALUES(?)") ){
 			// TODO do we need to make sure that there are no duplicate concepts???
 			for( String concept : concepts ){
 				ps.clearParameters();
@@ -260,5 +275,6 @@ public class I2b2ExtractorImpl extends I2b2Extractor {
 		// TODO escape _ and % with backslash
 		return likeString;
 	}
+
 
 }

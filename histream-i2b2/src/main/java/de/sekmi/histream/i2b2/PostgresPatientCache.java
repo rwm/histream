@@ -43,6 +43,7 @@ import de.sekmi.histream.DateTimeAccuracy;
 import de.sekmi.histream.ext.ExternalSourceType;
 import de.sekmi.histream.ext.Patient;
 import de.sekmi.histream.ext.StoredExtensionType;
+import de.sekmi.histream.impl.ExternalSourceImpl;
 import de.sekmi.histream.ext.Patient.Sex;
 
 /**
@@ -283,7 +284,7 @@ public class PostgresPatientCache implements Closeable{
 					p = getCached(num);
 					if( p != null ){
 						project_count ++;
-						p.setId(id);
+						p.setPatientId(id);
 						p.markDirty(false);
 					}
 				}else // all other ids are aliases
@@ -368,15 +369,15 @@ public class PostgresPatientCache implements Closeable{
 	private void updateStorage(I2b2Patient patient) throws SQLException {
 		synchronized( update ){
 			update.setString(1, patient.getVitalStatusCd());
-			update.setTimestamp(2, dialect.encodeInstantPartial(patient.getBirthDate()));
-			update.setTimestamp(3, dialect.encodeInstantPartial(patient.getDeathDate()));
+			update.setTimestamp(2, dialect.encodeInstantPartial(patient.getBirthDate(),patient.getSource().getSourceZone()));
+			update.setTimestamp(3, dialect.encodeInstantPartial(patient.getDeathDate(),patient.getSource().getSourceZone()));
 			update.setString(4, getSexCd(patient));
-			if( patient.getSourceTimestamp() != null ){
-				update.setTimestamp(5, dialect.encodeInstant(patient.getSourceTimestamp()));
+			if( patient.getSource().getSourceTimestamp() != null ){
+				update.setTimestamp(5, dialect.encodeInstant(patient.getSource().getSourceTimestamp()));
 			}else{
 				update.setTimestamp(5, null);
 			}
-			update.setString(6, patient.getSourceId());
+			update.setString(6, patient.getSource().getSourceId());
 			update.setInt(7, patient.getNum());
 			update.executeUpdate();
 			patient.markDirty(false);
@@ -392,7 +393,7 @@ public class PostgresPatientCache implements Closeable{
 	private void insertPatient(I2b2Patient patient) throws SQLException{
 		synchronized( insert ){
 			insert.setInt(1, patient.getNum() );
-			insert.setString(2, patient.getSourceId());
+			insert.setString(2, patient.getSource().getSourceId());
 			insert.executeUpdate();
 			patient.markDirty(false);
 		}
@@ -449,13 +450,17 @@ public class PostgresPatientCache implements Closeable{
 				sex_cd = null; // unknown
 			}
 		}
+		ExternalSourceImpl source = new ExternalSourceImpl();
 		
 		I2b2Patient patient = new I2b2Patient(id, sex, birthDate, deathDate);
 		if( rs.getTimestamp(6) != null ){
-			patient.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(6)));
+			source.setSourceTimestamp(dialect.decodeInstant(rs.getTimestamp(6)));
 		}
-		patient.setSourceId(rs.getString(7));
-		
+		source.setSourceId(rs.getString(7));
+		// XXX right now, we cannot store the zone information.
+		// use the i2b2 dialect local zone for the source zone
+		source.setSourceZone(dialect.getTimeZone());
+		patient.setSource(source);
 		patient.setVitalStatusCd(vital_cd);
 		
 		patient.markDirty(false);
@@ -511,13 +516,11 @@ public class PostgresPatientCache implements Closeable{
 			// create new patient
 			maxPatientNum ++;
 			int num = maxPatientNum;
-			pat = new I2b2Patient(num);
-			pat.setId(patientId);
+			pat = new I2b2Patient(num, patientId);
 			
 			
 			// don't use source metadata, since we only know the patient id
-			pat.setSourceId(source.getSourceId());
-			pat.setSourceTimestamp(source.getSourceTimestamp());
+			pat.setSource(source);
 
 			// put in cache and insert into storage
 			patientCache.put(num, pat);
@@ -572,7 +575,7 @@ public class PostgresPatientCache implements Closeable{
 		LinkedList<I2b2Patient>remove = new LinkedList<>();
 		while( all.hasMoreElements() ){
 			I2b2Patient p = all.nextElement();
-			if( p.getSourceId() != null && p.getSourceId().equals(sourceId) ){
+			if( p.getSource().getSourceId() != null && p.getSource().getSourceId().equals(sourceId) ){
 				remove.add(p); // remove later, otherwise the Enumeration might fail
 			}
 			// XXX does not work with sourceId == null

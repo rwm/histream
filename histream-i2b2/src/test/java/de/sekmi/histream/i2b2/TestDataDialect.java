@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import de.sekmi.histream.DateTimeAccuracy;
-import static org.junit.Assert.*;
+
 public class TestDataDialect {
 
 	@Test
@@ -29,7 +29,8 @@ public class TestDataDialect {
 	@Test
 	public void verifySqlTimestampConversions(){
 		DataDialect dialect = new DataDialect();
-		dialect.setTimeZone(ZoneId.of("Asia/Shanghai"));
+		ZoneId tz = ZoneId.of("Asia/Shanghai");
+		dialect.setTimeZone(tz);
 		Timestamp ts;
 
 		Instant inst = Instant.parse("2001-02-03T04:05:06Z");
@@ -37,7 +38,7 @@ public class TestDataDialect {
 		System.out.println(inst);
 		
 		ts = dialect.encodeInstant(inst);
-		assertEquals(ts, dialect.encodeInstantPartial(da));
+		assertEquals(ts, dialect.encodeInstantPartial(da,tz));
 		System.out.println(ts.toInstant());
 
 
