@@ -231,8 +231,10 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 			int ox = os / 3600;
 			os = os % 3600;
 			padZeros(b,ox,2);
-			// add colon between timezone hours and minutes
-			b.append(':');
+			if( colon ) {
+				// add colon between timezone hours and minutes
+				b.append(':');
+			}
 			// minutes
 			ox = os / 60;
 			padZeros(b,ox,2);
