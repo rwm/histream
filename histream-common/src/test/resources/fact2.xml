@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:fact patient="12345" encounter="23456" concept="T:testconcept1" start="2015-01-09T22:30" end="2015-01" location="L:ocation" provider="provider" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:ns3="http://sekmi.de/histream/ns/eav-data">
+	<value xsi:type="ns3:numeric" unit="mm" flag="A" operator="E">123</value>
+	<modifier code="M:test"><value xsi:type="ns3:string">123</value></modifier>
+</ns3:fact>

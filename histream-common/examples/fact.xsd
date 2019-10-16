@@ -1,0 +1,63 @@
+<xs:schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://sekmi.de/histream/ns/eav-data" 
+	xmlns="http://sekmi.de/histream/ns/eav-data">
+	<!-- value -->
+	<xs:complexType name="valueType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="unit" />
+				<xs:attribute type="xs:string" name="flag" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="numeric">
+		<xs:simpleContent>
+			<xs:extension base="valueType">
+				<xs:attribute type="xs:string" name="operator" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="string">
+		<xs:simpleContent>
+			<xs:extension base="valueType"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- modifier -->
+	<xs:complexType name="modifierType">
+		<xs:sequence>
+			<xs:element name="value" type="valueType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="code" use="required"/>
+	</xs:complexType>
+	
+	<xs:simpleType name="partialDate">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{4}(-[0-1][0-9](-[0-3][0-9](T[0-2][0-9](:[0-5][0-9](:[0-5][0-9])?)?)?)?)?"></xs:pattern>
+        </xs:restriction>
+    </xs:simpleType>
+    
+	<xs:complexType name="sourceType">
+		<xs:attribute type="xs:dateTime" name="timestamp" />
+		<xs:attribute type="xs:string" name="id" />
+	</xs:complexType>
+
+	<xs:complexType name="factType">
+		<xs:sequence>
+			<xs:element name="value" type="valueType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="modifier" type="modifierType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="source" type="sourceType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="patient" />
+		<xs:attribute type="xs:string" name="encounter" />
+		<xs:attribute type="xs:string" name="concept" use="required"/>
+		<xs:attribute type="partialDate" name="start" />
+		<xs:attribute type="partialDate" name="end"/>
+		<xs:attribute type="xs:string" name="location" />
+		<xs:attribute type="xs:string" name="provider" />
+	</xs:complexType>
+
+
+	<xs:element name="fact" type="factType" />
+</xs:schema>

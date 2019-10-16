@@ -1,0 +1,23 @@
+<eav-data xmlns="http://sekmi.de/histream/ns/eav-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<!-- chronologisch impliziert, dass der zeitstempel eines nachfolgenden elementes 
+	größer als alle vorangehenden elemente sein muss. Der Zeitstempel kann vor dem 
+	Encounter-Start liegen -->
+	<meta>
+		<!-- Zeitpunkt, an dem der Export erstellt wurde bzw. Datenstand -->
+		<etl-strategy>replace-visit</etl-strategy>
+		<source timestamp="2015-04-21T06:58:00Z" id="test"/>
+	</meta>
+	<patient id="XX12345">
+		<given-name>A B</given-name>
+		<surname>Dampf</surname>
+		<!-- Gender allows for female, male, indeterminate -->
+		<!-- Gender element can also be removed or left empty -->
+		<gender>female</gender>
+		<encounter id="XXE12345">
+			<start>2014-01-01T10:30:00</start>
+			<fact concept="T:date:secs" start="2014-09-07T10:40:03"/>
+		</encounter>
+	</patient>
+	
+</eav-data>

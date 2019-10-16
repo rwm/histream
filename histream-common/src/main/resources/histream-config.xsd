@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    jxb:version="1.0"
+>
+
+  <xs:element name="histream" type="histream"/>
+
+  <xs:complexType name="histream">
+    <xs:sequence>
+      <xs:element name="plugins" type="plugins" minOccurs="1"/>
+      <xs:element name="source" type="pluginref" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="destination" type="pluginref" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="plugins">
+    <xs:sequence>
+      <xs:element name="plugin" type="plugin" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="plugin">
+    <xs:sequence>
+      <xs:element name="property" type="plugin-property" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="class" type="xs:ID" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="pluginref">
+    <xs:sequence/>
+    <xs:attribute name="plugin" type="xs:IDREF" use="required">
+		<xs:annotation>
+			<xs:appinfo>
+				<jxb:property>
+					<jxb:baseType name="Plugin"/>
+				</jxb:property>
+			</xs:appinfo>
+		</xs:annotation>    
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="plugin-property">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+</xs:schema>
+

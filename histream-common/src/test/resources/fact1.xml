@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<fact xmlns="http://sekmi.de/histream/ns/eav-data"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://sekmi.de/histream/ns/eav-data fact.xsd" 
+	concept="T:testconcept1" start="2015-01-09T22:30" end="2015-01" location="L:ocation" provider="provider">
+	<value xsi:type="numeric" unit="mm" flag="A" operator="E">123</value>
+	<modifier code="M:test"><value xsi:type="string">123</value></modifier>
+	<source id="system1" timestamp="2015-08-24T21:11:15.332Z"/>
+</fact>
