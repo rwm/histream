@@ -68,7 +68,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 	@Test
 	public void testWriteReadEmptyFile() throws Exception{
 		OutputStream out = Files.newOutputStream(debugFile);
-		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out);
+		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out, "UTF-8");
 		w.setMeta(Meta.META_SOURCE_ID, "123", null);
 		w.setMeta(Meta.META_SOURCE_TIMEZONE, "Europe/Berlin", null);
 		w.close();
@@ -112,7 +112,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 	public void testWriteStream() throws Exception{
 		// TODO remove duplicate XMLNS in output
 		ObservationSupplier s = getExampleSupplier();
-		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(debugLog);
+		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(debugLog, "UTF-8");
 		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		w.close();
@@ -129,7 +129,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 		ObservationSupplier s = getExampleSupplier();
 		Path temp = Files.createTempFile("eav", ".xml");
 		try( OutputStream out = Files.newOutputStream(temp) ){
-			GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out);
+			GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out, "UTF-8");
 //			w.setZoneId(zone);
 			Meta.transfer(s, w);
 			Streams.transfer(s, w);
@@ -185,7 +185,7 @@ public class TestFhirBundleWriter extends TestAbstractXML {
 		File dest = File.createTempFile("xmlwriter", ".xml");
 		FileOutputStream out = new FileOutputStream(dest);
 		ObservationSupplier s = getExampleSupplier();
-		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out);
+		GroupedFhirBundleWriter w = new GroupedFhirBundleWriter(out, "UTF-8");
 		Meta.transfer(s, w);
 		Streams.transfer(s, w);
 		s.close();

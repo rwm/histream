@@ -36,7 +36,7 @@ public class ExportFHIR {
 
 	public static void descriptorToXML(URL importDescriptor, OutputStream out) throws IOException, ParseException, XMLStreamException {
 		ETLObservationSupplier suppl = ETLObservationSupplier.load(importDescriptor);
-		GroupedFhirBundleWriter writer = new GroupedFhirBundleWriter(out);
+		GroupedFhirBundleWriter writer = new GroupedFhirBundleWriter(out, "UTF-8");
 		Meta.transfer(suppl, writer);
 		Streams.transfer(suppl, writer);
 		suppl.close();

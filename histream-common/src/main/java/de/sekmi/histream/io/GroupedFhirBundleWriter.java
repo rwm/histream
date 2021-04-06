@@ -66,11 +66,12 @@ public class GroupedFhirBundleWriter extends GroupedObservationHandler{
 	 * The stream must be closed separately.
 	 * 
 	 * @param output output stream
+	 * @param charsetEncoding encoding for the output
 	 * @throws XMLStreamException initialisation error
 	 */
-	public GroupedFhirBundleWriter(OutputStream output) throws XMLStreamException{
+	public GroupedFhirBundleWriter(OutputStream output, String charsetEncoding) throws XMLStreamException{
 		this();
-		w = new FhirBundleWriter(output);
+		w = new FhirBundleWriter(output, charsetEncoding);
 	}
 
 	/**

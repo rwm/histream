@@ -26,8 +26,8 @@ public class FhirBundleWriter extends AbstractXMLStreamWriter {
 	public static final String NAMESPACE = "http://hl7.org/fhir";
 	private String fhirBaseUrl;
 
-	public FhirBundleWriter(OutputStream output) throws XMLStreamException {
-		super(output);
+	public FhirBundleWriter(OutputStream output, String charsetEncoding) throws XMLStreamException {
+		super(output, charsetEncoding);
 	}
 
 	public FhirBundleWriter(Result result) throws XMLStreamException {
@@ -42,7 +42,8 @@ public class FhirBundleWriter extends AbstractXMLStreamWriter {
 		// NamespaceContext is not supported by DOM stream writer
 		writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, "Bundle", NAMESPACE);
 //		writer.setPrefix("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
-		writer.writeDefaultNamespace(NAMESPACE);
+// not needed as the default namespace is written via writeStartElement
+//		writer.writeDefaultNamespace(NAMESPACE);
 //		writer.writeNamespace("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
 		formatPush();
 		formatNewline();

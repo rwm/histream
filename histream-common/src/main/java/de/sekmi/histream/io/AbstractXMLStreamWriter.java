@@ -12,7 +12,7 @@ import javax.xml.transform.Result;
 public class AbstractXMLStreamWriter implements Closeable {
 	private boolean writeFormatted;
 	private int formattingDepth;
-	
+	private String encoding;
 
 	/**
 	 * Used to output XML
@@ -28,12 +28,13 @@ public class AbstractXMLStreamWriter implements Closeable {
 		this.writer = writer;
 	}
 
-	public AbstractXMLStreamWriter(OutputStream output) throws XMLStreamException {
+	public AbstractXMLStreamWriter(OutputStream output, String charsetEncoding) throws XMLStreamException {
 		this();
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		// enable repairing namespaces to remove duplicate namespace declarations by JAXB marshal
 		factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
-		this.writer = factory.createXMLStreamWriter(output);
+		this.writer = factory.createXMLStreamWriter(output, charsetEncoding);
+		this.encoding = charsetEncoding;
 	}
 
 	public AbstractXMLStreamWriter(Result result) throws XMLStreamException {
