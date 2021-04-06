@@ -111,7 +111,11 @@ public class TestExtractor implements DataSource{
 	@Test
 	public void extractFromDatabase() throws SQLException, IOException {
 		LocalHSQLDataSource ds = new LocalHSQLDataSource();
-		ds.delete();
+		try{
+			ds.delete();
+		}catch( SQLException e ) {
+			// ignore non-existing database
+		}
 		ds.createI2b2();
 		ds.loadTestDataset1();
 		long count = 0;
