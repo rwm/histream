@@ -309,7 +309,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 			// hours present
 			// add zone offset
 			int os = ((ZonedDateTime)dt).getOffset().getTotalSeconds();
-			appendZoneOffset(b, os, false);
+			appendZoneOffset(b, os, true);
 		}
 		
 		return b.toString();		
