@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>SKOS i2b2 ontology</name>
+	
+	<groupId>de.sekmi.histream</groupId>
+	<artifactId>skos-i2b2-ontology</artifactId>
+	<version>0.2-SNAPSHOT</version>
+
+	<parent>
+		<groupId>de.sekmi.histream</groupId>
+		<artifactId>histream</artifactId>
+		<version>0.13-SNAPSHOT</version>
+	</parent>
+  
+	<build>
+		<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+		<includeScope>compile</includeScope>
+              <!-- configure the plugin here -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-i2b2</artifactId>
+			<version>0.12.1</version>
+		</dependency>
+		<dependency>
+			<groupId>de.sekmi.histream</groupId>
+			<artifactId>histream-skos</artifactId>
+			<version>0.13-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>
