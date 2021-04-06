@@ -236,8 +236,9 @@ public class ETLObservationSupplier implements ObservationSupplier{
 	public Iterable<ScopedProperty> getMeta() {
 		// TODO implement
 		return Arrays.asList(
-				new ScopedProperty(null, "source.timestamp", Instant.ofEpochMilli(ds.getMeta().getLastModified()).toString()),
-				new ScopedProperty(null, "source.id", ds.getMeta().getSourceId())
+				new ScopedProperty(null,  de.sekmi.histream.impl.Meta.META_SOURCE_TIMESTAMP, Instant.ofEpochMilli(ds.getMeta().getLastModified()).toString()),
+				new ScopedProperty(null,  de.sekmi.histream.impl.Meta.META_SOURCE_ID, ds.getMeta().getSourceId()),
+				new ScopedProperty(null,  de.sekmi.histream.impl.Meta.META_SOURCE_TIMEZONE, ds.getMeta().getTimezone().toString())
 		);
 	}
 

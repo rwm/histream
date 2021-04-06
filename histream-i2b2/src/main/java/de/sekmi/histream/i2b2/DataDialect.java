@@ -84,13 +84,19 @@ public class DataDialect {
 			//return Timestamp.from(instant.atZone(zoneId).toLocalDateTime().atOffset(ZoneOffset.UTC).toInstant());
 		}
 	}
+	/**
+	 * Encode the given partial instant to a timestamp object.
+	 * @param instant partial instant
+	 * @param zone local zone of the instant
+	 * @return returns the local timestamp for the given instant
+	 */
 	public Timestamp encodeInstantPartial(DateTimeAccuracy instant, ZoneId zone){
 		if( instant == null ){
 			return null;
 		}else { //if( zone != null ){
 			return Timestamp.valueOf(instant.toLocal(zone));
-//		}else {
-//			return encodeInstant(instant.toInstantMin());
+		//}else {
+		//	return encodeInstant(instant.toInstantMin());
 		}
 	}
 	public Instant decodeInstant(Timestamp timestamp){
@@ -99,6 +105,7 @@ public class DataDialect {
 		}else{
 			// XXX maybe use dialect.zoneId to 
 			return timestamp.toInstant();
+			//return timestamp.toLocalDateTime().atZone(zoneId).toInstant();
 			//return timestamp.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().atZone(zoneId).toInstant();
 		}
 	}
