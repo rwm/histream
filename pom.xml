@@ -53,7 +53,7 @@
 	</licenses>
 	<modules>
 		<module>histream-i2b2</module>
-		<module>histream-core</module>
+		<module>histream-common</module>
 		<module>histream-export</module>
 		<module>histream-js</module>
 		<module>histream-import</module>
