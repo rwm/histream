@@ -120,16 +120,16 @@
 					<code>
 						<coding>
 							<system value="http://loinc.org" />
-							<code value="9267-6" />
-							<display value="Glasgow coma score eye opening" />
+							<code value="9268-4" />
+							<display value="Glasgow coma score motoric response" />
 						</coding>
-						<text value="Eyes" />
+						<text value="Motoric response" />
 					</code>
 					<valueCodeableConcept>
 						<coding>
 							<system value="http://acme.ec/codes" />
-							<code value="4" />
-							<display value="Opens eyes spontaneously" />
+							<code value="6" />
+							<display value="Obeys commands" />
 						</coding>
 					</valueCodeableConcept>
 				</component>
