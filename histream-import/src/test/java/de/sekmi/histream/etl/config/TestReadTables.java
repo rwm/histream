@@ -91,12 +91,14 @@ public class TestReadTables {
 		try( RecordSupplier<EavRow> s = ds.eavTables[0].open(ds.getMeta()) ){
 			EavRow r = s.get();
 			Assert.assertNotNull(r);
+			Assert.assertNotNull(r.start);
 			r.createFacts(pat, vis, of);
 
 			Assert.assertTrue(r.getFacts().size() > 0);
 			Observation o = r.getFacts().get(0);
 			// next fact without value. Verify mapped concept
 			Assert.assertEquals("f_eav_m_m", o.getConceptId());
+			Assert.assertNotNull(o.getStartTime());
 			
 			// next fact with numeric value
 			r = s.get();
@@ -105,6 +107,7 @@ public class TestReadTables {
 			Assert.assertEquals("f_eav_b", o.getConceptId());
 			Assert.assertEquals(Value.Type.Numeric, o.getValue().getType());
 			Assert.assertEquals(BigDecimal.valueOf(3.9), o.getValue().getNumericValue());
+			System.out.println("Start: "+o.getStartTime());
 			ExternalSourceType e = o.getSource();
 			Assert.assertNotNull(e);
 			Assert.assertEquals("test-1", e.getSourceId());
@@ -118,6 +121,7 @@ public class TestReadTables {
 			// should be processed by virtual column map
 			Assert.assertEquals("f_eav_x_1", f.getConceptId());
 			Assert.assertNull(f.getValue());
+			Assert.assertNotNull(f.getStartTime());
 			Assert.assertNotNull(f.getEndTime());
 		}
 	}

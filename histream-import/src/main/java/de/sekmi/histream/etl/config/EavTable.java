@@ -176,14 +176,17 @@ public class EavTable extends Table<EavRow> {
 			vval = null;
 		}
 
-		if( start == null ){
-			// start may be null at this point and will be filled later with the visit timestamp
-			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
-		}
-
 		EavRow eav = new EavRow(patid,visit,concept);
 		eav.source = source;
 		eav.recordOrigin = recordOrigin;
+
+		if( start == null ){
+			// start may be null at this point and will be filled later with the visit timestamp
+			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
+		}else {
+			eav.start = start;
+		}
+
 
 		if( mdat.end != null ) {
 			eav.end = mdat.end.valueOf(colMap,row);
