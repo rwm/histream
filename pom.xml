@@ -8,7 +8,7 @@
   
 	<name>HIStream</name>
 	<description>Real-time stream based decision support system</description>
-	<url>https://gitlab.uni-oldenburg.de/rwmajeed/histream</url>
+	<url>https://github.com/rwm/histream.git</url>
 	
   	<inceptionYear>2013</inceptionYear>
   	<organization>
@@ -17,16 +17,16 @@
 	<developers>
 		<developer>
 			<name>R.W.Majeed</name>
-			<email>raphael.majeed (a) uni-oldenburg.de</email>
-			<organization>Department for Medical Informatics, University Oldenburg</organization>
-			<organizationUrl>https://www.uni-oldenburg.de/medizininformatik/</organizationUrl>
+			<email>raphael.majeed (a) innere.med.uni-giessen.de</email>
+			<organization>University Giessen</organization>
+			<organizationUrl>https://www.uni-giesssen.de/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
-		<connection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</connection>
-		<developerConnection>scm:git:git@gitlab.uni-oldenburg.de:rwmajeed/histream.git</developerConnection>
+		<connection>scm:git:https://github.com/rwm/histream.git</connection>
+		<developerConnection>scm:git:https://github.com/rwm/histream.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://gitlab.uni-oldenburg.de/rwmajeed/histream/tree/master</url>
+		<url>https://github.com/rwm/histream/tree/master</url>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
@@ -54,7 +54,7 @@
 	<modules>
 		<module>histream-i2b2</module>
 		<module>histream-common</module>
-		<module>histream-export</module>
+		<!--<module>histream-export</module>-->
 		<module>histream-js</module>
 		<module>histream-import</module>
 		<module>histream-skos</module>
@@ -70,7 +70,7 @@
 				<!-- upload via scp for site/release-->
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
+				<version>3.5.3</version>
 			</extension>
 		</extensions>
 
@@ -88,7 +88,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.3.1</version>
 					<executions>
 						<execution>
 							<id>attach-sources</id>
@@ -151,12 +151,12 @@
 					<!-- forces newer version, old 2.3.2 contains bugs -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>2.5.2</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>1.6</version>
+					<version>3.2.4</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
