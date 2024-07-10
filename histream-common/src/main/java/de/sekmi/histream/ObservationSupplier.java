@@ -24,13 +24,14 @@ package de.sekmi.histream;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import de.sekmi.histream.impl.Meta;
 import de.sekmi.histream.impl.ScopedProperty;
 import de.sekmi.histream.io.Streams;
 
 /**
  * Supplier of observations.
  * 
- * Also provides meta informaiton via {@link #getMeta(String)}
+ * Also provides meta information via {@link #getMeta(String, String)}
  * <p>
  * When an instance is constructed, meta information should be read from
  * the file (e.g. etl strategy and other instructions)
@@ -53,9 +54,9 @@ public interface ObservationSupplier extends Supplier<Observation>, AutoCloseabl
 	
 	/**
 	 * Retrieve meta information for this supply of observations.
-	 * For possible keys see {@link #META_ETL_STRATEGY} ...
+	 * For possible keys see {@link Meta#META_ETL_STRATEGY} ...
 	 * @param key meta key
-	 * @param path 
+	 * @param path scope path for property
 	 * @return value for the meta key
 	 */
 	String getMeta(String key, String path);

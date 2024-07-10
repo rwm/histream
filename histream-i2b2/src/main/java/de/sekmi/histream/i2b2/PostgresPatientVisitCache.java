@@ -57,7 +57,7 @@ import de.sekmi.histream.impl.ExternalSourceImpl;
  * XXX after loading encounters, the String patientId not set anymore and always null. To determine the patientId, the patientStore is required for lookup of the patientNum
  * TODO use encounter_mapping table to map actual (source) patient_ide to internal patient_num for facts.
  * <p>
- * The variable argument list for {@link #createInstance(Object...)} requires the following arguments:
+ * The variable argument list for {@link #createVisit(String, DateTimeAccuracy, Patient, ExternalSourceType)} requires the following arguments:
  * {@link String}{@code visitId}, {@link I2b2Patient}{@code patient}, {@link ExternalSourceType}{@code source}.
  * 
  * @author marap1

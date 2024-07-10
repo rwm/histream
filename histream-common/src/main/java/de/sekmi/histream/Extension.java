@@ -65,6 +65,7 @@ public interface Extension<T>{
 	 * Extract subtype information from the slot type.
 	 * E.g. a visit store can provide info about the patient
 	 * @param slotInstance slot instance type
+	 * @param <U> type of subtype
 	 * @param subtype subtype to retrieve
 	 * @return subtype instance
 	 */

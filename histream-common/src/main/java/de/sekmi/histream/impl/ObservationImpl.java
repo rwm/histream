@@ -104,7 +104,7 @@ public class ObservationImpl implements Observation, Cloneable{
 
 	/**
 	 * Constructor should not be called directly. Instead, use
-	 * {@link ObservationFactory#createObservation(String, String, DateTimeAccuracy)}.
+	 * {@link ObservationFactory#createObservation(VisitPatientImpl, String, DateTimeAccuracy)}.
 	 * @param factory observation factory
 	 */
 	protected ObservationImpl(ObservationFactoryImpl factory){
@@ -370,8 +370,6 @@ public class ObservationImpl implements Observation, Cloneable{
 	
 	/**
 	 * Removes information from this observation which is already contained in the provided context
-	 * @param patientId patient context
-	 * @param encounterId encounter context
 	 * @param startTime start time
 	 * @param source source context
 	 */
@@ -400,8 +398,6 @@ public class ObservationImpl implements Observation, Cloneable{
 
 	/**
 	 * Fill some information from the provided context
-	 * @param patientId patient context
-	 * @param encounterId visit context
 	 * @param startTime start time context
 	 * @param source source context
 	 */

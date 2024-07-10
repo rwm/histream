@@ -21,7 +21,7 @@ public interface PatientVisitStore {
 	/**
 	 * Deletes the patient identified by given id. This method does not remove any other associated
 	 * data e.g. like visits, observations.
-	 * @param id patient id
+	 * @param patientId patient id
 	 */
 	void purgePatient(String patientId);
 	void purgeVisit(String visitId);

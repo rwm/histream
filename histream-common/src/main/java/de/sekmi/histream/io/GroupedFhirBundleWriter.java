@@ -51,7 +51,7 @@ public class GroupedFhirBundleWriter extends GroupedObservationHandler{
 	protected FhirBundleWriter w;
 	
 	/**
-	 * Constructor which doesn't initialize the {@link #writer}.
+	 * Constructor which doesn't initialize the writer {@link #w}.
 	 * Use this constructor to extend the class and provide a custom {@link XMLStreamWriter}.
 	 * 
 	 * @throws XMLStreamException initialisation error

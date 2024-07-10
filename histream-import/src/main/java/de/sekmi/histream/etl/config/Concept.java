@@ -168,8 +168,7 @@ public class Concept{
 	 * Create an observation for this concept with the given row data.
 	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
 	 * 
-	 * @param patid patient id
-	 * @param visit visit id
+	 * @param visit visit reference
 	 * @param factory observation factory
 	 * @param map column map
 	 * @param row row data

@@ -17,7 +17,7 @@ public interface FactRow {
 	/**
 	 * Get a list of facts for this row.
 	 * The list will be populated by a previous call to 
-	 * {@link #createFacts(PatientImpl, VisitPatientImpl)}.
+	 * {@link #createFacts(PatientImpl, VisitPatientImpl, ObservationFactory)}.
 	 * This method always return the same list so the list's
 	 * items can be modified.
 	 * @return list of facts for this row 
@@ -25,9 +25,9 @@ public interface FactRow {
 	List<Observation> getFacts();
 	/**
 	 * Get the patient id for this row. Can be called before 
-	 * {@link #createFacts(PatientImpl, VisitPatientImpl)} 
+	 * {@link #createFacts(PatientImpl, VisitPatientImpl, ObservationFactory)} 
 	 * or {@link #getFacts()}.
-	 * @returns patient id
+	 * @return patient id
 	 */
 	String getPatientId();
 	/**
