@@ -164,87 +164,88 @@ public class Concept{
 		}
 		return po;
 	}
-	/**
-	 * Create an observation for this concept with the given row data.
-	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
-	 * 
-	 * @param visit visit reference
-	 * @param factory observation factory
-	 * @param map column map
-	 * @param row row data
-	 * @return fact
-	 * @throws ParseException parse 
-	 */
-	@Deprecated
-	protected Observation createObservation(VisitPatientImpl visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
-		MapFeedback mf = new MapFeedback();
-
-		DateTimeAccuracy start = this.start.valueOf(map,row, mf);
-		mf.resetValue();
-		String concept = this.id;
-
-		// parse value
-		String unit = null;
-		if( this.unit != null ){
-			unit = this.unit.valueOf(map, row, mf);
-			mf.resetValue();
-		}
-
-		// TODO: use type of column this.value to infer value type
-		Object val = null;
-		if( this.value != null ){
+//  DEPRECATED CODE UNCOMMENTED. TODO delete later
+//	/**
+//	 * Create an observation for this concept with the given row data.
+//	 * TODO allow mapping actions to happen at this place, e.g. drop concept, log warning, change value
+//	 * 
+//	 * @param visit visit reference
+//	 * @param factory observation factory
+//	 * @param map column map
+//	 * @param row row data
+//	 * @return fact
+//	 * @throws ParseException parse 
+//	 */
+//	@Deprecated
+//	protected Observation createObservation(VisitPatientImpl visit, ObservationFactory factory, ColumnMap map, Object[] row) throws ParseException{
+//		MapFeedback mf = new MapFeedback();
+//
+//		DateTimeAccuracy start = this.start.valueOf(map,row, mf);
+//		mf.resetValue();
+//		String concept = this.id;
+//
+//		// parse value
+//		String unit = null;
+//		if( this.unit != null ){
+//			unit = this.unit.valueOf(map, row, mf);
+//			mf.resetValue();
+//		}
+//
+//		// TODO: use type of column this.value to infer value type
+//		Object val = null;
+//		if( this.value != null ){
 //			Objects.requireNonNull(this.value, "No value for concept: "+id);
-			val = this.value.valueOf(map, row, mf);
-			mf.resetValue();
-		}
-
-		if( mf.hasConceptOverride() ){
-			concept = mf.getConceptOverride();
-		}
-		if( mf.isActionDrop() ){
-			return null; // ignore this fact
-		}
-
-		// if start is null/na, use visit start timestamp
-		if( start == null ){
-			// start may be null at this point and will be filled later with the visit timestamp
-			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
-		}
-
-		Observation o = factory.createObservation(visit, concept, start);
-		o.setValue(createObservationValue(val, unit));
-
-		// load modifiers
-		if( modifiers != null ){
-			for( int i=0; i<modifiers.length; i++ ){
-				mf = new MapFeedback();
-				Modifier m = modifiers[i];
-				// parse value
-				val = null;
-				if( m.value != null ){
-					val = m.value.valueOf(map, row, mf);
-					mf.resetValue();
-				}
-				// parse unit
-				unit = null;
-				if( m.unit != null ){
-					unit = m.unit.valueOf(map, row, mf);
-					mf.resetValue();
-				}
-				concept = m.id;
-				// modifier values can override the modifier-ids via concept override
-				if( mf.hasConceptOverride() ){
-					concept = mf.getConceptOverride();
-				}
-				// or drop the modifier
-				// TODO how to specify that a modifier should be dropped (e.g. if the value is NA)???
-				if( mf.isActionDrop() ){
-					continue; // ignore this modifier
-				}
-				o.addModifier(concept, createObservationValue(val, unit));
-			}
-		}
-
-		return o;
-	}
+//			val = this.value.valueOf(map, row, mf);
+//			mf.resetValue();
+//		}
+//
+//		if( mf.hasConceptOverride() ){
+//			concept = mf.getConceptOverride();
+//		}
+//		if( mf.isActionDrop() ){
+//			return null; // ignore this fact
+//		}
+//
+//		// if start is null/na, use visit start timestamp
+//		if( start == null ){
+//			// start may be null at this point and will be filled later with the visit timestamp
+//			// see FactGroupingQueue#addFactsToWorkQueue(FactRow)
+//		}
+//
+//		Observation o = factory.createObservation(visit, concept, start);
+//		o.setValue(createObservationValue(val, unit));
+//
+//		// load modifiers
+//		if( modifiers != null ){
+//			for( int i=0; i<modifiers.length; i++ ){
+//				mf = new MapFeedback();
+//				Modifier m = modifiers[i];
+//				// parse value
+//				val = null;
+//				if( m.value != null ){
+//					val = m.value.valueOf(map, row, mf);
+//					mf.resetValue();
+//				}
+//				// parse unit
+//				unit = null;
+//				if( m.unit != null ){
+//					unit = m.unit.valueOf(map, row, mf);
+//					mf.resetValue();
+//				}
+//				concept = m.id;
+//				// modifier values can override the modifier-ids via concept override
+//				if( mf.hasConceptOverride() ){
+//					concept = mf.getConceptOverride();
+//				}
+//				// or drop the modifier
+//				// TODO how to specify that a modifier should be dropped (e.g. if the value is NA)???
+//				if( mf.isActionDrop() ){
+//					continue; // ignore this modifier
+//				}
+//				o.addModifier(concept, createObservationValue(val, unit));
+//			}
+//		}
+//
+//		return o;
+//	}
 }
