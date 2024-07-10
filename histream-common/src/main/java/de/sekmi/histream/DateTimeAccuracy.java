@@ -67,32 +67,32 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 		this.accuracy = ChronoUnit.SECONDS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year) {
+	private DateTimeAccuracy(ZoneId zone, int year) {
 		instant = LocalDateTime.of(year, 1, 1, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.YEARS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year, int month) {
+	private DateTimeAccuracy(ZoneId zone, int year, int month) {
 		instant = LocalDateTime.of(year, month, 1, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.MONTHS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year, int month, int day) {
+	private DateTimeAccuracy(ZoneId zone, int year, int month, int day) {
 		instant = LocalDateTime.of(year, month, day, 0, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.DAYS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours) {
+	private DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours) {
 		instant = LocalDateTime.of(year, month, day, hours, 0).atZone(zone).toInstant();
 		accuracy = ChronoUnit.HOURS;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins) {
+	private DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins) {
 		instant = LocalDateTime.of(year, month, day, hours, mins).atZone(zone).toInstant();
 		accuracy = ChronoUnit.MINUTES;
 	}
 	@Deprecated
-	public DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins, int secs) {
+	private DateTimeAccuracy(ZoneId zone, int year, int month, int day, int hours, int mins, int secs) {
 		instant = LocalDateTime.of(year, month, day, hours, mins, secs).atZone(zone).toInstant();
 		accuracy = ChronoUnit.SECONDS;
 	}
@@ -275,7 +275,7 @@ public class DateTimeAccuracy implements Comparable<DateTimeAccuracy> {
 	}
 
 	/**
-	 * Output FHIR dateTime data type. See {@link https://www.hl7.org/fhir/datatypes.html#dateTime}.
+	 * Output FHIR dateTime data type. See https://www.hl7.org/fhir/datatypes.html#dateTime .
 	 * Output is almost identical to {@link #toPartialIso8601(ZoneId)} but with the difference that
 	 * zone offset hours and minutes are separated by a colon {@code :}.
 	 * @param tz time zone id.
