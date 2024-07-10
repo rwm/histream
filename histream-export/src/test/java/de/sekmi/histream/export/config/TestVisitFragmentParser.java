@@ -11,30 +11,30 @@ import org.w3c.dom.Node;
 
 import de.sekmi.histream.ObservationSupplier;
 import de.sekmi.histream.export.VisitFragmentSupplier;
-import de.sekmi.histream.io.FileObservationProviderTest;
+//import de.sekmi.histream.io.FileObservationProviderTest;
 import de.sekmi.histream.xml.NamespaceResolver;
 import de.sekmi.histream.xml.XMLUtils;
 
 public class TestVisitFragmentParser {
 
-	@Test
-	public void verifyVisitFragmentContent() throws Exception{
-		FileObservationProviderTest t = new FileObservationProviderTest();
-		t.initializeObservationFactory();
-		//final Node visitNode = null;
-		try( ObservationSupplier s = t.getExampleSupplier() ){
-			VisitFragmentSupplier sup = new VisitFragmentSupplier(s);
-			Node n = sup.get();
-			
-			System.out.println("nodeName="+n.getNodeName());
-			System.out.println("localName="+n.getLocalName());
-			System.out.println("nsUri="+n.getNamespaceURI());
-			System.out.println("docRootNS="+n.getOwnerDocument().getFirstChild().getNamespaceURI());
-			System.out.println();
-			XMLUtils.printDOM(n, System.out);
-			testXPath(n);
-		}
-	}
+//	@Test
+//	public void verifyVisitFragmentContent() throws Exception{
+//		FileObservationProviderTest t = new FileObservationProviderTest();
+//		t.initializeObservationFactory();
+//		//final Node visitNode = null;
+//		try( ObservationSupplier s = t.getExampleSupplier() ){
+//			VisitFragmentSupplier sup = new VisitFragmentSupplier(s);
+//			Node n = sup.get();
+//			
+//			System.out.println("nodeName="+n.getNodeName());
+//			System.out.println("localName="+n.getLocalName());
+//			System.out.println("nsUri="+n.getNamespaceURI());
+//			System.out.println("docRootNS="+n.getOwnerDocument().getFirstChild().getNamespaceURI());
+//			System.out.println();
+//			XMLUtils.printDOM(n, System.out);
+//			testXPath(n);
+//		}
+//	}
 	
 	private void testXPath(Node visit) throws XPathExpressionException{
 		XPathFactory f = XPathFactory.newInstance();

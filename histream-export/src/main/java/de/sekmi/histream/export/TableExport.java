@@ -136,7 +136,7 @@ public class TableExport {
 		FragmentExporter fe = null;
 		try{
 			fe = new FragmentExporter(createXPath(), desc, writer);
-			fe.setZoneId(zoneId);
+			//fe.setZoneId(zoneId);
 			fe.setErrorHandler(new ExportErrorHandler());
 			Streams.transfer(supplier, fe);
 		} catch (XMLStreamException | ParserConfigurationException e) {
