@@ -2,6 +2,9 @@ package de.sekmi.histream.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.Objects;
@@ -119,6 +122,19 @@ public class GroupedFhirBundleWriter extends GroupedObservationHandler{
 			w.writeStartElement("Encounter");
 			// use integer sequence for local id
 			w.writeStringValue("id", getCurrentLocalEncounterId());
+			
+			// write location to observation meta.source 
+			if( visit.getLocationId() != null ) {
+				w.writeStartElement("meta");
+				try {
+					w.writeStringValue("source", "urn:location:"+URLEncoder.encode(visit.getLocationId(),StandardCharsets.UTF_8.name()));
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalStateException(e);
+				}
+				// TODO we could also write lastUpdated timestamp from source.getSourceTimestamp
+				w.writeEndElement();			
+			}
+
 			// write external id in identifier.value
 			w.writeStartElement("identifier");
 			w.writeStringValue("value", visit.getId());
@@ -336,6 +352,20 @@ public class GroupedFhirBundleWriter extends GroupedObservationHandler{
 		w.beginBundleEntry("Observation/"+Integer.toString(seqId));
 		w.writeStartElement("Observation");
 		w.writeStringValue("id", Integer.toString(seqId));
+		
+		// write location to observation meta.source 
+		// write location to observation meta.source 
+		if( o.getLocationId() != null ) {
+			w.writeStartElement("meta");
+			try {
+				w.writeStringValue("source", "urn:location:"+URLEncoder.encode(o.getLocationId(),StandardCharsets.UTF_8.name()));
+			} catch (UnsupportedEncodingException e) {
+				throw new IllegalStateException(e);
+			}
+			// TODO we could also write lastUpdated timestamp from source.getSourceTimestamp
+			w.writeEndElement();			
+		}
+
 		w.writeStringValue("status", "final");
 	
 		// concept code
